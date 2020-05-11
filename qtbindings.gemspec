@@ -1,4 +1,4 @@
-require './lib/qtbindings_version'
+require File.expand_path('lib/qtbindings_version', __dir__)
 
 spec = Gem::Specification.new do |s|
   s.authors = ['Ryan Melton', 'Jason Thomas', 'Richard Dale', 'Arno Rehn']
