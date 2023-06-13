@@ -1,8 +1,5 @@
 project(qtbind)
 
-# Always force c++03 standard
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++03")
-
 add_subdirectory(generator)
 
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
