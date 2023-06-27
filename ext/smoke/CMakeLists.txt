@@ -1,11 +1,5 @@
 project(SMOKE)
 
-# Always force c++03 standard
-# This is required because smoke derives from
-# classes and some have a private destructor that
-# makes them final starting with c++11.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++03")
-
 add_definitions(-DSMOKE_BUILDING)
 
 add_subdirectory(smokebase)
