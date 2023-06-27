@@ -5,7 +5,7 @@ set(rubyqtuitools_LIBRARY_SRC qtuitools.cpp qtuitoolshandlers.cpp)
 add_library(rubyqtuitools MODULE ${rubyqtuitools_LIBRARY_SRC})
 target_link_libraries(rubyqtuitools
     smokeqtuitools
-    qtruby4shared
+    qtruby5shared
 )
 set_target_properties(rubyqtuitools PROPERTIES PREFIX "" OUTPUT_NAME qtuitools)
 install(TARGETS rubyqtuitools DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})

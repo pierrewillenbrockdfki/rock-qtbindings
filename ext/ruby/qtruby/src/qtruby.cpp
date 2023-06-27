@@ -25,19 +25,19 @@
 #include <QtCore/qregexp.h>
 #include <QtCore/qstring.h>
 #include <QtCore/qvariant.h>
-#include <QtGui/qapplication.h>
+#include <QtWidgets/qapplication.h>
 #include <QtGui/qbitmap.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qcursor.h>
 #include <QtGui/qfont.h>
 #include <QtGui/qicon.h>
-#include <QtGui/qitemselectionmodel.h>
+#include <QtCore/qitemselectionmodel.h>
 #include <QtGui/qpalette.h>
 #include <QtGui/qpen.h>
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpolygon.h>
 #include <QtGui/qtextformat.h>
-#include <QtGui/qwidget.h>
+#include <QtWidgets/qwidget.h>
 
 #ifdef QT_QTDBUS
 #include <QtDBus/qdbusargument.h>
@@ -612,7 +612,7 @@ qimage_bits(VALUE self)
 	smokeruby_object *o = value_obj_info(self);
 	QImage * image = static_cast<QImage *>(o->ptr);
 	const uchar * bytes = image->bits();
-	return rb_str_new((const char *) bytes, image->numBytes());
+	return rb_str_new((const char *) bytes, image->sizeInBytes());
 }
 
 static VALUE
@@ -810,7 +810,6 @@ qabstractitemmodel_createindex(int argc, VALUE * argv, VALUE self)
 	return rb_call_super(argc, argv);
 }
 
-#if QT_VERSION >= 0x040600
 // copy the role names defined on the model instance into a ruby hash and return it
 static VALUE
 qabstractitemmodel_rolenames(int argc, VALUE * argv, VALUE self)
@@ -836,46 +835,6 @@ qabstractitemmodel_rolenames(int argc, VALUE * argv, VALUE self)
 
 	return result;
 }
-
-// let C++ call a protected member function from outside
-// NOTE: a little hacky, but setRoleNames is deprecated in Qt 5.0, anyway...
-struct SetRoleNamesExposer : QAbstractItemModel {
-  using QAbstractItemModel::setRoleNames;
-};
-
-// set the role names on the given model instance from the given hash
-static VALUE
-qabstractitemmodel_setrolenames(int argc, VALUE * argv, VALUE self)
-{
-	if( argc != 1 || TYPE(argv[0]) != T_HASH )
-	{
-	  rb_raise(rb_eArgError, "Invalid arguments");
-	}
-
-	// convert the ruby hash to a QHash<int,QByteArray>
-	QHash<int,QByteArray> rnames;
-	VALUE tmp = rb_funcall(argv[0], rb_intern("to_a"), 0);
-	for( long i=0; i<RARRAY_LEN(tmp); i++)
-	{
-		VALUE key = rb_ary_entry(rb_ary_entry(tmp, i), 0);
-		VALUE val = rb_ary_entry(rb_ary_entry(tmp, i), 1);
-		rnames[NUM2INT(key)] = QByteArray(StringValuePtr(val));
-	}
-
-	smokeruby_object *o = value_obj_info(self);
-	if( !o->ptr )
-	{
-		// not ok
-		rb_raise(rb_eArgError, "NULL given, expected subclass of QAbstractItemModel");
-	}
-
-	QAbstractItemModel* model = (QAbstractItemModel*) o->ptr;
-	(model->*&SetRoleNamesExposer::setRoleNames)(rnames);   // just a little hacky, since
-								// 'setRoleNames' is protected
-
-	return Qnil;
-}
-#endif
 
 static VALUE
 qmodelindex_internalpointer(VALUE self)
@@ -1147,19 +1106,19 @@ qvariant_value(VALUE /*self*/, VALUE variant_value_klass, VALUE variant_value)
 		return *(VALUE*) variant->data();
 #ifdef QT_QTDBUS
 	} else if (variant->userType() == qMetaTypeId<QDBusObjectPath>()) {
-		QString s = qVariantValue<QDBusObjectPath>(*variant).path();
+		QString s = variant->value<QDBusObjectPath>().path();
 		return rb_str_new2(s.toLatin1());
 	} else if (variant->userType() == qMetaTypeId<QDBusSignature>()) {
-		QString s = qVariantValue<QDBusSignature>(*variant).signature();
+		QString s = variant->value<QDBusSignature>().signature();
 		return rb_str_new2(s.toLatin1());
 	} else if (variant->userType() == qMetaTypeId<QDBusVariant>()) {
-		QVariant *ptr = new QVariant(qVariantValue<QDBusVariant>(*variant).variant());
+		QVariant *ptr = new QVariant(variant->value<QDBusVariant>().variant());
 		vo = alloc_smokeruby_object(true, qtcore_Smoke, qtcore_Smoke->idClass("QVariant").index, ptr);
 		return set_obj_info("Qt::Variant", vo);
 #endif
 	} else if (variant->type() >= QVariant::UserType) {
 		// If the QVariant contains a user type, don't bother to look at the Ruby class argument
-		value_ptr = QMetaType::construct(QMetaType::type(variant->typeName()), (void *) variant->constData());
+		value_ptr = QMetaType(QMetaType::type(variant->typeName())).construct((void *) variant->constData());
 		Smoke::ModuleIndex mi = o->smoke->findClass(variant->typeName());
 		vo = alloc_smokeruby_object(true, mi.smoke, mi.index, value_ptr);
 		return set_obj_info(qtruby_modules[mi.smoke].binding->className(mi.index), vo);
@@ -1172,52 +1131,52 @@ qvariant_value(VALUE /*self*/, VALUE variant_value_klass, VALUE variant_value)
 	}
 
 	if (qstrcmp(classname, "Qt::Pixmap") == 0) {
-		QPixmap v = qVariantValue<QPixmap>(*variant);
+		QPixmap v = variant->value<QPixmap>();
 		value_ptr = (void *) new QPixmap(v);
 	} else if (qstrcmp(classname, "Qt::Font") == 0) {
-		QFont v = qVariantValue<QFont>(*variant);
+		QFont v = variant->value<QFont>();
 		value_ptr = (void *) new QFont(v);
 	} else if (qstrcmp(classname, "Qt::Brush") == 0) {
-		QBrush v = qVariantValue<QBrush>(*variant);
+		QBrush v = variant->value<QBrush>();
 		value_ptr = (void *) new QBrush(v);
 	} else if (qstrcmp(classname, "Qt::Color") == 0) {
-		QColor v = qVariantValue<QColor>(*variant);
+		QColor v = variant->value<QColor>();
 		value_ptr = (void *) new QColor(v);
 	} else if (qstrcmp(classname, "Qt::Palette") == 0) {
-		QPalette v = qVariantValue<QPalette>(*variant);
+		QPalette v = variant->value<QPalette>();
 		value_ptr = (void *) new QPalette(v);
 	} else if (qstrcmp(classname, "Qt::Icon") == 0) {
-		QIcon v = qVariantValue<QIcon>(*variant);
+		QIcon v = variant->value<QIcon>();
 		value_ptr = (void *) new QIcon(v);
 	} else if (qstrcmp(classname, "Qt::Image") == 0) {
-		QImage v = qVariantValue<QImage>(*variant);
+		QImage v = variant->value<QImage>();
 		value_ptr = (void *) new QImage(v);
 	} else if (qstrcmp(classname, "Qt::Polygon") == 0) {
-		QPolygon v = qVariantValue<QPolygon>(*variant);
+		QPolygon v = variant->value<QPolygon>();
 		value_ptr = (void *) new QPolygon(v);
 	} else if (qstrcmp(classname, "Qt::Region") == 0) {
-		QRegion v = qVariantValue<QRegion>(*variant);
+		QRegion v = variant->value<QRegion>();
 		value_ptr = (void *) new QRegion(v);
 	} else if (qstrcmp(classname, "Qt::Bitmap") == 0) {
-		QBitmap v = qVariantValue<QBitmap>(*variant);
+		QBitmap v = variant->value<QBitmap>();
 		value_ptr = (void *) new QBitmap(v);
 	} else if (qstrcmp(classname, "Qt::Cursor") == 0) {
-		QCursor v = qVariantValue<QCursor>(*variant);
+		QCursor v = variant->value<QCursor>();
 		value_ptr = (void *) new QCursor(v);
 	} else if (qstrcmp(classname, "Qt::SizePolicy") == 0) {
-		QSizePolicy v = qVariantValue<QSizePolicy>(*variant);
+		QSizePolicy v = variant->value<QSizePolicy>();
 		value_ptr = (void *) new QSizePolicy(v);
 	} else if (qstrcmp(classname, "Qt::KeySequence") == 0) {
-		QKeySequence v = qVariantValue<QKeySequence>(*variant);
+		QKeySequence v = variant->value<QKeySequence>();
 		value_ptr = (void *) new QKeySequence(v);
 	} else if (qstrcmp(classname, "Qt::Pen") == 0) {
-		QPen v = qVariantValue<QPen>(*variant);
+		QPen v = variant->value<QPen>();
 		value_ptr = (void *) new QPen(v);
 	} else if (qstrcmp(classname, "Qt::TextLength") == 0) {
-		QTextLength v = qVariantValue<QTextLength>(*variant);
+		QTextLength v = variant->value<QTextLength>();
 		value_ptr = (void *) new QTextLength(v);
 	} else if (qstrcmp(classname, "Qt::TextFormat") == 0) {
-		QTextFormat v = qVariantValue<QTextFormat>(*variant);
+		QTextFormat v = variant->value<QTextFormat>();
 		value_ptr = (void *) new QTextFormat(v);
 	} else if (qstrcmp(classname, "Qt::Variant") == 0) {
 		value_ptr = (void *) new QVariant(*((QVariant *) variant->constData()));
@@ -1486,8 +1445,8 @@ qapplication_argv(VALUE /*self*/)
 {
 	VALUE result = rb_ary_new();
 	// Drop argv[0], as it isn't included in the ruby global ARGV
-	for (int index = 1; index < qApp->argc(); index++) {
-		rb_ary_push(result, rb_str_new2(qApp->argv()[index]));
+	for (int index = 1; index < qApp->arguments().size(); index++) {
+		rb_ary_push(result, rb_str_new2(qApp->arguments()[index].toLatin1()	));
 	}
 
 	return result;
@@ -1524,7 +1483,7 @@ qt_signal(int argc, VALUE * argv, VALUE self)
 	const QMetaObject * m = (QMetaObject*) ometa->ptr;
 	for (i = m->methodCount() - 1; i > -1; i--) {
 		if (m->method(i).methodType() == QMetaMethod::Signal) {
-			QString name(m->method(i).signature());
+			QString name(m->method(i).methodSignature());
 static QRegExp * rx = 0;
 			if (rx == 0) {
 				rx = new QRegExp("\\(.*");
@@ -1614,7 +1573,7 @@ qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 
 		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, method.typeName(), method.parameterTypes());
 
-		QString name(method.signature());
+		QString name(method.methodSignature());
 		static QRegExp * rx = 0;
 		if (rx == 0) {
 			rx = new QRegExp("\\(.*");
@@ -1763,7 +1722,7 @@ rb_qFindChildren_helper(VALUE parent, const QString &name, VALUE re,
 	return;
 }
 
-/* Should mimic Qt4's QObject::findChildren method with this syntax:
+/* Should mimic Qt5's QObject::findChildren method with this syntax:
 	 obj.findChildren(Qt::Widget, "Optional Widget Name")
 */
 static VALUE
@@ -1964,12 +1923,10 @@ make_metaObject(VALUE /*self*/, VALUE obj, VALUE parentMeta, VALUE stringdata_va
 		superdata = (QMetaObject *) p->ptr;
 	}
 
-	char *stringdata = new char[RSTRING_LEN(stringdata_value)];
+	QByteArrayData *stringdata = QTypedArrayData<char>::fromRawData(RSTRING_PTR(stringdata_value), RSTRING_LEN(stringdata_value));
 
 	int count = RARRAY_LEN(data_value);
 	uint * data = new uint[count];
-
-	memcpy(	(void *) stringdata, RSTRING_PTR(stringdata_value), RSTRING_LEN(stringdata_value) );
 
 	for (long i = 0; i < count; i++) {
 		VALUE rv = rb_ary_entry(data_value, i);
@@ -2329,13 +2286,9 @@ create_qobject_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 		rb_define_method(qlistmodel_class, "remove_rows", (VALUE (*) (...)) qabstract_item_model_removerows, -1);
 		rb_define_method(qlistmodel_class, "removeColumns", (VALUE (*) (...)) qabstract_item_model_removecolumns, -1);
 		rb_define_method(qlistmodel_class, "remove_columns", (VALUE (*) (...)) qabstract_item_model_removecolumns, -1);
-#if QT_VERSION >= 0x040600
 		// make it work with qml
 		rb_define_method(qlistmodel_class, "roleNames", (VALUE (*) (...)) qabstractitemmodel_rolenames, -1);
 		rb_define_method(qlistmodel_class, "role_names", (VALUE (*) (...)) qabstractitemmodel_rolenames, -1);
-		rb_define_method(qlistmodel_class, "setRoleNames", (VALUE (*) (...)) qabstractitemmodel_setrolenames, -1);
-		rb_define_method(qlistmodel_class, "set_role_names", (VALUE (*) (...)) qabstractitemmodel_setrolenames, -1);
-#endif
 	}
 	else if (packageName == "Qt::AbstractItemModel") {
 		rb_define_method(klass, "createIndex", (VALUE (*) (...)) qabstractitemmodel_createindex, -1);

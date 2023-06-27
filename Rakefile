@@ -22,26 +22,26 @@ end
 
 def set_version
   if ENV['VERSION']
-    File.open('lib/qtbindings_version.rb', 'w') do |file|
-      file.write("QTBINDINGS_VERSION = '#{ENV['VERSION']}'\n")
-      file.write("QTBINDINGS_RELEASE_DATE = '#{Time.now}'\n")
+    File.open('lib/qt5bindings_version.rb', 'w') do |file|
+      file.write("QT5BINDINGS_VERSION = '#{ENV['VERSION']}'\n")
+      file.write("QT5BINDINGS_RELEASE_DATE = '#{Time.now}'\n")
     end
-    File.open('qtlib/qtbindings_qt_version.rb', 'w') do |file|
-      file.write("QTBINDINGS_QT_VERSION = '#{ENV['VERSION']}'\n")
-      file.write("QTBINDINGS_QT_RELEASE_DATE = '#{Time.now}'\n")
+    File.open('qtlib/qt5bindings_qt_version.rb', 'w') do |file|
+      file.write("QT5BINDINGS_QT_VERSION = '#{ENV['VERSION']}'\n")
+      file.write("QT5BINDINGS_QT_RELEASE_DATE = '#{Time.now}'\n")
     end
   end
 end
 
 def clear_version
   if ENV['VERSION']
-    File.open('lib/qtbindings_version.rb', 'w') do |file|
-      file.write("QTBINDINGS_VERSION = '0.0.0.0'\n")
-      file.write("QTBINDINGS_RELEASE_DATE = ''\n")
+    File.open('lib/qt5bindings_version.rb', 'w') do |file|
+      file.write("QT5BINDINGS_VERSION = '0.0.0.0'\n")
+      file.write("QT5BINDINGS_RELEASE_DATE = ''\n")
     end
-    File.open('qtlib/qtbindings_qt_version.rb', 'w') do |file|
-      file.write("QTBINDINGS_QT_VERSION = '0.0.0.0'\n")
-      file.write("QTBINDINGS_QT_RELEASE_DATE = ''\n")
+    File.open('qtlib/qt5bindings_qt_version.rb', 'w') do |file|
+      file.write("QT5BINDINGS_QT_VERSION = '0.0.0.0'\n")
+      file.write("QT5BINDINGS_QT_RELEASE_DATE = ''\n")
     end
   end
 end
@@ -91,26 +91,26 @@ end
 task :gem => [:distclean] do
   warn_version()
   set_version()
-  system("gem build qtbindings.gemspec")
+  system("gem build qt5bindings.gemspec")
   clear_version()
 end
 
 task :gemnative do
   warn_version()
   set_version()
-  system("#{COPY} gemspecs#{SLASH}qtbindingsnative.gemspec .")
-  system("gem build qtbindingsnative.gemspec")
-  system("#{DEL} qtbindingsnative.gemspec")
+  system("#{COPY} gemspecs#{SLASH}qt5bindingsnative.gemspec .")
+  system("gem build qt5bindingsnative.gemspec")
+  system("#{DEL} qt5bindingsnative.gemspec")
   clear_version()
 end
 
 task :gemqt do
   warn_version()
   set_version()
-  system("#{MAKE} installqt")
-  system("#{COPY} gemspecs#{SLASH}qtbindings-qt.gemspec .")
-  system("gem build qtbindings-qt.gemspec")
-  system("#{DEL} qtbindings-qt.gemspec")
+  system("#{MAKE} installqt5")
+  system("#{COPY} gemspecs#{SLASH}qt5bindings-qt5.gemspec .")
+  system("gem build qt5bindings-qt5.gemspec")
+  system("#{DEL} qt5bindings-qt5.gemspec")
   clear_version()
 end
 

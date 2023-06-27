@@ -48,7 +48,8 @@ resolve_classname_qttest(smokeruby_object * o)
     return qtruby_modules[o->smoke].binding->className(o->classId);
 }
 
-extern TypeHandler QtTest_handlers[];
+//there are no handlers for QtTest
+TypeHandler QtTest_handlers[] = {};
 
 extern "C" {
 

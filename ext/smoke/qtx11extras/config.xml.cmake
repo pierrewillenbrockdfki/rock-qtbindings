@@ -7,6 +7,5 @@
         <dir>@QT_INCLUDE_DIR@</dir>
         <dir>@QT_QTCORE_INCLUDE_DIR@</dir>
         <dir>@QT_QTGUI_INCLUDE_DIR@</dir>
-        <dir>@QT_QTDECLARATIVE_INCLUDE_DIR@</dir>
     </includeDirs>
 </config>

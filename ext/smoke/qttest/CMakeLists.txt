@@ -24,9 +24,10 @@ add_library(smokeqttest SHARED ${smokeqttest_LIB_SRCS})
 
 target_link_libraries(  smokeqttest 
                         smokeqtcore 
-                        ${QT_QTCORE_LIBRARY} 
-                        ${QT_QTGUI_LIBRARY} 
-                        ${QT_QTTEST_LIBRARY}
+                        Qt5::Core
+                        Qt5::Gui
+                        Qt5::Widgets
+                        Qt5::Test
 )
 
 set_target_properties(smokeqttest PROPERTIES VERSION 3.0.0 SOVERSION 3 )

@@ -24,6 +24,7 @@
 #include <QtCore/qabstractitemmodel.h>
 #include <QtCore/qglobal.h>
 #include <QtCore/qhash.h>
+#include <QtCore/qitemselectionmodel.h>
 #include <QtCore/qline.h>
 #include <QtCore/qmetaobject.h>
 #include <QtCore/qobject.h>
@@ -32,19 +33,18 @@
 #include <QtCore/qstring.h>
 #include <QtCore/qvariant.h>
 #include <QtCore/qmutex.h>
-#include <QtGui/qapplication.h>
 #include <QtGui/qbitmap.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qcursor.h>
 #include <QtGui/qfont.h>
 #include <QtGui/qicon.h>
-#include <QtGui/qitemselectionmodel.h>
 #include <QtGui/qpalette.h>
 #include <QtGui/qpen.h>
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpolygon.h>
 #include <QtGui/qtextformat.h>
-#include <QtGui/qwidget.h>
+#include <QtWidgets/qapplication.h>
+#include <QtWidgets/qwidget.h>
 
 #ifdef QT_QTDBUS
 #include <QtDBus/qdbusargument.h>
@@ -948,7 +948,7 @@ static QByteArray * name = 0;
 							// and call the slot directly
 							for (int id = meta->methodOffset(); id < meta->methodCount(); id++) {
 								if (meta->method(id).methodType() == QMetaMethod::Slot) {
-									QByteArray signature(meta->method(id).signature());
+									QByteArray signature(meta->method(id).methodSignature());
 									QByteArray methodName = signature.mid(0, signature.indexOf('('));
 
 									// Don't check that the types of the ruby args match the c++ ones for now,

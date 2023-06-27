@@ -4,9 +4,9 @@ INCLUDE_DIRECTORIES (${QT_INCLUDES})
 set(rubyqtdeclarative_LIBRARY_SRC qtdeclarative.cpp qtdeclarativehandlers.cpp)
 add_library(rubyqtdeclarative MODULE ${rubyqtdeclarative_LIBRARY_SRC})
 target_link_libraries(rubyqtdeclarative
-    ${QT_QTWEBKIT_LIBRARY}
+    Qt5::WebKit
     smokeqtdeclarative
-    qtruby4shared
+    qtruby5shared
 )
 set_target_properties(rubyqtdeclarative PROPERTIES PREFIX "" OUTPUT_NAME qtdeclarative)
 install(TARGETS rubyqtdeclarative DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})

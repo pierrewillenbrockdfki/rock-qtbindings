@@ -199,12 +199,12 @@ QtRuby features a very complete coverage of the Qt api:
 	  will need to set $KCODE='u' or use the -Ku command line option.
  	
 	- Qt Designer
-		A 'rbuic4' tool is included in tools/rbuic to compile
+		A 'rbuic5' tool is included in tools/rbuic to compile
 		.ui files into ruby code. As described above, Qt Designer uses UTF-8.
 		In addition to the options in the original uic C++ utility an '-x' flag
 		has been added. This will generate a top level stub in the code:
 		
-		$ rbuic4 mainwindowbase.ui -x -o mainwindowbase.rb
+		$ rbuic5 mainwindowbase.ui -x -o mainwindowbase.rb
 		
 		Will add this to the end of the generated code:
 

@@ -17,7 +17,7 @@ HEADERS += customwidgetsinfo.h \
            option.h \
            qclass_lib_map.h \
            treewalker.h \
-           ui4.h \
+           ui5.h \
            uic.h \
            utils.h \
            validator.h \
@@ -32,7 +32,7 @@ SOURCES += customwidgetsinfo.cpp \
            driver.cpp \
            main.cpp \
            treewalker.cpp \
-           ui4.cpp \
+           ui5.cpp \
            uic.cpp \
            validator.cpp \
            ruby/rbextractimages.cpp \

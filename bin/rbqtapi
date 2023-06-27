@@ -3,7 +3,7 @@
 # Note: this program is part of qtruby and makes use of its internal functions.
 #       You should not rely on those in your own programs.
 
-require 'Qt4'
+require 'Qt5'
 require 'getoptlong'
 
 $usage = <<USAGE

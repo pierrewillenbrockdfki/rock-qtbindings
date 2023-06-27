@@ -26,7 +26,7 @@
 #include <smokeruby.h>
 #include <marshall_macros.h>
 
-#include <QtWebKit/qwebframe.h>
+#include <QtWebKitWidgets/qwebframe.h>
 #include <QtWebKit/qwebhistory.h>
 
 DEF_LIST_MARSHALLER( QWebFrameList, QList<QWebFrame*>, QWebFrame )

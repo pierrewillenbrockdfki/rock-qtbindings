@@ -2,7 +2,7 @@ windows = false
 platform = RUBY_PLATFORM.split("-")[1]
 windows = true if platform =~ /mswin32/ or platform =~ /mingw32/
 
-module Qt
+module Qt5
   PLUGIN_PATH = File.expand_path(File.join(File.dirname(__FILE__), '..', 'qtbin', 'plugins'))
 end
 ENV['PATH'] = File.join(File.dirname(__FILE__), '../qtbin') + ';' + File.join(File.dirname(__FILE__), '../qtbin/plugins') + ';' + ENV['PATH']

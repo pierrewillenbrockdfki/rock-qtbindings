@@ -111,10 +111,9 @@ foreach(test_entry ${define_tests})
   endif(${${test_entry}} GREATER ${qt_test_threshold})
 endforeach(test_entry ${define_tests})
 
-file(STRINGS "${QT_QTCORE_INCLUDE_DIR}/qglobal.h" qglobal_h NEWLINE_CONSUME)
-file(STRINGS "${QT_QTCORE_INCLUDE_DIR}/qconfig.h" qconfig_h NEWLINE_CONSUME)
-file(STRINGS "${QT_QTCORE_INCLUDE_DIR}/qfeatures.h" qfeatures_h NEWLINE_CONSUME)
-set(qtheaders "${qglobal_h}\n${qconfig_h}\n${qfeatures}")
+file(STRINGS "${_qt5Core_install_prefix}/include/x86_64-linux-gnu/qt5/QtCore/qglobal.h" qglobal_h NEWLINE_CONSUME)
+file(STRINGS "${_qt5Core_install_prefix}/include/x86_64-linux-gnu/qt5/QtCore/qconfig.h" qconfig_h NEWLINE_CONSUME)
+set(qtheaders "${qglobal_h}\n${qconfig_h}\n")
 string(REGEX REPLACE "\n" ";" qtheaders "${qtheaders}")
 
 file(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/qtdefines.cpp ${CMAKE_CURRENT_BINARY_DIR}/qtdefines)
@@ -129,7 +128,8 @@ file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/qtdefines.cpp "return 0;\n}\n")
 
 try_run(qtdefines_run qtdefines_compile ${CMAKE_CURRENT_BINARY_DIR}/qtdefines
   ${CMAKE_CURRENT_BINARY_DIR}/qtdefines.cpp
-  CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${QT_INCLUDE_DIR};${QT_QTCORE_INCLUDE_DIR};${CMAKE_SYSTEM_INCLUDE_PATH}"
+  LINK_LIBRARIES Qt5::Core
+  CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${Qt5Core_INCLUDE_DIRS};${CMAKE_SYSTEM_INCLUDE_PATH}"
   RUN_OUTPUT_VARIABLE qtdefines_output)
 if(${qtdefines_run} EQUAL 0)
   list(REMOVE_DUPLICATES qtdefines_output)
