@@ -481,6 +481,11 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
             out << ") ";
         }
         out << QString("{ this->_binding->deleted(%1, (void*)this); }\n").arg(m_smokeData->classIndex[className]);
+    } else {
+        out << "#if __cplusplus >= 201103L\n";
+        out << "private:\n";
+        out << "    ~" << smokeClassName << "() = default;\n";
+        out << "#endif /*C++11*/\n";
     }
     out << "};\n";
     
