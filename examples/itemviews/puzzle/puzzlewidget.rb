@@ -64,7 +64,7 @@ class PuzzleWidget < Qt::Widget
     end
     
     def dragMoveEvent(event)
-        updateRect = @highlightedRect.unite(targetSquare(event.pos()))
+        updateRect = @highlightedRect.united(targetSquare(event.pos()))
     
         if event.mimeData().hasFormat("image/x-puzzle-piece") &&
             findPiece(targetSquare(event.pos)) == -1

@@ -6,9 +6,9 @@ files = Dir["**/main.rb"]
 files.each do |file|
   if windows
     next if file.include?('qdbus') # because qdbus is Unix only
-    command = "cd #{File.dirname(file).gsub('/', '\\')} && ruby -rubygems #{File.basename(file)}"
+    command = "cd #{File.dirname(file).gsub('/', '\\')} && ruby #{File.basename(file)}"
   else
-    command = "cd #{File.dirname(file)} && ruby -rubygems #{File.basename(file)}"
+    command = "cd #{File.dirname(file)} && ruby #{File.basename(file)}"
   end
   puts "running: #{command}"
   system(command)

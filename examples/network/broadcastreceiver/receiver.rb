@@ -55,10 +55,10 @@ class Receiver < Qt::Dialog
 	
 	def processPendingDatagrams()
 	    while @udpSocket.hasPendingDatagrams do
-	        datagram = Qt::ByteArray.new
-	        datagram.resize(@udpSocket.pendingDatagramSize)
-	        @udpSocket.readDatagram(datagram.data(), datagram.size())
-	        @statusLabel.text = tr('Received datagram: "%d"' % datagram.data)
+                # readDatagram does not work since it will fill in a copy of the
+                # string received from for example a Qt::ByteArray.data
+	        datagram = @udpSocket.receiveDatagram
+	        @statusLabel.text = tr('Received datagram: "%s"' % datagram.data.data)
 	    end
 	end
 end

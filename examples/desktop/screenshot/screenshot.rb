@@ -22,7 +22,7 @@
 
 ** Translated to QtRuby by Richard Dale
 =end
-	
+
 class Screenshot < Qt::Widget
 	
 	slots	:newScreenshot,
@@ -89,7 +89,11 @@ class Screenshot < Qt::Widget
 	        $qApp.beep
       end
       Qt::Application.processEvents()
-  	  @originalPixmap = Qt::Pixmap.grabWindow(Qt::Application.desktop.winId)
+          screen = Qt::Application.primaryScreen
+          if windowHandle
+              screen = windowHandle.screen
+          end
+  	  @originalPixmap = screen.grabWindow(0)
 	    updateScreenshotLabel()
 	
 	    @newScreenshotButton.disabled = false

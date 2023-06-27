@@ -35,7 +35,7 @@ class MainWindow < Qt::MainWindow
 	    labels << tr("Title") << tr("Location")
 	
 	    @treeWidget = Qt::TreeWidget.new
-	    @treeWidget.header().resizeMode = Qt::HeaderView::Stretch
+	    @treeWidget.header().setSectionResizeMode(0, Qt::HeaderView::Stretch)
 	    @treeWidget.headerLabels = labels
 	    setCentralWidget(@treeWidget)
 	

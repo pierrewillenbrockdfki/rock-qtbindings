@@ -36,7 +36,7 @@ class XbelTree < Qt::TreeWidget
 	    labels = []
 	    labels << tr("Title") << tr("Location")
 	
-	    header().resizeMode = Qt::HeaderView::Stretch
+	    header().setSectionResizeMode(0, Qt::HeaderView::Stretch)
 	    setHeaderLabels(labels)
 	
 		@folderIcon = Qt::Icon.new

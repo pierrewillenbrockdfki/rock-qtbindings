@@ -169,7 +169,7 @@ class Window < Qt::Widget
         labels = []
         labels << tr("File Name") << tr("Size")
         @filesTable.horizontalHeaderLabels = labels
-        @filesTable.horizontalHeader().setResizeMode(0, Qt::HeaderView::Stretch)
+        @filesTable.horizontalHeader().setSectionResizeMode(0, Qt::HeaderView::Stretch)
         @filesTable.verticalHeader().hide()
         @filesTable.showGrid = false
     end

@@ -134,9 +134,7 @@ class Canvas < Qt::GLWidget
             return if (dy == 0)
             World.instance.camera.zoom += 0.1 * -dy
         when MDA_ROTATE
-            break
         when MDA_CHANGE_FOCUS
-            break
         end
         World.instance.setupTranslation()
     end

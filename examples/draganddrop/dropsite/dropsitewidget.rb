@@ -47,7 +47,7 @@ class DropArea < Qt::Label
 	    setBackgroundRole(Qt::Palette::Highlight)
 	
 	    event.acceptProposedAction()
-#	    emit changed(event.mimeData())
+	    emit changed(event.mimeData())
 	end
 	
   def dragMoveEvent(event)

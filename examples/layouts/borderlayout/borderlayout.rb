@@ -22,8 +22,7 @@
 
 ** Translated to QtRuby by Richard Dale
 =end
-	
-	
+
 class BorderLayout < Qt::Layout
 	West = 0
 	North = 1

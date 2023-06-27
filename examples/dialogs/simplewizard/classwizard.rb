@@ -357,7 +357,7 @@ class ThirdPage < Qt::Widget
         className = wizard.firstPage.classNameLineEdit.text()
         @headerLineEdit.text = className.downcase + ".h"
         @implementationLineEdit.text = className.downcase + ".cpp"
-        @outputDirLineEdit.text = Qt::Dir.convertSeparators(Qt::Dir.homePath())
+        @outputDirLineEdit.text = Qt::Dir.toNativeSeparators(Qt::Dir.homePath())
     
         self.layout = Qt::GridLayout.new do |l|
             l.addWidget(@topLabel, 0, 0, 1, 2)

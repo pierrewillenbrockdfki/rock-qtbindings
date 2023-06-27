@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-require './pieceslist.rb'
+require './piecesmodel.rb'
 require './puzzlewidget.rb'
 
 class MainWindow < Qt::MainWindow
@@ -31,9 +31,7 @@ class MainWindow < Qt::MainWindow
     slots 'openImage(const QString&)', 'openImage()', 'setupPuzzle()'
     
     slots 'setCompleted()'
-    
-    RAND_MAX = 2147483647
-    
+        
     def initialize(parent = nil)
         super(parent)
         setupMenus()
@@ -80,21 +78,18 @@ class MainWindow < Qt::MainWindow
             (@puzzleImage.height() - size)/2, size, size).scaled(400,
                 400, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
     
-        @piecesList.clear()
-        
-        (0...5).each do |y|
-            (0...5).each do |x|
-                pieceImage = @puzzleImage.copy(x*80, y*80, 80, 80)
-                @piecesList.addPiece(pieceImage, Qt::Point.new(x, y))
-            end
-        end
-    
+		oldModel = @piecesList.model
+		newModel = PiecesModel.new(self)
+		@piecesList.model = newModel
+		oldModel.dispose
+
+		# srand(QCursor::pos().x() ^ QCursor::pos().y());
         Kernel.srand
-    
-        (0...@piecesList.count).each do |i|
-            if (2.0*rand(RAND_MAX)/(RAND_MAX+1.0)).to_i == 1
-                item = @piecesList.takeItem(i)
-                @piecesList.insertItem(0, item)
+        
+		for y in 0...5
+			for x in 0...5
+                pieceImage = @puzzleImage.copy(x*80, y*80, 80, 80)
+                newModel.addPiece(pieceImage, Qt::Point.new(x, y))
             end
         end
     
@@ -123,7 +118,19 @@ class MainWindow < Qt::MainWindow
         frame = Qt::Frame.new
         frameLayout = Qt::HBoxLayout.new(frame)
     
-        @piecesList = PiecesList.new
+		@piecesList = Qt::ListView.new
+		@piecesList.dragEnabled = true
+		@piecesList.viewMode = Qt::ListView::IconMode
+		@piecesList.iconSize = Qt::Size.new(60, 60)
+		@piecesList.gridSize = Qt::Size.new(80, 80)
+		@piecesList.spacing = 10
+		@piecesList.movement = Qt::ListView::Snap
+		@piecesList.acceptDrops = true
+		@piecesList.dropIndicatorShown = true
+	
+		model = PiecesModel.new(self)
+		@piecesList.model = model
+
         @puzzleWidget = PuzzleWidget.new
     
         connect(@puzzleWidget, SIGNAL('puzzleCompleted()'),

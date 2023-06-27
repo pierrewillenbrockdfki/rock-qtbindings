@@ -88,9 +88,9 @@ class DropSiteWindow < Qt::Widget
 		
 	        text = ""
 	        if format == "text/plain"
-                text = mimeData.text.simplified
+                text = mimeData.text.gsub(/\s+/, " ")
             elsif format == "text/html"
-                text = mimeData.text.simplified
+                text = mimeData.text.gsub(/\s+/, " ")
             elsif format == "text/uri-list"
                 urlList = mimeData.urls
                 urlList.each do |url|
@@ -103,10 +103,10 @@ class DropSiteWindow < Qt::Widget
 	            text << hexdata
 	        end
 	
-	        row = @supportedFormats.rowCount()
+	        row = @formatsTable.rowCount()
 	        @formatsTable.insertRow(row)
-	        @formatsTable.setItem(row, 0, Qt::TabelWidgetItem.new(format))
-	        @formatsTable.setItem(row, 1, Qt::TabelWidgetItem.new(text))
+	        @formatsTable.setItem(row, 0, Qt::TableWidgetItem.new(format))
+	        @formatsTable.setItem(row, 1, Qt::TableWidgetItem.new(text))
 	    end
 	
 	    @formatsTable.resizeColumnToContents(0)

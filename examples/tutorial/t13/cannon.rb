@@ -121,7 +121,7 @@ class CannonField < Qt::Widget
       emit missed()
       emit canShoot(true)
     else
-      r = r.unite(Qt::Region.new(shotR))
+      r = r.united(Qt::Region.new(shotR))
     end
 
     update(r)

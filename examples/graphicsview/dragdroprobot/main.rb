@@ -45,7 +45,7 @@ view = Qt::GraphicsView.new(scene)
 # Pass the view to the Robot and make it the parent of the
 # Qt::GraphicsItemAnimations, to prevent them being GC'd
 robot = Robot.new(view)
-robot.scale(1.2, 1.2)
+robot.setTransform(Qt::Transform.fromScale(1.2, 1.2), true);
 robot.setPos(0, -20)
 scene.addItem(robot)
 

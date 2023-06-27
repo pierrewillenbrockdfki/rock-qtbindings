@@ -39,7 +39,6 @@ class MainWindow < Qt::MainWindow
             'updateMenus()',
             'updateWindowMenu()',
             'MdiChild *createMdiChild()',
-            'switchLayoutDirection()',
             'setActiveSubWindow(QWidget*)'
      
     def initialize()
@@ -291,8 +290,6 @@ class MainWindow < Qt::MainWindow
         @fileMenu.addAction(@saveAct)
         @fileMenu.addAction(@saveAsAct)
         @fileMenu.addSeparator()
-        action = @fileMenu.addAction(tr("Switch layout direction"))
-        connect(action, SIGNAL('triggered()'), self, SLOT('switchLayoutDirection()'))
         @fileMenu.addAction(@exitAct)
     
         @editMenu = menuBar().addMenu(tr("&Edit"))

@@ -68,7 +68,7 @@ class CannonField < Qt::Widget
     r = Qt::Region.new(targetRect())
     @target = Qt::Point.new(200 + rand(190),
                  10 + rand(255))
-    repaint(r.unite(Qt::Region.new(targetRect())))
+    repaint(r.united(Qt::Region.new(targetRect())))
   end
 
   def moveShot()
@@ -84,7 +84,7 @@ class CannonField < Qt::Widget
       @autoShootTimer.stop()
       emit missed()
     else
-      r = r.unite(Qt::Region.new(shotR))
+      r = r.united(Qt::Region.new(shotR))
     end
 
     update(r)

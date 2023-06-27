@@ -41,8 +41,8 @@ class PieView < Qt::AbstractItemView
         @totalValue = 0.0
     end
     
-    def dataChanged(topLeft, bottomRight)
-        super(topLeft, bottomRight)
+    def dataChanged(topLeft, bottomRight, roles = [])
+        super(topLeft, bottomRight, roles)
     
         @validItems = 0
         @totalValue = 0.0
@@ -511,6 +511,6 @@ class PieView < Qt::AbstractItemView
         firstRect = visualRect(firstItem)
         lastRect = visualRect(lastItem)
     
-        return Qt::Region.new(firstRect.unite(lastRect))
+        return Qt::Region.new(firstRect.united(lastRect))
     end
 end

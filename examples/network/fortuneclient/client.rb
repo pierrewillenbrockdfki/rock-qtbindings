@@ -93,13 +93,15 @@ class Client < Qt::Dialog
     
     def readFortune
         inf = Qt::DataStream.new(@tcpSocket)
-        inf.version = Qt::DataStream::Qt_4_0
+        inf.version = Qt::DataStream::Qt_5_0
     
         if @blockSize == 0
             if @tcpSocket.bytesAvailable < 4
                 return
             end
     
+            #TODO QDataStream::operator>> wants references(&), but we seem to
+            #supply a literal. Not sure if this can work with ruby, at all.
             inf >> @blockSize
         end
     

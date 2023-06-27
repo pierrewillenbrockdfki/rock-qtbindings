@@ -26,7 +26,7 @@
     
 class Dialog < Qt::Dialog
         
-    slots   'setInteger()',
+    slots   'setInt()',
             'setDouble()',
             'setItem()',
             'setText()',
@@ -55,7 +55,7 @@ class Dialog < Qt::Dialog
     
         @integerLabel = Qt::Label.new
         @integerLabel.frameStyle = frameStyle
-        integerButton = Qt::PushButton.new(tr("Qt::InputDialog.get&Integer()"))
+        intButton = Qt::PushButton.new(tr("Qt::InputDialog.get&Int()"))
     
         @doubleLabel = Qt::Label.new
         @doubleLabel.frameStyle = frameStyle
@@ -122,7 +122,7 @@ class Dialog < Qt::Dialog
         errorButton =
                 Qt::PushButton.new(tr("Qt::ErrorMessage.show&M&essage()"))
     
-        connect(integerButton, SIGNAL('clicked()'), self, SLOT('setInteger()'))
+        connect(intButton, SIGNAL('clicked()'), self, SLOT('setInt()'))
         connect(doubleButton, SIGNAL('clicked()'), self, SLOT('setDouble()'))
         connect(itemButton, SIGNAL('clicked()'), self, SLOT('setItem()'))
         connect(textButton, SIGNAL('clicked()'), self, SLOT('setText()'))
@@ -146,7 +146,7 @@ class Dialog < Qt::Dialog
         self.layout = Qt::GridLayout.new do |l|
             l.setColumnStretch(1, 1)
             l.setColumnMinimumWidth(1, 250)
-            l.addWidget(integerButton, 0, 0)
+            l.addWidget(intButton, 0, 0)
             l.addWidget(@integerLabel, 0, 1)
             l.addWidget(doubleButton, 1, 0)
             l.addWidget(@doubleLabel, 1, 1)
@@ -181,12 +181,12 @@ class Dialog < Qt::Dialog
         self.windowTitle = tr("Standard Dialogs")
     end
     
-    def setInteger()
+    def setInt()
         ok = Qt::Boolean.new
-        i = Qt::InputDialog.getInteger(self, tr("Qt::InputDialog.getInteger()"),
-                                         tr("Percentage:"), 25, 0, 100, 1, ok)
+        i = Qt::InputDialog.getInt(self, tr("Qt::InputDialog.getInt()"),
+                                    tr("Percentage:"), 25, 0, 100, 1, ok)
         if ok
-            @integerLabel.text = tr("%d%" % i)
+            @integerLabel.text = tr("%d%%" % i)
         end
     end
     

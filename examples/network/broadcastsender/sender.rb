@@ -62,11 +62,8 @@ class Sender < Qt::Dialog
 	
 	def broadcastDatagram()
 	    @statusLabel.text = tr("Now broadcasting datagram %d" % @messageNo)
-	    datagram = Qt::ByteArray.new("Broadcast message %d" % @messageNo)
-	    @udpSocket.writeDatagram(datagram,
-	    # method_missing with this syntax
-	    #@udpSocket.writeDatagram(datagram.data(), datagram.size(),
-	                             Qt::HostAddress.new(Qt::HostAddress::Broadcast), 45454)
+            datagram = Qt::NetworkDatagram.new(Qt::ByteArray.new("Broadcast message %d" % @messageNo), Qt::HostAddress.new(Qt::HostAddress::Broadcast), 45454)
+	    @udpSocket.writeDatagram(datagram)
 	    @messageNo += 1
 	end
 end

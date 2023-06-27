@@ -42,7 +42,7 @@ class Ui_ChatMainWindow < Qt::MainWindow
     def initialize(parent = nil)
         super
         @m_nickname = "nickname"
-        require 'ui_chatmainwindow.rb'
+        require './ui_chatmainwindow.rb'
         setupUi(self)
         @sendButton.enabled = false
     

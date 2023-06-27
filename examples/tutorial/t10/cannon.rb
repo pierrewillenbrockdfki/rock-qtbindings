@@ -44,7 +44,7 @@ class CannonField < Qt::Widget
 
     cr = cannonRect()
     pix = Qt::Pixmap.new(cr.size())
-    pix.fill(self, cr.topLeft())
+    pix.fill(Qt::Color.new(250, 250, 200))
 
     painter = Qt::Painter.new(pix)
     painter.setBrush(Qt::Brush.new(Qt::blue))

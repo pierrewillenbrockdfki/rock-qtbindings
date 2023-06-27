@@ -58,7 +58,7 @@ class Mouse < Qt::GraphicsItem
         @speed = 0.0
         @mouseEyeDirection = 0.0
         @color = Qt::Color.new(rand(256), rand(256), rand(256))
-        rotate(rand(360 * 16))
+        setTransform(Qt::Transform.new.rotate(rand(360 * 16)), true)
         adjust = 0.5
         @boundingRect = Qt::RectF.new(-20 - adjust, -22 - adjust,
                       40 + adjust, 83 + adjust)
@@ -170,7 +170,7 @@ class Mouse < Qt::GraphicsItem
         dx = Math.sin(@angle) * 10
         @mouseEyeDirection = ((dx / 5).abs < 1) ? 0 : dx / 5
     
-        rotate(dx)
+        setTransform(Qt::Transform.new.rotate(dx), true)
         setPos(mapToParent(0, -(3 + Math.sin(@speed) * 3)))
     end
 end

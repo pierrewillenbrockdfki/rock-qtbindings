@@ -64,12 +64,13 @@ class PuzzleWidget < Qt::Widget
     end
     
     def dragMoveEvent(event)
-        updateRect = @highlightedRect.unite(targetSquare(event.pos()))
+        updateRect = @highlightedRect.united(targetSquare(event.pos()))
     
         if event.mimeData().hasFormat("image/x-puzzle-piece") &&
             findPiece(targetSquare(event.pos)) == -1
     
             @highlightedRect = targetSquare(event.pos())
+puts "dragMoveEvent event.dropAction = Qt::MoveAction"
             event.dropAction = Qt::MoveAction
             event.accept()
         else
@@ -98,9 +99,10 @@ class PuzzleWidget < Qt::Widget
             @highlightedRect = Qt::Rect.new()
             update(square)
     
+puts "dropEvent event.dropAction = Qt::MoveAction"
             event.dropAction = Qt::MoveAction
             event.accept()
-    
+p event.dropAction    
             if location == Qt::Point.new(square.x()/80, square.y()/80)
                 @inPlace += 1
                 if @inPlace == 25
@@ -155,7 +157,7 @@ class PuzzleWidget < Qt::Widget
         drag.hotSpot = event.pos - square.topLeft()
         drag.pixmap = pixmap
     
-        if !drag.start(Qt::MoveAction.to_i) == Qt::MoveAction
+        if drag.start(Qt::MoveAction) == 0
             @pieceLocations.insert(found, location)
             @piecePixmaps.insert(found, pixmap)
             @pieceRects.insert(found, square)

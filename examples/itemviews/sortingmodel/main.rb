@@ -46,8 +46,10 @@ sortedView.model = sortingModel
 sortedView.windowTitle = Qt::Object.tr("Sorted Data")
 sortedView.header.setSortIndicator(1, Qt::AscendingOrder)
 sortedView.header.sortIndicatorShown = true
-sortedView.header.clickable = true
+sortedView.header.sectionsClickable = true
+sortedView.sortingEnabled = true
 sortedView.show
+
 
 # Qt::Internal::setDebug Qt::QtDebugChannel::QTDB_VIRTUAL
 app.exec

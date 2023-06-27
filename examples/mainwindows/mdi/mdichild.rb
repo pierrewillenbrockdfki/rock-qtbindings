@@ -50,7 +50,7 @@ class MdiChild < Qt::TextEdit
 	
 	def loadFile(fileName)
 	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::File::ReadOnly | Qt::File::Text)
+	    if !file.open(Qt::IODevice::ReadOnly | Qt::IODevice::Text)
 	        Qt::MessageBox.warning(self, tr("MDI"),
 	                             tr("Cannot read file %s:\n%s." % [fileName, file.errorString]))
 	        return false
@@ -89,7 +89,7 @@ class MdiChild < Qt::TextEdit
 	
 	def saveFile(fileName)
 	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::File::WriteOnly | Qt::File::Text)
+	    if !file.open(Qt::IODevice::WriteOnly | Qt::IODevice::Text)
 	        Qt::MessageBox::warning(self, tr("MDI"),
 	                             tr("Cannot write file %s:\n%s." % [fileName, file.errorString]))
 	        return false

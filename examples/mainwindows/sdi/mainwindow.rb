@@ -271,7 +271,7 @@ class MainWindow < Qt::MainWindow
 
 	def loadFile(fileName)
 	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::File::ReadOnly | Qt::File::Text)
+	    if !file.open(Qt::IODevice::ReadOnly | Qt::IODevice::Text)
 	        Qt::MessageBox.warning(self, tr("SDI"),
 	                             tr("Cannot read file %s:\n%s." % [fileName, file.errorString]))
 	        return
@@ -288,7 +288,7 @@ class MainWindow < Qt::MainWindow
 	
 	def saveFile(fileName)
 	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::File::WriteOnly | Qt::File::Text)
+	    if !file.open(Qt::IODevice::WriteOnly | Qt::IODevice::Text)
 	        Qt::MessageBox.warning(self, tr("SDI"),
 	                             tr("Cannot write file %s:\n%s." % [fileName, file.errorString]))
 	        return
