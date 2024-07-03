@@ -4,8 +4,6 @@
     <generator>smoke</generator>
     <definesList>@CMAKE_BINARY_DIR@/smoke/qtdefines</definesList>
     <includeDirs>
-        <dir>@QT_INCLUDE_DIR@</dir>
-        <dir>@QT_QTCORE_INCLUDE_DIR@</dir>
-        <dir>@QT_QTWEBKIT_INCLUDE_DIR@</dir>
+        @QT_INCLUDE_DIRS_XML@
     </includeDirs>
 </config>

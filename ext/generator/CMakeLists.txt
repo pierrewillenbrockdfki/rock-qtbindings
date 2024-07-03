@@ -31,7 +31,7 @@ set (CMAKE_SKIP_RPATH FALSE)
 add_executable(smokegen ${generator_SRC})
 target_link_libraries(smokegen Qt5::Core Qt5::Xml cppparser)
 set_target_properties(smokegen PROPERTIES COMPILE_DEFINITIONS __GENERATOR_BUILDING ENABLE_EXPORTS TRUE)
-target_compile_options(smokegen PRIVATE -Wall)
+target_compile_options(smokegen PRIVATE -fPIC -Wall)
 
 install(TARGETS smokegen DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 install(FILES generatorenvironment.h  generator_export.h  generatorpreprocessor.h  generatorvisitor.h  name_compiler.h  options.h  type_compiler.h  type.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/smokegen)

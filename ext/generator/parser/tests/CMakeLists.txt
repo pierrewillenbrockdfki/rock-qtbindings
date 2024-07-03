@@ -2,6 +2,8 @@
 set( EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR} )
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testconfig.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/testconfig.h)
 
+find_package(Qt5 REQUIRED COMPONENTS Test)
+
 
 ########### next target ###############
 
@@ -9,7 +11,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/.
 
 set(parsertest_SRCS test_parser.cpp)
 
-QT4_GENERATE_MOC(${parsertest_SRCS} test_parser.moc)
+QT5_GENERATE_MOC(${parsertest_SRCS} test_parser.moc)
 add_executable(parsertest ${parsertest_SRCS} test_parser.moc)
 
 if (WIN32)
@@ -17,33 +19,33 @@ if (WIN32)
 	set_target_properties (parsertest PROPERTIES COMPILE_FLAGS -mstackrealign)
 endif (WIN32)
 
-target_link_libraries(parsertest ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} cppparser)
+target_link_libraries(parsertest Qt5::Core Qt5::Test cppparser)
 target_compile_options(parsertest PRIVATE -Wall)
 
 ########### next target ###############
 
 set(generatortest_SRCS test_generator.cpp)
 
-QT4_GENERATE_MOC(${generatortest_SRCS} test_generator.moc)
+QT5_GENERATE_MOC(${generatortest_SRCS} test_generator.moc)
 add_executable(generatortest ${generatortest_SRCS} test_generator.moc)
 if (WIN32)
 	# Realign the stack, for compatibility with an older ABI.
 	set_target_properties (generatortest PROPERTIES COMPILE_FLAGS -mstackrealign)
 endif (WIN32)
 
-target_link_libraries(generatortest ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} cppparser)
+target_link_libraries(generatortest Qt5::Core Qt5::Test cppparser)
 target_compile_options(generatortest PRIVATE -Wall)
 
 ########### next target ###############
 
 set(pooltest_SRCS test_pool.cpp)
 
-QT4_GENERATE_MOC(test_pool.h test_pool.moc)
+QT5_GENERATE_MOC(test_pool.h test_pool.moc)
 add_executable(pooltest ${pooltest_SRCS} test_pool.moc)
 if (WIN32)
 	# Realign the stack, for compatibility with an older ABI.
 	set_target_properties (pooltest PROPERTIES COMPILE_FLAGS -mstackrealign)
 endif (WIN32)
 
-target_link_libraries(pooltest ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} cppparser)
+target_link_libraries(pooltest Qt5::Core Qt5::Test cppparser)
 target_compile_options(pooltest PRIVATE -Wall)

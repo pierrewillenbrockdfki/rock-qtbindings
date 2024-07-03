@@ -4,18 +4,6 @@
     <generator>smoke</generator>
     <definesList>@CMAKE_INSTALL_PREFIX@/share/smokegen/qtdefines</definesList>
     <includeDirs>
-        <dir>@QT_INCLUDE_DIR@</dir>
-        <dir>@QT_QTCORE_INCLUDE_DIR@</dir>
-        <dir>@QT_QTGUI_INCLUDE_DIR@</dir>
-        <dir>@QT_QTNETWORK_INCLUDE_DIR@</dir>
-        <dir>@QT_QTDBUS_INCLUDE_DIR@</dir>
-        <dir>@QT_QTSQL_INCLUDE_DIR@</dir>
-        <dir>@QT_QTXML_INCLUDE_DIR@</dir>
-        <dir>@QT_QTOPENGL_INCLUDE_DIR@</dir>
-        <dir>@QT_QTSVG_INCLUDE_DIR@</dir>
-        <dir>@QT_QTSCRIPT_INCLUDE_DIR@</dir>
-        <dir>@QT_QTUITOOLS_INCLUDE_DIR@</dir>
-        <dir>@QT_QTTEST_INCLUDE_DIR@</dir>
-        <dir>@QT_QTWEBKIT_INCLUDE_DIR@</dir>
+        @QT_ALL_INCLUDE_DIRS_XML@
     </includeDirs>
 </config>

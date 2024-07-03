@@ -1,10 +1,9 @@
 include_directories( ${CMAKE_SOURCE_DIR}/smoke ${RUBY_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/ruby/qtruby/src)
-INCLUDE_DIRECTORIES (${QT_INCLUDES})
 
 set(rubyqtwebkit_LIBRARY_SRC qtwebkit.cpp qtwebkithandlers.cpp)
 add_library(rubyqtwebkit MODULE ${rubyqtwebkit_LIBRARY_SRC})
 target_link_libraries(rubyqtwebkit
-    ${QT_QTWEBKIT_LIBRARY}
+    Qt5::WebKit Qt5::WebKitWidgets
     smokeqtwebkit
     qtruby4shared
 )

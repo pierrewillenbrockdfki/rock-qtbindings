@@ -1,11 +1,10 @@
 include_directories( ${CMAKE_SOURCE_DIR}/smoke ${RUBY_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/ruby/qtruby/src)
-INCLUDE_DIRECTORIES (${QT_INCLUDES} ${KDE4_INCLUDE_DIR})
 
 set(qtscript_LIBRARY_SRC qtscript.cpp qtscripthandlers.cpp)
 
 add_library(qtscript MODULE ${qtscript_LIBRARY_SRC})
 target_link_libraries(qtscript
-    ${QT_QTSCRIPT_LIBRARY}
+    Qt5::Script
     smokeqtscript
     qtruby4shared
 )

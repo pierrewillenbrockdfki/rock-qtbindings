@@ -1,10 +1,9 @@
 include_directories( ${CMAKE_SOURCE_DIR}/smoke ${RUBY_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/ruby/qtruby/src)
-INCLUDE_DIRECTORIES (${QT_INCLUDES})
 
 set(rubyqtdeclarative_LIBRARY_SRC qtdeclarative.cpp qtdeclarativehandlers.cpp)
 add_library(rubyqtdeclarative MODULE ${rubyqtdeclarative_LIBRARY_SRC})
 target_link_libraries(rubyqtdeclarative
-    ${QT_QTWEBKIT_LIBRARY}
+    Qt5::Qml Qt5::Quick
     smokeqtdeclarative
     qtruby4shared
 )

@@ -1,4 +1,4 @@
-IF(QT_QTDBUS_FOUND AND NOT WIN32)
+IF(Qt5DBus_FOUND AND NOT WIN32)
     ADD_DEFINITIONS (-DQT_QTDBUS)
 ENDIF(QT_QTDBUS_FOUND)
 
@@ -27,70 +27,85 @@ set(qtruby_LIB_SRCS qtruby.cpp)
 add_library(qtruby4shared SHARED ${qtrubyshared_LIB_SRCS})
 add_library(qtruby4 MODULE ${qtruby_LIB_SRCS})
 
-if(QT_QTDBUS_FOUND AND NOT WIN32)
-  target_link_libraries(  qtruby4shared 
-                              ${QT_QTCORE_LIBRARY} 
-                              ${QT_QTGUI_LIBRARY} 
-                              ${RUBY_LIBRARY} 
-                              ${QT_QTNETWORK_LIBRARY}
+if(Qt5DBus_FOUND AND NOT WIN32)
+  target_link_libraries(  qtruby4shared
+                              Qt5::Core
+                              Qt5::Gui
+                              Qt5::Widgets
+                              ${RUBY_LIBRARY}
+                              Qt5::Network
+                              Qt5::PrintSupport
                               smokebase
                               smokeqtcore 
                               smokeqtgui 
-                              smokeqtxml 
+                              smokeqtwidgets
+                              smokeqtprintsupport
+                              smokeqtxml
                               smokeqtopengl 
                               smokeqtsql 
                               smokeqtnetwork 
                               smokeqtdbus 
                               smokeqtsvg )
 
-  target_link_libraries(  qtruby4 
-                              ${QT_QTCORE_LIBRARY} 
-                              ${QT_QTGUI_LIBRARY} 
-                              ${QT_QTDBUS_LIBRARY} 
-                              ${RUBY_LIBRARY} 
-                              ${QT_QTNETWORK_LIBRARY} 
-                              smokeqtcore 
+  target_link_libraries(  qtruby4
+                              Qt5::Core
+                              Qt5::Gui
+                              Qt5::Widgets
+                              Qt5::DBus
+                              ${RUBY_LIBRARY}
+                              Qt5::Network
+                              Qt5::PrintSupport
+                              smokeqtcore
                               smokeqtgui 
-                              smokeqtxml 
+                              smokeqtwidgets
+                              smokeqtprintsupport
+                              smokeqtxml
                               smokeqtopengl 
                               smokeqtsql 
                               smokeqtnetwork 
-                              smokeqtdbus 
+                              smokeqtdbus
                               smokeqtsvg
                               qtruby4shared )
-else(QT_DBUS_FOUND)
-  target_link_libraries(  qtruby4shared 
-                              ${QT_QTCORE_LIBRARY} 
-                              ${QT_QTGUI_LIBRARY} 
-                              ${RUBY_LIBRARY} 
-                              ${QT_QTNETWORK_LIBRARY}
+else(Qt5DBus_FOUND)
+  target_link_libraries(  qtruby4shared
+                              Qt5::Core
+                              Qt5::Gui
+                              Qt5::Widgets
+                              ${RUBY_LIBRARY}
+                              Qt5::Network
+                              Qt5::PrintSupport
                               smokebase
                               smokeqtcore 
                               smokeqtgui 
-                              smokeqtxml 
+                              smokeqtwidgets
+                              smokeqtprintsupport
+                              smokeqtxml
                               smokeqtopengl 
                               smokeqtsql 
                               smokeqtnetwork 
                               smokeqtsvg )
 
-  target_link_libraries(  qtruby4 
-                              ${QT_QTCORE_LIBRARY} 
-                              ${QT_QTGUI_LIBRARY} 
-                              ${RUBY_LIBRARY} 
-                              ${QT_QTNETWORK_LIBRARY} 
-                              smokeqtcore 
+  target_link_libraries(  qtruby4
+                              Qt5::Core
+                              Qt5::Gui
+                              Qt5::Widgets
+                              ${RUBY_LIBRARY}
+                              Qt5::Network
+                              Qt5::PrintSupport
+                              smokeqtcore
                               smokeqtgui 
-                              smokeqtxml 
+                              smokeqtwidgets
+                              smokeqtprintsupport
+                              smokeqtxml
                               smokeqtopengl 
                               smokeqtsql 
                               smokeqtnetwork 
                               smokeqtsvg
                               qtruby4shared )
-endif(QT_DBUS_FOUND)
+endif(Qt5DBus_FOUND)
 
 target_compile_options(qtruby4 PRIVATE -Wall)
 target_compile_options(qtruby4shared PRIVATE -Wall)
-# target_link_libraries(qtrubyinternal ${QT_QTCORE_LIBRARY} ${RUBY_LIBRARY} ${QT_QTNETWORK_LIBRARY})
 
 set_target_properties(qtruby4 PROPERTIES PREFIX "")
 set_target_properties(qtruby4shared PROPERTIES VERSION 2.0.0 SOVERSION 2)
@@ -101,5 +116,5 @@ install(TARGETS qtruby4 DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})
 install(FILES qtruby.h marshall.h marshall_basetypes.h marshall_complex.h marshall_macros.h marshall_primitives.h marshall_types.h smokeruby.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/qtruby)
 
 if (Q_WS_MAC)
-    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink \"${CUSTOM_RUBY_SITE_ARCH_DIR}/qtruby4.so\"  \"${CUSTOM_RUBY_SITE_ARCH_DIR}/qtruby4.bundle\" )" )
+    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink \"${CUSTOM_RUBY_SITE_ARCH_DIR}/qtruby4.so\" \"${CUSTOM_RUBY_SITE_ARCH_DIR}/qtruby4.bundle\" )" )
 endif (Q_WS_MAC)
