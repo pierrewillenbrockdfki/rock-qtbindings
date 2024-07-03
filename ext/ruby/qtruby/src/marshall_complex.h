@@ -76,9 +76,7 @@ template <>
 void marshall_to_ruby<int *>(Marshall *m)
 {
 	int *ip = (int*)m->item().s_voidp;
-	VALUE rv = *(m->var());
 	if(!ip) {
-		rv = Qnil;
 		return;
 	}
 	
@@ -122,9 +120,7 @@ template <>
 void marshall_to_ruby<unsigned int *>(Marshall *m)
 {
 	unsigned int *ip = (unsigned int*) m->item().s_voidp;
-	VALUE rv = *(m->var());
 	if (ip == 0) {
-		rv = Qnil;
 		return;
 	}
 	
