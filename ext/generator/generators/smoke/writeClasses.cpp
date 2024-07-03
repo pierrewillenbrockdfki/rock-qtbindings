@@ -311,7 +311,7 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
         }
         out << ") ";
     }
-    out << "{\n";
+    out << "override {\n";
     out << QString("        Smoke::StackItem x[%1];\n").arg(meth.parameters().count() + 1);
     out << x_params;
     
