@@ -301,12 +301,22 @@ Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool isAb
 		methodName += (sizeof("operator") - 1);
 	}
 
-	// If not in a ruby thread, just call the C++ version
-	// During GC, avoid checking for override and just call the C++ version
-	// If the virtual method hasn't been overriden, just call the C++ one.
+	// During GC, avoid checking for override and fall back to the
+	// original method. This happens during the mark phase of the GC,
+	// see handers.cpp. This can make the caller
+	// throw SmokeAbstractMethod exceptions.
+	// When overriding for example QBoxLayout, the ruby class may provide
+	// the count(), itemAt and related functions. During GC, these cannot
+	// be called, but the base class implementation works fine for the
+	// objects reachable through it. If, instead, QLayout has been used
+	// as the base class, these functions are abstract and, in this case,
+	// would be working when they returned 0, but in general, smokeruby_mark
+	// needs to decide, thus throwing SmokeAbstractMethod.
 	if (rb_during_gc()) {
 		return false;
 	}
+	// If not in a ruby thread, complain and throw and exception.
+	// It it is abstract, raise an error.
 #ifdef HAVE_RUBY_RUBY_H
 	int ruby_thread = ruby_native_thread_p();
 	if (ruby_thread == 0)
