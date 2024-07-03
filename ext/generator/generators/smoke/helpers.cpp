@@ -155,6 +155,9 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
                     parent->setIsNameSpace(true);
                 }
             }
+            if (Options::typeExcluded(e.toString())) {
+                continue;
+            }
 
             Type *t = 0;
             if (e.name().isEmpty()) {
@@ -166,6 +169,11 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
                 t = Type::registerType(Type(&e));
             }
             (*usedTypes) << t;
+            foreach (const EnumMember& member, e.members()) {
+                if (Options::typeExcluded(member.toString())) {
+                    e.membersRef().removeOne(member);
+                }
+            }
             parent->appendChild(&e);
         }
     }
@@ -216,6 +224,10 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
         foreach (BasicTypeDeclaration* decl, klass.children()) {
             Enum* e = 0;
             if ((e = dynamic_cast<Enum*>(decl))) {
+                if (Options::typeExcluded(e->toString())) {
+                    e->setAccess(Access_private);
+                    continue;
+                }
                 Type *t = 0;
                 if (e->name().isEmpty()) {
                     // unnamed enum
@@ -577,7 +589,9 @@ QList<const Method*> Util::collectVirtualMethods(const Class* klass)
     QList<const Method*> methods;
     foreach (const Method& meth, klass->methods()) {
         if ((meth.flags() & Method::Virtual || meth.flags() & Method::PureVirtual)
-            && !meth.isDestructor() && meth.access() != Access_private)
+            && !meth.isDestructor() && meth.access() != Access_private
+            && !Options::typeExcluded(meth.toString(false, true))
+	)
         {
             methods << &meth;
         }
