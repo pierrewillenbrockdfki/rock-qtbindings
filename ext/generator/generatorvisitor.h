@@ -70,6 +70,7 @@ protected:
     virtual void visitSimpleTypeSpecifier(SimpleTypeSpecifierAST* node);
     virtual void visitTemplateDeclaration(TemplateDeclarationAST* node);
     virtual void visitTemplateArgument(TemplateArgumentAST* node);
+    virtual void visitTypeAlias(TypeAliasAST* node);
     virtual void visitTypedef(TypedefAST* node);
     virtual void visitUsing(UsingAST* node);
     virtual void visitUsingDirective(UsingDirectiveAST* node);
@@ -83,6 +84,7 @@ private:
     
     bool createType;
     bool createTypedef;
+    bool createTypeAlias;
     short inClass;
     
     bool inTemplate;

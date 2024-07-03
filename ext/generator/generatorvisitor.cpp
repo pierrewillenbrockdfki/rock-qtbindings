@@ -27,7 +27,7 @@
 #include <QtDebug>
 
 GeneratorVisitor::GeneratorVisitor(ParseSession *session, const QString& header) 
-    : m_session(session), m_header(header), createType(false), createTypedef(false),
+    : m_session(session), m_header(header), createType(false), createTypedef(false), createTypeAlias(false),
       inClass(0), inTemplate(false), isStatic(false), isVirtual(false), isExplicit(false), hasInitializer(false), currentTypeRef(0), inMethod(false)
 {
     nc = new NameCompiler(m_session, this);
@@ -393,6 +393,12 @@ static bool operator==(const Method& rhs, const Method& lhs);
 
 void GeneratorVisitor::visitDeclarator(DeclaratorAST* node)
 {
+    if (createTypeAlias) {
+        createType = false;
+        createTypedef = false;
+        createTypeAlias = false;
+        return;
+    }
     // TODO: get rid of this and add a proper typdef
     bool typeCreated = false;
     if (createType) {
@@ -856,6 +862,30 @@ void GeneratorVisitor::visitTypedef(TypedefAST* node)
     if (ast_cast<EnumSpecifierAST*>(node->type_specifier)) {
         nc->run(node->init_declarators->at(0)->element->declarator->id);
         currentEnumRef->setName(nc->name());
+    }
+}
+
+void GeneratorVisitor::visitTypeAlias(TypeAliasAST* node)
+{
+    createTypeAlias = true;
+
+    tc->run(node->type_spec);
+    currentType = tc->type();
+    currentTypeRef = Type::registerType(currentType);
+
+    nc->run(node->name);
+    const QString declName = nc->name();
+
+    // we've just created the type that the typedef points to
+    // so we just need to get the new name and store it
+    Class* parent = klass.isEmpty() ? 0 : klass.top();
+    Typedef tdef = Typedef(currentTypeRef, declName, nspace.join("::"), parent);
+    tdef.setFileName(m_header);
+    QString name = tdef.toString();
+    if (!typedefs.contains(name)) {
+        QHash<QString, Typedef>::iterator it = typedefs.insert(name, tdef);
+        if (parent)
+            parent->appendChild(&it.value());
     }
 }
 
