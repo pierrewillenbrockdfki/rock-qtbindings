@@ -212,7 +212,7 @@ void unmapPointer(smokeruby_object *o, Smoke::Index classId, void *lastptr) {
 void mapPointer(VALUE obj, smokeruby_object* o, void *ptr, Smoke *smoke, Smoke::Index fromClassId, Smoke::Index toClassId, void *lastptr) {
 	ptr = smoke->cast(ptr, fromClassId, toClassId);
 
-    if (ptr != lastptr) {
+	if (ptr != lastptr) {
 		lastptr = ptr;
 
 		QMutexLocker locker(&pointer_map_mutex);
@@ -222,7 +222,7 @@ void mapPointer(VALUE obj, smokeruby_object* o, void *ptr, Smoke *smoke, Smoke::
 			qWarning("mapPointer (%s*)%p -> %p size: %d", className, ptr, (void *)obj, pointer_map.size() + 1);
 		}
 
-        SmokeValue value(obj, o);
+		SmokeValue value(obj, o);
 		pointer_map.insert(ptr, value);
 	}
 
@@ -255,11 +255,11 @@ void
 Binding::deleted(Smoke::Index classId, void *ptr) {
 	smokeruby_object *o = getSmokeValue(ptr).o;
 	if (do_debug & qtdb_gc) {
-	  	qWarning("unmapping: o = %p, ptr = %p\n", o, ptr);
-    	qWarning("%p->~%s()", ptr, smoke->className(classId));
-    }
+		qWarning("unmapping: o = %p, ptr = %p\n", o, ptr);
+		qWarning("%p->~%s()", ptr, smoke->className(classId));
+	}
 	if (!o || !o->ptr) {
-    	return;
+		return;
 	}
 	unmapPointer(o, o->classId, 0);
 	o->ptr = 0;
@@ -290,9 +290,9 @@ Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool /*is
 	}
 
 	if (o == 0) {
-    	if( do_debug & qtdb_virtual )   // if not in global destruction
+		if (do_debug & qtdb_virtual)  // if not in global destruction
 			qWarning("Cannot find object for virtual method %p -> %p", ptr, &obj);
-    	return false;
+		return false;
 	}
 	const char *methodName = smoke->methodNames[smoke->methods[method].name];
 	if (qstrncmp(methodName, "operator", sizeof("operator") - 1) == 0) {
@@ -810,8 +810,6 @@ method_missing(int argc, VALUE * argv, VALUE self)
 	const char * methodName = rb_id2name(SYM2ID(argv[0]));
     VALUE klass = rb_funcall(self, rb_intern("class"), 0);
 
-    VALUE retval = Qnil;
-
 	// Look for 'thing?' methods, and try to match isThing() or hasThing() in the Smoke runtime
   static QByteArray * pred = 0;
   static VALUE mainThread = Qnil;
@@ -865,7 +863,7 @@ method_missing(int argc, VALUE * argv, VALUE self)
 		if (_current_method.index == -1) {
 			// Find the C++ method to call. Do that from Ruby for now
 
-			retval = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+3, temp_stack);
+			(void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+3, temp_stack);
 			if (_current_method.index == -1) {
 				const char * op = rb_id2name(SYM2ID(argv[0]));
 				if (	qstrcmp(op, "-") == 0
@@ -880,7 +878,7 @@ method_missing(int argc, VALUE * argv, VALUE self)
 					op1[1] = '=';
 					op1[2] = '\0';
 					temp_stack[1] = rb_str_new2(op1);
-					retval = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+3, temp_stack);
+					(void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+3, temp_stack);
 				}
 
 				if (_current_method.index == -1) {
@@ -973,7 +971,6 @@ VALUE
 class_method_missing(int argc, VALUE * argv, VALUE klass)
 {
 	VALUE result = Qnil;
-	VALUE retval = Qnil;
 	const char * methodName = rb_id2name(SYM2ID(argv[0]));
 	VALUE * temp_stack = ALLOCA_N(VALUE, argc+3);
   static VALUE mainThread = Qnil;
@@ -997,7 +994,7 @@ class_method_missing(int argc, VALUE * argv, VALUE klass)
 		QByteArray * mcid = find_cached_selector(argc+3, temp_stack, klass, methodName);
 
 		if (_current_method.index == -1) {
-			retval = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+3, temp_stack);
+			(void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+3, temp_stack);
 			if (_current_method.index != -1) {
 				// Success. Cache result.
 				methcache.insert(*mcid, new Smoke::ModuleIndex(_current_method));
@@ -1005,8 +1002,8 @@ class_method_missing(int argc, VALUE * argv, VALUE klass)
 		}
 	}
 
-    if (_current_method.index == -1) {
-static QRegExp * rx = 0;
+	if (_current_method.index == -1) {
+		static QRegExp * rx = 0;
 		if (rx == 0) {
 			rx = new QRegExp("[a-zA-Z]+");
 		}

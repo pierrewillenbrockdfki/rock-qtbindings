@@ -189,9 +189,9 @@ smokeruby_mark(void * p)
 
 	if (do_debug & qtdb_gc) qWarning("Checking for mark (%s*)%p", className, o->ptr);
 
-    if (o->ptr && o->allocated) {
+	if (o->ptr && o->allocated) {
 		if (o->smoke->isDerivedFrom(className, "QObject")) {
-			QObject * qobject = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject", true).index);
+			QObject *qobject = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject", true).index);
 			// Only mark the QObject tree if the current item doesn't have a parent or the parent isn't wrapped by the bindings.
 			// This avoids marking parts of a tree more than once.
 			if (qobject->parent() == 0 || getPointerObject(qobject->parent()) == Qnil) {
@@ -937,9 +937,7 @@ static void marshall_doubleR(Marshall *m) {
 	case Marshall::ToVALUE:
 	{
 		double *dp = (double*)m->item().s_voidp;
-	    VALUE rv = *(m->var());
 		if (dp == 0) {
-			rv = Qnil;
 			break;
 		}
 		*(m->var()) = rb_float_new(*dp);
@@ -1803,7 +1801,7 @@ void marshall_voidP(Marshall *m) {
 	    if (rv != Qnil)
 
 #if __x86_64__
-    m->item().s_voidp = (void*)NUM2LL(*(m->var()));
+		m->item().s_voidp = (void*)NUM2LL(*(m->var()));
 #else
 		m->item().s_voidp = (void*)NUM2LONG(*(m->var()));
 #endif
