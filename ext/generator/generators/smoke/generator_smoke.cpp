@@ -128,6 +128,9 @@ int generate()
                     }
                     if (elem.tagName() == "module") {
                         Options::parentModules << elem.text();
+                    } else {
+                        qCritical() << "Unexpected element " << elem.tagName() << " in parentModules";
+                        exit(EXIT_FAILURE);
                     }
                     parent = parent.nextSibling();
                 }
@@ -141,6 +144,9 @@ int generate()
                     }
                     if (elem.tagName() == "typeName") {
                         Options::scalarTypes << elem.text();
+                    } else {
+                        qCritical() << "Unexpected element " << elem.tagName() << " in scalarTypes";
+                        exit(EXIT_FAILURE);
                     }
                     typeName = typeName.nextSibling();
                 }
@@ -154,6 +160,9 @@ int generate()
                     }
                     if (elem.tagName() == "typeName") {
                         Options::voidpTypes << elem.text();
+                    } else {
+                        qCritical() << "Unexpected element " << elem.tagName() << " in voidpTypes";
+                        exit(EXIT_FAILURE);
                     }
                     typeName = typeName.nextSibling();
                 }
@@ -167,6 +176,9 @@ int generate()
                     }
                     if (elem.tagName() == "class") {
                         Options::classList << elem.text();
+                    } else {
+                        qCritical() << "Unexpected element " << elem.tagName() << " in classList";
+                        exit(EXIT_FAILURE);
                     }
                     klass = klass.nextSibling();
                 }
@@ -180,6 +192,9 @@ int generate()
                     }
                     if (elem.tagName() == "signature") {
                         Options::excludeExpressions << QRegExp(elem.text());
+                    } else {
+                        qCritical() << "Unexpected element " << elem.tagName() << " in exclude";
+                        exit(EXIT_FAILURE);
                     }
                     typeName = typeName.nextSibling();
                 }
@@ -195,9 +210,15 @@ int generate()
                         Options::includeFunctionNames << QRegExp(elem.text());
                     } else if (elem.tagName() == "signature") {
                         Options::includeFunctionSignatures << QRegExp(elem.text());
+                    } else {
+                        qCritical() << "Unexpected element " << elem.tagName() << " in functions";
+                        exit(EXIT_FAILURE);
                     }
                     function = function.nextSibling();
                 }
+            } else {
+                qCritical() << "Unexpected element " << elem.tagName() << " in config";
+                exit(EXIT_FAILURE);
             }
             node = node.nextSibling();
         }
