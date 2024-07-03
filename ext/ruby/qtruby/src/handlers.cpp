@@ -18,51 +18,44 @@
 #include <QtCore/qstring.h>
 #include <QtCore/qtextcodec.h>
 #include <QtCore/qurl.h>
-#include <QtGui/qabstractbutton.h>
-#include <QtGui/qaction.h>
-#include <QtGui/qapplication.h>
-#include <QtGui/qdockwidget.h>
 #include <QtGui/qevent.h>
-#include <QtGui/qlayout.h>
-#include <QtGui/qlistwidget.h>
 #include <QtGui/qpainter.h>
 #include <QtGui/qpalette.h>
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpolygon.h>
-#include <QtGui/qtabbar.h>
-#include <QtGui/qtablewidget.h>
-#include <QtGui/qtextedit.h>
 #include <QtGui/qtextlayout.h>
 #include <QtGui/qtextobject.h>
-#include <QtGui/qtoolbar.h>
-#include <QtGui/qtreewidget.h>
-#include <QtGui/qwidget.h>
+#include <QtWidgets/qabstractbutton.h>
+#include <QtWidgets/qaction.h>
+#include <QtWidgets/qapplication.h>
+#include <QtWidgets/qdockwidget.h>
+#include <QtWidgets/qlayout.h>
+#include <QtWidgets/qlistwidget.h>
+#include <QtWidgets/qtabbar.h>
+#include <QtWidgets/qtablewidget.h>
+#include <QtWidgets/qtextedit.h>
+#include <QtWidgets/qtoolbar.h>
+#include <QtWidgets/qtreewidget.h>
+#include <QtWidgets/qwidget.h>
 #include <QtNetwork/qhostaddress.h>
 #include <QtNetwork/qnetworkinterface.h>
-#include <QtNetwork/qurlinfo.h>
 
 
-#if QT_VERSION >= 0x40200
-#include <QtGui/qgraphicsitem.h>
-#include <QtGui/qgraphicslayout.h>
-#include <QtGui/qgraphicsscene.h>
-#include <QtGui/qgraphicswidget.h>
+#include <QtWidgets/qgraphicsitem.h>
+#include <QtWidgets/qgraphicslayout.h>
+#include <QtWidgets/qgraphicsscene.h>
+#include <QtWidgets/qgraphicswidget.h>
 #include <QtGui/qstandarditemmodel.h>
-#include <QtGui/qundostack.h>
-#endif
+#include <QtWidgets/qundostack.h>
 
-#if QT_VERSION >= 0x40300
-#include <QtGui/qmdisubwindow.h>
+#include <QtWidgets/qmdisubwindow.h>
 #include <QtNetwork/qsslcertificate.h>
 #include <QtNetwork/qsslcipher.h>
 #include <QtNetwork/qsslerror.h>
-#include <QtXml/qxmlstream.h>
-#endif
+#include <QtCore/qxmlstream.h>
 
-#if QT_VERSION >= 0x040400
-#include <QtGui/qprinterinfo.h>
+#include <QtPrintSupport/qprinterinfo.h>
 #include <QtNetwork/qnetworkcookie.h>
-#endif
 
 #include <smoke/smoke.h>
 

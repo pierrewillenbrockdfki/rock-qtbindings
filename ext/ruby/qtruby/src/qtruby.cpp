@@ -18,6 +18,7 @@
 #include <QtCore/qabstractitemmodel.h>
 #include <QtCore/qglobal.h>
 #include <QtCore/qhash.h>
+#include <QtCore/qitemselectionmodel.h>
 #include <QtCore/qline.h>
 #include <QtCore/qmetaobject.h>
 #include <QtCore/qobject.h>
@@ -25,19 +26,18 @@
 #include <QtCore/qregexp.h>
 #include <QtCore/qstring.h>
 #include <QtCore/qvariant.h>
-#include <QtGui/qapplication.h>
 #include <QtGui/qbitmap.h>
 #include <QtGui/qcolor.h>
 #include <QtGui/qcursor.h>
 #include <QtGui/qfont.h>
 #include <QtGui/qicon.h>
-#include <QtGui/qitemselectionmodel.h>
 #include <QtGui/qpalette.h>
 #include <QtGui/qpen.h>
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpolygon.h>
 #include <QtGui/qtextformat.h>
-#include <QtGui/qwidget.h>
+#include <QtWidgets/qapplication.h>
+#include <QtWidgets/qwidget.h>
 
 #ifdef QT_QTDBUS
 #include <QtDBus/qdbusargument.h>
@@ -47,6 +47,8 @@
 
 #include <smoke/qtcore_smoke.h>
 #include <smoke/qtgui_smoke.h>
+#include <smoke/qtwidgets_smoke.h>
+#include <smoke/qtprintsupport_smoke.h>
 #include <smoke/qtxml_smoke.h>
 #include <smoke/qtsql_smoke.h>
 #include <smoke/qtopengl_smoke.h>

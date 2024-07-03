@@ -26,7 +26,7 @@
 #include <smokeruby.h>
 #include <marshall_macros.h>
 
-#include <QtDeclarative/QDeclarativeError>
+#include <QtQml/QQmlError>
 
 DEF_VALUELIST_MARSHALLER( QDeclarativeErrorList, QList<QDeclarativeError>, QDeclarativeError )
 
