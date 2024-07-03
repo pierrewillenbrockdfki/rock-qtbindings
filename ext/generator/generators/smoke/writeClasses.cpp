@@ -264,15 +264,18 @@ void SmokeClassFiles::generateSetAccessor(QTextStream& out, const QString& class
     out << "    }\n";
 }
 
-void SmokeClassFiles::generateEnumMemberCall(QTextStream& out, const QString& className, const QString& member, int index)
+void SmokeClassFiles::generateEnumMemberCall(QTextStream& out, const QString& className, const EnumMember& member, int index)
 {
     out << "    static void x_" << index << "(Smoke::Stack x) {\n"
         << "        x[0].s_enum = (long)";
     
     if (!className.isEmpty())
         out  << className << "::";
-    
-    out << member << ";\n"
+
+    if (member.getEnum()->isClass() && !member.getEnum()->name().isEmpty())
+        out  << member.getEnum()->name() << "::";
+
+    out << member.name() << ";\n"
         << "    }\n";
 }
 
@@ -424,9 +427,9 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
         foreach (const EnumMember& member, e->members()) {
             switchOut << "        case " << xcall_index << ": " << smokeClassName <<  "::x_" << xcall_index << "(args);\tbreak;\n";
             if (e->parent())
-                generateEnumMemberCall(out, className, member.name(), xcall_index++);
+                generateEnumMemberCall(out, className, member, xcall_index++);
             else
-                generateEnumMemberCall(out, e->nameSpace(), member.name(), xcall_index++);
+                generateEnumMemberCall(out, e->nameSpace(), member, xcall_index++);
         }
         
         // only generate the xenum_call if the enum has a valid name

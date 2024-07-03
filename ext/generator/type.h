@@ -165,16 +165,18 @@ class EnumMember;
 class GENERATOR_EXPORT Enum : public BasicTypeDeclaration
 {
 public:
-    Enum(const QString& name = QString(), const QString nspace = QString(), Class* parent = 0)
-         : BasicTypeDeclaration(name, nspace, parent) {}
+    Enum(const QString& name = QString(), const QString nspace = QString(), bool isClass = false, Class* parent = 0)
+         : BasicTypeDeclaration(name, nspace, parent), m_isClass(isClass) {}
     virtual ~Enum() {}
 
     const QList<EnumMember>& members() const { return m_members; }
     QList<EnumMember>& membersRef() { return m_members; }
     void appendMember(const EnumMember& member) { m_members.append(member); }
+    bool isClass() const { return m_isClass; }
 
 private:
     QList<EnumMember> m_members;
+    bool m_isClass;
 };
 
 class GENERATOR_EXPORT Member

@@ -577,7 +577,7 @@ void GeneratorVisitor::visitEnumSpecifier(EnumSpecifierAST* node)
 {
     nc->run(node->name);
     Class* parent = klass.isEmpty() ? 0 : klass.top();
-    currentEnum = Enum(nc->name(), nspace.join("::"), parent);
+    currentEnum = Enum(nc->name(), nspace.join("::"), node->class_key != 0, parent);
     Access a = (access.isEmpty() ? Access_public : access.top());
     currentEnum.setAccess(a);
     currentEnum.setFileName(m_header);
