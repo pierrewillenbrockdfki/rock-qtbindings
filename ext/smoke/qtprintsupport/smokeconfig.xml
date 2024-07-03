@@ -1,0 +1,179 @@
+<config>
+    <moduleName>qtprintsupport</moduleName>
+    <parentModules>
+        <module>qtcore</module>
+    </parentModules>
+    <parts>1</parts>
+    <scalarTypes>
+        <!-- QString is a class, but represented as a scalar (#) in munged names -->
+        <typeName>QString</typeName>
+        <typeName>HBITMAP__</typeName>
+        <typeName>HDC__</typeName>
+        <typeName>HFONT__</typeName>
+        <typeName>HICON__</typeName>
+        <typeName>HINSTANCE__</typeName>
+        <typeName>HPALETTE__</typeName>
+        <typeName>HRGN__</typeName>
+        <typeName>HWND__</typeName>
+    </scalarTypes>
+    <voidpTypes>
+        <!-- both are classes, but they are represented as Smoke::t_voidp -->
+        <typeName>QStringList</typeName>
+        <typeName>QString</typeName>
+        <typeName>HBITMAP__</typeName>
+        <typeName>HDC__</typeName>
+        <typeName>HFONT__</typeName>
+        <typeName>HICON__</typeName>
+        <typeName>HINSTANCE__</typeName>
+        <typeName>HPALETTE__</typeName>
+        <typeName>HRGN__</typeName>
+        <typeName>HWND__</typeName>
+    </voidpTypes>
+    <exclude>
+        <!-- we don't want private stuff in smoke.. -->
+        <signature>.*\(.*Private.*\).*</signature>
+        <signature>.*::d_ptr</signature>
+        <signature>.*::q_ptr</signature>
+        <signature>.*QGraphicsLayoutItem::QGraphicsLayoutItem\(const QGraphicsLayoutItem&amp;\).*</signature>
+        <signature>.*QGraphicsSceneEvent::QGraphicsSceneEvent\(const QGraphicsSceneEvent&amp;\).*</signature>
+        <signature>.*QGraphicsScene.*Event::QGraphicsScene.*Event\(const QGraphicsScene.*Event&amp;\).*</signature>
+        <signature>.*QPainterPathStroker::QPainterPathStroker\(const QPainterPathStroker&amp;\)</signature>
+        <signature>QBitmap&amp; QBitmap::operator=</signature>
+        <signature>QImage\* QImage::QImage\(.*, void\(\*\)\(void\*\), void\*\)</signature>
+        <signature>QMatrix&amp; QMatrix::operator=</signature>
+        <signature>const QMatrix&amp; QMatrix::QMatrix</signature>
+        <signature>const QRegion&amp; QRegion::QRegion</signature>
+        <signature>QPaintEngine\* QPaintEngine::QPaintEngine\(QFlags&lt;QPaintEngine::PaintEngineFeature&gt;\)</signature>
+        <signature>QTransform&amp; QTransform::operator=</signature>
+        <signature>const QTransform&amp; QTransform::QTransform</signature>
+        <!-- Looks like the generator/parser has trouble with the local type ConstIterator.
+             Maybe an error in our using implementation? -->
+        <signature>.*ConstIterator.* QRegion::.*\(\) const</signature>
+        <signature>QTextBlock::iterator\* QTextBlock::iterator::iterator\(const Iterator&amp;\)</signature>
+        <signature>bool QTextBlock::iterator::operator==\(const Iterator&amp;\) const</signature>
+        <signature>bool QTextBlock::iterator::operator!=\(const Iterator&amp;\) const</signature>
+        <signature>Iterator&amp; QTextBlock::iterator::operator\+\+\(\)</signature>
+        <signature>Iterator QTextBlock::iterator::operator\+\+\(int\)</signature>
+        <signature>Iterator&amp; QTextBlock::iterator::operator--\(\)</signature>
+        <signature>Iterator QTextBlock::iterator::operator--\(int\)</signature>
+        <signature>QTextFrame::iterator\* QTextFrame::iterator::iterator\(const Iterator&amp;\)</signature>
+        <signature>QTextFrame::iterator\* QTextFrame::iterator::iterator\(Iterator&amp;\)</signature>
+        <signature>bool QTextFrame::iterator::operator==\(const Iterator&amp;\) const</signature>
+        <signature>bool QTextFrame::iterator::operator!=\(const Iterator&amp;\) const</signature>
+        <signature>Iterator&amp; QTextFrame::iterator::operator\+\+\(\)</signature>
+        <signature>Iterator QTextFrame::iterator::operator\+\+\(int\)</signature>
+        <signature>Iterator&amp; QTextFrame::iterator::operator--\(\)</signature>
+        <signature>Iterator QTextFrame::iterator::operator--\(int\)</signature>
+        <signature>Iterator&amp; QTextFrame::iterator::operator=\(const Iterator&amp;\)</signature>
+        <signature>Iterator&amp; QTextFrame::iterator::operator=\(Iterator&amp;\)</signature>
+        <signature>const Iterator&amp; QTextFrame::iterator::iterator</signature>
+        <signature>Iterator&amp; QTextFrame::iterator::operator=</signature>
+        <!-- Thread related stuff belongs to the bindings language -->
+        <signature>.*QtConcurrent.*</signature>
+        <!-- this doesn't link, internal stuff.. -->
+        <signature>.*qFindString.*</signature>
+        <!-- windows internal helper functions -->
+        <signature>.*qFrom.*Endian_helper.*</signature>
+        <signature>.*QPixmapData.*</signature>
+        <signature>.*qt_x11_getX11InfoForWindow.*</signature>
+        <!-- OS X internal stuff -->
+        <signature>.*qt_mac_set_cursor.*</signature>
+        <signature>.*QMenu::macMenu\(.*</signature>
+        <!-- QtPrivate::IndexesList is a template type and smoke does not understand it properly, yet -->
+        <signature>.*[^a-zA-Z0-9_]IndexesList[^a-zA-Z0-9_].*</signature>
+        <signature>IndexesList .*</signature>
+        <!-- QGlobalSpace: "static" and "QGlobalSpace::" strings are not present when filtering -->
+        <!-- Some of these are the result of parse errors. -->
+        <signature>const QCborValue operator\[\]\(const QString&amp;\)</signature>
+        <signature>const QCborValue operator\[\]\(.*</signature>
+        <signature>QCborValueRef operator\[\]\(long long\)</signature>
+        <signature>QCborValueRef operator\[\]\(QLatin1String\)</signature>
+        <signature>QCborValueRef operator\[\]\(const QCborValue&amp;\)</signature>
+        <signature>QCborValueRef operator\[\]\(const QString&amp;\)</signature>
+        <signature>QCborValueRef operator\[\]\(qsizetype\)</signature>
+        <signature>QCborArray operator\+\(const QCborValue&amp;\)</signature>
+        <signature>QCborArray&amp; operator&lt;&lt;\(const QCborValue&amp;\)</signature>
+        <signature>QCborArray&amp; operator\+=\(const QCborValue&amp;\)</signature>
+        <signature>QCborValue&amp; operator=\(const QCborValue&amp;\)</signature>
+        <signature>QAbstractItemModel&amp; operator.*</signature>
+        <signature>bool operator&lt;\(const QCborArray&amp;\)</signature>
+        <signature>bool operator!\(\)</signature>
+        <signature>bool operator!=\(const QCborValue&amp;\)</signature>
+        <signature>bool operator!=\(const QString&amp;, QChar\)</signature>
+        <signature>bool operator==\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&gt;=\(QChar, const QStringRef&amp;\)</signature>
+        <signature>bool operator&gt;\(QLatin1String, QChar\)</signature>
+        <signature>bool operator&lt;\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborMap&amp;\)</signature>
+        <signature>QDebug operator&lt;&lt;\(QDebug,.*</signature>
+        <signature>E2 operator int\(\)</signature>
+        <signature>QUrlTwoFlags operator~\(\)</signature>
+        <signature>QUrlTwoFlags operator\^\(E1\)</signature>
+        <signature>QUrlTwoFlags operator\^\(E2\)</signature>
+        <signature>QUrlTwoFlags operator\^\(QUrlTwoFlags\)</signature>
+        <signature>QUrlTwoFlags operator\|\(E1\)</signature>
+        <signature>QUrlTwoFlags operator\|\(E2\)</signature>
+        <signature>QUrlTwoFlags operator\|\(QUrlTwoFlags\)</signature>
+        <signature>QUrlTwoFlags operator&amp;\(int\)</signature>
+        <signature>QUrlTwoFlags operator&amp;\(E2\)</signature>
+        <signature>QUrlTwoFlags operator&amp;\(E1\)</signature>
+        <signature>QUrlTwoFlags operator&amp;\(unsigned int\)</signature>
+        <signature>QUrlTwoFlags&amp; operator&amp;=\(int\)</signature>
+        <signature>QUrlTwoFlags&amp; operator&amp;=\(unsigned int\)</signature>
+        <signature>QUrlTwoFlags&amp; operator\^=\(E1\)</signature>
+        <signature>QUrlTwoFlags&amp; operator\^=\(E2\)</signature>
+        <signature>QUrlTwoFlags&amp; operator\^=\(QUrlTwoFlags\)</signature>
+        <signature>QUrlTwoFlags&amp; operator\|=\(E1\)</signature>
+        <signature>QUrlTwoFlags&amp; operator\|=\(E2\)</signature>
+        <signature>QUrlTwoFlags&amp; operator\|=\(QUrlTwoFlags\)</signature>
+        <signature>Code operator Code\(\)</signature>
+        <signature>E2 operator QFlags&lt;E2&gt;\(\)</signature>
+        <signature>E2 operator QFlags&lt;E1&gt;\(\)</signature>
+        <signature>const QByteArray operator\+\(const QByteArray&amp;, char\)</signature>
+        <signature>QTimer&amp; operator=\(const QTimer&amp;\)</signature>
+        <signature>float operator\[\]\(int\)</signature>
+        <signature>QVector3D&amp; operator\+=\(const QVector3D&amp;\)</signature>
+        <signature>QVector3D&amp; operator-=\(const QVector3D&amp;\)</signature>
+        <signature>QVector3D&amp; operator\*=\(float\)</signature>
+        <signature>QVector3D&amp; operator\*=\(const QVector3D&amp;\)</signature>
+        <signature>QVector3D&amp; operator/=\(float\)</signature>
+        <signature>QVector3D&amp; operator/=\(const QVector3D&amp;\)</signature>
+        <signature>float&amp; operator\[\]\(int\)</signature>
+        <signature>QPointF operator QVariant\(\)</signature>
+        <signature>QOpenGLPaintDevice&amp; operator=\(const QOpenGLPaintDevice&amp;\)</signature>
+        <signature>QWindow&amp; operator=\(const QWindow&amp;\)</signature>
+        <signature>void\* operator-&gt;\(\)</signature>
+        <!-- enums -->
+        <signature>::InvokeMetaMethod</signature>
+        <signature>::ReadProperty</signature>
+        <signature>::WriteProperty</signature>
+        <signature>::ResetProperty</signature>
+        <signature>::QueryPropertyDesignable</signature>
+        <signature>::QueryPropertyScriptable</signature>
+        <signature>::QueryPropertyStored</signature>
+        <signature>::QueryPropertyEditable</signature>
+        <signature>::QueryPropertyUser</signature>
+        <signature>::CreateInstance</signature>
+        <signature>::IndexOfMethod</signature>
+        <signature>::RegisterPropertyMetaType</signature>
+        <signature>::RegisterMethodArgumentMetaType</signature>
+        <signature>Call</signature>
+    </exclude>
+    <functions>
+        <!-- include functions starting with 'q' -->
+        <name>^q.*</name>
+        <name>.*::q.*</name>
+        <!-- and operators -->
+        <name>.*operator.*</name>
+    </functions>
+    <classList>
+        <class>QAbstractPrintDialog</class>
+        <class>QPageSetupDialog</class>
+        <class>QPrintDialog</class>
+        <class>QPrintEngine</class>
+        <class>QPrinter</class>
+        <class>QPrinterInfo</class>
+        <class>QPrintPreviewDialog</class>
+        <class>QPrintPreviewWidget</class>
+     </classList>
+</config>

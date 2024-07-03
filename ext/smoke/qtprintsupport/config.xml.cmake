@@ -1,0 +1,9 @@
+<config>
+    <resolveTypedefs>true</resolveTypedefs>
+    <qtMode>true</qtMode>
+    <generator>smoke</generator>
+    <definesList>@CMAKE_BINARY_DIR@/smoke/qtdefines</definesList>
+    <includeDirs>
+        @QT_INCLUDE_DIRS_XML@
+    </includeDirs>
+</config>
