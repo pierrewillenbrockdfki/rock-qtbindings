@@ -755,6 +755,17 @@ void GeneratorVisitor::visitSimpleDeclaration(SimpleDeclarationAST* node)
         if (tc->qualifiedName().isEmpty()) return;
         // for nested classes
         Class* parent = klass.isEmpty() ? 0 : klass.top();
+
+        QStringList local_nspace = nspace;
+        QStringList local_qualifiedName = tc->qualifiedName();
+        while(local_qualifiedName.size() > 1) {
+            local_nspace.append(local_qualifiedName.first());
+            local_qualifiedName.removeFirst();
+        }
+        if (tc->qualifiedName().size() > 1) {
+            parent = &classes[local_nspace.join("::")];
+        }
+
         Class _class = Class(tc->qualifiedName().last(), nspace.join("::"), parent, kind);
         Access a = (access.isEmpty() ? Access_public : access.top());
         _class.setAccess(a);
