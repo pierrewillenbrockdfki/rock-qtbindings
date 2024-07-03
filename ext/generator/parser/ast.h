@@ -93,6 +93,7 @@ struct ThrowExpressionAST;
 struct TranslationUnitAST;
 struct TryBlockStatementAST;
 struct CatchStatementAST;
+struct TypeAliasAST;
 struct TypeIdAST;
 struct TypeIdentificationAST;
 struct TypeParameterAST;
@@ -106,7 +107,7 @@ struct WhileStatementAST;
 struct WinDeclSpecAST;
 
 struct AST
-{///@warning When adding new nodes here, also modify the names[] array in dumptree.cpp
+{///@warning When adding new nodes here, also modify the names[] array in dumptree.cpp, Visitor::_S_table in visitor.cpp
   enum NODE_KIND
     {
       Kind_UNKNOWN = 0,
@@ -187,7 +188,8 @@ struct AST
       Kind_WinDeclSpec,                         // 74
       Kind_Comment,                             // 75
       Kind_JumpStatement,                       // 76
-      Kind_SignalSlotExpression,                     // 77
+      Kind_SignalSlotExpression,                // 77
+      Kind_TypeAlias,                           // 78
       NODE_KIND_COUNT
     };
 
@@ -393,6 +395,7 @@ struct EnumSpecifierAST: public TypeSpecifierAST
 {
   DECLARE_AST_NODE(EnumSpecifier)
 
+  std::size_t class_key;
   NameAST *name;
   const ListNode<EnumeratorAST*> *enumerators;
 };
@@ -816,6 +819,16 @@ struct CatchStatementAST: public StatementAST
   StatementAST* statement;
 };
 
+struct TypeAliasAST: public DeclarationAST
+{
+  DECLARE_AST_NODE(TypeAlias)
+
+  std::size_t eq_token;
+
+  NameAST *name;
+  TypeSpecifierAST *type_spec;
+};
+
 struct TypeIdAST: public AST
 {
   DECLARE_AST_NODE(TypeId)
@@ -839,6 +852,7 @@ struct TypeParameterAST: public AST
   DECLARE_AST_NODE(TypeParameter)
 
   std::size_t type;
+  std::size_t ellipsis;
   NameAST *name;
   TypeIdAST *type_id;
   const ListNode<TemplateParameterAST*> *template_parameters;

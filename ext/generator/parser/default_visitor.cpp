@@ -406,6 +406,12 @@ void DefaultVisitor::visitCatchStatement(CatchStatementAST * node)
   visit(node->statement);
 }
 
+void DefaultVisitor::visitTypeAlias(TypeAliasAST *node)
+{
+  visit(node->name);
+  visit(node->type_spec);
+}
+
 void DefaultVisitor::visitTypeId(TypeIdAST *node)
 {
   visit(node->type_specifier);

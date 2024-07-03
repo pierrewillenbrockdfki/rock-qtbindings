@@ -104,7 +104,8 @@ char const * const names[] = {
   "WinDeclSpec",
   "Kind_Comment",
   "Kind_JumpStatement",
-  "Kind_SignalSlotExpression"
+  "Kind_SignalSlotExpression",
+  "TypeAlias"
 };
 
 DumpTree::DumpTree()

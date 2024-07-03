@@ -870,16 +870,46 @@ bool Parser::parseUsing(DeclarationAST *&node)
   if (session->token_stream->lookAhead() == Token_namespace)
     return parseUsingDirective(node);
 
-  UsingAST *ast = CreateNode<UsingAST>(session->mempool);
+
+  std::size_t type_name = 0;
 
   if (session->token_stream->lookAhead() == Token_typename)
     {
-      ast->type_name = session->token_stream->cursor();
+      type_name = session->token_stream->cursor();
       advance();
     }
 
-  if (!parseName(ast->name))
+  NameAST *name = 0;
+  if (!parseName(name))
     return false;
+
+  if (type_name || session->token_stream->lookAhead() == ';')
+    {
+      UsingAST *ast = CreateNode<UsingAST>(session->mempool);
+      ast->type_name = type_name;
+      ast->name = name;
+
+      ADVANCE(';', ";");
+
+      UPDATE_POS(ast, start, _M_last_valid_token+1);
+      node = ast;
+
+      return true;
+    }
+
+  TypeAliasAST *ast = CreateNode<TypeAliasAST>(session->mempool);
+
+  ast->name = name;
+
+  ast->eq_token = session->token_stream->cursor();
+
+  ADVANCE('=', "=");
+
+  if (!parseTypeSpecifier(ast->type_spec))
+    {
+      reportError(("Need a type specifier to alias to"));
+      return false;
+    }
 
   ADVANCE(';', ";");
 
@@ -1138,6 +1168,7 @@ bool Parser::parseOperator(OperatorAST *&node)
     case Token_decr:
     case Token_ptrmem:
     case Token_arrow:
+    case Token_ellipsis:
       ast->op = session->token_stream->cursor();
       advance();
       break;
@@ -1227,7 +1258,8 @@ bool Parser::parseSimpleTypeSpecifier(TypeSpecifierAST *&node,
     {
       ast->integrals = integrals;
     }
-  else if (session->token_stream->lookAhead() == Token___typeof)
+  else if (session->token_stream->lookAhead() == Token___typeof ||
+      session->token_stream->lookAhead() == Token_decltype)
     {
       ast->type_of = session->token_stream->cursor();
       advance();
@@ -1277,7 +1309,7 @@ bool Parser::parsePtrOperator(PtrOperatorAST *&node)
   int tk = session->token_stream->lookAhead();
 
   if (tk != '&' && tk != '*'
-      && tk != Token_scope && tk != Token_identifier)
+      && tk != Token_scope && tk != Token_identifier && tk != Token_and)
     {
       return false;
     }
@@ -1289,6 +1321,7 @@ bool Parser::parsePtrOperator(PtrOperatorAST *&node)
     {
     case '&':
     case '*':
+    case Token_and:
       ast->op = session->token_stream->cursor();
       advance();
       break;
@@ -1332,6 +1365,11 @@ bool Parser::parseTemplateArgument(TemplateArgumentAST *&node)
       if (!parseLogicalOrExpression(expr, true))
         return false;
     }
+
+  //These actually can appear behind _any_ expression
+  if(session->token_stream->lookAhead() == Token_ellipsis) {
+      advance();
+  }
 
   TemplateArgumentAST *ast = CreateNode<TemplateArgumentAST>(session->mempool);
   ast->type_id = typeId;
@@ -1393,6 +1431,11 @@ bool Parser::parseDeclarator(DeclaratorAST *&node)
     }
   else
     {
+      if (session->token_stream->lookAhead() == Token_ellipsis)
+        {
+          advance();
+        }
+
       if (session->token_stream->lookAhead() == ':')
         {
           // unnamed bitfield
@@ -1630,6 +1673,13 @@ bool Parser::parseEnumSpecifier(TypeSpecifierAST *&node)
 
   CHECK(Token_enum);
 
+  std::size_t class_key = 0;
+  if (session->token_stream->lookAhead() == Token_class)
+    {
+      class_key = session->token_stream->cursor();
+      advance();
+    }
+
   NameAST *name = 0;
   parseName(name);
 
@@ -1641,6 +1691,7 @@ bool Parser::parseEnumSpecifier(TypeSpecifierAST *&node)
   advance();
 
   EnumSpecifierAST *ast = CreateNode<EnumSpecifierAST>(session->mempool);
+  ast->class_key = class_key;
   ast->name = name;
 
   EnumeratorAST *enumerator = 0;
@@ -1714,6 +1765,9 @@ bool Parser::parseTemplateParameter(TemplateParameterAST *&node)
   else if (!parseParameterDeclaration(ast->parameter_declaration))
     return false;
 
+  if(session->token_stream->lookAhead() == Token_ellipsis)
+    advance();
+
   UPDATE_POS(ast, start, _M_last_valid_token+1);
   node = ast;
 
@@ -1734,6 +1788,11 @@ bool Parser::parseTypeParameter(TypeParameterAST *&node)
       {
         advance(); // skip class
 
+        if(session->token_stream->lookAhead() == Token_ellipsis) {
+            ast->ellipsis = session->token_stream->cursor();
+            advance();
+        }
+
         // parse optional name
         if(parseName(ast->name, AcceptTemplate))
           {
@@ -1749,7 +1808,8 @@ bool Parser::parseTypeParameter(TypeParameterAST *&node)
                   }
               }
             else if (session->token_stream->lookAhead() != ','
-                     && session->token_stream->lookAhead() != '>')
+                     && session->token_stream->lookAhead() != '>'
+                     && session->token_stream->lookAhead() != Token_ellipsis)
               {
                 rewind(start);
                 return false;
@@ -1992,7 +2052,7 @@ bool Parser::parseParameterDeclaration(ParameterDeclarationAST *&node)
         }
     }
 
-  if( session->token_stream->lookAhead() != ',' && session->token_stream->lookAhead() != ')' && session->token_stream->lookAhead() != '>' )
+  if( session->token_stream->lookAhead() != ',' && session->token_stream->lookAhead() != ')' && session->token_stream->lookAhead() != '>'  && session->token_stream->lookAhead() != Token_ellipsis )
   {
     //Not a valid parameter declaration
     rewind(start);
@@ -2032,6 +2092,10 @@ bool Parser::parseClassSpecifier(TypeSpecifierAST *&node)
 
   NameAST *name = 0;
   parseName(name, AcceptTemplate);
+
+  if (session->token_stream->lookAhead() == Token_identifier &&
+      session->token_stream->token(session->token_stream->cursor()).symbolString() == "final")
+    advance();
 
   BaseClauseAST *bases = 0;
   if (session->token_stream->lookAhead() == ':')
@@ -2347,6 +2411,17 @@ bool Parser::parseInitDeclarator(InitDeclaratorAST *&node)
       skip('(', ')');
       advance();
     }
+
+  /* identifier with a special meaning in certain contexts */
+  if (session->token_stream->lookAhead() == Token_identifier &&
+      session->token_stream->token(session->token_stream->cursor()).symbolString() == "override")
+    advance();
+  if (session->token_stream->lookAhead() == Token_identifier &&
+      session->token_stream->token(session->token_stream->cursor()).symbolString() == "final")
+    advance();
+  if (session->token_stream->lookAhead() == Token_identifier &&
+      session->token_stream->token(session->token_stream->cursor()).symbolString() == "override")
+    advance();
 
   InitializerAST *init = 0;
   parseInitializer(init);

@@ -292,6 +292,9 @@ void CodeGenerator::visitEnumSpecifier(EnumSpecifierAST* node)
 {
   printToken(Token_enum, true);
 
+  if(node->class_key)
+    printToken(Token_class, true);
+
   visit(node->name);
 
   if (node->enumerators) {
@@ -793,6 +796,19 @@ void CodeGenerator::visitTypeParameter(TypeParameterAST* node)
     m_output << "=";
     visit(node->template_name);
   }
+}
+
+void CodeGenerator::visitTypeAlias(TypeAliasAST* node)
+{
+  printToken( Token_using );
+
+  visit(node->name);
+
+  m_output << "=";
+
+  visit(node->type_spec);
+
+  m_output << ";";
 }
 
 void CodeGenerator::visitTypedef(TypedefAST* node)

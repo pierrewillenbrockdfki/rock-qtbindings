@@ -110,6 +110,7 @@ protected:
   virtual void visitWhileStatement(WhileStatementAST *) {}
   virtual void visitWinDeclSpec(WinDeclSpecAST *) {}
   virtual void visitSignalSlotExpression(SignalSlotExpressionAST *) {}
+  virtual void visitTypeAlias(TypeAliasAST *) {}
 
 private:
   typedef void (Visitor::*visitor_fun_ptr)(AST *);
