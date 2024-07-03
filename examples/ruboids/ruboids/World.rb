@@ -14,7 +14,7 @@ require './Boid'
 require './Camera'
 require './Canvas'
 
-class World < Qt::Object
+class World < Qt5::Object
 	slots 'slotMove()'
 	
     include Singleton
@@ -50,7 +50,7 @@ class World < Qt::Object
 	    @flock.add(b)	# flock will delete boid
 	}
 
-	@clock = Qt::Timer.new()
+	@clock = Qt5::Timer.new()
 	connect(@clock, SIGNAL('timeout()'), self, SLOT('slotMove()'))
 
 	@camera = Camera.new	# Reads values from params

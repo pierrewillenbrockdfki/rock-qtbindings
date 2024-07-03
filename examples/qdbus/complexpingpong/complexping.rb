@@ -26,7 +26,7 @@
 require 'Qt5'
 require './ping-common.rb'
    
-class Ping < Qt::Object
+class Ping < Qt5::Object
     slots 'start(const QString&, const QString&, const QString&)'
 
     def start(name, oldValue, newValue)
@@ -35,14 +35,14 @@ class Ping < Qt::Object
         end
 
         # find our remote
-        iface = Qt::DBusInterface.new(SERVICE_NAME, "/", "com.trolltech.QtDBus.ComplexPong.Pong",
-                                   Qt::DBusConnection.sessionBus, self)
+        iface = Qt5::DBusInterface.new(SERVICE_NAME, "/", "com.trolltech.QtDBus.ComplexPong.Pong",
+                                   Qt5::DBusConnection.sessionBus, self)
         if !iface.valid?
-            $stderr.puts("%s" % Qt::DBusConnection.sessionBus.lastError.message)
-            Qt::CoreApplication.instance.quit
+            $stderr.puts("%s" % Qt5::DBusConnection.sessionBus.lastError.message)
+            Qt5::CoreApplication.instance.quit
         end
     
-        connect(iface, SIGNAL(:aboutToQuit), Qt::CoreApplication.instance(), SLOT(:quit))
+        connect(iface, SIGNAL(:aboutToQuit), Qt5::CoreApplication.instance(), SLOT(:quit))
     
         while true
             print("Ask your question: ")
@@ -57,9 +57,9 @@ class Ping < Qt::Object
                     puts("value = %s" % reply)
                 end
             elsif line =~ /^value=/
-                iface.setValue Qt::Variant.new(line[6, line.length])
+                iface.setValue Qt5::Variant.new(line[6, line.length])
             else
-                reply = Qt::DBusReply.new(iface.call("query", Qt::Variant.new(line)))
+                reply = Qt5::DBusReply.new(iface.call("query", Qt5::Variant.new(line)))
                 if reply.valid?
                     puts("Reply was: %s" % reply.value.value)
                 end
@@ -72,9 +72,9 @@ class Ping < Qt::Object
     end    
 end
 
-app = Qt::CoreApplication.new(ARGV)
+app = Qt5::CoreApplication.new(ARGV)
     
-if !Qt::DBusConnection.sessionBus.connected?
+if !Qt5::DBusConnection.sessionBus.connected?
     $stderr.puts("Cannot connect to the D-BUS session bus.\n" \
                     "To start it, run:\n" \
                     "\teval `dbus-launch --auto-syntax`\n")
@@ -82,11 +82,11 @@ if !Qt::DBusConnection.sessionBus.connected?
 end
     
 ping = Ping.new
-ping.connect(Qt::DBusConnection.sessionBus.interface,
+ping.connect(Qt5::DBusConnection.sessionBus.interface,
              SIGNAL('serviceOwnerChanged(QString,QString,QString)'),
              SLOT('start(QString,QString,QString)'))
 
-pong = Qt::Process.new
+pong = Qt5::Process.new
 pong.start("ruby ./complexpong.rb")
 
 app.exec

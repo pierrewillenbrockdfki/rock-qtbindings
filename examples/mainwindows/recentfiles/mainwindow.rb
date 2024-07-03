@@ -26,7 +26,7 @@
 	
 	
 	
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 	
 	
 	slots	'newFile()',
@@ -41,9 +41,9 @@ class MainWindow < Qt::MainWindow
 	
 	def initialize(parent = nil)
 		super
-	    setAttribute(Qt::WA_DeleteOnClose)
+	    setAttribute(Qt5::WA_DeleteOnClose)
 	
-	    @textEdit = Qt::TextEdit.new
+	    @textEdit = Qt5::TextEdit.new
 	    setCentralWidget(@textEdit)
 		@recentFileActs = []
 	    createActions()
@@ -60,7 +60,7 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def open()
-	    fileName = Qt::FileDialog.getOpenFileName(self)
+	    fileName = Qt5::FileDialog.getOpenFileName(self)
 	    if !fileName.nil?
 	        loadFile(fileName)
 		end
@@ -75,18 +75,18 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def saveAs()
-	    fileName = Qt::FileDialog::getSaveFileName(self)
+	    fileName = Qt5::FileDialog::getSaveFileName(self)
 	    if fileName.nil?
 	        return
 		end
 	
-	    if Qt::File.exists(fileName)
-	        ret = Qt::MessageBox::warning(self, tr("Recent Files"),
+	    if Qt5::File.exists(fileName)
+	        ret = Qt5::MessageBox::warning(self, tr("Recent Files"),
 	                     tr("File %s already exists.\nDo you want to overwrite it?" %
-	                     Qt::Dir.convertSeparators(fileName)),
-	                     Qt::MessageBox::Yes | Qt::MessageBox::Default,
-	                     Qt::MessageBox::No | Qt::MessageBox::Escape)
-	        if ret == Qt::MessageBox::No
+	                     Qt5::Dir.convertSeparators(fileName)),
+	                     Qt5::MessageBox::Yes | Qt5::MessageBox::Default,
+	                     Qt5::MessageBox::No | Qt5::MessageBox::Escape)
+	        if ret == Qt5::MessageBox::No
 	            return
 			end
 	    end
@@ -101,53 +101,53 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def about()
-	   Qt::MessageBox.about(self, tr("About Recent Files"),
+	   Qt5::MessageBox.about(self, tr("About Recent Files"),
 	            tr("The <b>Recent Files</b> example demonstrates how to provide a " +
 	               "recently used file menu in a Qt application."))
 	end
 	
 	def createActions()
-	    @newAct = Qt::Action.new(tr("&New"), self)
-	    @newAct.shortcut = Qt::KeySequence.new( tr("Ctrl+N") )
+	    @newAct = Qt5::Action.new(tr("&New"), self)
+	    @newAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+N") )
 	    @newAct.statusTip = tr("Create a file.new")
 	    connect(@newAct, SIGNAL('triggered()'), self, SLOT('newFile()'))
 	
-	    @openAct = Qt::Action.new(tr("&Open..."), self)
-	    @openAct.shortcut = Qt::KeySequence.new( tr("Ctrl+O") )
+	    @openAct = Qt5::Action.new(tr("&Open..."), self)
+	    @openAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+O") )
 	    @openAct.statusTip = tr("Open an existing file")
 	    connect(@openAct, SIGNAL('triggered()'), self, SLOT('open()'))
 	
-	    @saveAct = Qt::Action.new(tr("&Save"), self)
-	    @saveAct.shortcut = Qt::KeySequence.new( tr("Ctrl+S") )
+	    @saveAct = Qt5::Action.new(tr("&Save"), self)
+	    @saveAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+S") )
 	    @saveAct.statusTip = tr("Save the document to disk")
 	    connect(@saveAct, SIGNAL('triggered()'), self, SLOT('save()'))
 	
-	    @saveAsAct = Qt::Action.new(tr("Save &As..."), self)
+	    @saveAsAct = Qt5::Action.new(tr("Save &As..."), self)
 	    @saveAsAct.statusTip = tr("Save the document under a name.new")
 	    connect(@saveAsAct, SIGNAL('triggered()'), self, SLOT('saveAs()'))
 	
 		(0...MaxRecentFiles).each do |i|
-	        @recentFileActs[i] = Qt::Action.new(self)
+	        @recentFileActs[i] = Qt5::Action.new(self)
 	        @recentFileActs[i].visible = false
 	        connect(@recentFileActs[i], SIGNAL('triggered()'),
 	                self, SLOT('openRecentFile()'))
 	    end
 	
-	    @exitAct = Qt::Action.new(tr("&Close"), self)
-	    @exitAct.shortcut = Qt::KeySequence.new( tr("Ctrl+W") )
+	    @exitAct = Qt5::Action.new(tr("&Close"), self)
+	    @exitAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+W") )
 	    @exitAct.statusTip = tr("Close self window")
 	    connect(@exitAct, SIGNAL('triggered()'), self, SLOT('close()'))
 	
-	    @exitAct = Qt::Action.new(tr("E&xit"), self)
-	    @exitAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Q") )
+	    @exitAct = Qt5::Action.new(tr("E&xit"), self)
+	    @exitAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Q") )
 	    @exitAct.statusTip = tr("Exit the application")
 	    connect(@exitAct, SIGNAL('triggered()'), $qApp, SLOT('closeAllWindows()'))
 	
-	    @aboutAct = Qt::Action.new(tr("&About"), self)
+	    @aboutAct = Qt5::Action.new(tr("&About"), self)
 	    @aboutAct.statusTip = tr("Show the application's About box")
 	    connect(@aboutAct, SIGNAL('triggered()'), self, SLOT('about()'))
 	
-	    @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+	    @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
 	    @aboutQtAct.statusTip = tr("Show the Qt library's About box")
 	    connect(@aboutQtAct, SIGNAL('triggered()'), $qApp, SLOT('aboutQt()'))
 	end
@@ -174,35 +174,35 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def loadFile(fileName)
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::IODevice::ReadOnly | Qt::IODevice::Text)
-	        Qt::MessageBox.warning(self, tr("Recent Files"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::IODevice::ReadOnly | Qt5::IODevice::Text)
+	        Qt5::MessageBox.warning(self, tr("Recent Files"),
 	                             tr("Cannot read file %s:\n%s." % [fileName, file.errorString]))
 	        return
 	    end
 	
-	    inf = Qt::TextStream.new(file)
-	    Qt::Application.overrideCursor = Qt::Cursor.new(Qt::WaitCursor)
+	    inf = Qt5::TextStream.new(file)
+	    Qt5::Application.overrideCursor = Qt5::Cursor.new(Qt5::WaitCursor)
 	    @textEdit.plainText = inf.readAll
-	    Qt::Application::restoreOverrideCursor
+	    Qt5::Application::restoreOverrideCursor
 	
 	    setCurrentFile(fileName)
 	    statusBar().showMessage(tr("File loaded"), 2000)
 	end
 	
 	def saveFile(fileName)
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::IODevice::WriteOnly | Qt::IODevice::Text)
-	        Qt::MessageBox.warning(self, tr("Recent Files"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::IODevice::WriteOnly | Qt5::IODevice::Text)
+	        Qt5::MessageBox.warning(self, tr("Recent Files"),
 	                             tr("Cannot write file %s:\n%s." % [fileName, file.errorString]))
 	        return
 	    end
 	
-	    outf = Qt::TextStream.new(file)
-	    Qt::Application.overrideCursor = Qt::Cursor.new(Qt::WaitCursor)
+	    outf = Qt5::TextStream.new(file)
+	    Qt5::Application.overrideCursor = Qt5::Cursor.new(Qt5::WaitCursor)
 	    outf << @textEdit.toPlainText
 		outf.flush
-	    Qt::Application.restoreOverrideCursor
+	    Qt5::Application.restoreOverrideCursor
 	
 	    setCurrentFile(fileName)
 	    statusBar().showMessage(tr("File saved"), 2000)
@@ -216,7 +216,7 @@ class MainWindow < Qt::MainWindow
 	        setWindowTitle(tr("%s - %s" % [strippedName(@curFile), tr("Recent Files")]))
 		end
 	
-	    settings = Qt::Settings.new("Trolltech", "Recent Files Example")
+	    settings = Qt5::Settings.new("Trolltech", "Recent Files Example")
 	    files = settings.value("recentFileList").toStringList()
 	    files.delete(fileName)
 	    files.insert(0, fileName)
@@ -224,17 +224,17 @@ class MainWindow < Qt::MainWindow
 	        files.pop
 		end
 	
-	    settings.setValue("recentFileList", Qt::Variant.new(files))
+	    settings.setValue("recentFileList", Qt5::Variant.new(files))
 	
-	    Qt::Application.topLevelWidgets.each do |widget|
-	        if widget.inherits "Qt::MainWindow"
+	    Qt5::Application.topLevelWidgets.each do |widget|
+	        if widget.inherits "Qt5::MainWindow"
 	            widget.updateRecentFileActions()
 			end
 	    end
 	end
 	
 	def updateRecentFileActions()
-	    settings = Qt::Settings.new("Trolltech", "Recent Files Example")
+	    settings = Qt5::Settings.new("Trolltech", "Recent Files Example")
 	    files = settings.value("recentFileList").toStringList()
 	
 	    numRecentFiles = [files.length, MaxRecentFiles].min
@@ -242,7 +242,7 @@ class MainWindow < Qt::MainWindow
 		(0...numRecentFiles).each do |i|
 	        text = tr("&%s %s" % [i + 1, strippedName(files[i])])
 	        @recentFileActs[i].text = text
-	        @recentFileActs[i].data = Qt::Variant.new(files[i])
+	        @recentFileActs[i].data = Qt5::Variant.new(files[i])
 	        @recentFileActs[i].visible = true
 	    end
 		(numRecentFiles...MaxRecentFiles).each do |j|
@@ -253,6 +253,6 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def strippedName(fullFileName)
-	    return Qt::FileInfo.new(fullFileName).fileName()
+	    return Qt5::FileInfo.new(fullFileName).fileName()
 	end
 end

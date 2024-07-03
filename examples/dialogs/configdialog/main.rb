@@ -26,6 +26,6 @@
 require 'Qt5'
 require './configdialog.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 dialog = ConfigDialog.new
 dialog.exec

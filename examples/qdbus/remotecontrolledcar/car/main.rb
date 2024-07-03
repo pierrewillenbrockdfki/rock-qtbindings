@@ -26,25 +26,25 @@
 require 'Qt5'
 require './car.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 
-scene = Qt::GraphicsScene.new
+scene = Qt5::GraphicsScene.new
 scene.setSceneRect(-500, -500, 1000, 1000)
-scene.itemIndexMethod = Qt::GraphicsScene::NoIndex
+scene.itemIndexMethod = Qt5::GraphicsScene::NoIndex
 
 car = Car.new
 scene.addItem(car)
 
-view = Qt::GraphicsView.new(scene)
-view.renderHint = Qt::Painter::Antialiasing
-view.backgroundBrush = Qt::Brush.new(Qt::darkGray)
-view.setWindowTitle(QT_TRANSLATE_NOOP(Qt::GraphicsView, "Qt DBus Controlled Car"))
+view = Qt5::GraphicsView.new(scene)
+view.renderHint = Qt5::Painter::Antialiasing
+view.backgroundBrush = Qt5::Brush.new(Qt5::darkGray)
+view.setWindowTitle(QT_TRANSLATE_NOOP(Qt5::GraphicsView, "Qt5 DBus Controlled Car"))
 view.resize(400, 300)
 view.show()
 
 adaptor = CarAdaptor.new(car)
-connection = Qt::DBusConnection::sessionBus()
-connection.registerObject("/Car", adaptor, Qt::DBusConnection::ExportScriptableSlots)
+connection = Qt5::DBusConnection::sessionBus()
+connection.registerObject("/Car", adaptor, Qt5::DBusConnection::ExportScriptableSlots)
 connection.registerService("com.trolltech.CarExample")
 
 app.exec

@@ -24,27 +24,27 @@
 =end
 		
 	
-class SvgRasterView < Qt::Widget
+class SvgRasterView < Qt5::Widget
 	slots :poluteImage
 
 	def initialize(file, parent)
 	    super(parent)
-        @buffer = Qt::Image.new
+        @buffer = Qt5::Image.new
         @dirty = true
-	    @doc = Qt::SvgRenderer.new(file, self)
+	    @doc = Qt5::SvgRenderer.new(file, self)
 	    connect(@doc, SIGNAL(:repaintNeeded),
 	            self, SLOT(:poluteImage))
 	end
 	
 	def paintEvent(event)
 	    if @buffer.size() != size() || @dirty
-	        @buffer = Qt::Image.new(size(), Qt::Image::Format_ARGB32_Premultiplied)
-	        p = Qt::Painter.new(@buffer)
+	        @buffer = Qt5::Image.new(size(), Qt5::Image::Format_ARGB32_Premultiplied)
+	        p = Qt5::Painter.new(@buffer)
 	        p.setViewport(0, 0, width(), height())
 	        p.eraseRect(0, 0, width(), height())
 	        @doc.render(p)
 	    end
-	    pt = Qt::Painter.new(self)
+	    pt = Qt5::Painter.new(self)
 	    pt.drawImage(0, 0, @buffer)
         pt.end
 	end
@@ -78,17 +78,17 @@ class SvgRasterView < Qt::Widget
 	end
 end
 
-class SvgNativeView < Qt::Widget
+class SvgNativeView < Qt5::Widget
 
 	def initialize(file, parent)
 	    super(parent)
-	    @doc = Qt::SvgRenderer.new(file, self)
+	    @doc = Qt5::SvgRenderer.new(file, self)
 	    connect(@doc, SIGNAL(:repaintNeeded),
 	            self, SLOT(:update))
 	end
 	
 	def paintEvent(event)
-	    p = Qt::Painter.new(self)
+	    p = Qt5::Painter.new(self)
 	    p.setViewport(0, 0, width(), height())
 	    @doc.render(p)
         p.end
@@ -117,17 +117,17 @@ class SvgNativeView < Qt::Widget
 	end
 end
 
-class SvgGLView < Qt::GLWidget
+class SvgGLView < Qt5::GLWidget
 	
 	def initialize(file, parent)
-	    super(Qt::GLFormat.new(Qt::GL::SampleBuffers), parent)
-	    @doc = Qt::SvgRenderer.new(file, self)
+	    super(Qt5::GLFormat.new(Qt5::GL::SampleBuffers), parent)
+	    @doc = Qt5::SvgRenderer.new(file, self)
 	    connect(@doc, SIGNAL(:repaintNeeded),
 	            self, SLOT(:update))
 	end
 	
 	def paintEvent(event)
-	    p = Qt::Painter.new(self)
+	    p = Qt5::Painter.new(self)
 	    @doc.render(p)
         p.end
 	end

@@ -15,7 +15,7 @@ require './Camera'
 
 include GL
 
-class Canvas < Qt::GLWidget
+class Canvas < Qt5::GLWidget
 
     GRASS_COLOR = [0, 0.75, 0]
     MDA_ROTATE = :MDA_ROTATE
@@ -103,11 +103,11 @@ class Canvas < Qt::GLWidget
     def mousePressEvent(e)
         @mouseLoc = e.pos()
         case e.button()
-        when Qt::LeftButton
+        when Qt5::LeftButton
             @mouseDragAction = MDA_ZOOM
-        when Qt::RightButton
+        when Qt5::RightButton
             @mouseDragAction = MDA_ROTATE
-        when Qt::MidButton
+        when Qt5::MidButton
             @mouseDragAction = MDA_CHANGE_FOCUS
         end
     end

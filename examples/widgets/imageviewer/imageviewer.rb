@@ -24,7 +24,7 @@
 =end
 
 
-class ImageViewer < Qt::MainWindow
+class ImageViewer < Qt5::MainWindow
 
 slots   'open()',
         'print()',
@@ -36,13 +36,13 @@ slots   'open()',
 
 	def initialize(parent = nil)
 		super(parent)
-		@imageLabel = Qt::Label.new
-		@imageLabel.backgroundRole = Qt::Palette::Base
-		@imageLabel.setSizePolicy(Qt::SizePolicy::Ignored, Qt::SizePolicy::Ignored)
+		@imageLabel = Qt5::Label.new
+		@imageLabel.backgroundRole = Qt5::Palette::Base
+		@imageLabel.setSizePolicy(Qt5::SizePolicy::Ignored, Qt5::SizePolicy::Ignored)
 		@imageLabel.scaledContents = true
 	
-		@scrollArea = Qt::ScrollArea.new
-		@scrollArea.backgroundRole = Qt::Palette::Dark
+		@scrollArea = Qt5::ScrollArea.new
+		@scrollArea.backgroundRole = Qt5::Palette::Dark
 		@scrollArea.widget = @imageLabel
 		setCentralWidget(@scrollArea)
 	
@@ -51,20 +51,20 @@ slots   'open()',
 	
 		setWindowTitle(tr("Image Viewer"))
 		resize(500, 400)
-		@printer = Qt::Printer.new
+		@printer = Qt5::Printer.new
 	end
 	
 	def open()
-		fileName = Qt::FileDialog::getOpenFileName(self,
-										tr("Open File"), Qt::Dir.currentPath())
+		fileName = Qt5::FileDialog::getOpenFileName(self,
+										tr("Open File"), Qt5::Dir.currentPath())
 		if !fileName.nil?
-			image = Qt::Image.new(fileName)
+			image = Qt5::Image.new(fileName)
 			if image.nil?
-				Qt::MessageBox.information(self, tr("Image Viewer"),
+				Qt5::MessageBox.information(self, tr("Image Viewer"),
 										tr("Cannot load %s." % fileName))
 				return
 			end
-			@imageLabel.pixmap = Qt::Pixmap.fromImage(image)
+			@imageLabel.pixmap = Qt5::Pixmap.fromImage(image)
 			@scaleFactor = 1.0
 	
 			@printAct.enabled = true
@@ -78,13 +78,13 @@ slots   'open()',
 	end
 	
 	def print()
-		dialog = Qt::PrintDialog.new(@printer, self)
+		dialog = Qt5::PrintDialog.new(@printer, self)
 		if dialog.exec
-			painter = Qt::Painter.new(@printer)
+			painter = Qt5::Painter.new(@printer)
 			rect = painter.viewport
 			size = @imageLabel.pixmap.size
-			size.scale(rect.size(), Qt::KeepAspectRatio)
-			painter.viewport = Qt::Rect.new(rect.x, rect.y, size.width, size.height)
+			size.scale(rect.size(), Qt5::KeepAspectRatio)
+			painter.viewport = Qt5::Rect.new(rect.x, rect.y, size.width, size.height)
 			painter.window = @imageLabel.pixmap.rect
 			painter.drawPixmap(0, 0, @imageLabel.pixmap)
 		end
@@ -115,78 +115,78 @@ slots   'open()',
 	
 	
 	def about()
-		Qt::MessageBox::about(self, tr("About Image Viewer"),
-				tr("<p>The <b>Image Viewer</b> example shows how to combine Qt::Label " +
-				"and Qt::ScrollArea to display an image. Qt::Label is typically used " +
+		Qt5::MessageBox::about(self, tr("About Image Viewer"),
+				tr("<p>The <b>Image Viewer</b> example shows how to combine Qt5::Label " +
+				"and Qt5::ScrollArea to display an image. Qt5::Label is typically used " +
 				"for displaying a text, but it can also display an image. " +
-				"Qt::ScrollArea provides a scrolling view around another widget. " +
-				"If the child widget exceeds the size of the frame, Qt::ScrollArea " +
+				"Qt5::ScrollArea provides a scrolling view around another widget. " +
+				"If the child widget exceeds the size of the frame, Qt5::ScrollArea " +
 				"automatically provides scroll bars. </p><p>The example " +
-				"demonstrates how Qt::Label's ability to scale its contents " +
-				"(Qt::Label::scaledContents), and Qt::ScrollArea's ability to " +
+				"demonstrates how Qt5::Label's ability to scale its contents " +
+				"(Qt5::Label::scaledContents), and Qt5::ScrollArea's ability to " +
 				"automatically resize its contents " +
-				"(Qt::ScrollArea.widgetResizable), can be used to implement " +
+				"(Qt5::ScrollArea.widgetResizable), can be used to implement " +
 				"zooming and scaling features. </p><p>In addition the example " +
-				"shows how to use Qt::Painter to print an image.</p>"))
+				"shows how to use Qt5::Painter to print an image.</p>"))
 	end
 	
 	def createActions()
-		@openAct = Qt::Action.new(tr("&Open..."), self)
-		@openAct.shortcut = Qt::KeySequence.new(tr("Ctrl+O"))
+		@openAct = Qt5::Action.new(tr("&Open..."), self)
+		@openAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+O"))
 		connect(@openAct, SIGNAL('triggered()'), self, SLOT('open()'))
 	
-		@printAct = Qt::Action.new(tr("&Print..."), self)
-		@printAct.shortcut = Qt::KeySequence.new(tr("Ctrl+P"))
+		@printAct = Qt5::Action.new(tr("&Print..."), self)
+		@printAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+P"))
 		@printAct.enabled = false
 		connect(@printAct, SIGNAL('triggered()'), self, SLOT('print()'))
 	
-		@exitAct = Qt::Action.new(tr("E&xit"), self)
-		@exitAct.shortcut = Qt::KeySequence.new(tr("Ctrl+Q"))
+		@exitAct = Qt5::Action.new(tr("E&xit"), self)
+		@exitAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+Q"))
 		connect(@exitAct, SIGNAL('triggered()'), self, SLOT('close()'))
 	
-		@zoomInAct = Qt::Action.new(tr("Zoom &In (25%)"), self)
-		@zoomInAct.shortcut = Qt::KeySequence.new(tr("Ctrl++"))
+		@zoomInAct = Qt5::Action.new(tr("Zoom &In (25%)"), self)
+		@zoomInAct.shortcut = Qt5::KeySequence.new(tr("Ctrl++"))
 		@zoomInAct.enabled = false
 		connect(@zoomInAct, SIGNAL('triggered()'), self, SLOT('zoomIn()'))
 	
-		@zoomOutAct = Qt::Action.new(tr("Zoom &Out (25%)"), self)
-		@zoomOutAct.shortcut = Qt::KeySequence.new(tr("Ctrl+-"))
+		@zoomOutAct = Qt5::Action.new(tr("Zoom &Out (25%)"), self)
+		@zoomOutAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+-"))
 		@zoomOutAct.enabled = false
 		connect(@zoomOutAct, SIGNAL('triggered()'), self, SLOT('zoomOut()'))
 	
-		@normalSizeAct = Qt::Action.new(tr("&Normal Size"), self)
-		@normalSizeAct.shortcut = Qt::KeySequence.new(tr("Ctrl+S"))
+		@normalSizeAct = Qt5::Action.new(tr("&Normal Size"), self)
+		@normalSizeAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+S"))
 		@normalSizeAct.enabled = false
 		connect(@normalSizeAct, SIGNAL('triggered()'), self, SLOT('normalSize()'))
 	
-		@fitToWindowAct = Qt::Action.new(tr("&Fit to Window"), self)
+		@fitToWindowAct = Qt5::Action.new(tr("&Fit to Window"), self)
 		@fitToWindowAct.enabled = false
 		@fitToWindowAct.checkable = true
-		@fitToWindowAct.shortcut = Qt::KeySequence.new(tr("Ctrl+F"))
+		@fitToWindowAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+F"))
 		connect(@fitToWindowAct, SIGNAL('triggered()'), self, SLOT('fitToWindow()'))
 	
-		@aboutAct = Qt::Action.new(tr("&About"), self)
+		@aboutAct = Qt5::Action.new(tr("&About"), self)
 		connect(@aboutAct, SIGNAL('triggered()'), self, SLOT('about()'))
 	
-		@aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+		@aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
 		connect(@aboutQtAct, SIGNAL('triggered()'), $qApp, SLOT('aboutQt()'))
 	end
 	
 	def createMenus()
-		@fileMenu = Qt::Menu.new(tr("&File"), self)
+		@fileMenu = Qt5::Menu.new(tr("&File"), self)
 		@fileMenu.addAction(@openAct)
 		@fileMenu.addAction(@printAct)
 		@fileMenu.addSeparator()
 		@fileMenu.addAction(@exitAct)
 	
-		@viewMenu = Qt::Menu.new(tr("&View"), self)
+		@viewMenu = Qt5::Menu.new(tr("&View"), self)
 		@viewMenu.addAction(@zoomInAct)
 		@viewMenu.addAction(@zoomOutAct)
 		@viewMenu.addAction(@normalSizeAct)
 		@viewMenu.addSeparator()
 		@viewMenu.addAction(@fitToWindowAct)
 	
-		@helpMenu = Qt::Menu.new(tr("&Help"), self)
+		@helpMenu = Qt5::Menu.new(tr("&Help"), self)
 		@helpMenu.addAction(@aboutAct)
 		@helpMenu.addAction(@aboutQtAct)
 	

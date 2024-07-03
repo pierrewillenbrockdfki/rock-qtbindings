@@ -28,7 +28,7 @@ class Adjustor
     end
 end
 
-class CameraDialog < Qt::Dialog
+class CameraDialog < Qt5::Dialog
         slots         'slotReset()', 'slotLocXChanged(int)', 
                         'slotLocYChanged(int)', 'slotLocZChanged(int)', 
                         'slotRotationXChanged(int)', 'slotRotationYChanged(int)', 
@@ -47,16 +47,16 @@ class CameraDialog < Qt::Dialog
         @origCamera = @camera.dup()
 
         # Group and layout widgets
-        vLayout = Qt::VBoxLayout.new(self)
+        vLayout = Qt5::VBoxLayout.new(self)
 
-        locBox = Qt::GroupBox.new('Location', self)
-        rotationBox = Qt::GroupBox.new('Rotation', self)
-        otherBox = Qt::GroupBox.new('Other', self)
+        locBox = Qt5::GroupBox.new('Location', self)
+        rotationBox = Qt5::GroupBox.new('Rotation', self)
+        otherBox = Qt5::GroupBox.new('Other', self)
 
-        locLayout = Qt::GridLayout.new(locBox)
-        rotationLayout = Qt::GridLayout.new(rotationBox)
-        otherLayout = Qt::GridLayout.new(otherBox)
-        buttonLayout = Qt::HBoxLayout.new()
+        locLayout = Qt5::GridLayout.new(locBox)
+        rotationLayout = Qt5::GridLayout.new(rotationBox)
+        otherLayout = Qt5::GridLayout.new(otherBox)
+        buttonLayout = Qt5::HBoxLayout.new()
 
         vLayout.addWidget(locBox)
         vLayout.addWidget(rotationBox)
@@ -95,14 +95,14 @@ class CameraDialog < Qt::Dialog
         @otherAdjustors[0].origValue = @camera.zoom
 
         # The Close button
-        button = Qt::PushButton.new('Close', self)
+        button = Qt5::PushButton.new('Close', self)
         connect(button, SIGNAL('clicked()'), self, SLOT('close()'))
         button.setDefault(true)
         button.setFixedSize(button.sizeHint())
         buttonLayout.addWidget(button)
 
         # The Close button
-        button = Qt::PushButton.new('Reset', self)
+        button = Qt5::PushButton.new('Reset', self)
         connect(button, SIGNAL('clicked()'), self, SLOT('slotReset()'))
         button.setFixedSize(button.sizeHint())
         buttonLayout.addWidget(button)
@@ -121,12 +121,12 @@ class CameraDialog < Qt::Dialog
     def addSlider(row, box, layout, label, min, max, pageStep, slot,
                   initialValue)
         # Label
-        text = Qt::Label.new(label, box)
+        text = Qt5::Label.new(label, box)
         text.setMinimumSize(text.sizeHint())
         layout.addWidget(text, row, 0)
 
         # Slider
-        slider = Qt::Slider.new(Qt::Horizontal, box) do |s|
+        slider = Qt5::Slider.new(Qt5::Horizontal, box) do |s|
             s.range = min..max
             s.sliderPosition = initialValue
             s.pageStep = pageStep
@@ -141,10 +141,10 @@ class CameraDialog < Qt::Dialog
         connect(slider, SIGNAL('valueChanged(int)'), self, SLOT(slot))
 
         # Number display
-        num = Qt::Label.new('XXXXX', box)
+        num = Qt5::Label.new('XXXXX', box)
         num.setMinimumSize(num.sizeHint())
-        num.setFrameStyle(Qt::Frame::Panel | Qt::Frame::Sunken)
-        num.setAlignment(Qt::AlignRight | Qt::AlignVCenter)
+        num.setFrameStyle(Qt5::Frame::Panel | Qt5::Frame::Sunken)
+        num.setAlignment(Qt5::AlignRight | Qt5::AlignVCenter)
         num.setNum(initialValue)
 
         layout.addWidget(num, row, 2)

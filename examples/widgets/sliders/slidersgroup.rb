@@ -24,7 +24,7 @@
 =end
     
     
-class SlidersGroup < Qt::GroupBox
+class SlidersGroup < Qt5::GroupBox
     
     signals 'valueChanged(int)'
     
@@ -36,30 +36,30 @@ class SlidersGroup < Qt::GroupBox
     
     def initialize(orientation, title, parent = nil)
         super(title, parent)
-        @slider = Qt::Slider.new(orientation)
-        @slider.focusPolicy = Qt::StrongFocus
-        @slider.tickPosition = Qt::Slider::TicksBothSides
+        @slider = Qt5::Slider.new(orientation)
+        @slider.focusPolicy = Qt5::StrongFocus
+        @slider.tickPosition = Qt5::Slider::TicksBothSides
         @slider.tickInterval = 10
         @slider.singleStep = 1
     
-        @scrollBar = Qt::ScrollBar.new(orientation)
-        @scrollBar.focusPolicy = Qt::StrongFocus
+        @scrollBar = Qt5::ScrollBar.new(orientation)
+        @scrollBar.focusPolicy = Qt5::StrongFocus
     
-        @dial = Qt::Dial.new
-        @dial.focusPolicy = Qt::StrongFocus
+        @dial = Qt5::Dial.new
+        @dial.focusPolicy = Qt5::StrongFocus
     
         connect(@slider, SIGNAL('valueChanged(int)'), @scrollBar, SLOT('setValue(int)'))
         connect(@scrollBar, SIGNAL('valueChanged(int)'), @dial, SLOT('setValue(int)'))
         connect(@dial, SIGNAL('valueChanged(int)'), @slider, SLOT('setValue(int)'))
         connect(@dial, SIGNAL('valueChanged(int)'), self, SIGNAL('valueChanged(int)'))
     
-        if orientation == Qt::Horizontal
-            direction = Qt::BoxLayout::TopToBottom
+        if orientation == Qt5::Horizontal
+            direction = Qt5::BoxLayout::TopToBottom
         else
-            direction = Qt::BoxLayout::LeftToRight
+            direction = Qt5::BoxLayout::LeftToRight
         end
 
-        @slidersLayout = Qt::BoxLayout.new(direction) do |l|
+        @slidersLayout = Qt5::BoxLayout.new(direction) do |l|
 			l.addWidget(@slider)
 			l.addWidget(@scrollBar)
 			l.addWidget(@dial)

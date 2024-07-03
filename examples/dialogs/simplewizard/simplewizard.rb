@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
         
-class SimpleWizard < Qt::Dialog
+class SimpleWizard < Qt5::Dialog
     
     slots 'backButtonClicked()', 'nextButtonClicked()'
         
@@ -31,17 +31,17 @@ class SimpleWizard < Qt::Dialog
         super(parent)
         @history = []
         @numPages = 0
-        @cancelButton = Qt::PushButton.new(tr("Cancel"))
-        @backButton = Qt::PushButton.new(tr("< &Back"))
-        @nextButton = Qt::PushButton.new(tr("Next >"))
-        @finishButton = Qt::PushButton.new(tr("&Finish"))
+        @cancelButton = Qt5::PushButton.new(tr("Cancel"))
+        @backButton = Qt5::PushButton.new(tr("< &Back"))
+        @nextButton = Qt5::PushButton.new(tr("Next >"))
+        @finishButton = Qt5::PushButton.new(tr("&Finish"))
     
         connect(@cancelButton, SIGNAL('clicked()'), self, SLOT('reject()'))
         connect(@backButton, SIGNAL('clicked()'), self, SLOT('backButtonClicked()'))
         connect(@nextButton, SIGNAL('clicked()'), self, SLOT('nextButtonClicked()'))
         connect(@finishButton, SIGNAL('clicked()'), self, SLOT('accept()'))
     
-        @buttonLayout = Qt::HBoxLayout.new do |b|
+        @buttonLayout = Qt5::HBoxLayout.new do |b|
 			b.addStretch(1)
 			b.addWidget(@cancelButton)
 			b.addWidget(@backButton)
@@ -49,7 +49,7 @@ class SimpleWizard < Qt::Dialog
 			b.addWidget(@finishButton)
     	end
 
-        @mainLayout = Qt::VBoxLayout.new {|l| l.addLayout(@buttonLayout)}
+        @mainLayout = Qt5::VBoxLayout.new {|l| l.addLayout(@buttonLayout)}
         self.layout = @mainLayout
     end
     

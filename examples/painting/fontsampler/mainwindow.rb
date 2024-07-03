@@ -26,7 +26,7 @@
 require './ui_mainwindowbase.rb'
 require './previewdialog.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
     
     
     slots   'on_clearAction_triggered()',
@@ -59,7 +59,7 @@ class MainWindow < Qt::MainWindow
     end
     
     def setupFontTree()
-        database = Qt::FontDatabase.new
+        database = Qt5::FontDatabase.new
         @ui.fontTree.columnCount = 1
         @ui.fontTree.headerLabels = [tr("Font")]
     
@@ -69,18 +69,18 @@ class MainWindow < Qt::MainWindow
                 continue
             end
     
-            familyItem = Qt::TreeWidgetItem.new(@ui.fontTree)
+            familyItem = Qt5::TreeWidgetItem.new(@ui.fontTree)
             familyItem.setText(0, family)
-            familyItem.setCheckState(0, Qt::Unchecked)
+            familyItem.setCheckState(0, Qt5::Unchecked)
     
             styles.each do |style|
-                styleItem = Qt::TreeWidgetItem.new(familyItem)
+                styleItem = Qt5::TreeWidgetItem.new(familyItem)
                 styleItem.setText(0, style)
-                styleItem.setCheckState(0, Qt::Unchecked)
-                styleItem.setData(0, Qt::UserRole,
-                    Qt::Variant.new(database.weight(family, style)))
-                styleItem.setData(0, Qt::UserRole + 1,
-                    Qt::Variant.new(database.italic(family, style)))
+                styleItem.setCheckState(0, Qt5::Unchecked)
+                styleItem.setData(0, Qt5::UserRole,
+                    Qt5::Variant.new(database.weight(family, style)))
+                styleItem.setData(0, Qt5::UserRole + 1,
+                    Qt5::Variant.new(database.italic(family, style)))
             end
         end
     end
@@ -94,11 +94,11 @@ class MainWindow < Qt::MainWindow
     end
     
     def on_markAction_triggered()
-        markUnmarkFonts(Qt::Checked)
+        markUnmarkFonts(Qt5::Checked)
     end
     
     def on_unmarkAction_triggered()
-        markUnmarkFonts(Qt::Unchecked)
+        markUnmarkFonts(Qt5::Unchecked)
     end
     
     def markUnmarkFonts(state)
@@ -118,23 +118,23 @@ class MainWindow < Qt::MainWindow
         if !item.parent.nil?
             family = item.parent().text(0)
             style = item.text(0)
-            weight = item.data(0, Qt::UserRole).to_i
-            italic = item.data(0, Qt::UserRole + 1).toBool()
+            weight = item.data(0, Qt5::UserRole).to_i
+            italic = item.data(0, Qt5::UserRole + 1).toBool()
         else
             family = item.text(0)
             style = item.child(0).text(0)
-            weight = item.child(0).data(0, Qt::UserRole).to_i
-            italic = item.child(0).data(0, Qt::UserRole + 1).toBool()
+            weight = item.child(0).data(0, Qt5::UserRole).to_i
+            italic = item.child(0).data(0, Qt5::UserRole + 1).toBool()
         end
     
         oldText = @ui.textEdit.toPlainText.lstrip.rstrip
         modified = @ui.textEdit.document.modified?
         @ui.textEdit.clear
-        @ui.textEdit.document.setDefaultFont(Qt::Font.new(family, 32, weight, italic))
+        @ui.textEdit.document.setDefaultFont(Qt5::Font.new(family, 32, weight, italic))
     
         cursor = @ui.textEdit.textCursor()
-        blockFormat = Qt::TextBlockFormat.new
-        blockFormat.alignment = Qt::AlignCenter
+        blockFormat = Qt5::TextBlockFormat.new
+        blockFormat.alignment = Qt5::AlignCenter
         cursor.insertBlock(blockFormat)
     
         if modified
@@ -156,51 +156,51 @@ class MainWindow < Qt::MainWindow
         if !parent.nil?
     
             # Only count style items.
-            if state == Qt::Checked
+            if state == Qt5::Checked
                 @markedCount += 1
             else
                 @markedCount -= 1
             end
 
-            if state == Qt::Checked &&
-                parent.checkState(0) == Qt::Unchecked
+            if state == Qt5::Checked &&
+                parent.checkState(0) == Qt5::Unchecked
                 # Mark parent items when child items are checked.
-                parent.setCheckState(0, Qt::Checked)
-            elsif state == Qt::Unchecked &&
-                       parent.checkState(0) == Qt::Checked
+                parent.setCheckState(0, Qt5::Checked)
+            elsif state == Qt5::Unchecked &&
+                       parent.checkState(0) == Qt5::Checked
                 marked = false
                 for row in 0..(parent.childCount - 1)
-                    if parent.child(row).checkState(0) == Qt::Checked
+                    if parent.child(row).checkState(0) == Qt5::Checked
                         marked = true
                         break
                     end
                 end
                 # Unmark parent items when all child items are unchecked.
                 if !marked
-                    parent.setCheckState(0, Qt::Unchecked)
+                    parent.setCheckState(0, Qt5::Unchecked)
                 end
             end
         else
             row
             number = 0
             for row in 0..(item.childCount - 1)
-                if item.child(row).checkState(0) == Qt::Checked
+                if item.child(row).checkState(0) == Qt5::Checked
                     number += 1
                 end
             end
     
             # Mark/unmark all child items when marking/unmarking top-level
             # items.
-            if state == Qt::Checked && number == 0
+            if state == Qt5::Checked && number == 0
                 for row in 0..(item.childCount - 1)
-                    if item.child(row).checkState(0) == Qt::Unchecked
-                        item.child(row).setCheckState(0, Qt::Checked)
+                    if item.child(row).checkState(0) == Qt5::Unchecked
+                        item.child(row).setCheckState(0, Qt5::Checked)
                     end
                 end
-            elsif state == Qt::Unchecked && number > 0
+            elsif state == Qt5::Unchecked && number > 0
                 for row in 0..(item.childCount - 1)
-                    if item.child(row).checkState(0) == Qt::Checked
-                        item.child(row).setCheckState(0, Qt::Unchecked)
+                    if item.child(row).checkState(0) == Qt5::Checked
+                        item.child(row).setCheckState(0, Qt5::Unchecked)
                     end
                 end
             end
@@ -217,7 +217,7 @@ class MainWindow < Qt::MainWindow
             return
         end
 
-        printer = Qt::Printer.new(Qt::Printer::HighResolution)
+        printer = Qt5::Printer.new(Qt5::Printer::HighResolution)
         if !setupPrinter(printer)
             return
         end
@@ -229,14 +229,14 @@ class MainWindow < Qt::MainWindow
             to = @pageMap.keys().length
         end
     
-        progress = Qt::ProgressDialog.new(tr("Printing font samples..."), tr("&Cancel"),
+        progress = Qt5::ProgressDialog.new(tr("Printing font samples..."), tr("&Cancel"),
                                  0, @pageMap.length, self)
-        progress.windowModality = Qt::ApplicationModal
+        progress.windowModality = Qt5::ApplicationModal
         progress.windowTitle = tr("Printing")
         progress.minimum = from - 1
         progress.maximum = to
     
-        painter = Qt::Painter.new
+        painter = Qt5::Painter.new
         painter.begin(printer)
         firstPage = true
     
@@ -264,13 +264,13 @@ class MainWindow < Qt::MainWindow
         if @pageMap.length == 0
             return
         end
-        printer = Qt::Printer.new
+        printer = Qt5::Printer.new
     
         preview = PreviewDialog.new(printer, self)
         connect(preview,
             SIGNAL('pageRequested(int, QPainter*, QPrinter*)'),
             self, SLOT('printPage(int, QPainter*, QPrinter*)'),
-            Qt::DirectConnection)
+            Qt5::DirectConnection)
     
         preview.setNumberOfPages = @pageMap.length
         preview.exec()
@@ -282,14 +282,14 @@ class MainWindow < Qt::MainWindow
         for row in 0..(@ui.fontTree.topLevelItemCount - 1)
             familyItem = @ui.fontTree.topLevelItem(row)
     
-            if familyItem.checkState(0) == Qt::Checked
+            if familyItem.checkState(0) == Qt5::Checked
                 family = familyItem.text(0)
                 pageMap[family] = []
             end
             
             for childRow in 0..(familyItem.childCount - 1)
                 styleItem = familyItem.child(childRow)
-                if styleItem.checkState(0) == Qt::Checked
+                if styleItem.checkState(0) == Qt5::Checked
                     pageMap[family] << styleItem
                 end
             end
@@ -299,8 +299,8 @@ class MainWindow < Qt::MainWindow
     end
     
     def setupPrinter(printer)
-        dialog = Qt::PrintDialog.new(printer, self)
-        return dialog.exec() == Qt::Dialog::Accepted
+        dialog = Qt5::PrintDialog.new(printer, self)
+        return dialog.exec() == Qt5::Dialog::Accepted
     end
     
     def printPage(index, painter, printer)
@@ -313,14 +313,14 @@ class MainWindow < Qt::MainWindow
         height = 0.0
         items.each do |item|
             style = item.text(0)
-            weight = item.data(0, Qt::UserRole).to_i
-            italic = item.data(0, Qt::UserRole + 1).toBool()
+            weight = item.data(0, Qt5::UserRole).to_i
+            italic = item.data(0, Qt5::UserRole + 1).toBool()
     
             # Calculate the maximum width and total height of the text.
             @sampleSizes.each do |size|
-                font = Qt::Font.new(family, size, weight, italic)
-                font = Qt::Font.new(font, painter.device())
-                fontMetrics = Qt::FontMetricsF.new(font)
+                font = Qt5::Font.new(family, size, weight, italic)
+                font = Qt5::Font.new(font, painter.device())
+                fontMetrics = Qt5::FontMetricsF.new(font)
                 rect = fontMetrics.boundingRect(
                 "%s %s" % [family, style])
                 width = [rect.width(), width].max
@@ -339,25 +339,25 @@ class MainWindow < Qt::MainWindow
         painter.save()
         painter.translate(printer.pageRect().width()/2.0, printer.pageRect().height()/2.0)
         painter.scale(scale, scale)
-        painter.brush = Qt::Brush.new(Qt::black)
+        painter.brush = Qt5::Brush.new(Qt5::black)
     
         x = -width/2.0
         y = -height/2.0 - remainingHeight/4.0 + spaceHeight
     
         items.each do |item|
             style = item.text(0)
-            weight = item.data(0, Qt::UserRole).to_i
-            italic = item.data(0, Qt::UserRole + 1).toBool()
+            weight = item.data(0, Qt5::UserRole).to_i
+            italic = item.data(0, Qt5::UserRole + 1).toBool()
     
             # Draw each line of text
             @sampleSizes.each do |size|
-                font = Qt::Font.new(family, size, weight, italic)
-                font = Qt::Font.new(font, painter.device())
-                fontMetrics = Qt::FontMetricsF.new(font)
+                font = Qt5::Font.new(family, size, weight, italic)
+                font = Qt5::Font.new(font, painter.device())
+                fontMetrics = Qt5::FontMetricsF.new(font)
                 rect = fontMetrics.boundingRect("%s %s" % [font.family(), style])
                 y += rect.height()
                 painter.font = font
-                painter.drawText(Qt::PointF.new(x, y),
+                painter.drawText(Qt5::PointF.new(x, y),
                                  "%s %s" % [family, style])
                 y += interLineHeight
             end

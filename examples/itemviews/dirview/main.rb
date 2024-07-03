@@ -25,14 +25,14 @@
 	
 require 'Qt5'
 	
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 	
-model = Qt::DirModel.new
+model = Qt5::DirModel.new
 	
-tree = Qt::TreeView.new
+tree = Qt5::TreeView.new
 tree.model = model
 	
-tree.windowTitle = Qt::Object.tr("Dir View")
+tree.windowTitle = Qt5::Object.tr("Dir View")
 tree.resize(640, 480)
 tree.show
 	

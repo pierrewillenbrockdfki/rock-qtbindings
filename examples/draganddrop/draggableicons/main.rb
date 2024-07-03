@@ -26,10 +26,10 @@
 require 'Qt5'
 require './dragwidget.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 
-mainWidget = Qt::Widget.new
-horizontalLayout = Qt::HBoxLayout.new
+mainWidget = Qt5::Widget.new
+horizontalLayout = Qt5::HBoxLayout.new
 
 horizontalLayout.addWidget(DragWidget.new)
 horizontalLayout.addWidget(DragWidget.new)

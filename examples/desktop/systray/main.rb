@@ -27,11 +27,11 @@ require 'Qt5'
 require './qrc_systray.rb'
 require './window.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 
-if !Qt::SystemTrayIcon.isSystemTrayAvailable
-    Qt::MessageBox.critical(nil, Qt::Object.tr("Systray"),
-                              Qt::Object.tr("I couldn't detect any system tray " \
+if !Qt5::SystemTrayIcon.isSystemTrayAvailable
+    Qt5::MessageBox.critical(nil, Qt5::Object.tr("Systray"),
+                              Qt5::Object.tr("I couldn't detect any system tray " \
                                           "on this system."))
     exit 1
 end

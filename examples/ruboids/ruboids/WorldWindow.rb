@@ -9,7 +9,7 @@ require 'Qt5'
 require './Canvas'
 require './CameraDialog'
 
-class WorldWindow < Qt::MainWindow
+class WorldWindow < Qt5::MainWindow
 
     slots 'slotCameraDialog()'
 
@@ -28,8 +28,8 @@ class WorldWindow < Qt::MainWindow
 
     def setupMenubar
         # Create and populate file menu
-        exitAct = Qt::Action.new("E&xit", self)
-        exitAct.shortcut = Qt::KeySequence.new("Ctrl+Q")
+        exitAct = Qt5::Action.new("E&xit", self)
+        exitAct.shortcut = Qt5::KeySequence.new("Ctrl+Q")
         connect(exitAct, SIGNAL('triggered()'), $qApp, SLOT('quit()'))
 
         # Add file menu to menu bar
@@ -37,7 +37,7 @@ class WorldWindow < Qt::MainWindow
         fileMenu.addAction(exitAct)
 
         # Create and populate options menu
-        cameraAct = Qt::Action.new("&Camera...", self)
+        cameraAct = Qt5::Action.new("&Camera...", self)
         connect(cameraAct, SIGNAL('triggered()'), self, SLOT('slotCameraDialog()'))
 
         # Add options menu to menu bar and link it to method below

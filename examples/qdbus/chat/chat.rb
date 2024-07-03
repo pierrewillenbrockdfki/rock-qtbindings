@@ -27,7 +27,7 @@ require 'Qt5'
 require './chat_interface.rb'
 require './chat_adaptor.rb'
 
-class Ui_ChatMainWindow < Qt::MainWindow
+class Ui_ChatMainWindow < Qt5::MainWindow
     signals 'message(const QString&, const QString&)',
             'action(const QString&, const QString&)'
     
@@ -55,10 +55,10 @@ class Ui_ChatMainWindow < Qt::MainWindow
     
         # add our D-Bus interface and connect to D-Bus
         ChatAdaptor.new(self)
-        Qt::DBusConnection.sessionBus.registerObject("/", self)
-        iface = ComTrolltechChatInterface.new(nil, nil, Qt::DBusConnection.sessionBus(), self)
+        Qt5::DBusConnection.sessionBus.registerObject("/", self)
+        iface = ComTrolltechChatInterface.new(nil, nil, Qt5::DBusConnection.sessionBus(), self)
 #        connect(self, SIGNAL('message(QString,QString)'), self, SLOT('messageSlot(QString,QString)'))
-        Qt::DBusConnection.sessionBus.connect(nil, nil, "com.trolltech.chat", "message", self, SLOT('messageSlot(QString,QString)'))
+        Qt5::DBusConnection.sessionBus.connect(nil, nil, "com.trolltech.chat", "message", self, SLOT('messageSlot(QString,QString)'))
         connect(iface, SIGNAL('action(QString,QString)'), self, SLOT('actionSlot(QString,QString)'))
     
         require 'ui_chatsetnickname.rb'
@@ -101,15 +101,15 @@ class Ui_ChatMainWindow < Qt::MainWindow
     
     def sendClickedSlot()
         # emit message(@m_nickname, messageLineEdit.text())
-        msg = Qt::DBusMessage.createSignal("/", "com.trolltech.chat", "message")
+        msg = Qt5::DBusMessage.createSignal("/", "com.trolltech.chat", "message")
         msg << @m_nickname << @messageLineEdit.text()
-        Qt::DBusConnection.sessionBus().send(msg)
+        Qt5::DBusConnection.sessionBus().send(msg)
         @messageLineEdit.text = ""
     end
     
     def changeNickname()
         dialog = Ui_NicknameDialog.new(self)
-        if dialog.exec == Qt::Dialog::Accepted
+        if dialog.exec == Qt5::Dialog::Accepted
             old = @m_nickname
             @m_nickname = dialog.nickname.text.strip
             emit action(old, "is now known as %s" % @m_nickname)
@@ -117,7 +117,7 @@ class Ui_ChatMainWindow < Qt::MainWindow
     end
     
     def aboutQt()
-        Qt::MessageBox.aboutQt(self)
+        Qt5::MessageBox.aboutQt(self)
     end
     
     def exiting()
@@ -125,16 +125,16 @@ class Ui_ChatMainWindow < Qt::MainWindow
     end
 end
 
-class Ui_NicknameDialog < Qt::Dialog
+class Ui_NicknameDialog < Qt5::Dialog
     def initialize(parent = nil)
         super(parent)
         setupUi(self)
     end
 end
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
     
-if !Qt::DBusConnection.sessionBus().connected?
+if !Qt5::DBusConnection.sessionBus().connected?
     qWarning("Cannot connect to the D-BUS session bus.\n" \
     "Please check your system settings and try again.\n")
     return 1

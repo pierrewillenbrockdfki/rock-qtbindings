@@ -23,68 +23,68 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class ConfigurationPage < Qt::Widget
+class ConfigurationPage < Qt5::Widget
     
     def initialize(parent = nil)
         super(parent)
-        configGroup = Qt::GroupBox.new(tr("Server configuration"))
+        configGroup = Qt5::GroupBox.new(tr("Server configuration"))
     
-        serverLabel = Qt::Label.new(tr("Server:"))
-        serverCombo = Qt::ComboBox.new do |c|
+        serverLabel = Qt5::Label.new(tr("Server:"))
+        serverCombo = Qt5::ComboBox.new do |c|
             c.addItem(tr("Trolltech (Australia)"))
             c.addItem(tr("Trolltech (Norway)"))
             c.addItem(tr("Trolltech (People's Republic of China)"))
             c.addItem(tr("Trolltech (USA)"))
         end
     
-        serverLayout = Qt::HBoxLayout.new do |s|
+        serverLayout = Qt5::HBoxLayout.new do |s|
             s.addWidget(serverLabel)
             s.addWidget(serverCombo)
         end
     
-        configGroup.layout = Qt::VBoxLayout.new do |c|
+        configGroup.layout = Qt5::VBoxLayout.new do |c|
             c.addLayout(serverLayout)
         end
     
-        self.layout = Qt::VBoxLayout.new do |m|
+        self.layout = Qt5::VBoxLayout.new do |m|
             m.addWidget(configGroup)
             m.addStretch(1)
         end
     end
 end
 
-class QueryPage < Qt::Widget
+class QueryPage < Qt5::Widget
     
     def initialize(parent = nil)
         super(parent)
-        updateGroup = Qt::GroupBox.new(tr("Package selection"))
-        systemCheckBox = Qt::CheckBox.new(tr("Update system"))
-        appsCheckBox = Qt::CheckBox.new(tr("Update applications"))
-        docsCheckBox = Qt::CheckBox.new(tr("Update documentation"))
+        updateGroup = Qt5::GroupBox.new(tr("Package selection"))
+        systemCheckBox = Qt5::CheckBox.new(tr("Update system"))
+        appsCheckBox = Qt5::CheckBox.new(tr("Update applications"))
+        docsCheckBox = Qt5::CheckBox.new(tr("Update documentation"))
     
-        packageGroup = Qt::GroupBox.new(tr("Existing packages"))
+        packageGroup = Qt5::GroupBox.new(tr("Existing packages"))
     
-        packageList = Qt::ListWidget.new
-        qtItem = Qt::ListWidgetItem.new(packageList)
-        qtItem.text = tr("Qt")
-        qsaItem = Qt::ListWidgetItem.new(packageList)
+        packageList = Qt5::ListWidget.new
+        qtItem = Qt5::ListWidgetItem.new(packageList)
+        qtItem.text = tr("Qt5")
+        qsaItem = Qt5::ListWidgetItem.new(packageList)
         qsaItem.text = tr("QSA")
-        teamBuilderItem = Qt::ListWidgetItem.new(packageList)
+        teamBuilderItem = Qt5::ListWidgetItem.new(packageList)
         teamBuilderItem.text = tr("Teambuilder")
     
-        startUpdateButton = Qt::PushButton.new(tr("Start update"))
+        startUpdateButton = Qt5::PushButton.new(tr("Start update"))
     
-        updateGroup.layout = Qt::VBoxLayout.new do |u|
+        updateGroup.layout = Qt5::VBoxLayout.new do |u|
             u.addWidget(systemCheckBox)
             u.addWidget(appsCheckBox)
             u.addWidget(docsCheckBox)
         end
     
-        packageGroup.layout = Qt::VBoxLayout.new do |p|
+        packageGroup.layout = Qt5::VBoxLayout.new do |p|
             p.addWidget(packageList)
         end
     
-        self.layout = Qt::VBoxLayout.new do |m|
+        self.layout = Qt5::VBoxLayout.new do |m|
             m.addWidget(updateGroup)
             m.addWidget(packageGroup)
             m.addSpacing(12)
@@ -94,22 +94,22 @@ class QueryPage < Qt::Widget
     end
 end
 
-class UpdatePage < Qt::Widget
+class UpdatePage < Qt5::Widget
     
     def initialize(parent = nil)
         super(parent)
-        packagesGroup = Qt::GroupBox.new(tr("Look for packages"))
+        packagesGroup = Qt5::GroupBox.new(tr("Look for packages"))
     
-        nameLabel = Qt::Label.new(tr("Name:"))
-        nameEdit = Qt::LineEdit.new
+        nameLabel = Qt5::Label.new(tr("Name:"))
+        nameEdit = Qt5::LineEdit.new
     
-        dateLabel = Qt::Label.new(tr("Released after:"))
-        dateEdit = Qt::DateTimeEdit.new(Qt::Date.currentDate())
+        dateLabel = Qt5::Label.new(tr("Released after:"))
+        dateEdit = Qt5::DateTimeEdit.new(Qt5::Date.currentDate())
     
-        releasesCheckBox = Qt::CheckBox.new(tr("Releases"))
-        upgradesCheckBox = Qt::CheckBox.new(tr("Upgrades"))
+        releasesCheckBox = Qt5::CheckBox.new(tr("Releases"))
+        upgradesCheckBox = Qt5::CheckBox.new(tr("Upgrades"))
     
-        hitsSpinBox = Qt::SpinBox.new do |h|
+        hitsSpinBox = Qt5::SpinBox.new do |h|
             h.prefix = tr("Return up to ")
             h.suffix = tr(" results")
             h.specialValueText = tr("Return only the first result")
@@ -118,9 +118,9 @@ class UpdatePage < Qt::Widget
             h.singleStep = 10
         end
 
-        startQueryButton = Qt::PushButton.new(tr("Start query"))
+        startQueryButton = Qt5::PushButton.new(tr("Start query"))
     
-        packagesGroup.layout = Qt::GridLayout.new do |p|
+        packagesGroup.layout = Qt5::GridLayout.new do |p|
             p.addWidget(nameLabel, 0, 0)
             p.addWidget(nameEdit, 0, 1)
             p.addWidget(dateLabel, 1, 0)
@@ -130,7 +130,7 @@ class UpdatePage < Qt::Widget
             p.addWidget(hitsSpinBox, 4, 0, 1, 2)
         end
     
-        self.layout = Qt::VBoxLayout.new do |m|
+        self.layout = Qt5::VBoxLayout.new do |m|
             m.addWidget(packagesGroup)
             m.addSpacing(12)
             m.addWidget(startQueryButton)

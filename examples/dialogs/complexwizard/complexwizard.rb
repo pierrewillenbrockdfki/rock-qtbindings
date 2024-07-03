@@ -24,7 +24,7 @@
 =end
 	
 	
-class ComplexWizard < Qt::Dialog
+class ComplexWizard < Qt5::Dialog
 	
 	slots   'backButtonClicked()',
     		'nextButtonClicked()',
@@ -34,24 +34,24 @@ class ComplexWizard < Qt::Dialog
 	    super(parent)
 
 		@history = []
-	    @cancelButton = Qt::PushButton.new(tr("Cancel"))
-	    @backButton = Qt::PushButton.new(tr("< &Back"))
-	    @nextButton = Qt::PushButton.new(tr("Next >"))
-	    @finishButton = Qt::PushButton.new(tr("&Finish"))
+	    @cancelButton = Qt5::PushButton.new(tr("Cancel"))
+	    @backButton = Qt5::PushButton.new(tr("< &Back"))
+	    @nextButton = Qt5::PushButton.new(tr("Next >"))
+	    @finishButton = Qt5::PushButton.new(tr("&Finish"))
 	
 	    connect(@cancelButton, SIGNAL('clicked()'), self, SLOT('reject()'))
 	    connect(@backButton, SIGNAL('clicked()'), self, SLOT('backButtonClicked()'))
 	    connect(@nextButton, SIGNAL('clicked()'), self, SLOT('nextButtonClicked()'))
 	    connect(@finishButton, SIGNAL('clicked()'), self, SLOT('accept()'))
 	
-	    @buttonLayout = Qt::HBoxLayout.new
+	    @buttonLayout = Qt5::HBoxLayout.new
 	    @buttonLayout.addStretch(1)
 	    @buttonLayout.addWidget(@cancelButton)
 	    @buttonLayout.addWidget(@backButton)
 	    @buttonLayout.addWidget(@nextButton)
 	    @buttonLayout.addWidget(@finishButton)
 	
-	    @mainLayout = Qt::VBoxLayout.new
+	    @mainLayout = Qt5::VBoxLayout.new
 	    @mainLayout.addLayout(@buttonLayout)
 	    setLayout(@mainLayout)
 	end
@@ -114,7 +114,7 @@ class ComplexWizard < Qt::Dialog
 	end
 end
 
-class WizardPage < Qt::Widget
+class WizardPage < Qt5::Widget
 
 	signals 'completeStateChanged()'
 	

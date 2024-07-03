@@ -25,7 +25,7 @@
 
 require './renderarea.rb'
 
-class Window < Qt::Widget
+class Window < Qt5::Widget
 	
 	slots	'operationChanged()',
     		'shapeSelected(int)'
@@ -36,13 +36,13 @@ class Window < Qt::Widget
 		super
 	    @originalRenderArea = RenderArea.new
 	
-	    @shapeComboBox = Qt::ComboBox.new
+	    @shapeComboBox = Qt5::ComboBox.new
 	    @shapeComboBox.addItem(tr("Clock"))
 	    @shapeComboBox.addItem(tr("House"))
 	    @shapeComboBox.addItem(tr("Text"))
 	    @shapeComboBox.addItem(tr("Truck"))
 	
-	    layout = Qt::GridLayout.new
+	    layout = Qt5::GridLayout.new
 	    layout.addWidget(@originalRenderArea, 0, 0)
 	    layout.addWidget(@shapeComboBox, 1, 0)
 	
@@ -51,7 +51,7 @@ class Window < Qt::Widget
 		(0...NumTransformedAreas).each do |i|
 	        @transformedRenderAreas[i] = RenderArea.new
 	
-	        @operationComboBoxes[i] = Qt::ComboBox.new
+	        @operationComboBoxes[i] = Qt5::ComboBox.new
 	        @operationComboBoxes[i].addItem(tr("No transformation"))
 	        @operationComboBoxes[i].addItem(tr("Rotate by 60\xB0"))
 	        @operationComboBoxes[i].addItem(tr("Scale to 75%"))
@@ -72,8 +72,8 @@ class Window < Qt::Widget
 	end
 	
 	def setupShapes()
-	    truck = Qt::PainterPath.new
-	    truck.fillRule = Qt::WindingFill
+	    truck = Qt5::PainterPath.new
+	    truck.fillRule = Qt5::WindingFill
 	    truck.moveTo(0.0, 87.0)
 	    truck.lineTo(0.0, 60.0)
 	    truck.lineTo(10.0, 60.0)
@@ -89,7 +89,7 @@ class Window < Qt::Widget
 	    truck.addEllipse(17.0, 75.0, 25.0, 25.0)
 	    truck.addEllipse(63.0, 75.0, 25.0, 25.0)
 	
-	    clock = Qt::PainterPath.new
+	    clock = Qt5::PainterPath.new
 	    clock.addEllipse(-50.0, -50.0, 100.0, 100.0)
 	    clock.addEllipse(-48.0, -48.0, 96.0, 96.0)
 	    clock.moveTo(0.0, 0.0)
@@ -103,7 +103,7 @@ class Window < Qt::Widget
 	    clock.lineTo(0.732, 2.732)
 	    clock.lineTo(0.0, 0.0)
 	
-	    house = Qt::PainterPath.new
+	    house = Qt5::PainterPath.new
 	    house.moveTo(-45.0, -20.0)
 	    house.lineTo(0.0, -45.0)
 	    house.lineTo(45.0, -20.0)
@@ -113,11 +113,11 @@ class Window < Qt::Widget
 	    house.addRect(15.0, 5.0, 20.0, 35.0)
 	    house.addRect(-35.0, -15.0, 25.0, 25.0)
 	
-	    text = Qt::PainterPath.new
-	    font = Qt::Font.new
+	    text = Qt5::PainterPath.new
+	    font = Qt5::Font.new
 	    font.pixelSize = 50
-	    fontBoundingRect = Qt::FontMetrics.new(font).boundingRect(tr("Qt"))
-	    text.addText(-Qt::PointF.new(fontBoundingRect.center()), font, tr("Qt"))
+	    fontBoundingRect = Qt5::FontMetrics.new(font).boundingRect(tr("Qt5"))
+	    text.addText(-Qt5::PointF.new(fontBoundingRect.center()), font, tr("Qt5"))
 	
 		@shapes = []
 	    @shapes.push(clock)

@@ -26,7 +26,7 @@
 require './pixeldelegate.rb'
 require './imagemodel.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
     
     slots   :chooseImage,
             :printImage,
@@ -35,12 +35,12 @@ class MainWindow < Qt::MainWindow
     
     def initialize()
         super
-        @currentPath = Qt::Dir.home.absolutePath
-        @model = ImageModel.new(Qt::Image.new, self)
+        @currentPath = Qt5::Dir.home.absolutePath
+        @model = ImageModel.new(Qt5::Image.new, self)
     
-		centralWidget = Qt::Widget.new
+		centralWidget = Qt5::Widget.new
 
-        @view = Qt::TableView.new
+        @view = Qt5::TableView.new
         @view.showGrid = false
         @view.horizontalHeader.hide
         @view.verticalHeader.hide
@@ -48,25 +48,25 @@ class MainWindow < Qt::MainWindow
         delegate = PixelDelegate.new(self)
         @view.itemDelegate = delegate
 
-    	pixelSizeLabel = Qt::Label.new(tr("Pixel size:"))
-    	pixelSizeSpinBox = Qt::SpinBox.new do |s|
+    	pixelSizeLabel = Qt5::Label.new(tr("Pixel size:"))
+    	pixelSizeSpinBox = Qt5::SpinBox.new do |s|
     		s.minimum = 1
     		s.maximum = 32
     		s.value = 12
 		end
     
-        fileMenu = Qt::Menu.new(tr("&File"), self)
+        fileMenu = Qt5::Menu.new(tr("&File"), self)
         openAction = fileMenu.addAction(tr("&Open..."))
-        openAction.shortcut = Qt::KeySequence.new(tr("Ctrl+O"))
+        openAction.shortcut = Qt5::KeySequence.new(tr("Ctrl+O"))
     
         @printAction = fileMenu.addAction(tr("&Print..."))
         @printAction.enabled = false
-        @printAction.shortcut = Qt::KeySequence.new(tr("Ctrl+P"))
+        @printAction.shortcut = Qt5::KeySequence.new(tr("Ctrl+P"))
     
         quitAction = fileMenu.addAction(tr("E&xit"))
-        quitAction.shortcut = Qt::KeySequence.new(tr("Ctrl+Q"))
+        quitAction.shortcut = Qt5::KeySequence.new(tr("Ctrl+Q"))
     
-        helpMenu = Qt::Menu.new(tr("&Help"), self)
+        helpMenu = Qt5::Menu.new(tr("&Help"), self)
         aboutAction = helpMenu.addAction(tr("&About"))
     
         menuBar.addMenu(fileMenu)
@@ -82,13 +82,13 @@ class MainWindow < Qt::MainWindow
     	connect(pixelSizeSpinBox, SIGNAL('valueChanged(int)'),
             self, SLOT(:updateView))
 
-		controlsLayout = Qt::HBoxLayout.new do |c|
+		controlsLayout = Qt5::HBoxLayout.new do |c|
 			c.addWidget(pixelSizeLabel)
 			c.addWidget(pixelSizeSpinBox)
 			c.addStretch(1)
 		end
 	
-		centralWidget.layout = Qt::VBoxLayout.new do |m|
+		centralWidget.layout = Qt5::VBoxLayout.new do |m|
 			m.addWidget(@view)
 			m.addLayout(controlsLayout)
 		end
@@ -100,7 +100,7 @@ class MainWindow < Qt::MainWindow
     end
     
     def chooseImage
-        fileName = Qt::FileDialog.getOpenFileName(self,
+        fileName = Qt5::FileDialog.getOpenFileName(self,
             tr("Choose an image"), @currentPath, "*")
     
         if !fileName.nil?
@@ -111,7 +111,7 @@ class MainWindow < Qt::MainWindow
     end
     
     def openImage(fileName)
-        image = Qt::Image.new
+        image = Qt5::Image.new
     
         if image.load(fileName)
             @model = ImageModel.new(image)
@@ -128,30 +128,30 @@ class MainWindow < Qt::MainWindow
     end
     
     def printImage()
-        if @model.rowCount(Qt::ModelIndex.new()).model.columnCount(Qt::ModelIndex.new()) > 90000
-            answer = Qt::MessageBox::question(self, tr("Large Image Size"),
+        if @model.rowCount(Qt5::ModelIndex.new()).model.columnCount(Qt5::ModelIndex.new()) > 90000
+            answer = Qt5::MessageBox::question(self, tr("Large Image Size"),
                 tr("The printed image may be very large. Are you sure that " \
                    "you want to print it?"),
-                Qt::MessageBox::Yes, Qt::MessageBox::No)
-            if answer == Qt::MessageBox::No
+                Qt5::MessageBox::Yes, Qt5::MessageBox::No)
+            if answer == Qt5::MessageBox::No
                 return
             end
         end
     
-        printer = Qt::Printer.new(Qt::Printer::HighResolution)
+        printer = Qt5::Printer.new(Qt5::Printer::HighResolution)
     
-        dlg = Qt::PrintDialog.new(printer, self)
+        dlg = Qt5::PrintDialog.new(printer, self)
         dlg.windowTitle = tr("Print Image")
     
-        if dlg.exec != Qt::Dialog::Accepted
+        if dlg.exec != Qt5::Dialog::Accepted
             return
         end
     
-        painter = Qt::Painter.new
+        painter = Qt5::Painter.new
         painter.begin(printer)
     
-        rows = @model.rowCount(Qt::ModelIndex.new)
-        columns = @model.columnCount(Qt::ModelIndex.new)
+        rows = @model.rowCount(Qt5::ModelIndex.new)
+        columns = @model.columnCount(Qt5::ModelIndex.new)
         sourceWidth = (columns+1) * PixelDelegate::ItemSize
         sourceHeight = (rows+1) * PixelDelegate::ItemSize
     
@@ -166,10 +166,10 @@ class MainWindow < Qt::MainWindow
         painter.scale(scale, scale)
         painter.translate(-sourceWidth/2, -sourceHeight/2)
     
-        option = Qt::StyleOptionViewItem.new
-        parent = Qt::ModelIndex.new
+        option = Qt5::StyleOptionViewItem.new
+        parent = Qt5::ModelIndex.new
     
-        progress = Qt::ProgressDialog.new(tr("Printing..."), tr("Cancel"), 0, rows, self)
+        progress = Qt5::ProgressDialog.new(tr("Printing..."), tr("Cancel"), 0, rows, self)
         y = PixelDelegate::ItemSize/2
     
         for row in 0...rows do
@@ -182,7 +182,7 @@ class MainWindow < Qt::MainWindow
             x = PixelDelegate::ItemSize/2
     
             for column in 0...columns do
-                option.rect = Qt::Rect.new(x.to_i, y.to_i, PixelDelegate::ItemSize, PixelDelegate::ItemSize)
+                option.rect = Qt5::Rect.new(x.to_i, y.to_i, PixelDelegate::ItemSize, PixelDelegate::ItemSize)
                 @view.itemDelegate().paint(painter, option,
                                             @model.index(row, column, parent))
                 x += PixelDelegate::ItemSize
@@ -195,23 +195,23 @@ class MainWindow < Qt::MainWindow
         painter.end
     
         if progress.wasCanceled()
-            Qt::MessageBox.information(self, tr("Printing canceled"),
-                tr("The printing process was canceled."), Qt::MessageBox::Cancel)
+            Qt5::MessageBox.information(self, tr("Printing canceled"),
+                tr("The printing process was canceled."), Qt5::MessageBox::Cancel)
         end
     end
     
     def showAboutBox()
-        Qt::MessageBox.about(self, tr("About the Pixelator example"),
+        Qt5::MessageBox.about(self, tr("About the Pixelator example"),
             tr("This example demonstrates how a standard view and a custom\n" \
                "delegate can be used to produce a specialized representation\n " \
                "of data in a simple custom model."))
     end
 
 	def updateView
-        for row in 0...@model.rowCount(Qt::ModelIndex.new) do
+        for row in 0...@model.rowCount(Qt5::ModelIndex.new) do
             @view.resizeRowToContents(row)
         end
-        for column in 0...@model.columnCount(Qt::ModelIndex.new) do
+        for column in 0...@model.columnCount(Qt5::ModelIndex.new) do
             @view.resizeColumnToContents(column)
         end
 	end

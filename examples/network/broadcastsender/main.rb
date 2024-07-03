@@ -26,7 +26,7 @@
 require 'Qt5'
 require './sender.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 sender = Sender.new
 sender.show
 sender.exec

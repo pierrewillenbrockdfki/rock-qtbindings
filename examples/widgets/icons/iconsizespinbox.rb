@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class IconSizeSpinBox < Qt::SpinBox
+class IconSizeSpinBox < Qt5::SpinBox
 
     def initialize(parent = nil)
         super(parent)

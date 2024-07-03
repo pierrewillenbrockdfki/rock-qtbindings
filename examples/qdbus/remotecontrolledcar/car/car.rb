@@ -24,7 +24,7 @@
 =end
     
 
-class CarAdaptor < Qt::Object
+class CarAdaptor < Qt5::Object
     q_classinfo("D-Bus Interface", "com.trolltech.Examples.CarInterface")
 
     slots :accelerate, :decelerate, :turnLeft, :turnRight
@@ -58,22 +58,22 @@ class CarAdaptor < Qt::Object
  end
 
 # Note that as Ruby doesn't have multiple inheritance, and 'Car', can't inherit from 
-# Qt::Object as well as Qt::Graphics item. So the timerEvent event handling is done
-# in the CarAdaptor instance which is a Qt::Object, which calls back to the Car
+# Qt5::Object as well as Qt5::Graphics item. So the timerEvent event handling is done
+# in the CarAdaptor instance which is a Qt5::Object, which calls back to the Car
 # instance.
 #
-class Car < Qt::GraphicsItem
+class Car < Qt5::GraphicsItem
     def boundingRect()
-        return Qt::RectF.new(-35, -81, 70, 115)
+        return Qt5::RectF.new(-35, -81, 70, 115)
     end
     
     def initialize()
         super
-        @color = Qt::Brush.new(Qt::green)
+        @color = Qt5::Brush.new(Qt5::green)
         @wheelsAngle = 0.0 
         @speed = 0.0
-        setFlag(Qt::GraphicsItem::ItemIsMovable, true)
-        setFlag(Qt::GraphicsItem::ItemIsFocusable, true)
+        setFlag(Qt5::GraphicsItem::ItemIsMovable, true)
+        setFlag(Qt5::GraphicsItem::ItemIsFocusable, true)
     end
     
     def accelerate()
@@ -101,7 +101,7 @@ class Car < Qt::GraphicsItem
     end
     
     def paint(painter, option, widget)
-        painter.brush = Qt::Brush.new(Qt::gray)
+        painter.brush = Qt5::Brush.new(Qt5::gray)
         painter.drawRect(-20, -58, 40, 2) # front axel
         painter.drawRect(-20, 7, 40, 2) # rear axel
     
@@ -116,7 +116,7 @@ class Car < Qt::GraphicsItem
     
         painter.drawRect(-17, 19, 34, 15) # rear wing
     
-        painter.brush = Qt::Brush.new(Qt::black)
+        painter.brush = Qt5::Brush.new(Qt5::black)
         painter.drawPie(-5, -51, 10, 15, 0, 180 * 16)
         painter.drawRect(-5, -44, 10, 10) # cocpit
     

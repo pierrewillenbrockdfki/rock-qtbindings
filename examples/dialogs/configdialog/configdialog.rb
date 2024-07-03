@@ -25,44 +25,44 @@
     
 require './pages.rb'
 
-class ConfigDialog < Qt::Dialog
+class ConfigDialog < Qt5::Dialog
     
     slots 'changePage(QListWidgetItem*, QListWidgetItem*)'
     
     def initialize()
         super
-        @contentsWidget = Qt::ListWidget.new do |c|
-            c.viewMode = Qt::ListView::IconMode
-            c.iconSize = Qt::Size.new(96, 84)
-            c.movement = Qt::ListView::Static
+        @contentsWidget = Qt5::ListWidget.new do |c|
+            c.viewMode = Qt5::ListView::IconMode
+            c.iconSize = Qt5::Size.new(96, 84)
+            c.movement = Qt5::ListView::Static
             c.maximumWidth = 128
             c.spacing = 12
         end
     
-        @pagesWidget = Qt::StackedWidget.new do |p|
+        @pagesWidget = Qt5::StackedWidget.new do |p|
             p.addWidget(ConfigurationPage.new)
             p.addWidget(UpdatePage.new)
             p.addWidget(QueryPage.new)
         end
     
-        closeButton = Qt::PushButton.new(tr("Close"))
+        closeButton = Qt5::PushButton.new(tr("Close"))
     
         createIcons()
         @contentsWidget.currentRow = 0
     
         connect(closeButton, SIGNAL('clicked()'), self, SLOT('close()'))
     
-        horizontalLayout = Qt::HBoxLayout.new do |h|
+        horizontalLayout = Qt5::HBoxLayout.new do |h|
             h.addWidget(@contentsWidget)
             h.addWidget(@pagesWidget, 1)
         end
     
-        buttonsLayout = Qt::HBoxLayout.new do |b|
+        buttonsLayout = Qt5::HBoxLayout.new do |b|
             b.addStretch(1)
             b.addWidget(closeButton)
         end
     
-        self.layout = Qt::VBoxLayout.new do |m|
+        self.layout = Qt5::VBoxLayout.new do |m|
             m.addLayout(horizontalLayout)
             m.addStretch(1)
             m.addSpacing(12)
@@ -73,25 +73,25 @@ class ConfigDialog < Qt::Dialog
     end
     
     def createIcons
-        configButton = Qt::ListWidgetItem.new(@contentsWidget) do |c|
-            c.icon = Qt::Icon.new("images/config.png")
+        configButton = Qt5::ListWidgetItem.new(@contentsWidget) do |c|
+            c.icon = Qt5::Icon.new("images/config.png")
             c.text = tr("Configuration")
-            c.textAlignment = Qt::AlignHCenter
-            c.flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled
+            c.textAlignment = Qt5::AlignHCenter
+            c.flags = Qt5::ItemIsSelectable | Qt5::ItemIsEnabled
         end
 
-        updateButton = Qt::ListWidgetItem.new(@contentsWidget) do |u|
-            u.icon = Qt::Icon.new("images/update.png")
+        updateButton = Qt5::ListWidgetItem.new(@contentsWidget) do |u|
+            u.icon = Qt5::Icon.new("images/update.png")
             u.text = tr("Update")
-            u.textAlignment = Qt::AlignHCenter
-            u.flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled
+            u.textAlignment = Qt5::AlignHCenter
+            u.flags = Qt5::ItemIsSelectable | Qt5::ItemIsEnabled
         end
 
-        queryButton = Qt::ListWidgetItem.new(@contentsWidget) do |q|
-            q.icon = Qt::Icon.new("images/query.png")
+        queryButton = Qt5::ListWidgetItem.new(@contentsWidget) do |q|
+            q.icon = Qt5::Icon.new("images/query.png")
             q.text = tr("Query")
-            q.textAlignment = Qt::AlignHCenter
-            q.flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled
+            q.textAlignment = Qt5::AlignHCenter
+            q.flags = Qt5::ItemIsSelectable | Qt5::ItemIsEnabled
         end
     
         connect(@contentsWidget,

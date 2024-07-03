@@ -25,7 +25,7 @@
     
 require './glwidget.rb'
 
-class Window < Qt::Widget
+class Window < Qt5::Widget
     
     def initialize(parent = nil)
         super
@@ -38,7 +38,7 @@ class Window < Qt::Widget
         @zSlider = createSlider(SIGNAL('zRotationChanged(int)'),
                                SLOT('setZRotation(int)'))
     
-        self.layout = Qt::HBoxLayout.new do |m|
+        self.layout = Qt5::HBoxLayout.new do |m|
             m.addWidget(@glWidget)
             m.addWidget(@xSlider)
             m.addWidget(@ySlider)
@@ -52,12 +52,12 @@ class Window < Qt::Widget
     end
     
     def createSlider(changedSignal, setterSlot)
-        slider = Qt::Slider.new(Qt::Vertical) do |s|
+        slider = Qt5::Slider.new(Qt5::Vertical) do |s|
             s.range = 0..(360 * 16)
             s.singleStep = 16
             s.pageStep = 15 * 16
             s.tickInterval = 15 * 16
-            s.tickPosition = Qt::Slider::TicksRight
+            s.tickPosition = Qt5::Slider::TicksRight
         end
         connect(slider, SIGNAL('valueChanged(int)'), @glWidget, setterSlot)
         connect(@glWidget, changedSignal, slider, SLOT('setValue(int)'))

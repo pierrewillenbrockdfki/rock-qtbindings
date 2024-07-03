@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 	
 	slots 'newFile()',
     		'open()',
@@ -47,21 +47,21 @@ class MainWindow < Qt::MainWindow
 	
 	def initialize(parent = nil)
 		super
-	    w = Qt::Widget.new
+	    w = Qt5::Widget.new
 	    setCentralWidget(w)
 	
-	    topFiller = Qt::Widget.new
-	    topFiller.setSizePolicy(Qt::SizePolicy::Expanding, Qt::SizePolicy::Expanding)
+	    topFiller = Qt5::Widget.new
+	    topFiller.setSizePolicy(Qt5::SizePolicy::Expanding, Qt5::SizePolicy::Expanding)
 	
-	    @infoLabel = Qt::Label.new(tr("<i>Choose a menu option, or right-click to " +
+	    @infoLabel = Qt5::Label.new(tr("<i>Choose a menu option, or right-click to " +
 	                              "invoke a context menu</i>"))
-	    @infoLabel.frameStyle = Qt::Frame::StyledPanel | Qt::Frame::Sunken
-	    @infoLabel.alignment = Qt::AlignCenter.to_i
+	    @infoLabel.frameStyle = Qt5::Frame::StyledPanel | Qt5::Frame::Sunken
+	    @infoLabel.alignment = Qt5::AlignCenter.to_i
 	
-	    bottomFiller = Qt::Widget.new
-	    bottomFiller.setSizePolicy(Qt::SizePolicy::Expanding, Qt::SizePolicy::Expanding)
+	    bottomFiller = Qt5::Widget.new
+	    bottomFiller.setSizePolicy(Qt5::SizePolicy::Expanding, Qt5::SizePolicy::Expanding)
 	
-	    vbox = Qt::VBoxLayout.new
+	    vbox = Qt5::VBoxLayout.new
 	    vbox.margin = 5
 	    vbox.addWidget(topFiller)
 	    vbox.addWidget(@infoLabel)
@@ -79,7 +79,7 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def contextMenuEvent(event)
-	    menu = Qt::Menu.new(self)
+	    menu = Qt5::Menu.new(self)
 	    menu.addAction(@cutAct)
 	    menu.addAction(@copyAct)
 	    menu.addAction(@pasteAct)
@@ -156,7 +156,7 @@ class MainWindow < Qt::MainWindow
 	
 	def about()
 	    @infoLabel.text = tr("Invoked <b>Help|About</b>")
-	    Qt::MessageBox.about(self, tr("About Menu"),
+	    Qt5::MessageBox.about(self, tr("About Menu"),
 	            tr("The <b>Menu</b> example shows how to create " +
 	               "menu-bar menus and context menus."))
 	end
@@ -166,62 +166,62 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def createActions()
-	    @newAct = Qt::Action.new(tr("&New"), self)
-	    @newAct.shortcut = Qt::KeySequence.new( tr("Ctrl+N") )
+	    @newAct = Qt5::Action.new(tr("&New"), self)
+	    @newAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+N") )
 	    @newAct.statusTip = tr("Create a file.new")
 	    connect(@newAct, SIGNAL('triggered()'), self, SLOT('newFile()'))
 	
-	    @openAct = Qt::Action.new(tr("&Open..."), self)
-	    @openAct.shortcut = Qt::KeySequence.new( tr("Ctrl+O") )
+	    @openAct = Qt5::Action.new(tr("&Open..."), self)
+	    @openAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+O") )
 	    @openAct.statusTip = tr("Open an existing file")
 	    connect(@openAct, SIGNAL('triggered()'), self, SLOT('open()'))
 	
-	    @saveAct = Qt::Action.new(tr("&Save"), self)
-	    @saveAct.shortcut = Qt::KeySequence.new( tr("Ctrl+S") )
+	    @saveAct = Qt5::Action.new(tr("&Save"), self)
+	    @saveAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+S") )
 	    @saveAct.statusTip = tr("Save the document to disk")
 	    connect(@saveAct, SIGNAL('triggered()'), self, SLOT('save()'))
 	
-	    @printAct = Qt::Action.new(tr("&Print..."), self)
-	    @printAct.shortcut = Qt::KeySequence.new( tr("Ctrl+P") )
+	    @printAct = Qt5::Action.new(tr("&Print..."), self)
+	    @printAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+P") )
 	    @printAct.statusTip = tr("Print the document")
 	    connect(@printAct, SIGNAL('triggered()'), self, SLOT('print()'))
 	
-	    @exitAct = Qt::Action.new(tr("E&xit"), self)
-	    @exitAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Q") )
+	    @exitAct = Qt5::Action.new(tr("E&xit"), self)
+	    @exitAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Q") )
 	    @exitAct.statusTip = tr("Exit the application")
 	    connect(@exitAct, SIGNAL('triggered()'), self, SLOT('close()'))
 	
-	    @undoAct = Qt::Action.new(tr("&Undo"), self)
-	    @undoAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Z") )
+	    @undoAct = Qt5::Action.new(tr("&Undo"), self)
+	    @undoAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Z") )
 	    @undoAct.statusTip = tr("Undo the last operation")
 	    connect(@undoAct, SIGNAL('triggered()'), self, SLOT('undo()'))
 	
-	    @redoAct = Qt::Action.new(tr("&Redo"), self)
-	    @redoAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Y") )
+	    @redoAct = Qt5::Action.new(tr("&Redo"), self)
+	    @redoAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Y") )
 	    @redoAct.statusTip = tr("Redo the last operation")
 	    connect(@redoAct, SIGNAL('triggered()'), self, SLOT('redo()'))
 	
-	    @cutAct = Qt::Action.new(tr("Cu&t"), self)
-	    @cutAct.shortcut = Qt::KeySequence.new( tr("Ctrl+X") )
+	    @cutAct = Qt5::Action.new(tr("Cu&t"), self)
+	    @cutAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+X") )
 	    @cutAct.setStatusTip(tr("Cut the current selection's contents to the " +
 	                            "clipboard"))
 	    connect(@cutAct, SIGNAL('triggered()'), self, SLOT('cut()'))
 	
-	    @copyAct = Qt::Action.new(tr("&Copy"), self)
-	    @copyAct.shortcut = Qt::KeySequence.new( tr("Ctrl+C") )
+	    @copyAct = Qt5::Action.new(tr("&Copy"), self)
+	    @copyAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+C") )
 	    @copyAct.setStatusTip(tr("Copy the current selection's contents to the " +
 	                             "clipboard"))
 	    connect(@copyAct, SIGNAL('triggered()'), self, SLOT('copy()'))
 	
-	    @pasteAct = Qt::Action.new(tr("&Paste"), self)
-	    @pasteAct.shortcut = Qt::KeySequence.new( tr("Ctrl+V") )
+	    @pasteAct = Qt5::Action.new(tr("&Paste"), self)
+	    @pasteAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+V") )
 	    @pasteAct.setStatusTip(tr("Paste the clipboard's contents into the current " +
 	                              "selection"))
 	    connect(@pasteAct, SIGNAL('triggered()'), self, SLOT('paste()'))
 	
-	    @boldAct = Qt::Action.new(tr("&Bold"), self)
+	    @boldAct = Qt5::Action.new(tr("&Bold"), self)
 	    @boldAct.checkable = true
-	    @boldAct.shortcut = Qt::KeySequence.new( tr("Ctrl+B") )
+	    @boldAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+B") )
 	    @boldAct.statusTip = tr("Make the text bold")
 	    connect(@boldAct, SIGNAL('triggered()'), self, SLOT('bold()'))
 	
@@ -229,9 +229,9 @@ class MainWindow < Qt::MainWindow
 	    boldFont.bold = true
 	    @boldAct.font = boldFont
 	
-	    @italicAct = Qt::Action.new(tr("&Italic"), self)
+	    @italicAct = Qt5::Action.new(tr("&Italic"), self)
 	    @italicAct.checkable = true
-	    @italicAct.shortcut = Qt::KeySequence.new( tr("Ctrl+I") )
+	    @italicAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+I") )
 	    @italicAct.statusTip = tr("Make the text italic")
 	    connect(@italicAct, SIGNAL('triggered()'), self, SLOT('italic()'))
 	
@@ -239,52 +239,52 @@ class MainWindow < Qt::MainWindow
 	    italicFont.italic = true
 	    @italicAct.font = italicFont
 	
-	    @leftAlignAct = Qt::Action.new(tr("&Left Align"), self)
+	    @leftAlignAct = Qt5::Action.new(tr("&Left Align"), self)
 	    @leftAlignAct.checkable = true
-	    @leftAlignAct.shortcut = Qt::KeySequence.new( tr("Ctrl+L") )
+	    @leftAlignAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+L") )
 	    @leftAlignAct.statusTip = tr("Left align the selected text")
 	    connect(@leftAlignAct, SIGNAL('triggered()'), self, SLOT('leftAlign()'))
 	
-	    @rightAlignAct = Qt::Action.new(tr("&Right Align"), self)
+	    @rightAlignAct = Qt5::Action.new(tr("&Right Align"), self)
 	    @rightAlignAct.checkable = true
-	    @rightAlignAct.shortcut = Qt::KeySequence.new( tr("Ctrl+R") )
+	    @rightAlignAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+R") )
 	    @rightAlignAct.statusTip = tr("Right align the selected text")
 	    connect(@rightAlignAct, SIGNAL('triggered()'), self, SLOT('rightAlign()'))
 	
-	    @justifyAct = Qt::Action.new(tr("&Justify"), self)
+	    @justifyAct = Qt5::Action.new(tr("&Justify"), self)
 	    @justifyAct.checkable = true
-	    @justifyAct.shortcut = Qt::KeySequence.new( tr("Ctrl+J") )
+	    @justifyAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+J") )
 	    @justifyAct.statusTip = tr("Justify the selected text")
 	    connect(@justifyAct, SIGNAL('triggered()'), self, SLOT('justify()'))
 	
-	    @centerAct = Qt::Action.new(tr("&Center"), self)
+	    @centerAct = Qt5::Action.new(tr("&Center"), self)
 	    @centerAct.checkable = true
-	    @centerAct.shortcut = Qt::KeySequence.new( tr("Ctrl+E") )
+	    @centerAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+E") )
 	    @centerAct.statusTip = tr("Center the selected text")
 	    connect(@centerAct, SIGNAL('triggered()'), self, SLOT('center()'))
 	
-	    @alignmentGroup = Qt::ActionGroup.new(self)
+	    @alignmentGroup = Qt5::ActionGroup.new(self)
 	    @alignmentGroup.addAction(@leftAlignAct)
 	    @alignmentGroup.addAction(@rightAlignAct)
 	    @alignmentGroup.addAction(@justifyAct)
 	    @alignmentGroup.addAction(@centerAct)
 	    @leftAlignAct.checked = true
 	
-	    @setLineSpacingAct = Qt::Action.new(tr("Set &Line Spacing..."), self)
+	    @setLineSpacingAct = Qt5::Action.new(tr("Set &Line Spacing..."), self)
 	    @setLineSpacingAct.setStatusTip(tr("Change the gap between the lines of a " +
 	                                       "paragraph"))
 	    connect(@setLineSpacingAct, SIGNAL('triggered()'), self, SLOT('setLineSpacing()'))
 	
-	    @setParagraphSpacingAct = Qt::Action.new(tr("Set &Paragraph Spacing..."), self)
+	    @setParagraphSpacingAct = Qt5::Action.new(tr("Set &Paragraph Spacing..."), self)
 	    @setLineSpacingAct.statusTip = tr("Change the gap between paragraphs")
 	    connect(@setParagraphSpacingAct, SIGNAL('triggered()'),
 	            self, SLOT('setParagraphSpacing()'))
 	
-	    @aboutAct = Qt::Action.new(tr("&About"), self)
+	    @aboutAct = Qt5::Action.new(tr("&About"), self)
 	    @aboutAct.statusTip = tr("Show the application's About box")
 	    connect(@aboutAct, SIGNAL('triggered()'), self, SLOT('about()'))
 	
-	    @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+	    @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
 	    @aboutQtAct.statusTip = tr("Show the Qt library's About box")
 	    connect(@aboutQtAct, SIGNAL('triggered()'), $qApp, SLOT('aboutQt()'))
 	    connect(@aboutQtAct, SIGNAL('triggered()'), self, SLOT('aboutQt()'))

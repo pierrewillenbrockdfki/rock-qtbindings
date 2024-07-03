@@ -27,13 +27,13 @@ require 'Qt5'
 require './qrc_simpletreemodel.rb'
 require './treemodel.rb'
 
-app = Qt::Application.new(ARGV)
-file = Qt::File.new(":/default.txt")
-file.open(Qt::IODevice::ReadOnly)
+app = Qt5::Application.new(ARGV)
+file = Qt5::File.new(":/default.txt")
+file.open(Qt5::IODevice::ReadOnly)
 model = TreeModel.new(file.readAll)
 file.close
 
-view = Qt::TreeView.new
+view = Qt5::TreeView.new
 view.model = model
 view.windowTitle = "Simple Tree Model"
 view.show

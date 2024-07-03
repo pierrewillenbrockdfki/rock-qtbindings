@@ -27,7 +27,7 @@ require './iconpreviewarea.rb'
 require './iconsizespinbox.rb'
 require './imagedelegate.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 
     slots   'about()',
             'changeStyle(bool)',
@@ -38,7 +38,7 @@ class MainWindow < Qt::MainWindow
 
     def initialize()
 		super
-        @centralWidget = Qt::Widget.new
+        @centralWidget = Qt5::Widget.new
         setCentralWidget(@centralWidget)
     
         createPreviewGroupBox()
@@ -49,7 +49,7 @@ class MainWindow < Qt::MainWindow
         createMenus()
         createContextMenu()
     
-        mainLayout = Qt::GridLayout.new
+        mainLayout = Qt5::GridLayout.new
         mainLayout.addWidget(@imagesGroupBox, 0, 0)
         mainLayout.addWidget(@iconSizeGroupBox, 1, 0)
         mainLayout.addWidget(@previewGroupBox, 0, 1, 2, 1)
@@ -62,7 +62,7 @@ class MainWindow < Qt::MainWindow
     end
     
     def about()
-        Qt::MessageBox.about(self, tr("About Icons"),
+        Qt5::MessageBox.about(self, tr("About Icons"),
                 tr("The <b>Icons</b> example illustrates how Qt renders an icon in " +
                 "different modes (active, normal, and disabled) and states (on " +
                 "and off) based on a set of images."))
@@ -74,24 +74,24 @@ class MainWindow < Qt::MainWindow
         end
     
         action = sender()
-        style = Qt::StyleFactory.create(action.data().toString())
-        Qt::Application.style = style
+        style = Qt5::StyleFactory.create(action.data().toString())
+        Qt5::Application.style = style
     
         @smallRadioButton.text = tr("Small (%d x %d" % 
-                [    style.pixelMetric(Qt::Style::PM_SmallIconSize),
-                    style.pixelMetric(Qt::Style::PM_SmallIconSize) ] )
+                [    style.pixelMetric(Qt5::Style::PM_SmallIconSize),
+                    style.pixelMetric(Qt5::Style::PM_SmallIconSize) ] )
         @largeRadioButton.text = tr("Large (%d x %d" % 
-                [    style.pixelMetric(Qt::Style::PM_LargeIconSize),
-                    style.pixelMetric(Qt::Style::PM_LargeIconSize) ] )
+                [    style.pixelMetric(Qt5::Style::PM_LargeIconSize),
+                    style.pixelMetric(Qt5::Style::PM_LargeIconSize) ] )
         @toolBarRadioButton.text = tr("Toolbars (%d x %d" % 
-                [    style.pixelMetric(Qt::Style::PM_ToolBarIconSize),
-                    style.pixelMetric(Qt::Style::PM_ToolBarIconSize) ] )
+                [    style.pixelMetric(Qt5::Style::PM_ToolBarIconSize),
+                    style.pixelMetric(Qt5::Style::PM_ToolBarIconSize) ] )
         @listViewRadioButton.text = tr("List views (%d x %d" % 
-                [    style.pixelMetric(Qt::Style::PM_ListViewIconSize),
-                    style.pixelMetric(Qt::Style::PM_ListViewIconSize) ] )
+                [    style.pixelMetric(Qt5::Style::PM_ListViewIconSize),
+                    style.pixelMetric(Qt5::Style::PM_ListViewIconSize) ] )
         @iconViewRadioButton.text = tr("Icon views (%d x %d" % 
-                [    style.pixelMetric(Qt::Style::PM_IconViewIconSize),
-                    style.pixelMetric(Qt::Style::PM_IconViewIconSize) ] )
+                [    style.pixelMetric(Qt5::Style::PM_IconViewIconSize),
+                    style.pixelMetric(Qt5::Style::PM_IconViewIconSize) ] )
     
         changeSize()
     end
@@ -101,49 +101,49 @@ class MainWindow < Qt::MainWindow
             extent = @otherSpinBox.value
         else
             if @smallRadioButton.checked?
-                metric = Qt::Style::PM_SmallIconSize
+                metric = Qt5::Style::PM_SmallIconSize
             elsif @largeRadioButton.checked?
-                metric = Qt::Style::PM_LargeIconSize
+                metric = Qt5::Style::PM_LargeIconSize
             elsif @toolBarRadioButton.checked?
-                metric = Qt::Style::PM_ToolBarIconSize
+                metric = Qt5::Style::PM_ToolBarIconSize
             elsif @listViewRadioButton.checked?
-                metric = Qt::Style::PM_ListViewIconSize
+                metric = Qt5::Style::PM_ListViewIconSize
             else
-                metric = Qt::Style::PM_IconViewIconSize
+                metric = Qt5::Style::PM_IconViewIconSize
             end
-            extent = Qt::Application::style().pixelMetric(metric)
+            extent = Qt5::Application::style().pixelMetric(metric)
         end
 
-        @previewArea.size = Qt::Size.new(extent, extent)
+        @previewArea.size = Qt5::Size.new(extent, extent)
         @otherSpinBox.enabled = @otherRadioButton.checked?
     end
     
     def changeIcon()
-		icon = Qt::Icon.new
+		icon = Qt5::Icon.new
         (0...@imagesTable.rowCount).each do |row|
             item0 = @imagesTable.item(row, 0)
             item1 = @imagesTable.item(row, 1)
             item2 = @imagesTable.item(row, 2)
     
-            if item0.checkState() == Qt::Checked
+            if item0.checkState() == Qt5::Checked
                 if item1.text() == tr("Normal")
-                    mode = Qt::Icon::Normal
+                    mode = Qt5::Icon::Normal
                 elsif item1.text() == tr("Active")
-                    mode = Qt::Icon::Active
+                    mode = Qt5::Icon::Active
                 else
-                    mode = Qt::Icon::Disabled
+                    mode = Qt5::Icon::Disabled
                 end
     
                 if item2.text() == tr("On")
-                    state = Qt::Icon::On
+                    state = Qt5::Icon::On
                 else
-                    state = Qt::Icon::Off
+                    state = Qt5::Icon::Off
                 end
     
-                fileName = item0.data(Qt::UserRole).toString()
-                image = Qt::Image.new(fileName)
+                fileName = item0.data(Qt5::UserRole).toString()
+                image = Qt5::Image.new(fileName)
                 if !image.nil?
-                    icon.addPixmap(Qt::Pixmap.fromImage(image), mode, state)
+                    icon.addPixmap(Qt5::Pixmap.fromImage(image), mode, state)
                 end
             end
         end
@@ -151,7 +151,7 @@ class MainWindow < Qt::MainWindow
     end
     
     def addImage()
-        fileNames = Qt::FileDialog.getOpenFileNames(self,
+        fileNames = Qt5::FileDialog.getOpenFileNames(self,
                                         tr("Open Images"), "",
                                         tr("Images (*.png *.xpm *.jpg);;" +
                                         "All Files (*)") )
@@ -160,13 +160,13 @@ class MainWindow < Qt::MainWindow
                 row = @imagesTable.rowCount()
                 @imagesTable.rowCount = row + 1
     
-                imageName = Qt::FileInfo.new(fileName).baseName()
-                item0 = Qt::TableWidgetItem.new(imageName)
-                item0.setData(Qt::UserRole, Qt::Variant.new(fileName))
-                item0.flags &= ~Qt::ItemIsEditable
+                imageName = Qt5::FileInfo.new(fileName).baseName()
+                item0 = Qt5::TableWidgetItem.new(imageName)
+                item0.setData(Qt5::UserRole, Qt5::Variant.new(fileName))
+                item0.flags &= ~Qt5::ItemIsEditable
     
-                item1 = Qt::TableWidgetItem.new(tr("Normal"))
-                item2 = Qt::TableWidgetItem.new(tr("Off"))
+                item1 = Qt5::TableWidgetItem.new(tr("Normal"))
+                item2 = Qt5::TableWidgetItem.new(tr("Off"))
     
                 if @guessModeStateAct.checked?
                     if fileName.include?("_act")
@@ -186,7 +186,7 @@ class MainWindow < Qt::MainWindow
                 @imagesTable.openPersistentEditor(item1)
                 @imagesTable.openPersistentEditor(item2)
     
-                item0.checkState = Qt::Checked
+                item0.checkState = Qt5::Checked
             end
         end
     end
@@ -197,26 +197,26 @@ class MainWindow < Qt::MainWindow
     end
     
     def createPreviewGroupBox()
-        @previewGroupBox = Qt::GroupBox.new(tr("Preview"))
+        @previewGroupBox = Qt5::GroupBox.new(tr("Preview"))
     
         @previewArea = IconPreviewArea.new
     
-        layout = Qt::VBoxLayout.new
+        layout = Qt5::VBoxLayout.new
         layout.addWidget(@previewArea)
         @previewGroupBox.layout = layout
     end
     
     def createImagesGroupBox()
-        @imagesGroupBox = Qt::GroupBox.new(tr("Images"))
-        @imagesGroupBox.setSizePolicy(Qt::SizePolicy::Expanding,
-                                    Qt::SizePolicy::Expanding)
+        @imagesGroupBox = Qt5::GroupBox.new(tr("Images"))
+        @imagesGroupBox.setSizePolicy(Qt5::SizePolicy::Expanding,
+                                    Qt5::SizePolicy::Expanding)
     
         labels = []
         labels << tr("Image") << tr("Mode") << tr("State")
     
-        @imagesTable = Qt::TableWidget.new
-        @imagesTable.setSizePolicy(Qt::SizePolicy::Expanding, Qt::SizePolicy::Ignored)
-        @imagesTable.selectionMode = Qt::AbstractItemView::NoSelection
+        @imagesTable = Qt5::TableWidget.new
+        @imagesTable.setSizePolicy(Qt5::SizePolicy::Expanding, Qt5::SizePolicy::Ignored)
+        @imagesTable.selectionMode = Qt5::AbstractItemView::NoSelection
         @imagesTable.columnCount = 3
         @imagesTable.horizontalHeaderLabels = labels
         @imagesTable.itemDelegate = ImageDelegate.new(self)
@@ -229,20 +229,20 @@ class MainWindow < Qt::MainWindow
         connect(@imagesTable, SIGNAL('itemChanged(QTableWidgetItem*)'),
                 self, SLOT('changeIcon()'))
     
-        layout = Qt::VBoxLayout.new
+        layout = Qt5::VBoxLayout.new
         layout.addWidget(@imagesTable)
         @imagesGroupBox.layout = layout
     end
     
     def createIconSizeGroupBox()
-        @iconSizeGroupBox = Qt::GroupBox.new(tr("Icon Size"))
+        @iconSizeGroupBox = Qt5::GroupBox.new(tr("Icon Size"))
     
-        @smallRadioButton = Qt::RadioButton.new
-        @largeRadioButton = Qt::RadioButton.new
-        @toolBarRadioButton = Qt::RadioButton.new
-        @listViewRadioButton = Qt::RadioButton.new
-        @iconViewRadioButton = Qt::RadioButton.new
-        @otherRadioButton = Qt::RadioButton.new(tr("Other:"))
+        @smallRadioButton = Qt5::RadioButton.new
+        @largeRadioButton = Qt5::RadioButton.new
+        @toolBarRadioButton = Qt5::RadioButton.new
+        @listViewRadioButton = Qt5::RadioButton.new
+        @iconViewRadioButton = Qt5::RadioButton.new
+        @otherRadioButton = Qt5::RadioButton.new(tr("Other:"))
     
         @otherSpinBox = IconSizeSpinBox.new
         @otherSpinBox.range = 8..128
@@ -259,11 +259,11 @@ class MainWindow < Qt::MainWindow
         connect(@otherRadioButton, SIGNAL('toggled(bool)'), self, SLOT('changeSize()'))
         connect(@otherSpinBox, SIGNAL('valueChanged(int)'), self, SLOT('changeSize()'))
     
-        otherSizeLayout = Qt::HBoxLayout.new
+        otherSizeLayout = Qt5::HBoxLayout.new
         otherSizeLayout.addWidget(@otherRadioButton)
         otherSizeLayout.addWidget(@otherSpinBox)
     
-        layout = Qt::GridLayout.new
+        layout = Qt5::GridLayout.new
         layout.addWidget(@smallRadioButton, 0, 0)
         layout.addWidget(@largeRadioButton, 1, 0)
         layout.addWidget(@toolBarRadioButton, 2, 0)
@@ -274,37 +274,37 @@ class MainWindow < Qt::MainWindow
     end
     
     def createActions()
-        @addImageAct = Qt::Action.new(tr("&Add Image..."), self)
-        @addImageAct.shortcut = Qt::KeySequence.new(tr("Ctrl+A"))
+        @addImageAct = Qt5::Action.new(tr("&Add Image..."), self)
+        @addImageAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+A"))
         connect(@addImageAct, SIGNAL('triggered()'), self, SLOT('addImage()'))
     
-        @removeAllImagesAct = Qt::Action.new(tr("&Remove All Images"), self)
-        @removeAllImagesAct.shortcut = Qt::KeySequence.new(tr("Ctrl+R"))
+        @removeAllImagesAct = Qt5::Action.new(tr("&Remove All Images"), self)
+        @removeAllImagesAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+R"))
         connect(@removeAllImagesAct, SIGNAL('triggered()'),
                 self, SLOT('removeAllImages()'))
     
-        @exitAct = Qt::Action.new(tr("&Quit"), self)
-        @exitAct.shortcut = Qt::KeySequence.new(tr("Ctrl+Q"))
+        @exitAct = Qt5::Action.new(tr("&Quit"), self)
+        @exitAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+Q"))
         connect(@exitAct, SIGNAL('triggered()'), self, SLOT('close()'))
     
-        @styleActionGroup = Qt::ActionGroup.new(self)
+        @styleActionGroup = Qt5::ActionGroup.new(self)
         
-        Qt::StyleFactory::keys().each do |styleName|
-            action = Qt::Action.new(@styleActionGroup)
+        Qt5::StyleFactory::keys().each do |styleName|
+            action = Qt5::Action.new(@styleActionGroup)
             action.text = tr("%s Style" % styleName)
-            action.data = Qt::Variant.new(styleName)
+            action.data = Qt5::Variant.new(styleName)
             action.checkable = true
             connect(action, SIGNAL('triggered(bool)'), self, SLOT('changeStyle(bool)'))
         end
     
-        @guessModeStateAct = Qt::Action.new(tr("&Guess Image Mode/State"), self)
+        @guessModeStateAct = Qt5::Action.new(tr("&Guess Image Mode/State"), self)
         @guessModeStateAct.checkable = true
         @guessModeStateAct.checked = true
     
-        @aboutAct = Qt::Action.new(tr("&About"), self)
+        @aboutAct = Qt5::Action.new(tr("&About"), self)
         connect(@aboutAct, SIGNAL('triggered()'), self, SLOT('about()'))
     
-        @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+        @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
         connect(@aboutQtAct, SIGNAL('triggered()'), $qApp, SLOT('aboutQt()'))
     end
     
@@ -331,7 +331,7 @@ class MainWindow < Qt::MainWindow
     end
     
     def createContextMenu()
-        @imagesTable.contextMenuPolicy = Qt::ActionsContextMenu
+        @imagesTable.contextMenuPolicy = Qt5::ActionsContextMenu
         @imagesTable.addAction(@addImageAct)
         @imagesTable.addAction(@removeAllImagesAct)
     end
@@ -339,10 +339,10 @@ class MainWindow < Qt::MainWindow
     def checkCurrentStyle()
         @styleActionGroup.actions().each do |action|
             styleName = action.data().toString()
-            candidate = Qt::StyleFactory.create(styleName)
+            candidate = Qt5::StyleFactory.create(styleName)
 
             if candidate.metaObject().className() ==
-               Qt::Application.style().metaObject().className()
+               Qt5::Application.style().metaObject().className()
                 action.trigger()
                 return
             end

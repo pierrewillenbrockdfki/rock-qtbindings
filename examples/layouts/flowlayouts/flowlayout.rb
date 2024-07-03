@@ -24,7 +24,7 @@
 =end
 	
 	
-class FlowLayout < Qt::Layout
+class FlowLayout < Qt5::Layout
 	
 	def initialize(parent = nil, spacing = -1)
 	    super(parent)
@@ -62,7 +62,7 @@ class FlowLayout < Qt::Layout
 	end
 	
 	def heightForWidth(width)
-	    height = doLayout(Qt::Rect.new(0, 0, width, 0), true)
+	    height = doLayout(Qt5::Rect.new(0, 0, width, 0), true)
 	    return height
 	end
 	
@@ -76,9 +76,9 @@ class FlowLayout < Qt::Layout
 	end
 	
 	def minimumSize()
-	    size = Qt::Size.new
+	    size = Qt5::Size.new
 		@itemList.each { |item| size = size.expandedTo(item.minimumSize()) }
-	    size += Qt::Size.new(2*margin(), 2*margin())
+	    size += Qt5::Size.new(2*margin(), 2*margin())
 	    return size
 	end
 	
@@ -97,7 +97,7 @@ class FlowLayout < Qt::Layout
 	        end
 	
 	        if !testOnly
-	            item.setGeometry(Qt::Rect.new(Qt::Point.new(x, y), item.sizeHint()))
+	            item.setGeometry(Qt5::Rect.new(Qt5::Point.new(x, y), item.sizeHint()))
 			end
 	
 	        x = nextX

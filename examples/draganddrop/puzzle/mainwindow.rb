@@ -26,7 +26,7 @@
 require './piecesmodel.rb'
 require './puzzlewidget.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
     
     slots 'openImage(const QString&)', 'openImage()', 'setupPuzzle()'
     
@@ -37,25 +37,25 @@ class MainWindow < Qt::MainWindow
         setupMenus()
         setupWidgets()
     
-        setSizePolicy(Qt::SizePolicy.new(Qt::SizePolicy::Fixed, Qt::SizePolicy::Fixed))
+        setSizePolicy(Qt5::SizePolicy.new(Qt5::SizePolicy::Fixed, Qt5::SizePolicy::Fixed))
         setWindowTitle(tr("Puzzle"))
-        @puzzleImage = Qt::Pixmap.new
+        @puzzleImage = Qt5::Pixmap.new
     end
     
     def openImage(path = "")
         fileName = path
     
         if fileName.empty?
-            fileName = Qt::FileDialog.getOpenFileName(self,
+            fileName = Qt5::FileDialog.getOpenFileName(self,
                 tr("Open Image"), "", "Image Files (*.png *.jpg *.bmp)")
         end
     
         if !fileName.nil?
-            newImage = Qt::Pixmap.new
+            newImage = Qt5::Pixmap.new
             if !newImage.load(fileName)
-                Qt::MessageBox.warning(self, tr("Open Image"),
+                Qt5::MessageBox.warning(self, tr("Open Image"),
                                      tr("The image file could not be loaded."),
-                                     Qt::MessageBox::Cancel, Qt::MessageBox::NoButton)
+                                     Qt5::MessageBox::Cancel, Qt5::MessageBox::NoButton)
                 return
             end
             @puzzleImage = newImage
@@ -64,10 +64,10 @@ class MainWindow < Qt::MainWindow
     end
     
     def setCompleted()
-        Qt::MessageBox.information(self, tr("Puzzle Completed"),
+        Qt5::MessageBox.information(self, tr("Puzzle Completed"),
             tr("Congratulations! You have completed the puzzle!\n" +
                "Click OK to start again."),
-            Qt::MessageBox::Ok)
+            Qt5::MessageBox::Ok)
     
         setupPuzzle()
     end
@@ -76,7 +76,7 @@ class MainWindow < Qt::MainWindow
         size = [@puzzleImage.width(), @puzzleImage.height()].min
         @puzzleImage = @puzzleImage.copy((@puzzleImage.width() - size)/2,
             (@puzzleImage.height() - size)/2, size, size).scaled(400,
-                400, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
+                400, Qt5::IgnoreAspectRatio, Qt5::SmoothTransformation)
     
 		oldModel = @piecesList.model
 		newModel = PiecesModel.new(self)
@@ -89,7 +89,7 @@ class MainWindow < Qt::MainWindow
 		for y in 0...5
 			for x in 0...5
                 pieceImage = @puzzleImage.copy(x*80, y*80, 80, 80)
-                newModel.addPiece(pieceImage, Qt::Point.new(x, y))
+                newModel.addPiece(pieceImage, Qt5::Point.new(x, y))
             end
         end
     
@@ -100,10 +100,10 @@ class MainWindow < Qt::MainWindow
         fileMenu = menuBar().addMenu(tr("&File"))
     
         openAction = fileMenu.addAction(tr("&Open..."))
-        openAction.shortcut = Qt::KeySequence.new(tr("Ctrl+O"))
+        openAction.shortcut = Qt5::KeySequence.new(tr("Ctrl+O"))
     
         exitAction = fileMenu.addAction(tr("E&xit"))
-        exitAction.shortcut = Qt::KeySequence.new(tr("Ctrl+Q"))
+        exitAction.shortcut = Qt5::KeySequence.new(tr("Ctrl+Q"))
     
         gameMenu = menuBar().addMenu(tr("&Game"))
     
@@ -115,16 +115,16 @@ class MainWindow < Qt::MainWindow
     end
     
     def setupWidgets()
-        frame = Qt::Frame.new
-        frameLayout = Qt::HBoxLayout.new(frame)
+        frame = Qt5::Frame.new
+        frameLayout = Qt5::HBoxLayout.new(frame)
     
-		@piecesList = Qt::ListView.new
+		@piecesList = Qt5::ListView.new
 		@piecesList.dragEnabled = true
-		@piecesList.viewMode = Qt::ListView::IconMode
-		@piecesList.iconSize = Qt::Size.new(60, 60)
-		@piecesList.gridSize = Qt::Size.new(80, 80)
+		@piecesList.viewMode = Qt5::ListView::IconMode
+		@piecesList.iconSize = Qt5::Size.new(60, 60)
+		@piecesList.gridSize = Qt5::Size.new(80, 80)
 		@piecesList.spacing = 10
-		@piecesList.movement = Qt::ListView::Snap
+		@piecesList.movement = Qt5::ListView::Snap
 		@piecesList.acceptDrops = true
 		@piecesList.dropIndicatorShown = true
 	
@@ -134,7 +134,7 @@ class MainWindow < Qt::MainWindow
         @puzzleWidget = PuzzleWidget.new
     
         connect(@puzzleWidget, SIGNAL('puzzleCompleted()'),
-                self, SLOT('setCompleted()'), Qt::QueuedConnection)
+                self, SLOT('setCompleted()'), Qt5::QueuedConnection)
     
         frameLayout.addWidget(@piecesList)
         frameLayout.addWidget(@puzzleWidget)

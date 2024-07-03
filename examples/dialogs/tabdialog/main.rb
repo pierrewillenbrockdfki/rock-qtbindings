@@ -26,7 +26,7 @@
 require 'Qt5'
 require './tabdialog.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 
 if ARGV.length >= 1
    fileName = ARGV[0]

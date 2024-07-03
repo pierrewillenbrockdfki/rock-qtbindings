@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class DetailsDialog < Qt::Dialog
+class DetailsDialog < Qt5::Dialog
 
 	slots 'verify()'
 	
@@ -31,24 +31,24 @@ class DetailsDialog < Qt::Dialog
 	    super(parent)
 		@orderItems = []
 		@items = []
-	    nameLabel = Qt::Label.new(tr("Name:"))
-	    addressLabel = Qt::Label.new(tr("Address:"))
+	    nameLabel = Qt5::Label.new(tr("Name:"))
+	    addressLabel = Qt5::Label.new(tr("Address:"))
 	
-	    @nameEdit = Qt::LineEdit.new
-	    @addressEdit = Qt::TextEdit.new
+	    @nameEdit = Qt5::LineEdit.new
+	    @addressEdit = Qt5::TextEdit.new
 	    @addressEdit.plainText = ""
-	    @offersCheckBox = Qt::CheckBox.new(tr("Send offers:"))
+	    @offersCheckBox = Qt5::CheckBox.new(tr("Send offers:"))
 	
 	    setupItemsTable()
 	
-	    okButton = Qt::PushButton.new(tr("OK"))
-	    cancelButton = Qt::PushButton.new(tr("Cancel"))
+	    okButton = Qt5::PushButton.new(tr("OK"))
+	    cancelButton = Qt5::PushButton.new(tr("Cancel"))
 	    okButton.default = true
 	
 	    connect(okButton, SIGNAL('clicked()'), self, SLOT('verify()'))
 	    connect(cancelButton, SIGNAL('clicked()'), self, SLOT('reject()'))
 	
-	    detailsLayout = Qt::GridLayout.new do |d|
+	    detailsLayout = Qt5::GridLayout.new do |d|
 			d.addWidget(nameLabel, 0, 0)
 			d.addWidget(@nameEdit, 0, 1)
 			d.addWidget(addressLabel, 1, 0)
@@ -57,13 +57,13 @@ class DetailsDialog < Qt::Dialog
 			d.addWidget(@offersCheckBox, 2, 1, 1, 4)
 		end
 	
-	    buttonLayout = Qt::HBoxLayout.new do |b|
+	    buttonLayout = Qt5::HBoxLayout.new do |b|
 			b.addStretch(1)
 			b.addWidget(okButton)
 			b.addWidget(cancelButton)
 		end
 	
-	    self.layout = Qt::VBoxLayout.new do |m|
+	    self.layout = Qt5::VBoxLayout.new do |m|
 			m.addLayout(detailsLayout)
 			m.addLayout(buttonLayout)
 	    end
@@ -75,13 +75,13 @@ class DetailsDialog < Qt::Dialog
 	    @items << tr("T-shirt") << tr("Badge") << tr("Reference book") <<
 	          tr("Coffee cup")
 	
-	    @itemsTable = Qt::TableWidget.new(@items.length, 2)
+	    @itemsTable = Qt5::TableWidget.new(@items.length, 2)
 	
 		(0...@items.length).each do |row|
-	        name = Qt::TableWidgetItem.new(@items[row])
-	        name.flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable
+	        name = Qt5::TableWidgetItem.new(@items[row])
+	        name.flags = Qt5::ItemIsEnabled | Qt5::ItemIsSelectable
 	        @itemsTable.setItem(row, 0, name)
-	        quantity = Qt::TableWidgetItem.new("1")
+	        quantity = Qt5::TableWidgetItem.new("1")
 	        @itemsTable.setItem(row, 1, quantity)
 	    end
 	end
@@ -92,7 +92,7 @@ class DetailsDialog < Qt::Dialog
 		(0...@items.length).each do |row|
 	        item = Array.new(2)
         	item[0] = @itemsTable.item(row, 0).text
-        	quantity = @itemsTable.item(row, 1).data(Qt::DisplayRole).toInt
+        	quantity = @itemsTable.item(row, 1).data(Qt5::DisplayRole).toInt
 	        item[1] = [0, quantity].max
 	        orderList.push(item)
 	    end
@@ -118,12 +118,12 @@ class DetailsDialog < Qt::Dialog
 	        return
 	    end
 	
-	    answer = Qt::MessageBox.warning(self, tr("Incomplete Form"),
+	    answer = Qt5::MessageBox.warning(self, tr("Incomplete Form"),
 	        tr("The form does not contain all the necessary information.\n" +
 	           "Do you want to discard it?"),
-	        Qt::MessageBox::Yes, Qt::MessageBox::No)
+	        Qt5::MessageBox::Yes, Qt5::MessageBox::No)
 	
-	    if answer == Qt::MessageBox::Yes
+	    if answer == Qt5::MessageBox::Yes
 	        reject()
 		end
 	end

@@ -1,13 +1,13 @@
 require_relative 'lcdrange.rb'
 require_relative 'cannon.rb'
 
-class GameBoard < Qt::Widget
+class GameBoard < Qt5::Widget
   slots 'fire()', 'hit()', 'missed()', 'newGame()'
 
   def initialize()
     super
-    quit = Qt::PushButton.new('&Quit')
-    quit.font = Qt::Font.new('Times', 18, Qt::Font::Bold)
+    quit = Qt5::PushButton.new('&Quit')
+    quit.font = Qt5::Font.new('Times', 18, Qt5::Font::Bold)
 
     connect(quit, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
 
@@ -17,8 +17,8 @@ class GameBoard < Qt::Widget
     force = LCDRange.new('FORCE')
     force.range = 10..50
 
-    cannonBox = Qt::Frame.new
-    cannonBox.frameStyle = Qt::Frame::WinPanel | Qt::Frame::Sunken
+    cannonBox = Qt5::Frame.new
+    cannonBox.frameStyle = Qt5::Frame::WinPanel | Qt5::Frame::Sunken
 
     @cannonField = CannonField.new
 
@@ -37,28 +37,28 @@ class GameBoard < Qt::Widget
     connect(@cannonField, SIGNAL('missed()'),
                 self, SLOT('missed()'))
 
-    shoot = Qt::PushButton.new('&Shoot')
-    shoot.font = Qt::Font.new('Times', 18, Qt::Font::Bold)
+    shoot = Qt5::PushButton.new('&Shoot')
+    shoot.font = Qt5::Font.new('Times', 18, Qt5::Font::Bold)
 
     connect(shoot, SIGNAL('clicked()'), SLOT('fire()'))
     connect(@cannonField, SIGNAL('canShoot(bool)'),
                 shoot, SLOT('setEnabled(bool)'))
 
-    restart = Qt::PushButton.new('&New Game')
-    restart.font = Qt::Font.new('Times', 18, Qt::Font::Bold)
+    restart = Qt5::PushButton.new('&New Game')
+    restart.font = Qt5::Font.new('Times', 18, Qt5::Font::Bold)
 
     connect(restart, SIGNAL('clicked()'), self, SLOT('newGame()'))
 
-    @hits = Qt::LCDNumber.new(2, self)
-    @shotsLeft = Qt::LCDNumber.new(2, self)
-    hitsLabel = Qt::Label.new('HITS', self)
-    shotsLeftLabel = Qt::Label.new('SHOTS LEFT', self)
+    @hits = Qt5::LCDNumber.new(2, self)
+    @shotsLeft = Qt5::LCDNumber.new(2, self)
+    hitsLabel = Qt5::Label.new('HITS', self)
+    shotsLeftLabel = Qt5::Label.new('SHOTS LEFT', self)
 
-    Qt::Shortcut.new(Qt::KeySequence.new(Qt::Key_Enter), self, SLOT('fire()'))
-    Qt::Shortcut.new(Qt::KeySequence.new(Qt::Key_Return), self, SLOT('fire()'))
-    Qt::Shortcut.new(Qt::KeySequence.new(Qt::CTRL + Qt::Key_Q), self, SLOT('close()'))
+    Qt5::Shortcut.new(Qt5::KeySequence.new(Qt5::Key_Enter), self, SLOT('fire()'))
+    Qt5::Shortcut.new(Qt5::KeySequence.new(Qt5::Key_Return), self, SLOT('fire()'))
+    Qt5::Shortcut.new(Qt5::KeySequence.new(Qt5::CTRL + Qt5::Key_Q), self, SLOT('close()'))
 
-    topLayout = Qt::HBoxLayout.new
+    topLayout = Qt5::HBoxLayout.new
     topLayout.addWidget(shoot)
     topLayout.addWidget(@hits)
     topLayout.addWidget(hitsLabel)
@@ -67,15 +67,15 @@ class GameBoard < Qt::Widget
     topLayout.addStretch(1)
     topLayout.addWidget(restart)
 
-    leftLayout = Qt::VBoxLayout.new()
+    leftLayout = Qt5::VBoxLayout.new()
     leftLayout.addWidget(angle)
     leftLayout.addWidget(force)
 
-    cannonLayout = Qt::VBoxLayout.new
+    cannonLayout = Qt5::VBoxLayout.new
     cannonLayout.addWidget(@cannonField)
     cannonBox.layout = cannonLayout
 
-    gridLayout = Qt::GridLayout.new
+    gridLayout = Qt5::GridLayout.new
     gridLayout.addWidget(quit, 0, 0)
     gridLayout.addLayout(topLayout, 0, 1)
     gridLayout.addLayout(leftLayout, 1, 0)

@@ -24,30 +24,30 @@
 =end
     
     
-class TabDialog < Qt::Dialog
+class TabDialog < Qt5::Dialog
     
     def initialize(fileName, parent = nil)
         super(parent)
-        fileInfo = Qt::FileInfo.new(fileName)
+        fileInfo = Qt5::FileInfo.new(fileName)
     
-        @tabWidget = Qt::TabWidget.new
+        @tabWidget = Qt5::TabWidget.new
         @tabWidget.addTab(GeneralTab.new(fileInfo), tr("General"))
         @tabWidget.addTab(PermissionsTab.new(fileInfo), tr("Permissions"))
         @tabWidget.addTab(ApplicationsTab.new(fileInfo), tr("Applications"))
     
-        okButton = Qt::PushButton.new(tr("OK"))
-        cancelButton = Qt::PushButton.new(tr("Cancel"))
+        okButton = Qt5::PushButton.new(tr("OK"))
+        cancelButton = Qt5::PushButton.new(tr("Cancel"))
     
         connect(okButton, SIGNAL('clicked()'), self, SLOT('accept()'))
         connect(cancelButton, SIGNAL('clicked()'), self, SLOT('reject()'))
     
-        buttonLayout = Qt::HBoxLayout.new do |b|
+        buttonLayout = Qt5::HBoxLayout.new do |b|
             b.addStretch(1)
             b.addWidget(okButton)
             b.addWidget(cancelButton)
         end
     
-        self.layout = Qt::VBoxLayout.new do |m|
+        self.layout = Qt5::VBoxLayout.new do |m|
             m.addWidget(@tabWidget)
             m.addLayout(buttonLayout)
         end
@@ -56,31 +56,31 @@ class TabDialog < Qt::Dialog
     end
 end
 
-class GeneralTab < Qt::Widget
+class GeneralTab < Qt5::Widget
     
     def initialize(fileInfo, parent = nil)
         super(parent)
-        fileNameLabel = Qt::Label.new(tr("File Name:"))
-        fileNameEdit = Qt::LineEdit.new(fileInfo.fileName())
+        fileNameLabel = Qt5::Label.new(tr("File Name:"))
+        fileNameEdit = Qt5::LineEdit.new(fileInfo.fileName())
     
-        pathLabel = Qt::Label.new(tr("Path:"))
-        pathValueLabel = Qt::Label.new(fileInfo.absoluteFilePath())
-        pathValueLabel.frameStyle = Qt::Frame::Panel | Qt::Frame::Sunken
+        pathLabel = Qt5::Label.new(tr("Path:"))
+        pathValueLabel = Qt5::Label.new(fileInfo.absoluteFilePath())
+        pathValueLabel.frameStyle = Qt5::Frame::Panel | Qt5::Frame::Sunken
     
-        sizeLabel = Qt::Label.new(tr("Size:"))
+        sizeLabel = Qt5::Label.new(tr("Size:"))
         size = fileInfo.size()/1024
-        sizeValueLabel = Qt::Label.new("%d K" % size)
-        sizeValueLabel.frameStyle = Qt::Frame::Panel | Qt::Frame::Sunken
+        sizeValueLabel = Qt5::Label.new("%d K" % size)
+        sizeValueLabel.frameStyle = Qt5::Frame::Panel | Qt5::Frame::Sunken
     
-        lastReadLabel = Qt::Label.new(tr("Last Read:"))
-        lastReadValueLabel = Qt::Label.new(fileInfo.lastRead().toString())
-        lastReadValueLabel.frameStyle = Qt::Frame::Panel | Qt::Frame::Sunken
+        lastReadLabel = Qt5::Label.new(tr("Last Read:"))
+        lastReadValueLabel = Qt5::Label.new(fileInfo.lastRead().toString())
+        lastReadValueLabel.frameStyle = Qt5::Frame::Panel | Qt5::Frame::Sunken
     
-        lastModLabel = Qt::Label.new(tr("Last Modified:"))
-        lastModValueLabel = Qt::Label.new(fileInfo.lastModified().toString())
-        lastModValueLabel.frameStyle = Qt::Frame::Panel | Qt::Frame::Sunken
+        lastModLabel = Qt5::Label.new(tr("Last Modified:"))
+        lastModValueLabel = Qt5::Label.new(fileInfo.lastModified().toString())
+        lastModValueLabel.frameStyle = Qt5::Frame::Panel | Qt5::Frame::Sunken
     
-        self.layout = Qt::VBoxLayout.new do |m|
+        self.layout = Qt5::VBoxLayout.new do |m|
             m.addWidget(fileNameLabel)
             m.addWidget(fileNameEdit)
             m.addWidget(pathLabel)
@@ -96,51 +96,51 @@ class GeneralTab < Qt::Widget
     end
 end
 
-class PermissionsTab < Qt::Widget
+class PermissionsTab < Qt5::Widget
 
     def initialize(fileInfo, parent = nil)
         super(parent)
-        permissionsGroup = Qt::GroupBox.new(tr("Permissions"))
+        permissionsGroup = Qt5::GroupBox.new(tr("Permissions"))
     
-        readable = Qt::CheckBox.new(tr("Readable"))
+        readable = Qt5::CheckBox.new(tr("Readable"))
         if fileInfo.readable?
             readable.checked = true
         end
     
-        writable = Qt::CheckBox.new(tr("Writable"))
+        writable = Qt5::CheckBox.new(tr("Writable"))
         if fileInfo.writable?
             writable.checked = true
         end
     
-        executable = Qt::CheckBox.new(tr("Executable"))
+        executable = Qt5::CheckBox.new(tr("Executable"))
         if fileInfo.executable?
             executable.checked = true
         end
     
-        ownerGroup = Qt::GroupBox.new(tr("Ownership"))
+        ownerGroup = Qt5::GroupBox.new(tr("Ownership"))
     
-        ownerLabel = Qt::Label.new(tr("Owner"))
-        ownerValueLabel = Qt::Label.new(fileInfo.owner())
-        ownerValueLabel.frameStyle = Qt::Frame::Panel | Qt::Frame::Sunken
+        ownerLabel = Qt5::Label.new(tr("Owner"))
+        ownerValueLabel = Qt5::Label.new(fileInfo.owner())
+        ownerValueLabel.frameStyle = Qt5::Frame::Panel | Qt5::Frame::Sunken
     
-        groupLabel = Qt::Label.new(tr("Group"))
-        groupValueLabel = Qt::Label.new(fileInfo.group())
-        groupValueLabel.frameStyle = Qt::Frame::Panel | Qt::Frame::Sunken
+        groupLabel = Qt5::Label.new(tr("Group"))
+        groupValueLabel = Qt5::Label.new(fileInfo.group())
+        groupValueLabel.frameStyle = Qt5::Frame::Panel | Qt5::Frame::Sunken
     
-        permissionsGroup.layout = Qt::VBoxLayout.new do |p|
+        permissionsGroup.layout = Qt5::VBoxLayout.new do |p|
             p.addWidget(readable)
             p.addWidget(writable)
             p.addWidget(executable)
         end
     
-        ownerGroup.layout = Qt::VBoxLayout.new do |o|
+        ownerGroup.layout = Qt5::VBoxLayout.new do |o|
             o.addWidget(ownerLabel)
             o.addWidget(ownerValueLabel)
             o.addWidget(groupLabel)
             o.addWidget(groupValueLabel)
         end
     
-        self.layout = Qt::VBoxLayout.new do |m|
+        self.layout = Qt5::VBoxLayout.new do |m|
             m.addWidget(permissionsGroup)
             m.addWidget(ownerGroup)
             m.addStretch(1)
@@ -148,13 +148,13 @@ class PermissionsTab < Qt::Widget
     end
 end
 
-class ApplicationsTab < Qt::Widget
+class ApplicationsTab < Qt5::Widget
     
     def initialize(fileInfo, parent = nil)
         super(parent)
-        topLabel = Qt::Label.new(tr("Open with:"))
+        topLabel = Qt5::Label.new(tr("Open with:"))
     
-        applicationsListBox = Qt::ListWidget.new
+        applicationsListBox = Qt5::ListWidget.new
         applications = []
         (1..30).each do |i|
             applications.push tr("Application %d" % i)
@@ -162,14 +162,14 @@ class ApplicationsTab < Qt::Widget
         applicationsListBox.insertItems(0, applications)
 
         if fileInfo.suffix.nil?
-            alwaysCheckBox = Qt::CheckBox.new(tr("Always use this application to " +
+            alwaysCheckBox = Qt5::CheckBox.new(tr("Always use this application to " +
                 "open this type of file"))
         else
-            alwaysCheckBox = Qt::CheckBox.new(tr("Always use this application to " +
+            alwaysCheckBox = Qt5::CheckBox.new(tr("Always use this application to " +
                 "open files with the extension '%s'" % fileInfo.suffix()))
         end
     
-        self.layout = Qt::VBoxLayout.new do |l|
+        self.layout = Qt5::VBoxLayout.new do |l|
             l.addWidget(topLabel)
             l.addWidget(applicationsListBox)
             l.addWidget(alwaysCheckBox)

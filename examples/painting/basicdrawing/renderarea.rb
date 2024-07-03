@@ -24,7 +24,7 @@
 =end
 	
 	
-class RenderArea < Qt::Widget
+class RenderArea < Qt5::Widget
 	
 	Line = 0
 	Points = 1
@@ -50,20 +50,20 @@ class RenderArea < Qt::Widget
 	    super(parent)
 	    @shape = Polygon
 	    @antialiased = false
-		@pen = Qt::Pen.new
-		@brush = Qt::Brush.new
-		@pixmap = Qt::Pixmap.new
+		@pen = Qt5::Pen.new
+		@brush = Qt5::Brush.new
+		@pixmap = Qt5::Pixmap.new
 	    @pixmap.load("images/qt-logo.png")
 	
-	    setBackgroundRole(Qt::Palette::Base)
+	    setBackgroundRole(Qt5::Palette::Base)
 	end
 	
 	def minimumSizeHint()
-	    return Qt::Size.new(100, 100)
+	    return Qt5::Size.new(100, 100)
 	end
 	
 	def sizeHint()
-	    return Qt::Size.new(400, 200)
+	    return Qt5::Size.new(400, 200)
 	end
 	
 	def shape=(shape)
@@ -92,14 +92,14 @@ class RenderArea < Qt::Widget
 	end
 	
 	def paintEvent(event)
-	    points = Qt::Polygon.new([	Qt::Point.new(10, 80),
-	        						Qt::Point.new(20, 10),
-	        						Qt::Point.new(80, 30),
-	        						Qt::Point.new(90, 70) ])
+	    points = Qt5::Polygon.new([	Qt5::Point.new(10, 80),
+	        						Qt5::Point.new(20, 10),
+	        						Qt5::Point.new(80, 30),
+	        						Qt5::Point.new(90, 70) ])
 	
-	    rect = Qt::Rect.new(10, 20, 80, 60)
+	    rect = Qt5::Rect.new(10, 20, 80, 60)
 	
-	    path = Qt::PainterPath.new
+	    path = Qt5::PainterPath.new
 	    path.moveTo(20, 80)
 	    path.lineTo(20, 30)
 	    path.cubicTo(80, 0, 50, 50, 80, 80)
@@ -107,12 +107,12 @@ class RenderArea < Qt::Widget
 	    startAngle = 30 * 16
 	    arcLength = 120 * 16
 	
-	    painter = Qt::Painter.new(self)
+	    painter = Qt5::Painter.new(self)
 	    painter.pen = @pen
 
 	    painter.brush = @brush
 	    if @antialiased
-	        painter.renderHint = Qt::Painter::Antialiasing
+	        painter.renderHint = Qt5::Painter::Antialiasing
 		end
 	
 		x = 0
@@ -152,7 +152,7 @@ class RenderArea < Qt::Widget
 	            when Path
 	                painter.drawPath(path)
 	            when Text
-	                painter.drawText(rect, Qt::AlignCenter, tr("Qt by\nTrolltech"))
+	                painter.drawText(rect, Qt5::AlignCenter, tr("Qt by\nTrolltech"))
 	            when Pixmap
 	                painter.drawPixmap(10, 10, @pixmap)
 	            end

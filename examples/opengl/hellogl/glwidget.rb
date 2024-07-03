@@ -26,7 +26,7 @@
 require 'opengl'
 include Math
 
-class GLWidget < Qt::GLWidget
+class GLWidget < Qt5::GLWidget
 
     slots   'setXRotation(int)',
             'setYRotation(int)',
@@ -45,8 +45,8 @@ class GLWidget < Qt::GLWidget
         @yRot = 0
         @zRot = 0
     
-        @trolltechGreen = Qt::Color.fromCmykF(0.40, 0.0, 1.0, 0.0)
-        @trolltechPurple = Qt::Color.fromCmykF(0.39, 0.39, 0.0, 0.0)
+        @trolltechGreen = Qt5::Color.fromCmykF(0.40, 0.0, 1.0, 0.0)
+        @trolltechPurple = Qt5::Color.fromCmykF(0.39, 0.39, 0.0, 0.0)
     end
     
     def dispose()
@@ -60,11 +60,11 @@ class GLWidget < Qt::GLWidget
     def zRotation() return @zRot end
     
     def minimumSizeHint()
-        return Qt::Size.new(50, 50)
+        return Qt5::Size.new(50, 50)
     end
     
     def sizeHint()
-        return Qt::Size.new(400, 400)
+        return Qt5::Size.new(400, 400)
     end
     
     def setXRotation(angle)
@@ -130,10 +130,10 @@ class GLWidget < Qt::GLWidget
         dx = event.x - @lastPos.x
         dy = event.y - @lastPos.y
     
-        if event.buttons & Qt::LeftButton.to_i != 0
+        if event.buttons & Qt5::LeftButton.to_i != 0
             setXRotation(@xRot + 8 * dy)
             setYRotation(@yRot + 8 * dx)
-        elsif event.buttons & Qt::RightButton.to_i != 0
+        elsif event.buttons & Qt5::RightButton.to_i != 0
             setXRotation(@xRot + 8 * dy)
             setZRotation(@zRot + 8 * dx)
         end

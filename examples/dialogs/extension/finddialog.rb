@@ -23,61 +23,61 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class FindDialog < Qt::Dialog
+class FindDialog < Qt5::Dialog
 	
 	def initialize(parent = nil)
 	    super(parent)
-	    @label = Qt::Label.new(tr("Find &what:"))
-	    @lineEdit = Qt::LineEdit.new
+	    @label = Qt5::Label.new(tr("Find &what:"))
+	    @lineEdit = Qt5::LineEdit.new
 	    @label.buddy = @lineEdit
 	
-	    @caseCheckBox = Qt::CheckBox.new(tr("Match &case"))
-	    @fromStartCheckBox = Qt::CheckBox.new(tr("Search from &start"))
+	    @caseCheckBox = Qt5::CheckBox.new(tr("Match &case"))
+	    @fromStartCheckBox = Qt5::CheckBox.new(tr("Search from &start"))
 	    @fromStartCheckBox.checked = true
 	
-	    @findButton = Qt::PushButton.new(tr("&Find"))
+	    @findButton = Qt5::PushButton.new(tr("&Find"))
 	    @findButton.default = true
 	
-	    @closeButton = Qt::PushButton.new(tr("Close"))
+	    @closeButton = Qt5::PushButton.new(tr("Close"))
 	
-	    @moreButton = Qt::PushButton.new(tr("&More"))
+	    @moreButton = Qt5::PushButton.new(tr("&More"))
 	    @moreButton.checkable = true
 	    @moreButton.autoDefault = false
 	
-	    @extension = Qt::Widget.new
+	    @extension = Qt5::Widget.new
 	
-	    @wholeWordsCheckBox = Qt::CheckBox.new(tr("&Whole words"))
-	    @backwardCheckBox = Qt::CheckBox.new(tr("Search &backward"))
-	    @searchSelectionCheckBox = Qt::CheckBox.new(tr("Search se&lection"))
+	    @wholeWordsCheckBox = Qt5::CheckBox.new(tr("&Whole words"))
+	    @backwardCheckBox = Qt5::CheckBox.new(tr("Search &backward"))
+	    @searchSelectionCheckBox = Qt5::CheckBox.new(tr("Search se&lection"))
 	
 	    connect(@closeButton, SIGNAL('clicked()'), self, SLOT('close()'))
 	    connect(@moreButton, SIGNAL('toggled(bool)'), @extension, SLOT('setVisible(bool)'))
 	
-	    @extensionLayout = Qt::VBoxLayout.new
+	    @extensionLayout = Qt5::VBoxLayout.new
 	    @extensionLayout.margin = 0
 	    @extensionLayout.addWidget(@wholeWordsCheckBox)
 	    @extensionLayout.addWidget(@backwardCheckBox)
 	    @extensionLayout.addWidget(@searchSelectionCheckBox)
 	    @extension.layout = @extensionLayout
 	
-	    topLeftLayout = Qt::HBoxLayout.new
+	    topLeftLayout = Qt5::HBoxLayout.new
 	    topLeftLayout.addWidget(@label)
 	    topLeftLayout.addWidget(@lineEdit)
 	
-	    leftLayout = Qt::VBoxLayout.new
+	    leftLayout = Qt5::VBoxLayout.new
 	    leftLayout.addLayout(topLeftLayout)
 	    leftLayout.addWidget(@caseCheckBox)
 	    leftLayout.addWidget(@fromStartCheckBox)
 	    leftLayout.addStretch(1)
 	
-	    rightLayout = Qt::VBoxLayout.new
+	    rightLayout = Qt5::VBoxLayout.new
 	    rightLayout.addWidget(@findButton)
 	    rightLayout.addWidget(@closeButton)
 	    rightLayout.addWidget(@moreButton)
 	    rightLayout.addStretch(1)
 	
-	    mainLayout = Qt::GridLayout.new
-	    mainLayout.sizeConstraint = Qt::Layout::SetFixedSize
+	    mainLayout = Qt5::GridLayout.new
+	    mainLayout.sizeConstraint = Qt5::Layout::SetFixedSize
 	    mainLayout.addLayout(leftLayout, 0, 0)
 	    mainLayout.addLayout(rightLayout, 0, 1)
 	    mainLayout.addWidget(@extension, 1, 0, 1, 2)

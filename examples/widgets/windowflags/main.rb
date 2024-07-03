@@ -26,7 +26,7 @@
 require 'Qt5'
 require './controllerwindow.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 controller = ControllerWindow.new
 controller.show
 app.exec

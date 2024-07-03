@@ -23,14 +23,14 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class IconPreviewArea < Qt::Widget
+class IconPreviewArea < Qt5::Widget
 
     NumModes = 3
     NumStates = 2
 
     def initialize(parent = nil)
         super(parent)
-        mainLayout = Qt::GridLayout.new
+        mainLayout = Qt5::GridLayout.new
         setLayout(mainLayout)
     
         stateLabels = []
@@ -57,8 +57,8 @@ class IconPreviewArea < Qt::Widget
             end
         end
 
-        @size = Qt::Size.new
-		@icon = Qt::Icon.new
+        @size = Qt5::Size.new
+		@icon = Qt5::Icon.new
     end
     
     def icon=(icon)
@@ -74,18 +74,18 @@ class IconPreviewArea < Qt::Widget
     end
     
     def createHeaderLabel(text)
-        label = Qt::Label.new(tr("<b>%s</b>" % text))
-        label.alignment = Qt::AlignCenter.to_i
+        label = Qt5::Label.new(tr("<b>%s</b>" % text))
+        label.alignment = Qt5::AlignCenter.to_i
         return label
     end
     
     def createPixmapLabel()
-        label = Qt::Label.new
+        label = Qt5::Label.new
         label.enabled = false
-        label.alignment = Qt::AlignCenter.to_i
-        label.frameShape = Qt::Frame::Box
-        label.setSizePolicy(Qt::SizePolicy::Expanding, Qt::SizePolicy::Expanding)
-        label.backgroundRole = Qt::Palette::Base
+        label.alignment = Qt5::AlignCenter.to_i
+        label.frameShape = Qt5::Frame::Box
+        label.setSizePolicy(Qt5::SizePolicy::Expanding, Qt5::SizePolicy::Expanding)
+        label.backgroundRole = Qt5::Palette::Base
         label.setMinimumSize(132, 132)
         return label
     end
@@ -93,15 +93,15 @@ class IconPreviewArea < Qt::Widget
     def updatePixmapLabels()
         (0...NumModes).each do |i|
             if i == 0
-                mode = Qt::Icon::Normal
+                mode = Qt5::Icon::Normal
             elsif i == 1
-                mode = Qt::Icon::Active
+                mode = Qt5::Icon::Active
             else
-                mode = Qt::Icon::Disabled
+                mode = Qt5::Icon::Disabled
             end
     
             (0...NumStates).each do |j|
-                state = (j == 0) ? Qt::Icon::Off : Qt::Icon::On
+                state = (j == 0) ? Qt5::Icon::Off : Qt5::Icon::On
                 pixmap = @icon.pixmap(@size, mode, state)
                 @pixmapLabels[i][j].pixmap = pixmap
                 @pixmapLabels[i][j].enabled = !pixmap.nil?

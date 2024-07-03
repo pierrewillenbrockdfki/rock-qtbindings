@@ -3,7 +3,7 @@
 require 'Qt5'
 require './digitalclock.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 clock = DigitalClock.new
 clock.show
 app.exec

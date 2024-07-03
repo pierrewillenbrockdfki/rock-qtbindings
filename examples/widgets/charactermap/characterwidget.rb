@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class CharacterWidget < Qt::Widget
+class CharacterWidget < Qt5::Widget
 
     slots 'updateFont(const QString&)', 'updateStyle(const QString&)'
     signals 'characterSelected(const QString&)'
@@ -31,7 +31,7 @@ class CharacterWidget < Qt::Widget
     def initialize(parent = nil)
         super(parent)
         @lastKey = -1
-        @displayFont = Qt::Font.new
+        @displayFont = Qt5::Font.new
         setMouseTracking(true)
     end
 
@@ -42,27 +42,27 @@ class CharacterWidget < Qt::Widget
     end
 
     def updateStyle(fontStyle)
-        fontDatabase = Qt::FontDatabase.new
+        fontDatabase = Qt5::FontDatabase.new
         @displayFont = fontDatabase.font(@displayFont.family(), fontStyle, 12)
         @displayFont.pixelSize = 16
         update()
     end
 
     def sizeHint()
-        return Qt::Size.new(32*24, (65536/32)*24)
+        return Qt5::Size.new(32*24, (65536/32)*24)
     end
 
     def mouseMoveEvent(event)
         widgetPosition = mapFromGlobal(event.globalPos())
         key = (widgetPosition.y()/24)*32 + widgetPosition.x()/24
-        Qt::ToolTip.showText(event.globalPos(), key.to_s, self)
+        Qt5::ToolTip.showText(event.globalPos(), key.to_s, self)
     end
 
     def mousePressEvent(event)
-        if event.button() == Qt::LeftButton
+        if event.button() == Qt5::LeftButton
             @lastKey = (event.y()/24)*32 + event.x()/24
-            if Qt::Char.new(@lastKey).category() != Qt::Char::NoCategory
-                emit characterSelected(Qt::Char.new(@lastKey).to_s)
+            if Qt5::Char.new(@lastKey).category() != Qt5::Char::NoCategory
+                emit characterSelected(Qt5::Char.new(@lastKey).to_s)
             end
             update()
         else
@@ -71,8 +71,8 @@ class CharacterWidget < Qt::Widget
     end
 
     def paintEvent(event)
-        painter = Qt::Painter.new(self)
-        painter.fillRect(event.rect(), Qt::Brush.new(Qt::white))
+        painter = Qt5::Painter.new(self)
+        painter.fillRect(event.rect(), Qt5::Brush.new(Qt5::white))
         painter.font = @displayFont
 
         redrawRect = event.rect()
@@ -81,15 +81,15 @@ class CharacterWidget < Qt::Widget
         beginColumn = redrawRect.left()/24
         endColumn = redrawRect.right()/24
 
-        painter.pen = Qt::Color.new(Qt::gray)
+        painter.pen = Qt5::Color.new(Qt5::gray)
         (beginRow..endRow).each do |row|
             (beginColumn..endColumn).each do |column|
                 painter.drawRect(column*24, row*24, 24, 24)
             end
         end
 
-        fontMetrics = Qt::FontMetrics.new(@displayFont)
-        painter.pen = Qt::Color.new(Qt::black)
+        fontMetrics = Qt5::FontMetrics.new(@displayFont)
+        painter.pen = Qt5::Color.new(Qt5::black)
         (beginRow..endRow).each do |row|
             (beginColumn..endColumn).each do |column|
 
@@ -97,12 +97,12 @@ class CharacterWidget < Qt::Widget
                 painter.setClipRect(column*24, row*24, 24, 24)
 
                 if key == @lastKey
-                    painter.fillRect(column*24, row*24, 24, 24, Qt::Brush.new(Qt::red))
+                    painter.fillRect(column*24, row*24, 24, 24, Qt5::Brush.new(Qt5::red))
                 end
 
-                painter.drawText(   column*24 + 12 - fontMetrics.width(Qt::Char.new(key))/2,
+                painter.drawText(   column*24 + 12 - fontMetrics.width(Qt5::Char.new(key))/2,
                                     row*24 + 4 + fontMetrics.ascent(),
-                                    Qt::Char.new(key).to_s )
+                                    Qt5::Char.new(key).to_s )
             end
         end
         painter.end

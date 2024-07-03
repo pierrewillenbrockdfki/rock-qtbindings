@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class RenderArea < Qt::Widget
+class RenderArea < Qt5::Widget
 	
 	NoTransformation = 0
 	Translate = 1
@@ -36,11 +36,11 @@ class RenderArea < Qt::Widget
 	    newFont.pixelSize = 12
 	    setFont(newFont)
 	
-	    fontMetrics = Qt::FontMetrics.new(newFont)
+	    fontMetrics = Qt5::FontMetrics.new(newFont)
 	    @xBoundingRect = fontMetrics.boundingRect(tr("x"))
 	    @yBoundingRect = fontMetrics.boundingRect(tr("y"))
 		@operations = []
-		@shape = Qt::PainterPath.new
+		@shape = Qt5::PainterPath.new
 	end
 	
 	def operations=(operations)
@@ -54,17 +54,17 @@ class RenderArea < Qt::Widget
 	end
 	
 	def minimumSizeHint()
-	    return Qt::Size.new(50, 50)
+	    return Qt5::Size.new(50, 50)
 	end
 	
 	def sizeHint()
-	    return Qt::Size.new(232, 232)
+	    return Qt5::Size.new(232, 232)
 	end
 	
 	def paintEvent(event)
-	    painter = Qt::Painter.new(self)
-	    painter.renderHint = Qt::Painter::Antialiasing
-	    painter.fillRect(event.rect(), Qt::Brush.new(Qt::white))
+	    painter = Qt5::Painter.new(self)
+	    painter.renderHint = Qt5::Painter::Antialiasing
+	    painter.fillRect(event.rect(), Qt5::Brush.new(Qt5::white))
 	
 	    painter.translate(66, 66)
 	
@@ -83,7 +83,7 @@ class RenderArea < Qt::Widget
 	end
 	
 	def drawCoordinates(painter)
-	    painter.pen = Qt::Pen.new(Qt::Color.new(Qt::red))
+	    painter.pen = Qt5::Pen.new(Qt5::Color.new(Qt5::red))
 	
 	    painter.drawLine(0, 0, 50, 0)
 	    painter.drawLine(48, -2, 50, 0)
@@ -99,14 +99,14 @@ class RenderArea < Qt::Widget
 	end
 	
 	def drawOutline(painter)
-	    painter.pen = Qt::Pen.new(Qt::Color.new(Qt::darkGreen))
-	    painter.pen = Qt::Pen.new(Qt::DashLine)
-	    painter.brush = Qt::NoBrush
+	    painter.pen = Qt5::Pen.new(Qt5::Color.new(Qt5::darkGreen))
+	    painter.pen = Qt5::Pen.new(Qt5::DashLine)
+	    painter.brush = Qt5::NoBrush
 	    painter.drawRect(0, 0, 100, 100)
 	end
 	
 	def drawShape(painter)
-	    painter.fillPath(@shape, Qt::Brush.new(Qt::blue))
+	    painter.fillPath(@shape, Qt5::Brush.new(Qt5::blue))
 	end
 	
 	def transformPainter(painter)

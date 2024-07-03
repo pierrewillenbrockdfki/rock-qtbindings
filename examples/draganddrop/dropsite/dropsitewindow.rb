@@ -25,13 +25,13 @@
 		
 require './dropsitewidget.rb'
 	
-class DropSiteWindow < Qt::Widget
+class DropSiteWindow < Qt5::Widget
 	
 	slots 'updateFormatsTable(const QMimeData *)'
 	
 	def initialize(parent = nil)
 	    super(parent)
-	    @abstractLabel = Qt::Label.new(tr("The Drop Site example accepts drops from other " \
+	    @abstractLabel = Qt5::Label.new(tr("The Drop Site example accepts drops from other " \
 	                                  "applications, and displays the MIME formats " \
 	                                  "provided by the drag object."))
 	    @abstractLabel.wordWrap = true
@@ -44,23 +44,23 @@ class DropSiteWindow < Qt::Widget
 	    labels = []
 	    labels << tr("Format") << tr("Content")
 
-	    @formatsTable = Qt::TableWidget.new
+	    @formatsTable = Qt5::TableWidget.new
         @formatsTable.setColumnCount(2)
-        @formatsTable.setEditTriggers(Qt::AbstractItemView::NoEditTriggers)
+        @formatsTable.setEditTriggers(Qt5::AbstractItemView::NoEditTriggers)
         @formatsTable.setHorizontalHeaderLabels(labels)
         @formatsTable.horizontalHeader.setStretchLastSection(true)
 
-	    @quitButton = Qt::PushButton.new(tr("Quit"))
-	    @clearButton = Qt::PushButton.new(tr("Clear"))
+	    @quitButton = Qt5::PushButton.new(tr("Quit"))
+	    @clearButton = Qt5::PushButton.new(tr("Clear"))
 
-        @buttonBox = Qt::DialogButtonBox.new
-        @buttonBox.addButton(@clearButton, Qt::DialogButtonBox::ActionRole)
-        @buttonBox.addButton(@quitButton, Qt::DialogButtonBox::RejectRole)
+        @buttonBox = Qt5::DialogButtonBox.new
+        @buttonBox.addButton(@clearButton, Qt5::DialogButtonBox::ActionRole)
+        @buttonBox.addButton(@quitButton, Qt5::DialogButtonBox::RejectRole)
 
 	    connect(@quitButton, SIGNAL('pressed()'), self, SLOT('close()'))
 	    connect(@clearButton, SIGNAL('pressed()'), @dropArea, SLOT('clear()'))
 
-	    @layout = Qt::VBoxLayout.new do |l|
+	    @layout = Qt5::VBoxLayout.new do |l|
 			l.addWidget(@abstractLabel)
 			l.addWidget(@dropArea)
 			l.addWidget(@formatsTable)
@@ -82,9 +82,9 @@ class DropSiteWindow < Qt::Widget
 	    formats = mimeData.formats()
 
 	    formats.each do |format|
-	        formatItem = Qt::TableWidgetItem.new(format)
-	        formatItem.flags = Qt::ItemIsEnabled
-	        formatItem.textAlignment = Qt::AlignTop | Qt::AlignLeft
+	        formatItem = Qt5::TableWidgetItem.new(format)
+	        formatItem.flags = Qt5::ItemIsEnabled
+	        formatItem.textAlignment = Qt5::AlignTop | Qt5::AlignLeft
 		
 	        text = ""
 	        if format == "text/plain"
@@ -105,8 +105,8 @@ class DropSiteWindow < Qt::Widget
 	
 	        row = @formatsTable.rowCount()
 	        @formatsTable.insertRow(row)
-	        @formatsTable.setItem(row, 0, Qt::TableWidgetItem.new(format))
-	        @formatsTable.setItem(row, 1, Qt::TableWidgetItem.new(text))
+	        @formatsTable.setItem(row, 0, Qt5::TableWidgetItem.new(format))
+	        @formatsTable.setItem(row, 1, Qt5::TableWidgetItem.new(text))
 	    end
 	
 	    @formatsTable.resizeColumnToContents(0)

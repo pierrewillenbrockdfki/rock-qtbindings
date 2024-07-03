@@ -26,7 +26,7 @@
 require 'Qt5'
 require './tetrixwindow.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 window = TetrixWindow.new
 window.show
 Kernel.srand

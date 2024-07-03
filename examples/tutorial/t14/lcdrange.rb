@@ -1,4 +1,4 @@
-class LCDRange < Qt::Widget
+class LCDRange < Qt5::Widget
   signals 'valueChanged(int)'
 
   slots 'value=(int)', 'setRange(int, int)', 'text=(const char*)'
@@ -10,21 +10,21 @@ class LCDRange < Qt::Widget
   end
 
   def init
-    lcd = Qt::LCDNumber.new(2)
-    @slider = Qt::Slider.new(Qt::Horizontal) do |s|
+    lcd = Qt5::LCDNumber.new(2)
+    @slider = Qt5::Slider.new(Qt5::Horizontal) do |s|
       s.range = 0..99
       s.value = 0
     end
 
-    @label = Qt::Label.new do |l|
-      l.alignment = Qt::AlignHCenter.to_i | Qt::AlignTop.to_i
-      l.setSizePolicy(Qt::SizePolicy::Preferred, Qt::SizePolicy::Fixed)
+    @label = Qt5::Label.new do |l|
+      l.alignment = Qt5::AlignHCenter.to_i | Qt5::AlignTop.to_i
+      l.setSizePolicy(Qt5::SizePolicy::Preferred, Qt5::SizePolicy::Fixed)
     end
 
     connect(@slider, SIGNAL('valueChanged(int)'), lcd, SLOT('display(int)'))
     connect(@slider, SIGNAL('valueChanged(int)'), SIGNAL('valueChanged(int)'))
 
-    self.layout = Qt::VBoxLayout.new do |l|
+    self.layout = Qt5::VBoxLayout.new do |l|
       l.addWidget(lcd)
       l.addWidget(@slider)
       l.addWidget(@label)

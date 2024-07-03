@@ -27,7 +27,7 @@ require 'Qt5'
 require './qrc_chart.rb'
 require './mainwindow.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 window = MainWindow.new
 window.show
 app.exec

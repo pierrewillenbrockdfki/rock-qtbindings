@@ -26,6 +26,6 @@
 require 'Qt5'
 require './finddialog.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 dialog = FindDialog.new
 dialog.exec

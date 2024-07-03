@@ -25,7 +25,7 @@
     
 require './tetrixpiece.rb'
 
-class TetrixBoard < Qt::Frame
+class TetrixBoard < Qt5::Frame
     
     slots 'start()', 'pause()'
     
@@ -36,8 +36,8 @@ class TetrixBoard < Qt::Frame
     
     def initialize(parent = nil)
         super(parent)
-        setFrameStyle(Qt::Frame::Panel | Qt::Frame::Sunken)
-        setFocusPolicy(Qt::StrongFocus)
+        setFrameStyle(Qt5::Frame::Panel | Qt5::Frame::Sunken)
+        setFocusPolicy(Qt5::StrongFocus)
         @isStarting = false
         @isPaused = false
         @board = []
@@ -46,7 +46,7 @@ class TetrixBoard < Qt::Frame
         @curPiece = TetrixPiece.new
         @nextPiece = TetrixPiece.new
         @nextPiece.setRandomShape()
-        @timer = Qt::BasicTimer.new
+        @timer = Qt5::BasicTimer.new
     end
 
     def shapeAt(x, y)
@@ -66,12 +66,12 @@ class TetrixBoard < Qt::Frame
     end
     
     def sizeHint()
-        return Qt::Size.new(BoardWidth * 15 + frameWidth() * 2,
+        return Qt5::Size.new(BoardWidth * 15 + frameWidth() * 2,
                       15 + frameWidth() * 2)
     end
     
     def minimumSizeHint()
-        return Qt::Size.new(BoardWidth * 5 + frameWidth() * 2,
+        return Qt5::Size.new(BoardWidth * 5 + frameWidth() * 2,
                       5 + frameWidth() * 2)
     end
     
@@ -111,13 +111,13 @@ class TetrixBoard < Qt::Frame
     end
     
     def paintEvent(e)
-        painter = Qt::Painter.new(self)
+        painter = Qt5::Painter.new(self)
         rect = contentsRect()
     
         drawFrame(painter)
     
         if @isPaused
-            painter.drawText(rect, Qt::AlignCenter, tr("Pause"))
+            painter.drawText(rect, Qt5::AlignCenter, tr("Pause"))
             painter.end
             return
         end
@@ -153,17 +153,17 @@ class TetrixBoard < Qt::Frame
         end
     
         case event.key
-        when Qt::Key_Left
+        when Qt5::Key_Left
             tryMove(@curPiece, @curX - 1, @curY)
-        when Qt::Key_Right
+        when Qt5::Key_Right
             tryMove(@curPiece, @curX + 1, @curY)
-        when Qt::Key_Down
+        when Qt5::Key_Down
             tryMove(@curPiece.rotatedRight, @curX, @curY)
-        when Qt::Key_Up
+        when Qt5::Key_Up
             tryMove(@curPiece.rotatedLeft, @curX, @curY)
-        when Qt::Key_Space
+        when Qt5::Key_Space
             dropDown()
-        when Qt::Key_D
+        when Qt5::Key_D
             oneLineDown()
         else
             super(event)
@@ -292,8 +292,8 @@ class TetrixBoard < Qt::Frame
         dx = @nextPiece.maxX() - @nextPiece.minX() + 1
         dy = @nextPiece.maxY() - @nextPiece.minY() + 1
     
-        pixmap = Qt::Pixmap.new(dx * squareWidth(), dy * squareHeight())
-        painter = Qt::Painter.new(pixmap)
+        pixmap = Qt5::Pixmap.new(dx * squareWidth(), dy * squareHeight())
+        painter = Qt5::Painter.new(pixmap)
         painter.fillRect(pixmap.rect(), @nextPieceLabel.palette().background())
     
         (0...4).each do |i|
@@ -329,9 +329,9 @@ class TetrixBoard < Qt::Frame
         colorTable = [  0x000000, 0xCC6666, 0x66CC66, 0x6666CC,
                         0xCCCC66, 0xCC66CC, 0x66CCCC, 0xDAAA00 ]
     
-        color = Qt::Color.fromRgb(colorTable[shape])
+        color = Qt5::Color.fromRgb(colorTable[shape])
         painter.fillRect(x + 1, y + 1, squareWidth() - 2, squareHeight() - 2,
-                         Qt::Brush.new(color))
+                         Qt5::Brush.new(color))
     
         painter.pen = color.light
         painter.drawLine(x, y + squareHeight() - 1, x, y)

@@ -24,18 +24,18 @@
 =end
     
     
-class PreviewWindow < Qt::Widget
+class PreviewWindow < Qt5::Widget
     
     def initialize(parent = nil)
         super(parent)
-        @textEdit = Qt::TextEdit.new
+        @textEdit = Qt5::TextEdit.new
         @textEdit.readOnly = true
-        @textEdit.lineWrapMode = Qt::TextEdit::NoWrap
+        @textEdit.lineWrapMode = Qt5::TextEdit::NoWrap
     
-        @closeButton = Qt::PushButton.new(tr("&Close"))
+        @closeButton = Qt5::PushButton.new(tr("&Close"))
         connect(@closeButton, SIGNAL('clicked()'), self, SLOT('close()'))
     
-        layout = Qt::VBoxLayout.new do |l|
+        layout = Qt5::VBoxLayout.new do |l|
             l.addWidget(@textEdit)
             l.addWidget(@closeButton)
         end
@@ -48,54 +48,54 @@ class PreviewWindow < Qt::Widget
     def setWindowFlags(flags)
         super(flags.to_i)
     
-        type = (flags & Qt::WindowType_Mask.to_i)
-        if type == Qt::WindowType
-            text = "Qt::Window"
-        elsif type == Qt::DialogType
-            text = "Qt::Dialog"
-        elsif type == Qt::SheetType
-            text = "Qt::Sheet"
-        elsif type == Qt::DrawerType
-            text = "Qt::Drawer"
-        elsif type == Qt::PopupType
-            text = "Qt::Popup"
-        elsif type == Qt::ToolType
-            text = "Qt::Tool"
-        elsif type == Qt::ToolTipType
-            text = "Qt::ToolTip"
-        elsif type == Qt::SplashScreenType
-            text = "Qt::SplashScreen"
+        type = (flags & Qt5::WindowType_Mask.to_i)
+        if type == Qt5::WindowType
+            text = "Qt5::Window"
+        elsif type == Qt5::DialogType
+            text = "Qt5::Dialog"
+        elsif type == Qt5::SheetType
+            text = "Qt5::Sheet"
+        elsif type == Qt5::DrawerType
+            text = "Qt5::Drawer"
+        elsif type == Qt5::PopupType
+            text = "Qt5::Popup"
+        elsif type == Qt5::ToolType
+            text = "Qt5::Tool"
+        elsif type == Qt5::ToolTipType
+            text = "Qt5::ToolTip"
+        elsif type == Qt5::SplashScreenType
+            text = "Qt5::SplashScreen"
         end
     
-        if (flags & Qt::MSWindowsFixedSizeDialogHint.to_i) != 0
-            text += "\n| Qt::MSWindowsFixedSizeDialogHint"
+        if (flags & Qt5::MSWindowsFixedSizeDialogHint.to_i) != 0
+            text += "\n| Qt5::MSWindowsFixedSizeDialogHint"
         end
-        if (flags & Qt::X11BypassWindowManagerHint.to_i) != 0
-            text += "\n| Qt::X11BypassWindowManagerHint"
+        if (flags & Qt5::X11BypassWindowManagerHint.to_i) != 0
+            text += "\n| Qt5::X11BypassWindowManagerHint"
         end
-        if (flags & Qt::FramelessWindowHint.to_i) != 0
-            text += "\n| Qt::FramelessWindowHint"
+        if (flags & Qt5::FramelessWindowHint.to_i) != 0
+            text += "\n| Qt5::FramelessWindowHint"
         end
-        if (flags & Qt::WindowTitleHint.to_i) != 0
-            text += "\n| Qt::WindowTitleHint"
+        if (flags & Qt5::WindowTitleHint.to_i) != 0
+            text += "\n| Qt5::WindowTitleHint"
         end
-        if (flags & Qt::WindowSystemMenuHint.to_i) != 0
-            text += "\n| Qt::WindowSystemMenuHint"
+        if (flags & Qt5::WindowSystemMenuHint.to_i) != 0
+            text += "\n| Qt5::WindowSystemMenuHint"
         end
-        if (flags & Qt::WindowMinimizeButtonHint.to_i) != 0
-            text += "\n| Qt::WindowMinimizeButtonHint"
+        if (flags & Qt5::WindowMinimizeButtonHint.to_i) != 0
+            text += "\n| Qt5::WindowMinimizeButtonHint"
         end
-        if (flags & Qt::WindowMaximizeButtonHint.to_i) != 0
-            text += "\n| Qt::WindowMaximizeButtonHint"
+        if (flags & Qt5::WindowMaximizeButtonHint.to_i) != 0
+            text += "\n| Qt5::WindowMaximizeButtonHint"
         end
-        if (flags & Qt::WindowContextHelpButtonHint.to_i) != 0
-            text += "\n| Qt::WindowContextHelpButtonHint"
+        if (flags & Qt5::WindowContextHelpButtonHint.to_i) != 0
+            text += "\n| Qt5::WindowContextHelpButtonHint"
         end
-        if (flags & Qt::WindowShadeButtonHint.to_i) != 0
-            text += "\n| Qt::WindowShadeButtonHint"
+        if (flags & Qt5::WindowShadeButtonHint.to_i) != 0
+            text += "\n| Qt5::WindowShadeButtonHint"
         end
-        if (flags & Qt::WindowStaysOnTopHint.to_i) != 0
-            text += "\n| Qt::WindowStaysOnTopHint"
+        if (flags & Qt5::WindowStaysOnTopHint.to_i) != 0
+            text += "\n| Qt5::WindowStaysOnTopHint"
         end
     
         @textEdit.plainText = text

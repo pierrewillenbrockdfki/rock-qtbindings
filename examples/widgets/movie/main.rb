@@ -26,7 +26,7 @@
 require 'Qt5'
 require './movieplayer.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 player = MoviePlayer.new
 player.show
 app.exec

@@ -26,7 +26,7 @@
 require 'Qt5'
 require './client.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 client = Client.new
 client.show
 client.exec

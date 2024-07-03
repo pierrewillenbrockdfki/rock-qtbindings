@@ -23,37 +23,37 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class DragWidget < Qt::Frame
+class DragWidget < Qt5::Frame
 	
 	def initialize(parent = nil, flags = 0)
 	    super(parent, flags)
 	    setMinimumSize(200, 200)
-	    setFrameStyle(Qt::Frame::Sunken | Qt::Frame::StyledPanel)
+	    setFrameStyle(Qt5::Frame::Sunken | Qt5::Frame::StyledPanel)
 	    setAcceptDrops(true)
 	
-	    boatIcon = Qt::Label.new(self)
-	    boatIcon.pixmap = Qt::Pixmap.new("images/boat.png")
+	    boatIcon = Qt5::Label.new(self)
+	    boatIcon.pixmap = Qt5::Pixmap.new("images/boat.png")
 	    boatIcon.move(20, 20)
 	    boatIcon.show()
-	    boatIcon.attribute = Qt::WA_DeleteOnClose
+	    boatIcon.attribute = Qt5::WA_DeleteOnClose
 	
-	    carIcon = Qt::Label.new(self)
-	    carIcon.pixmap = Qt::Pixmap.new("images/car.png")
+	    carIcon = Qt5::Label.new(self)
+	    carIcon.pixmap = Qt5::Pixmap.new("images/car.png")
 	    carIcon.move(120, 20)
 	    carIcon.show()
-	    carIcon.attribute = Qt::WA_DeleteOnClose
+	    carIcon.attribute = Qt5::WA_DeleteOnClose
 	
-	    houseIcon = Qt::Label.new(self)
-	    houseIcon.pixmap = Qt::Pixmap.new("images/house.png")
+	    houseIcon = Qt5::Label.new(self)
+	    houseIcon.pixmap = Qt5::Pixmap.new("images/house.png")
 	    houseIcon.move(20, 120)
 	    houseIcon.show()
-	    houseIcon.attribute = Qt::WA_DeleteOnClose
+	    houseIcon.attribute = Qt5::WA_DeleteOnClose
 	end
 	
 	def dragEnterEvent(event)
 	    if event.mimeData().hasFormat("application/x-dnditemdata")
 	        if event.source() == self
-	            event.dropAction = Qt::MoveAction
+	            event.dropAction = Qt5::MoveAction
 	            event.accept()
 	        else
 	            event.acceptProposedAction()
@@ -66,19 +66,19 @@ class DragWidget < Qt::Frame
 	def dropEvent(event)
 	    if event.mimeData().hasFormat("application/x-dnditemdata")
 	        itemData = event.mimeData().data("application/x-dnditemdata")
-	        dataStream = Qt::DataStream.new(itemData, Qt::IODevice::ReadOnly.to_i)
+	        dataStream = Qt5::DataStream.new(itemData, Qt5::IODevice::ReadOnly.to_i)
 	        
-	        pixmap = Qt::Pixmap.new
-	        offset = Qt::Point.new
+	        pixmap = Qt5::Pixmap.new
+	        offset = Qt5::Point.new
 	        dataStream >> pixmap >> offset
-	        newIcon = Qt::Label.new(self)
+	        newIcon = Qt5::Label.new(self)
 	        newIcon.pixmap = pixmap
 	        newIcon.move(event.pos() - offset)
 	        newIcon.show()
-	        newIcon.attribute = Qt::WA_DeleteOnClose
+	        newIcon.attribute = Qt5::WA_DeleteOnClose
 	
 	        if event.source() == self
-	            event.dropAction = Qt::MoveAction
+	            event.dropAction = Qt5::MoveAction
 	            event.accept()
 	        else
 	            event.acceptProposedAction()
@@ -96,26 +96,26 @@ class DragWidget < Qt::Frame
 	
 	    pixmap = child.pixmap.copy
 	
-	    itemData = Qt::ByteArray.new("")
-	    dataStream = Qt::DataStream.new(itemData, Qt::IODevice::WriteOnly.to_i)
+	    itemData = Qt5::ByteArray.new("")
+	    dataStream = Qt5::DataStream.new(itemData, Qt5::IODevice::WriteOnly.to_i)
 	    dataStream << pixmap << (event.pos() - child.pos())
-	    mimeData = Qt::MimeData.new
+	    mimeData = Qt5::MimeData.new
 	    mimeData.setData("application/x-dnditemdata", itemData)
 	        
-	    drag = Qt::Drag.new(self)
+	    drag = Qt5::Drag.new(self)
 	    drag.mimeData = mimeData
 	    drag.pixmap = pixmap
 	    drag.hotSpot = event.pos - child.pos
 	
 	    tempPixmap = pixmap.copy
-	    painter = Qt::Painter.new
+	    painter = Qt5::Painter.new
 	    painter.begin(tempPixmap)
-	    painter.fillRect(pixmap.rect(), Qt::Brush.new(Qt::Color.new(127, 127, 127, 127)))
+	    painter.fillRect(pixmap.rect(), Qt5::Brush.new(Qt5::Color.new(127, 127, 127, 127)))
 	    painter.end
 	
 	    child.pixmap = tempPixmap
 	
-	    if drag.start(Qt::CopyAction | Qt::MoveAction) == Qt::MoveAction
+	    if drag.start(Qt5::CopyAction | Qt5::MoveAction) == Qt5::MoveAction
 	        child.close()
 	    else
 	        child.show()

@@ -26,7 +26,7 @@
 	
 require './renderarea.rb'
 
-class Window < Qt::Widget
+class Window < Qt5::Widget
 		
 	slots	'fillRuleChanged()',
     		'fillGradientChanged()',
@@ -37,7 +37,7 @@ class Window < Qt::Widget
 	def initialize(parent = nil)
 		super
 		@renderAreas = Array(NumRenderAreas)
-	    rectPath = Qt::PainterPath.new do |r|
+	    rectPath = Qt5::PainterPath.new do |r|
 			r.moveTo(20.0, 30.0)
 			r.lineTo(80.0, 30.0)
 			r.lineTo(80.0, 70.0)
@@ -45,7 +45,7 @@ class Window < Qt::Widget
 			r.closeSubpath()
 		end
 	
-	    roundRectPath = Qt::PainterPath.new do |r|
+	    roundRectPath = Qt5::PainterPath.new do |r|
 			r.moveTo(80.0, 35.0)
 			r.arcTo(70.0, 30.0, 10.0, 10.0, 0.0, 90.0)
 			r.lineTo(25.0, 30.0)
@@ -57,19 +57,19 @@ class Window < Qt::Widget
 			r.closeSubpath()
 		end
 	
-	    ellipsePath = Qt::PainterPath.new do |e|
+	    ellipsePath = Qt5::PainterPath.new do |e|
 	    	e.moveTo(80.0, 50.0)
 	    	e.arcTo(20.0, 30.0, 60.0, 40.0, 0.0, 360.0)
 		end
 	
-	    piePath = Qt::PainterPath.new do |p|
+	    piePath = Qt5::PainterPath.new do |p|
 			p.moveTo(50.0, 50.0)
 			p.lineTo(65.0, 32.6795)
 			p.arcTo(20.0, 30.0, 60.0, 40.0, 60.0, 240.0)
 			p.closeSubpath()
 		end
 	
-	    polygonPath = Qt::PainterPath.new do |p|
+	    polygonPath = Qt5::PainterPath.new do |p|
 			p.moveTo(10.0, 80.0)
 			p.lineTo(20.0, 10.0)
 			p.lineTo(80.0, 30.0)
@@ -77,7 +77,7 @@ class Window < Qt::Widget
 			p.closeSubpath()
 		end
 	
-	    groupPath = Qt::PainterPath.new do |g|
+	    groupPath = Qt5::PainterPath.new do |g|
 			g.moveTo(60.0, 40.0)
 			g.arcTo(20.0, 20.0, 40.0, 40.0, 0.0, 360.0)
 			g.moveTo(40.0, 40.0)
@@ -87,18 +87,18 @@ class Window < Qt::Widget
 			g.closeSubpath()
 		end
 	
-	    textPath = Qt::PainterPath.new do |t|
-	    	timesFont = Qt::Font.new("Times", 50)
-	    	timesFont.styleStrategy = Qt::Font::ForceOutline
-	    	t.addText(10, 70, timesFont, tr("Qt"))
+	    textPath = Qt5::PainterPath.new do |t|
+	    	timesFont = Qt5::Font.new("Times", 50)
+	    	timesFont.styleStrategy = Qt5::Font::ForceOutline
+	    	t.addText(10, 70, timesFont, tr("Qt5"))
 		end
 	
-	    bezierPath = Qt::PainterPath.new do |b|
+	    bezierPath = Qt5::PainterPath.new do |b|
 	    	b.moveTo(20, 30)
 	    	b.cubicTo(80, 0, 50, 50, 80, 80)
 		end
 	
-	    starPath = Qt::PainterPath.new do |s|
+	    starPath = Qt5::PainterPath.new do |s|
 			s.moveTo(90, 50)
 			(1...5).each do |i|
 				s.lineTo(50 + 40 * Math.cos(0.8 * i * Math::PI),
@@ -117,51 +117,51 @@ class Window < Qt::Widget
 	    @renderAreas[7] = RenderArea.new(bezierPath)
 	    @renderAreas[8] = RenderArea.new(starPath)
 	
-	    @fillRuleComboBox = Qt::ComboBox.new do |f|
-	    	f.addItem(tr("Odd Even"), Qt::Variant.new(Qt::OddEvenFill.to_i))
-	    	f.addItem(tr("Winding"), Qt::Variant.new(Qt::WindingFill.to_i))
+	    @fillRuleComboBox = Qt5::ComboBox.new do |f|
+	    	f.addItem(tr("Odd Even"), Qt5::Variant.new(Qt5::OddEvenFill.to_i))
+	    	f.addItem(tr("Winding"), Qt5::Variant.new(Qt5::WindingFill.to_i))
 		end
 	
-	    @fillRuleLabel = Qt::Label.new(tr("Fill &Rule:"))
+	    @fillRuleLabel = Qt5::Label.new(tr("Fill &Rule:"))
 	    @fillRuleLabel.buddy = @fillRuleComboBox
 	
-	    @fillColor1ComboBox = Qt::ComboBox.new
+	    @fillColor1ComboBox = Qt5::ComboBox.new
 	    populateWithColors(@fillColor1ComboBox)
 	    @fillColor1ComboBox.setCurrentIndex(
 	            @fillColor1ComboBox.findText("mediumslateblue"))
 	
-	    @fillColor2ComboBox = Qt::ComboBox.new
+	    @fillColor2ComboBox = Qt5::ComboBox.new
 	    populateWithColors(@fillColor2ComboBox)
 	    @fillColor2ComboBox.setCurrentIndex(
 	            @fillColor2ComboBox.findText("cornsilk"))
 	
-	    @fillGradientLabel = Qt::Label.new(tr("&Fill Gradient:"))
+	    @fillGradientLabel = Qt5::Label.new(tr("&Fill Gradient:"))
 	    @fillGradientLabel.buddy = @fillColor1ComboBox
 	
-	    @fillToLabel = Qt::Label.new(tr("to"))
-	    @fillToLabel.setSizePolicy(Qt::SizePolicy::Fixed, Qt::SizePolicy::Fixed)
+	    @fillToLabel = Qt5::Label.new(tr("to"))
+	    @fillToLabel.setSizePolicy(Qt5::SizePolicy::Fixed, Qt5::SizePolicy::Fixed)
 	
-	    @penWidthSpinBox = Qt::SpinBox.new
+	    @penWidthSpinBox = Qt5::SpinBox.new
 	    @penWidthSpinBox.range = 0..20
 	
-	    @penWidthLabel = Qt::Label.new(tr("&Pen Width:"))
+	    @penWidthLabel = Qt5::Label.new(tr("&Pen Width:"))
 	    @penWidthLabel.buddy = @penWidthSpinBox
 	
-	    @penColorComboBox = Qt::ComboBox.new
+	    @penColorComboBox = Qt5::ComboBox.new
 	    populateWithColors(@penColorComboBox)
 	    @penColorComboBox.setCurrentIndex(
 	            @penColorComboBox.findText("darkslateblue"))
 	
-	    @penColorLabel = Qt::Label.new(tr("Pen &Color:"))
+	    @penColorLabel = Qt5::Label.new(tr("Pen &Color:"))
 	    @penColorLabel.buddy = @penColorComboBox
 	
-	    @rotationAngleSpinBox = Qt::SpinBox.new do |r|
+	    @rotationAngleSpinBox = Qt5::SpinBox.new do |r|
 			r.range = 0..359
 			r.wrapping = true
 			r.suffix = "\xB0"
 		end
 	
-	    @rotationAngleLabel = Qt::Label.new(tr("&Rotation Angle:"))
+	    @rotationAngleLabel = Qt5::Label.new(tr("&Rotation Angle:"))
 	    @rotationAngleLabel.buddy = @rotationAngleSpinBox
 	
 	    connect(@fillRuleComboBox, SIGNAL('activated(int)'),
@@ -180,12 +180,12 @@ class Window < Qt::Widget
 	                @renderAreas[i], SLOT('rotationAngle=(int)'))
 	    end
 	
-	    topLayout = Qt::GridLayout.new
+	    topLayout = Qt5::GridLayout.new
 		(0...NumRenderAreas).each do |i|
 	        topLayout.addWidget(@renderAreas[i], i / 3, i % 3)
 		end
 	
-	    self.layout = Qt::GridLayout.new do |m|
+	    self.layout = Qt5::GridLayout.new do |m|
 			m.addLayout(topLayout, 0, 0, 1, 4)
 			m.addWidget(@fillRuleLabel, 1, 0)
 			m.addWidget(@fillRuleComboBox, 1, 1, 1, 3)
@@ -218,8 +218,8 @@ class Window < Qt::Widget
 	end
 	
 	def fillGradientChanged()
-	    color1 = qVariantValue(Qt::Color, currentItemData(@fillColor1ComboBox))
-	    color2 = qVariantValue(Qt::Color, currentItemData(@fillColor2ComboBox))
+	    color1 = qVariantValue(Qt5::Color, currentItemData(@fillColor1ComboBox))
+	    color2 = qVariantValue(Qt5::Color, currentItemData(@fillColor2ComboBox))
 	
 		(0...NumRenderAreas).each do |i|
 	        @renderAreas[i].setFillGradient(color1, color2)
@@ -227,7 +227,7 @@ class Window < Qt::Widget
 	end
 	
 	def penColorChanged()
-	    color = qVariantValue(Qt::Color, currentItemData(@penColorComboBox))
+	    color = qVariantValue(Qt5::Color, currentItemData(@penColorComboBox))
 	
 		(0...NumRenderAreas).each do |i|
 	        @renderAreas[i].penColor = color
@@ -235,9 +235,9 @@ class Window < Qt::Widget
 	end
 	
 	def populateWithColors(comboBox)
-	    colorNames = Qt::Color::colorNames()
+	    colorNames = Qt5::Color::colorNames()
 		colorNames.each do |name|
-	        comboBox.addItem(name, qVariantFromValue(Qt::Color.new(name)))
+	        comboBox.addItem(name, qVariantFromValue(Qt5::Color.new(name)))
 		end
 	end
 	

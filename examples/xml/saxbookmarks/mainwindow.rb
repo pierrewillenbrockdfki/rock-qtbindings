@@ -25,7 +25,7 @@
 	
 require './xbelhandler.rb'
 	
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 		
 	slots :open, :saveAs, :about
 	
@@ -34,8 +34,8 @@ class MainWindow < Qt::MainWindow
 	    labels = []
 	    labels << tr("Title") << tr("Location")
 	
-	    @treeWidget = Qt::TreeWidget.new
-	    @treeWidget.header().setSectionResizeMode(0, Qt::HeaderView::Stretch)
+	    @treeWidget = Qt5::TreeWidget.new
+	    @treeWidget.header().setSectionResizeMode(0, Qt5::HeaderView::Stretch)
 	    @treeWidget.headerLabels = labels
 	    setCentralWidget(@treeWidget)
 	
@@ -50,8 +50,8 @@ class MainWindow < Qt::MainWindow
 	
 	def open()
 	    fileName =
-	            Qt::FileDialog.getOpenFileName(self, tr("Open Bookmark File"),
-	                                         Qt::Dir.currentPath(),
+	            Qt5::FileDialog.getOpenFileName(self, tr("Open Bookmark File"),
+	                                         Qt5::Dir.currentPath(),
 	                                         tr("XBEL Files (*.xbel *.xml)"))
 	    if fileName.nil?
 	        return
@@ -60,19 +60,19 @@ class MainWindow < Qt::MainWindow
 	    @treeWidget.clear()
 	
 	    handler = XbelHandler.new(@treeWidget)
-	    reader = Qt::XmlSimpleReader.new
+	    reader = Qt5::XmlSimpleReader.new
 	    reader.contentHandler = handler
 	    reader.errorHandler = handler
 	
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::File::ReadOnly | Qt::File::Text)
-	        Qt::MessageBox.warning(self, tr("SAX Bookmarks"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::File::ReadOnly | Qt5::File::Text)
+	        Qt5::MessageBox.warning(self, tr("SAX Bookmarks"),
 	                             tr("Cannot read file %s:\n%s." %
 	                             [fileName, file.errorString]))
 	        return
 	    end
 	
-	    xmlInputSource = Qt::XmlInputSource.new(file)
+	    xmlInputSource = Qt5::XmlInputSource.new(file)
 	    if reader.parse(xmlInputSource, false)
 	        statusBar().showMessage(tr("File loaded"), 2000)
 		end
@@ -80,16 +80,16 @@ class MainWindow < Qt::MainWindow
 	
 	def saveAs()
 	    fileName =
-	            Qt::FileDialog::getSaveFileName(self, tr("Save Bookmark File"),
-	                                         Qt::Dir.currentPath(),
+	            Qt5::FileDialog::getSaveFileName(self, tr("Save Bookmark File"),
+	                                         Qt5::Dir.currentPath(),
 	                                         tr("XBEL Files (*.xbel *.xml)"))
 	    if fileName.nil?
 	        return
 		end
 	
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::File::WriteOnly | Qt::File::Text.to_i)
-	        Qt::MessageBox.warning(self, tr("SAX Bookmarks"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::File::WriteOnly | Qt5::File::Text.to_i)
+	        Qt5::MessageBox.warning(self, tr("SAX Bookmarks"),
 	                             tr("Cannot write file %s:\n%s." %
 	                             [fileName, file.errorString]))
 	        return
@@ -103,29 +103,29 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def about()
-	   Qt::MessageBox.about(self, tr("About SAX Bookmarks"),
+	   Qt5::MessageBox.about(self, tr("About SAX Bookmarks"),
 	            tr("The <b>SAX Bookmarks</b> example demonstrates how to use Qt's " \
 	               "SAX classes to read XML documents and how to generate XML by " \
 	               "hand."))
 	end
 	
 	def createActions()
-	    @openAct = Qt::Action.new(tr("&Open..."), self)
-	    @openAct.shortcut = Qt::KeySequence.new( tr("Ctrl+O"))
+	    @openAct = Qt5::Action.new(tr("&Open..."), self)
+	    @openAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+O"))
 	    connect(@openAct, SIGNAL(:triggered), self, SLOT(:open))
 	
-	    @saveAsAct = Qt::Action.new(tr("&Save As..."), self)
-	    @saveAsAct.shortcut = Qt::KeySequence.new( tr("Ctrl+S"))
+	    @saveAsAct = Qt5::Action.new(tr("&Save As..."), self)
+	    @saveAsAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+S"))
 	    connect(@saveAsAct, SIGNAL(:triggered), self, SLOT(:saveAs))
 	
-	    @exitAct = Qt::Action.new(tr("E&xit"), self)
-	    @exitAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Q"))
+	    @exitAct = Qt5::Action.new(tr("E&xit"), self)
+	    @exitAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Q"))
 	    connect(@exitAct, SIGNAL(:triggered), self, SLOT(:close))
 	
-	    @aboutAct = Qt::Action.new(tr("&About"), self)
+	    @aboutAct = Qt5::Action.new(tr("&About"), self)
 	    connect(@aboutAct, SIGNAL(:triggered), self, SLOT(:about))
 	
-	    @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+	    @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
 	    connect(@aboutQtAct, SIGNAL(:triggered), $qApp, SLOT(:aboutQt))
 	end
 	

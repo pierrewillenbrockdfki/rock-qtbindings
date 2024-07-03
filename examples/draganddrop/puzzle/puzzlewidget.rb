@@ -24,7 +24,7 @@
 =end
     
     
-class PuzzleWidget < Qt::Widget
+class PuzzleWidget < Qt5::Widget
     
     signals 'puzzleCompleted()'
     
@@ -43,7 +43,7 @@ class PuzzleWidget < Qt::Widget
         @pieceLocations.clear()
         @piecePixmaps.clear()
         @pieceRects.clear()
-        @highlightedRect = Qt::Rect.new()
+        @highlightedRect = Qt5::Rect.new()
         @inPlace = 0
         update()
     end
@@ -58,7 +58,7 @@ class PuzzleWidget < Qt::Widget
     
     def dragLeaveEvent(event)
         updateRect = @highlightedRect
-        @highlightedRect = Qt::Rect.new()
+        @highlightedRect = Qt5::Rect.new()
         update(updateRect)
         event.accept()
     end
@@ -70,11 +70,11 @@ class PuzzleWidget < Qt::Widget
             findPiece(targetSquare(event.pos)) == -1
     
             @highlightedRect = targetSquare(event.pos())
-puts "dragMoveEvent event.dropAction = Qt::MoveAction"
-            event.dropAction = Qt::MoveAction
+puts "dragMoveEvent event.dropAction = Qt5::MoveAction"
+            event.dropAction = Qt5::MoveAction
             event.accept()
         else
-            @highlightedRect = Qt::Rect.new()
+            @highlightedRect = Qt5::Rect.new()
             event.ignore()
         end
     
@@ -86,31 +86,31 @@ puts "dragMoveEvent event.dropAction = Qt::MoveAction"
             findPiece(targetSquare(event.pos)) == -1
     
             pieceData = event.mimeData().data("image/x-puzzle-piece")
-            dataStream = Qt::DataStream.new(pieceData, Qt::IODevice::ReadOnly.to_i)
+            dataStream = Qt5::DataStream.new(pieceData, Qt5::IODevice::ReadOnly.to_i)
             square = targetSquare(event.pos)
-            pixmap = Qt::Pixmap.new
-            location = Qt::Point.new
+            pixmap = Qt5::Pixmap.new
+            location = Qt5::Point.new
             dataStream >> pixmap >> location
     
             @pieceLocations.push location
             @piecePixmaps.push pixmap
             @pieceRects.push square
     
-            @highlightedRect = Qt::Rect.new()
+            @highlightedRect = Qt5::Rect.new()
             update(square)
     
-puts "dropEvent event.dropAction = Qt::MoveAction"
-            event.dropAction = Qt::MoveAction
+puts "dropEvent event.dropAction = Qt5::MoveAction"
+            event.dropAction = Qt5::MoveAction
             event.accept()
 p event.dropAction    
-            if location == Qt::Point.new(square.x()/80, square.y()/80)
+            if location == Qt5::Point.new(square.x()/80, square.y()/80)
                 @inPlace += 1
                 if @inPlace == 25
                     emit puzzleCompleted()
                 end
             end
         else
-            @highlightedRect = Qt::Rect.new()
+            @highlightedRect = Qt5::Rect.new()
             event.ignore()
         end
     end
@@ -138,45 +138,45 @@ p event.dropAction
         @piecePixmaps.delete_at(found)
         @pieceRects.delete_at(found)
     
-        if location == Qt::Point.new(square.x()/80, square.y()/80)
+        if location == Qt5::Point.new(square.x()/80, square.y()/80)
             @inPlace -= 1
         end
     
         update(square)
     
-        itemData = Qt::ByteArray.new("")
-        dataStream = Qt::DataStream.new(itemData, Qt::IODevice::WriteOnly.to_i)
+        itemData = Qt5::ByteArray.new("")
+        dataStream = Qt5::DataStream.new(itemData, Qt5::IODevice::WriteOnly.to_i)
     
         dataStream << pixmap << location
     
-        mimeData = Qt::MimeData.new
+        mimeData = Qt5::MimeData.new
         mimeData.setData("image/x-puzzle-piece", itemData)
     
-        drag = Qt::Drag.new(self)
+        drag = Qt5::Drag.new(self)
         drag.mimeData = mimeData
         drag.hotSpot = event.pos - square.topLeft()
         drag.pixmap = pixmap
     
-        if drag.start(Qt::MoveAction) == 0
+        if drag.start(Qt5::MoveAction) == 0
             @pieceLocations.insert(found, location)
             @piecePixmaps.insert(found, pixmap)
             @pieceRects.insert(found, square)
             update(targetSquare(event.pos()))
 
-			if (location == Qt::Point.new(square.x()/80, square.y()/80))
+			if (location == Qt5::Point.new(square.x()/80, square.y()/80))
 				@inPlace += 1
 			end
         end
     end
     
     def paintEvent(event)
-        painter = Qt::Painter.new
+        painter = Qt5::Painter.new
         painter.begin(self)
-        painter.fillRect(event.rect(), Qt::Brush.new(Qt::white))
+        painter.fillRect(event.rect(), Qt5::Brush.new(Qt5::white))
     
         if @highlightedRect.isValid()
-            painter.brush = Qt::Brush.new(Qt::Color.new("#ffcccc"))
-            painter.pen = Qt::NoPen
+            painter.brush = Qt5::Brush.new(Qt5::Color.new("#ffcccc"))
+            painter.pen = Qt5::NoPen
             painter.drawRect(@highlightedRect.adjusted(0, 0, -1, -1))
         end
     
@@ -187,6 +187,6 @@ p event.dropAction
     end
     
      def targetSquare(position)
-        return Qt::Rect.new(position.x()/80 * 80, position.y()/80 * 80, 80, 80)
+        return Qt5::Rect.new(position.x()/80 * 80, position.y()/80 * 80, 80, 80)
     end
 end

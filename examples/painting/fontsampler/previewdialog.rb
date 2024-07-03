@@ -26,7 +26,7 @@
 require './ui_previewdialogbase.rb'
 require './previewlabel.rb'
 
-class PreviewDialog < Qt::Dialog
+class PreviewDialog < Qt5::Dialog
     
     SmallPreviewLength = 200
     LargePreviewLength = 400
@@ -49,51 +49,51 @@ class PreviewDialog < Qt::Dialog
     
         @currentPage = 0
         @pageCount = 0
-        @ui.pageList.setIconSize(Qt::Size.new(SmallPreviewLength, SmallPreviewLength))
+        @ui.pageList.setIconSize(Qt5::Size.new(SmallPreviewLength, SmallPreviewLength))
         @ui.pageList.header().hide()
         @previewLabel = PreviewLabel.new
-        @printer = Qt::Printer.new
+        @printer = Qt5::Printer.new
         @ui.previewArea.widget = @previewLabel
         setupComboBoxes()
     
-        @ui.buttonBox.button(Qt::DialogButtonBox::Ok).text = tr("&Print")
+        @ui.buttonBox.button(Qt5::DialogButtonBox::Ok).text = tr("&Print")
     end
     
     def setupComboBoxes()
-        @ui.paperSizeCombo.addItem(tr("A0 (841 x 1189 mm)"), Qt::Variant.new(Qt::Printer::A0))
-        @ui.paperSizeCombo.addItem(tr("A1 (594 x 841 mm)"), Qt::Variant.new(Qt::Printer::A1))
-        @ui.paperSizeCombo.addItem(tr("A2 (420 x 594 mm)"), Qt::Variant.new(Qt::Printer::A2))
-        @ui.paperSizeCombo.addItem(tr("A3 (297 x 420 mm)"), Qt::Variant.new(Qt::Printer::A3))
-        @ui.paperSizeCombo.addItem(tr("A4 (210 x 297 mm, 8.26 x 11.7 inches)"), Qt::Variant.new(Qt::Printer::A4))
-        @ui.paperSizeCombo.addItem(tr("A5 (148 x 210 mm)"), Qt::Variant.new(Qt::Printer::A5))
-        @ui.paperSizeCombo.addItem(tr("A6 (105 x 148 mm)"), Qt::Variant.new(Qt::Printer::A6))
-        @ui.paperSizeCombo.addItem(tr("A7 (74 x 105 mm)"), Qt::Variant.new(Qt::Printer::A7))
-        @ui.paperSizeCombo.addItem(tr("A8 (52 x 74 mm)"), Qt::Variant.new(Qt::Printer::A8))
-        @ui.paperSizeCombo.addItem(tr("A9 (37 x 52 mm)"), Qt::Variant.new(Qt::Printer::A9))
-        @ui.paperSizeCombo.addItem(tr("B0 (1000 x 1414 mm)"), Qt::Variant.new(Qt::Printer::B0))
-        @ui.paperSizeCombo.addItem(tr("B1 (707 x 1000 mm)"), Qt::Variant.new(Qt::Printer::B1))
-        @ui.paperSizeCombo.addItem(tr("B2 (500 x 707 mm)"), Qt::Variant.new(Qt::Printer::B2))
-        @ui.paperSizeCombo.addItem(tr("B3 (353 x 500 mm)"), Qt::Variant.new(Qt::Printer::B3))
-        @ui.paperSizeCombo.addItem(tr("B4 (250 x 353 mm)"), Qt::Variant.new(Qt::Printer::B4))
-        @ui.paperSizeCombo.addItem(tr("B5 (176 x 250 mm, 6.93 x 9.84 inches)"), Qt::Variant.new(Qt::Printer::B5))
-        @ui.paperSizeCombo.addItem(tr("B6 (125 x 176 mm)"), Qt::Variant.new(Qt::Printer::B6))
-        @ui.paperSizeCombo.addItem(tr("B7 (88 x 125 mm)"), Qt::Variant.new(Qt::Printer::B7))
-        @ui.paperSizeCombo.addItem(tr("B8 (62 x 88 mm)"), Qt::Variant.new(Qt::Printer::B8))
-        @ui.paperSizeCombo.addItem(tr("B9 (44 x 62 mm)"), Qt::Variant.new(Qt::Printer::B9))
-        @ui.paperSizeCombo.addItem(tr("B10 (31 x 44 mm)"), Qt::Variant.new(Qt::Printer::B10))
-        @ui.paperSizeCombo.addItem(tr("C5E (163 x 229 mm)"), Qt::Variant.new(Qt::Printer::C5E))
-        @ui.paperSizeCombo.addItem(tr("DLE (110 x 220 mm)"), Qt::Variant.new(Qt::Printer::DLE))
-        @ui.paperSizeCombo.addItem(tr("Executive (7.5 x 10 inches, 191 x 254 mm)"), Qt::Variant.new(Qt::Printer::Executive))
-        @ui.paperSizeCombo.addItem(tr("Folio (210 x 330 mm)"), Qt::Variant.new(Qt::Printer::Folio))
-        @ui.paperSizeCombo.addItem(tr("Ledger (432 x 279 mm)"), Qt::Variant.new(Qt::Printer::Ledger))
-        @ui.paperSizeCombo.addItem(tr("Legal (8.5 x 14 inches, 216 x 356 mm)"), Qt::Variant.new(Qt::Printer::Legal))
-        @ui.paperSizeCombo.addItem(tr("Letter (8.5 x 11 inches, 216 x 279 mm)"), Qt::Variant.new(Qt::Printer::Letter))
-        @ui.paperSizeCombo.addItem(tr("Tabloid (279 x 432 mm)"), Qt::Variant.new(Qt::Printer::Tabloid))
-        @ui.paperSizeCombo.addItem(tr("US Common #10 Envelope (105 x 241 mm)"), Qt::Variant.new(Qt::Printer::Comm10E))
-        @ui.paperSizeCombo.currentIndex = @ui.paperSizeCombo.findData(Qt::Variant.new(Qt::Printer::A4))
+        @ui.paperSizeCombo.addItem(tr("A0 (841 x 1189 mm)"), Qt5::Variant.new(Qt5::Printer::A0))
+        @ui.paperSizeCombo.addItem(tr("A1 (594 x 841 mm)"), Qt5::Variant.new(Qt5::Printer::A1))
+        @ui.paperSizeCombo.addItem(tr("A2 (420 x 594 mm)"), Qt5::Variant.new(Qt5::Printer::A2))
+        @ui.paperSizeCombo.addItem(tr("A3 (297 x 420 mm)"), Qt5::Variant.new(Qt5::Printer::A3))
+        @ui.paperSizeCombo.addItem(tr("A4 (210 x 297 mm, 8.26 x 11.7 inches)"), Qt5::Variant.new(Qt5::Printer::A4))
+        @ui.paperSizeCombo.addItem(tr("A5 (148 x 210 mm)"), Qt5::Variant.new(Qt5::Printer::A5))
+        @ui.paperSizeCombo.addItem(tr("A6 (105 x 148 mm)"), Qt5::Variant.new(Qt5::Printer::A6))
+        @ui.paperSizeCombo.addItem(tr("A7 (74 x 105 mm)"), Qt5::Variant.new(Qt5::Printer::A7))
+        @ui.paperSizeCombo.addItem(tr("A8 (52 x 74 mm)"), Qt5::Variant.new(Qt5::Printer::A8))
+        @ui.paperSizeCombo.addItem(tr("A9 (37 x 52 mm)"), Qt5::Variant.new(Qt5::Printer::A9))
+        @ui.paperSizeCombo.addItem(tr("B0 (1000 x 1414 mm)"), Qt5::Variant.new(Qt5::Printer::B0))
+        @ui.paperSizeCombo.addItem(tr("B1 (707 x 1000 mm)"), Qt5::Variant.new(Qt5::Printer::B1))
+        @ui.paperSizeCombo.addItem(tr("B2 (500 x 707 mm)"), Qt5::Variant.new(Qt5::Printer::B2))
+        @ui.paperSizeCombo.addItem(tr("B3 (353 x 500 mm)"), Qt5::Variant.new(Qt5::Printer::B3))
+        @ui.paperSizeCombo.addItem(tr("B4 (250 x 353 mm)"), Qt5::Variant.new(Qt5::Printer::B4))
+        @ui.paperSizeCombo.addItem(tr("B5 (176 x 250 mm, 6.93 x 9.84 inches)"), Qt5::Variant.new(Qt5::Printer::B5))
+        @ui.paperSizeCombo.addItem(tr("B6 (125 x 176 mm)"), Qt5::Variant.new(Qt5::Printer::B6))
+        @ui.paperSizeCombo.addItem(tr("B7 (88 x 125 mm)"), Qt5::Variant.new(Qt5::Printer::B7))
+        @ui.paperSizeCombo.addItem(tr("B8 (62 x 88 mm)"), Qt5::Variant.new(Qt5::Printer::B8))
+        @ui.paperSizeCombo.addItem(tr("B9 (44 x 62 mm)"), Qt5::Variant.new(Qt5::Printer::B9))
+        @ui.paperSizeCombo.addItem(tr("B10 (31 x 44 mm)"), Qt5::Variant.new(Qt5::Printer::B10))
+        @ui.paperSizeCombo.addItem(tr("C5E (163 x 229 mm)"), Qt5::Variant.new(Qt5::Printer::C5E))
+        @ui.paperSizeCombo.addItem(tr("DLE (110 x 220 mm)"), Qt5::Variant.new(Qt5::Printer::DLE))
+        @ui.paperSizeCombo.addItem(tr("Executive (7.5 x 10 inches, 191 x 254 mm)"), Qt5::Variant.new(Qt5::Printer::Executive))
+        @ui.paperSizeCombo.addItem(tr("Folio (210 x 330 mm)"), Qt5::Variant.new(Qt5::Printer::Folio))
+        @ui.paperSizeCombo.addItem(tr("Ledger (432 x 279 mm)"), Qt5::Variant.new(Qt5::Printer::Ledger))
+        @ui.paperSizeCombo.addItem(tr("Legal (8.5 x 14 inches, 216 x 356 mm)"), Qt5::Variant.new(Qt5::Printer::Legal))
+        @ui.paperSizeCombo.addItem(tr("Letter (8.5 x 11 inches, 216 x 279 mm)"), Qt5::Variant.new(Qt5::Printer::Letter))
+        @ui.paperSizeCombo.addItem(tr("Tabloid (279 x 432 mm)"), Qt5::Variant.new(Qt5::Printer::Tabloid))
+        @ui.paperSizeCombo.addItem(tr("US Common #10 Envelope (105 x 241 mm)"), Qt5::Variant.new(Qt5::Printer::Comm10E))
+        @ui.paperSizeCombo.currentIndex = @ui.paperSizeCombo.findData(Qt5::Variant.new(Qt5::Printer::A4))
     
-        @ui.paperOrientationCombo.addItem(tr("Portrait"), Qt::Variant.new(Qt::Printer::Portrait))
-        @ui.paperOrientationCombo.addItem(tr("Landscape"), Qt::Variant.new(Qt::Printer::Landscape))
+        @ui.paperOrientationCombo.addItem(tr("Portrait"), Qt5::Variant.new(Qt5::Printer::Portrait))
+        @ui.paperOrientationCombo.addItem(tr("Landscape"), Qt5::Variant.new(Qt5::Printer::Landscape))
     end
     
     def addPage()
@@ -101,8 +101,8 @@ class PreviewDialog < Qt::Dialog
             return
         end
 
-        item = Qt::TreeWidgetItem.new(@ui.pageList)
-        item.setCheckState(0, Qt::Checked)
+        item = Qt5::TreeWidgetItem.new(@ui.pageList)
+        item.setCheckState(0, Qt5::Checked)
     
         paintItem(item, @currentPage)
         if @ui.pageList.indexOfTopLevelItem(@ui.pageList.currentItem()) < 0
@@ -112,18 +112,18 @@ class PreviewDialog < Qt::Dialog
         $qApp.processEvents()
         @currentPage += 1
     
-        Qt::Timer.singleShot(0, self, SLOT('addPage()'))
+        Qt5::Timer.singleShot(0, self, SLOT('addPage()'))
     end
     
     def setNumberOfPages(count)
         @pageCount = count
-        Qt::Timer.singleShot(0, self, SLOT('addPage()'))
+        Qt5::Timer.singleShot(0, self, SLOT('addPage()'))
     end
     
     def paintItem(item, index)
-        pixmap = Qt::Pixmap.new(SmallPreviewLength, SmallPreviewLength)
+        pixmap = Qt5::Pixmap.new(SmallPreviewLength, SmallPreviewLength)
         paintPreview(pixmap, index)
-        item.setIcon(0, Qt::Icon.new(pixmap))
+        item.setIcon(0, Qt5::Icon.new(pixmap))
     end
     
     def paintPreview(pixmap, index)
@@ -132,13 +132,13 @@ class PreviewDialog < Qt::Dialog
         width = pixmap.width() * @printer.paperRect().width() / longestSide
         height = pixmap.height() * @printer.paperRect().height() / longestSide
    
-        pixmap.fill(Qt::Color.new(qRgb(224,224,224)))
-        painter = Qt::Painter.new
+        pixmap.fill(Qt5::Color.new(qRgb(224,224,224)))
+        painter = Qt5::Painter.new
         painter.begin(pixmap)
-        painter.renderHint = Qt::Painter::Antialiasing
+        painter.renderHint = Qt5::Painter::Antialiasing
         painter.translate((pixmap.width() - width)/2,
                           (pixmap.height() - height)/2)
-        painter.fillRect(Qt::RectF.new(0, 0, width, height), Qt::Brush.new(Qt::white))
+        painter.fillRect(Qt5::RectF.new(0, 0, width, height), Qt5::Brush.new(Qt5::white))
         painter.scale(pixmap.width() / longestSide, pixmap.height() / longestSide)
         painter.translate(@printer.pageRect().topLeft())
         emit pageRequested(index, painter, @printer)
@@ -148,7 +148,7 @@ class PreviewDialog < Qt::Dialog
     def accept()
         markedPages = 0
         for pageIndex in 0..@ui.pageList.topLevelItemCount
-            if @ui.pageList.topLevelItem(pageIndex).checkState(0) == Qt::Checked
+            if @ui.pageList.topLevelItem(pageIndex).checkState(0) == Qt5::Checked
                 markedPages += 1
             end
         end
@@ -159,8 +159,8 @@ class PreviewDialog < Qt::Dialog
         @printer.pageSize = @ui.paperSizeCombo.itemData(@ui.paperSizeCombo.currentIndex()).to_i
         @printer.orientation = paperOrientationCombo.itemData(paperOrientationCombo.currentIndex()).to_i
     
-        dialog = Qt::PrintDialog.new(@printer, self)
-        if dialog.exec() != Qt::Dialog::Accepted
+        dialog = Qt5::PrintDialog.new(@printer, self)
+        if dialog.exec() != Qt5::Dialog::Accepted
             return
         end
 
@@ -168,7 +168,7 @@ class PreviewDialog < Qt::Dialog
         @ui.progressBar.enabled = true
         @ui.progressBar.textVisible = true
     
-        painter = Qt::Painter.new
+        painter = Qt5::Painter.new
         painter.begin(@printer)
     
         @canceled = false
@@ -199,12 +199,12 @@ class PreviewDialog < Qt::Dialog
         @ui.progressBar.textVisible = false
         @ui.progressBar.enabled = false
     
-        Qt::Dialog.accept()
+        Qt5::Dialog.accept()
     end
     
     def isSelected(index)
         if index >= 0 && index < @ui.pageList.topLevelItemCount
-            return @ui.pageList.topLevelItem(index).checkState(0) == Qt::Checked
+            return @ui.pageList.topLevelItem(index).checkState(0) == Qt5::Checked
         else
             return false
         end
@@ -212,7 +212,7 @@ class PreviewDialog < Qt::Dialog
     
     def reject()
         @canceled = true
-        Qt::Dialog.reject()
+        Qt5::Dialog.reject()
     end
     
     def resizeEvent(event)
@@ -228,7 +228,7 @@ class PreviewDialog < Qt::Dialog
             return
         end
 
-        pixmap = Qt::Pixmap.new(@previewLabel.size())
+        pixmap = Qt5::Pixmap.new(@previewLabel.size())
         paintPreview(pixmap, @ui.pageList.indexOfTopLevelItem(@ui.pageList.currentItem()))
         @previewLabel.pixmap = pixmap
         @previewLabel.update()

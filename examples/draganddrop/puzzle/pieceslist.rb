@@ -24,13 +24,13 @@
 =end
     
     
-class PiecesList < Qt::ListWidget
+class PiecesList < Qt5::ListWidget
     
     def initialize(parent = nil)
         super(parent)
         setDragEnabled(true)
-        setViewMode(Qt::ListView::IconMode)
-        setIconSize(Qt::Size.new(60, 60))
+        setViewMode(Qt5::ListView::IconMode)
+        setIconSize(Qt5::Size.new(60, 60))
         setSpacing(10)
         setAcceptDrops(true)
         setDropIndicatorShown(true)
@@ -38,7 +38,7 @@ class PiecesList < Qt::ListWidget
     
     def dragMoveEvent(event)
         if event.mimeData().hasFormat("image/x-puzzle-piece")
-            event.dropAction = Qt::MoveAction
+            event.dropAction = Qt5::MoveAction
             event.accept()
         else
             event.ignore()
@@ -48,14 +48,14 @@ class PiecesList < Qt::ListWidget
     def dropEvent(event)
         if event.mimeData().hasFormat("image/x-puzzle-piece")
             pieceData = event.mimeData().data("image/x-puzzle-piece")
-            dataStream = Qt::DataStream.new(pieceData, Qt::IODevice::ReadOnly.to_i)
-            pixmap = Qt::Pixmap.new
-            location = Qt::Point.new
+            dataStream = Qt5::DataStream.new(pieceData, Qt5::IODevice::ReadOnly.to_i)
+            pixmap = Qt5::Pixmap.new
+            location = Qt5::Point.new
             dataStream >> pixmap >> location
     
             addPiece(pixmap, location)
     
-            event.dropAction = Qt::MoveAction
+            event.dropAction = Qt5::MoveAction
             event.accept()
         else
             event.ignore()
@@ -63,32 +63,32 @@ class PiecesList < Qt::ListWidget
     end
     
     def addPiece(pixmap, location)
-        pieceItem = Qt::ListWidgetItem.new(self)
-        pieceItem.icon = Qt::Icon.new(pixmap)
-        pieceItem.setData(Qt::UserRole, qVariantFromValue(pixmap))
-        pieceItem.setData(Qt::UserRole.to_i + 1, Qt::Variant.new(location))
-        pieceItem.setFlags( Qt::ItemIsEnabled.to_i | Qt::ItemIsSelectable.to_i |
-                            Qt::ItemIsDragEnabled.to_i )
+        pieceItem = Qt5::ListWidgetItem.new(self)
+        pieceItem.icon = Qt5::Icon.new(pixmap)
+        pieceItem.setData(Qt5::UserRole, qVariantFromValue(pixmap))
+        pieceItem.setData(Qt5::UserRole.to_i + 1, Qt5::Variant.new(location))
+        pieceItem.setFlags( Qt5::ItemIsEnabled.to_i | Qt5::ItemIsSelectable.to_i |
+                            Qt5::ItemIsDragEnabled.to_i )
     end
     
     def startDrag(supportedActions)
         item = currentItem()
-        itemData = Qt::ByteArray.new("")
-        dataStream = Qt::DataStream.new(itemData, Qt::IODevice::WriteOnly.to_i)
-        pixmap = qVariantValue(Qt::Pixmap, item.data(Qt::UserRole))
-        location = item.data(Qt::UserRole+1).toPoint()
+        itemData = Qt5::ByteArray.new("")
+        dataStream = Qt5::DataStream.new(itemData, Qt5::IODevice::WriteOnly.to_i)
+        pixmap = qVariantValue(Qt5::Pixmap, item.data(Qt5::UserRole))
+        location = item.data(Qt5::UserRole+1).toPoint()
 
         dataStream << pixmap << location
 
-        mimeData = Qt::MimeData.new
+        mimeData = Qt5::MimeData.new
         mimeData.setData("image/x-puzzle-piece", itemData)
     
-        drag = Qt::Drag.new(self)
+        drag = Qt5::Drag.new(self)
         drag.mimeData = mimeData
-        drag.hotSpot = Qt::Point.new(pixmap.width/2, pixmap.height/2)
+        drag.hotSpot = Qt5::Point.new(pixmap.width/2, pixmap.height/2)
         drag.pixmap = pixmap
     
-        if drag.start(Qt::MoveAction.to_i) == Qt::MoveAction
+        if drag.start(Qt5::MoveAction.to_i) == Qt5::MoveAction
             takeItem(row(item)).dispose
         end
     end

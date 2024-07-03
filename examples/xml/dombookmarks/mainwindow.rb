@@ -25,7 +25,7 @@
 
 require './xbeltree.rb'
 	
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 		
 	slots :open, :saveAs, :about
 	
@@ -45,16 +45,16 @@ class MainWindow < Qt::MainWindow
 	
 	def open()
 	    fileName =
-	            Qt::FileDialog.getOpenFileName(self, tr("Open Bookmark File"),
-	                                         Qt::Dir.currentPath(),
+	            Qt5::FileDialog.getOpenFileName(self, tr("Open Bookmark File"),
+	                                         Qt5::Dir.currentPath(),
 	                                         tr("XBEL Files (*.xbel *.xml)"))
 	    if fileName.nil?
 	        return
 		end
 	
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::File::ReadOnly | Qt::File::Text)
-	        Qt::MessageBox.warning(self, tr("SAX Bookmarks"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::File::ReadOnly | Qt5::File::Text)
+	        Qt5::MessageBox.warning(self, tr("SAX Bookmarks"),
 	                             tr("Cannot read file %s:\n%s." %
 	                             [fileName, file.errorString]))
 	        return
@@ -67,16 +67,16 @@ class MainWindow < Qt::MainWindow
 	
 	def saveAs()
 	    fileName =
-	            Qt::FileDialog.getSaveFileName(self, tr("Save Bookmark File"),
-	                                         Qt::Dir.currentPath(),
+	            Qt5::FileDialog.getSaveFileName(self, tr("Save Bookmark File"),
+	                                         Qt5::Dir.currentPath(),
 	                                         tr("XBEL Files (*.xbel *.xml)"))
 	    if fileName.nil?
 	        return
 		end
 	
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::File::WriteOnly | Qt::File::Text)
-	        Qt::MessageBox.warning(self, tr("SAX Bookmarks"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::File::WriteOnly | Qt5::File::Text)
+	        Qt5::MessageBox.warning(self, tr("SAX Bookmarks"),
 	                             tr("Cannot write file %s:\n%s." %
 	                             [fileName, file.errorString]))
 	        return
@@ -88,29 +88,29 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def about()
-	   Qt::MessageBox.about(self, tr("About DOM Bookmarks"),
+	   Qt5::MessageBox.about(self, tr("About DOM Bookmarks"),
 	                      tr("The <b>DOM Bookmarks</b> example demonstrates how to " \
 	                         "use Qt's DOM classes to read and write XML " \
 	                         "documents."))
 	end
 	
 	def createActions()
-	    @openAct = Qt::Action.new(tr("&Open..."), self)
-	    @openAct.shortcut = Qt::KeySequence.new( tr("Ctrl+O"))
+	    @openAct = Qt5::Action.new(tr("&Open..."), self)
+	    @openAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+O"))
 	    connect(@openAct, SIGNAL(:triggered), self, SLOT(:open))
 	
-	    @saveAsAct = Qt::Action.new(tr("&Save As..."), self)
-	    @saveAsAct.shortcut = Qt::KeySequence.new( tr("Ctrl+S"))
+	    @saveAsAct = Qt5::Action.new(tr("&Save As..."), self)
+	    @saveAsAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+S"))
 	    connect(@saveAsAct, SIGNAL(:triggered), self, SLOT(:saveAs))
 	
-	    @exitAct = Qt::Action.new(tr("E&xit"), self)
-	    @exitAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Q"))
+	    @exitAct = Qt5::Action.new(tr("E&xit"), self)
+	    @exitAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Q"))
 	    connect(@exitAct, SIGNAL(:triggered), self, SLOT(:close))
 	
-	    @aboutAct = Qt::Action.new(tr("&About"), self)
+	    @aboutAct = Qt5::Action.new(tr("&About"), self)
 	    connect(@aboutAct, SIGNAL(:triggered), self, SLOT(:about))
 	
-	    @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+	    @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
 	    connect(@aboutQtAct, SIGNAL(:triggered), $qApp, SLOT(:aboutQt))
 	end
 	

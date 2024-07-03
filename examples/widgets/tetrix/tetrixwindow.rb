@@ -25,30 +25,30 @@
     
 require './tetrixboard.rb'
     
-class TetrixWindow < Qt::Widget
+class TetrixWindow < Qt5::Widget
     
     def initialize(parent = nil)
         super(parent)
         @board = TetrixBoard.new(self)
     
-        @nextPieceLabel = Qt::Label.new
-        @nextPieceLabel.frameStyle = Qt::Frame::Box | Qt::Frame::Raised
-        @nextPieceLabel.alignment = Qt::AlignCenter.to_i
+        @nextPieceLabel = Qt5::Label.new
+        @nextPieceLabel.frameStyle = Qt5::Frame::Box | Qt5::Frame::Raised
+        @nextPieceLabel.alignment = Qt5::AlignCenter.to_i
         @board.nextPieceLabel = @nextPieceLabel
     
-        @scoreLcd = Qt::LCDNumber.new(5)
-        @scoreLcd.segmentStyle = Qt::LCDNumber::Filled
-        @levelLcd = Qt::LCDNumber.new(2)
-        @levelLcd.segmentStyle = Qt::LCDNumber::Filled
-        @linesLcd = Qt::LCDNumber.new(5)
-        @linesLcd.segmentStyle = Qt::LCDNumber::Filled
+        @scoreLcd = Qt5::LCDNumber.new(5)
+        @scoreLcd.segmentStyle = Qt5::LCDNumber::Filled
+        @levelLcd = Qt5::LCDNumber.new(2)
+        @levelLcd.segmentStyle = Qt5::LCDNumber::Filled
+        @linesLcd = Qt5::LCDNumber.new(5)
+        @linesLcd.segmentStyle = Qt5::LCDNumber::Filled
     
-        @startButton = Qt::PushButton.new(tr("&Start"))
-        @startButton.focusPolicy = Qt::NoFocus
-        @quitButton = Qt::PushButton.new(tr("&Quit"))
-        @quitButton.focusPolicy = Qt::NoFocus
-        @pauseButton = Qt::PushButton.new(tr("&Pause"))
-        @pauseButton.focusPolicy = Qt::NoFocus
+        @startButton = Qt5::PushButton.new(tr("&Start"))
+        @startButton.focusPolicy = Qt5::NoFocus
+        @quitButton = Qt5::PushButton.new(tr("&Quit"))
+        @quitButton.focusPolicy = Qt5::NoFocus
+        @pauseButton = Qt5::PushButton.new(tr("&Pause"))
+        @pauseButton.focusPolicy = Qt5::NoFocus
     
         connect(@startButton, SIGNAL('clicked()'), @board, SLOT('start()'))
         connect(@quitButton , SIGNAL('clicked()'), $qApp, SLOT('quit()'))
@@ -58,7 +58,7 @@ class TetrixWindow < Qt::Widget
         connect(@board, SIGNAL('linesRemovedChanged(int)'),
                 @linesLcd, SLOT('display(int)'))
     
-        layout = Qt::GridLayout.new do |l|
+        layout = Qt5::GridLayout.new do |l|
             l.addWidget(createLabel(tr("NEXT")), 0, 0)
             l.addWidget(@nextPieceLabel, 1, 0)
             l.addWidget(createLabel(tr("LEVEL")), 2, 0)
@@ -80,8 +80,8 @@ class TetrixWindow < Qt::Widget
     end
     
     def createLabel(text)
-        lbl = Qt::Label.new(text)
-        lbl.alignment = Qt::AlignHCenter | Qt::AlignBottom
+        lbl = Qt5::Label.new(text)
+        lbl.alignment = Qt5::AlignHCenter | Qt5::AlignBottom
         return lbl
     end
     

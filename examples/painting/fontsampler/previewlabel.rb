@@ -23,16 +23,16 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class PreviewLabel < Qt::Widget
+class PreviewLabel < Qt5::Widget
 	
 	def initialize(parent = nil)
 	    super(parent)
 	end
 	
 	def paintEvent(event)
-	    painter = Qt::Painter.new
+	    painter = Qt5::Painter.new
 	    painter.begin(self)
-	    painter.fillRect(event.rect(), Qt::Color.new(224,224,224))
+	    painter.fillRect(event.rect(), Qt5::Color.new(224,224,224))
 	    painter.drawPixmap(0, 0, @pixmap) if @pixmap
 	    painter.end()
 	end

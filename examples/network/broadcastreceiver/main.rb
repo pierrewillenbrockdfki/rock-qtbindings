@@ -26,7 +26,7 @@
 require 'Qt5'
 require './receiver.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 receiver = Receiver.new
 receiver.show
 receiver.exec

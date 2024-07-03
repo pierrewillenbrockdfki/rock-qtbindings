@@ -27,7 +27,7 @@ require 'Qt5'
 require './imagecomposer.rb'
 require './qrc_imagecomposition.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 composer = ImageComposer.new
 composer.show
 app.exec

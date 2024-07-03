@@ -25,7 +25,7 @@
     
 require './previewwindow.rb'
 
-class ControllerWindow < Qt::Widget
+class ControllerWindow < Qt5::Widget
     
     slots 'updatePreview()'
     
@@ -36,15 +36,15 @@ class ControllerWindow < Qt::Widget
         createTypeGroupBox()
         createHintsGroupBox()
     
-        @quitButton = Qt::PushButton.new(tr("&Quit"))
+        @quitButton = Qt5::PushButton.new(tr("&Quit"))
         connect(@quitButton, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
     
-        bottomLayout = Qt::HBoxLayout.new do |b|
+        bottomLayout = Qt5::HBoxLayout.new do |b|
         	b.addStretch()
         	b.addWidget(@quitButton)
 		end
     
-        mainLayout = Qt::VBoxLayout.new do |m|
+        mainLayout = Qt5::VBoxLayout.new do |m|
 			m.addWidget(@typeGroupBox)
 			m.addWidget(@hintsGroupBox)
 			m.addLayout(bottomLayout)
@@ -57,55 +57,55 @@ class ControllerWindow < Qt::Widget
     end
     
     def updatePreview()
-        flags = Qt::Enum.new(0, "Qt::WindowFlags")
+        flags = Qt5::Enum.new(0, "Qt5::WindowFlags")
     
         if @windowRadioButton.checked?
-            flags = Qt::WindowType
+            flags = Qt5::WindowType
         elsif @dialogRadioButton.checked?
-            flags = Qt::DialogType
+            flags = Qt5::DialogType
         elsif @sheetRadioButton.checked?
-            flags = Qt::SheetType
+            flags = Qt5::SheetType
         elsif @drawerRadioButton.checked?
-            flags = Qt::DrawerType
+            flags = Qt5::DrawerType
         elsif @popupRadioButton.checked?
-            flags = Qt::PopupType
+            flags = Qt5::PopupType
         elsif @toolRadioButton.checked?
-            flags = Qt::ToolType
+            flags = Qt5::ToolType
         elsif @toolTipRadioButton.checked?
-            flags = Qt::ToolTipType
+            flags = Qt5::ToolTipType
         elsif @splashScreenRadioButton.checked?
-            flags = Qt::SplashScreenType
+            flags = Qt5::SplashScreenType
         end
     
         if @msWindowsFixedSizeDialogCheckBox.checked?
-            flags |= Qt::MSWindowsFixedSizeDialogHint.to_i
+            flags |= Qt5::MSWindowsFixedSizeDialogHint.to_i
         end
         if @x11BypassWindowManagerCheckBox.checked?
-            flags |= Qt::X11BypassWindowManagerHint.to_i
+            flags |= Qt5::X11BypassWindowManagerHint.to_i
         end
         if @framelessWindowCheckBox.checked?
-            flags |= Qt::FramelessWindowHint.to_i
+            flags |= Qt5::FramelessWindowHint.to_i
         end
         if @windowTitleCheckBox.checked?
-            flags |= Qt::WindowTitleHint.to_i
+            flags |= Qt5::WindowTitleHint.to_i
         end
         if @windowSystemMenuCheckBox.checked?
-            flags |= Qt::WindowSystemMenuHint.to_i
+            flags |= Qt5::WindowSystemMenuHint.to_i
         end
         if @windowMinimizeButtonCheckBox.checked?
-            flags |= Qt::WindowMinimizeButtonHint.to_i
+            flags |= Qt5::WindowMinimizeButtonHint.to_i
         end
         if @windowMaximizeButtonCheckBox.checked?
-            flags |= Qt::WindowMaximizeButtonHint.to_i
+            flags |= Qt5::WindowMaximizeButtonHint.to_i
         end
         if @windowContextHelpButtonCheckBox.checked?
-            flags |= Qt::WindowContextHelpButtonHint.to_i
+            flags |= Qt5::WindowContextHelpButtonHint.to_i
         end
         if @windowShadeButtonCheckBox.checked?
-            flags |= Qt::WindowShadeButtonHint.to_i
+            flags |= Qt5::WindowShadeButtonHint.to_i
         end
         if @windowStaysOnTopCheckBox.checked?
-            flags |= Qt::WindowStaysOnTopHint.to_i
+            flags |= Qt5::WindowStaysOnTopHint.to_i
         end
 
         @previewWindow.setWindowFlags(flags)
@@ -122,7 +122,7 @@ class ControllerWindow < Qt::Widget
     end
     
     def createTypeGroupBox()
-        @typeGroupBox = Qt::GroupBox.new(tr("Type"))
+        @typeGroupBox = Qt5::GroupBox.new(tr("Type"))
     
         @windowRadioButton = createRadioButton(tr("Window"))
         @dialogRadioButton = createRadioButton(tr("Dialog"))
@@ -134,7 +134,7 @@ class ControllerWindow < Qt::Widget
         @splashScreenRadioButton = createRadioButton(tr("Splash screen"))
         @windowRadioButton.checked = true
     
-        layout = Qt::GridLayout.new do |l|
+        layout = Qt5::GridLayout.new do |l|
             l.addWidget(@windowRadioButton, 0, 0)
             l.addWidget(@dialogRadioButton, 1, 0)
             l.addWidget(@sheetRadioButton, 2, 0)
@@ -149,7 +149,7 @@ class ControllerWindow < Qt::Widget
     end
     
     def createHintsGroupBox()
-        @hintsGroupBox = Qt::GroupBox.new(tr("Hints"))
+        @hintsGroupBox = Qt5::GroupBox.new(tr("Hints"))
     
         @msWindowsFixedSizeDialogCheckBox =
                 createCheckBox(tr("MS Windows fixed size dialog"))
@@ -165,7 +165,7 @@ class ControllerWindow < Qt::Widget
         @windowShadeButtonCheckBox = createCheckBox(tr("Window shade button"))
         @windowStaysOnTopCheckBox = createCheckBox(tr("Window stays on top"))
     
-        layout = Qt::GridLayout.new do |l|
+        layout = Qt5::GridLayout.new do |l|
             l.addWidget(@msWindowsFixedSizeDialogCheckBox, 0, 0)
             l.addWidget(@x11BypassWindowManagerCheckBox, 1, 0)
             l.addWidget(@framelessWindowCheckBox, 2, 0)
@@ -182,13 +182,13 @@ class ControllerWindow < Qt::Widget
     end
     
     def createCheckBox(text)
-        checkBox = Qt::CheckBox.new(text)
+        checkBox = Qt5::CheckBox.new(text)
         connect(checkBox, SIGNAL('clicked()'), self, SLOT('updatePreview()'))
         return checkBox
     end
     
     def createRadioButton(text)
-        button = Qt::RadioButton.new(text)
+        button = Qt5::RadioButton.new(text)
         connect(button, SIGNAL('clicked()'), self, SLOT('updatePreview()'))
         return button
     end

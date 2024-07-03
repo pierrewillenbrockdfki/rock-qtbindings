@@ -26,6 +26,6 @@
 require 'Qt5'
 require './licensewizard.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 wizard = LicenseWizard.new
 wizard.exec

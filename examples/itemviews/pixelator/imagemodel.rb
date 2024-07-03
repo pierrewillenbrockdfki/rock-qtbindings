@@ -24,11 +24,11 @@
 =end
     
 
-class ImageModel < Qt::AbstractTableModel
+class ImageModel < Qt5::AbstractTableModel
     
     def initialize(image, parent = nil)
         super(parent)
-        @modelImage = Qt::Image.new(image)
+        @modelImage = Qt5::Image.new(image)
     end
     
     def rowCount(parent)
@@ -41,11 +41,11 @@ class ImageModel < Qt::AbstractTableModel
     
     def data(index, role)
         if !index.valid?
-            return Qt::Variant.new
-        elsif role == Qt::ToolTipRole
-            return Qt::Variant.new
+            return Qt5::Variant.new
+        elsif role == Qt5::ToolTipRole
+            return Qt5::Variant.new
         end
 
-        return Qt::Variant.new(qGray(@modelImage.pixel(index.column, index.row)))
+        return Qt5::Variant.new(qGray(@modelImage.pixel(index.column, index.row)))
     end
 end

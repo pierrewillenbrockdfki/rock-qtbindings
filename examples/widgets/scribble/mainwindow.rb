@@ -25,7 +25,7 @@
 
 require './scribblearea.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 
     slots   'open()',
             'save()',
@@ -56,8 +56,8 @@ class MainWindow < Qt::MainWindow
     
     def open()
         if maybeSave()
-            fileName = Qt::FileDialog::getOpenFileName(self,
-                                    tr("Open File"), Qt::Dir::currentPath())
+            fileName = Qt5::FileDialog::getOpenFileName(self,
+                                    tr("Open File"), Qt5::Dir::currentPath())
             if !fileName.nil?
                 @scribbleArea.openImage(fileName)
             end
@@ -71,15 +71,15 @@ class MainWindow < Qt::MainWindow
     end
     
     def penColor()
-        newColor = Qt::ColorDialog.getColor(Qt::Color.new(@scribbleArea.penColor))
+        newColor = Qt5::ColorDialog.getColor(Qt5::Color.new(@scribbleArea.penColor))
         if newColor.isValid()
             @scribbleArea.penColor = newColor
         end
     end
     
     def penWidth()
-        ok = Qt::Boolean.new
-        newWidth = Qt::InputDialog::getInteger(self, tr("Scribble"),
+        ok = Qt5::Boolean.new
+        newWidth = Qt5::InputDialog::getInteger(self, tr("Scribble"),
                                                 tr("Select pen width:"),
                                                 @scribbleArea.penWidth(),
                                                 1, 50, 1, ok)
@@ -89,77 +89,77 @@ class MainWindow < Qt::MainWindow
     end
     
     def about()
-        Qt::MessageBox.about(self, tr("About Scribble"),
-                tr("<p>The <b>Scribble</b> example shows how to use Qt::MainWindow as the " +
+        Qt5::MessageBox.about(self, tr("About Scribble"),
+                tr("<p>The <b>Scribble</b> example shows how to use Qt5::MainWindow as the " +
                 "base widget for an application, and how to reimplement some of " +
-                "Qt::Widget's event handlers to receive the events generated for " +
+                "Qt5::Widget's event handlers to receive the events generated for " +
                 "the application's widgets:</p><p> We reimplement the mouse event " +
                 "handlers to facilitate drawing, the paint event handler to " +
                 "update the application and the resize event handler to optimize " +
                 "the application's appearance. In addition we reimplement the " +
                 "close event handler to intercept the close events before " +
                 "terminating the application.</p><p> The example also demonstrates " +
-                "how to use Qt::Painter to draw an image in real time, as well as " +
+                "how to use Qt5::Painter to draw an image in real time, as well as " +
                 "to repaint widgets.</p>"))
     end
     
     def createActions()
-        @openAct = Qt::Action.new(tr("&Open..."), self)
-        @openAct.shortcut = Qt::KeySequence.new(tr("Ctrl+O"))
+        @openAct = Qt5::Action.new(tr("&Open..."), self)
+        @openAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+O"))
         connect(@openAct, SIGNAL('triggered()'), self, SLOT('open()'))
     
-        Qt::ImageWriter.supportedImageFormats().each do |format|
+        Qt5::ImageWriter.supportedImageFormats().each do |format|
             text = tr("%s..." % format.upcase)
     
-            action = Qt::Action.new(text, self)
-            action.data = Qt::Variant.new(format)
+            action = Qt5::Action.new(text, self)
+            action.data = Qt5::Variant.new(format)
             connect(action, SIGNAL('triggered()'), self, SLOT('save()'))
             @saveAsActs.push action
         end
     
-        @exitAct = Qt::Action.new(tr("E&xit"), self)
-        @exitAct.shortcut = Qt::KeySequence.new(tr("Ctrl+Q"))
+        @exitAct = Qt5::Action.new(tr("E&xit"), self)
+        @exitAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+Q"))
         connect(@exitAct, SIGNAL('triggered()'), self, SLOT('close()'))
     
-        @penColorAct = Qt::Action.new(tr("&Pen Color..."), self)
+        @penColorAct = Qt5::Action.new(tr("&Pen Color..."), self)
         connect(@penColorAct, SIGNAL('triggered()'), self, SLOT('penColor()'))
     
-        @penWidthAct = Qt::Action.new(tr("Pen &Width..."), self)
+        @penWidthAct = Qt5::Action.new(tr("Pen &Width..."), self)
         connect(@penWidthAct, SIGNAL('triggered()'), self, SLOT('penWidth()'))
     
-        @clearScreenAct = Qt::Action.new(tr("&Clear Screen"), self)
-        @clearScreenAct.shortcut = Qt::KeySequence.new(tr("Ctrl+L"))
+        @clearScreenAct = Qt5::Action.new(tr("&Clear Screen"), self)
+        @clearScreenAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+L"))
         connect(@clearScreenAct, SIGNAL('triggered()'),
                 @scribbleArea, SLOT('clearImage()'))
     
-        @aboutAct = Qt::Action.new(tr("&About"), self)
+        @aboutAct = Qt5::Action.new(tr("&About"), self)
         connect(@aboutAct, SIGNAL('triggered()'), self, SLOT('about()'))
     
-        @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+        @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
         connect(@aboutQtAct, SIGNAL('triggered()'), $qApp, SLOT('aboutQt()'))
     end
     
     def createMenus()
-        @saveAsMenu = Qt::Menu.new(tr("&Save As"), self)
+        @saveAsMenu = Qt5::Menu.new(tr("&Save As"), self)
         @saveAsActs.each do |action|
             @saveAsMenu.addAction(action)
         end
 
-        @fileMenu = Qt::Menu.new(tr("&File"), self) do |f|
+        @fileMenu = Qt5::Menu.new(tr("&File"), self) do |f|
             f.addAction(@openAct)
             f.addMenu(@saveAsMenu)
             f.addSeparator()
             f.addAction(@exitAct)
         end
     
-        @optionMenu = Qt::Menu.new(tr("&Options"), self) do |o|
+        @optionMenu = Qt5::Menu.new(tr("&Options"), self) do |o|
             o.addAction(@penColorAct)
             o.addAction(@penWidthAct)
             o.addSeparator()
             o.addAction(@clearScreenAct)
         end
     
-        @helpMenu = Qt::Menu.new(tr("&Help"), self) do |h|
+        @helpMenu = Qt5::Menu.new(tr("&Help"), self) do |h|
             h.addAction(@aboutAct)
             h.addAction(@aboutQtAct)
         end
@@ -171,15 +171,15 @@ class MainWindow < Qt::MainWindow
     
     def maybeSave()
         if @scribbleArea.modified?
-            ret = Qt::MessageBox::warning(self, tr("Scribble"),
+            ret = Qt5::MessageBox::warning(self, tr("Scribble"),
                             tr("The image has been modified.\n" +
                                 "Do you want to save your changes?"),
-                            Qt::MessageBox::Yes | Qt::MessageBox::Default,
-                            Qt::MessageBox::No,
-                            Qt::MessageBox::Cancel | Qt::MessageBox::Escape)
-            if ret == Qt::MessageBox::Yes
+                            Qt5::MessageBox::Yes | Qt5::MessageBox::Default,
+                            Qt5::MessageBox::No,
+                            Qt5::MessageBox::Cancel | Qt5::MessageBox::Escape)
+            if ret == Qt5::MessageBox::Yes
                 return saveFile("png")
-            elsif ret == Qt::MessageBox::Cancel
+            elsif ret == Qt5::MessageBox::Cancel
                 return false
             end
         end
@@ -187,9 +187,9 @@ class MainWindow < Qt::MainWindow
     end
     
     def saveFile(fileFormat)
-        initialPath = Qt::Dir.currentPath() + "/untitled." + fileFormat
+        initialPath = Qt5::Dir.currentPath() + "/untitled." + fileFormat
     
-        fileName = Qt::FileDialog.getSaveFileName(self, tr("Save As"),
+        fileName = Qt5::FileDialog.getSaveFileName(self, tr("Save As"),
                                 initialPath,
                                 tr("%s Files (*.%s);;All Files (*)" %
                                         [fileFormat.upcase, fileFormat] ) )

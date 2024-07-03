@@ -25,7 +25,7 @@
 	
 require './svgview.rb'
 
-class SvgWindow < Qt::ScrollArea
+class SvgWindow < Qt5::ScrollArea
 
     Native = 0
     OpenGL = 1
@@ -33,9 +33,9 @@ class SvgWindow < Qt::ScrollArea
 	
 	def initialize()
 	    super()
-	    view = Qt::Widget.new(self)
-        @mousePressPos = Qt::Point.new
-        @scrollBarValuesOnMousePress = Qt::Point.new
+	    view = Qt5::Widget.new(self)
+        @mousePressPos = Qt5::Point.new
+        @scrollBarValuesOnMousePress = Qt5::Point.new
 	    @renderer = Native
 	    setWidget(view)
 	end
@@ -81,7 +81,7 @@ class SvgWindow < Qt::ScrollArea
 	end
 	
 	def mouseReleaseEvent(event)
-	    @mousePressPos = Qt::Point.new
+	    @mousePressPos = Qt5::Point.new
 	    event.accept
 	end
 end

@@ -57,14 +57,14 @@ end
 class TitlePage < LicenseWizardPage
     def initialize(wizard)
         super(wizard)
-        @topLabel = Qt::Label.new(tr("<center><font color=\"blue\" size=\"5\"><b><i>" +
+        @topLabel = Qt5::Label.new(tr("<center><font color=\"blue\" size=\"5\"><b><i>" +
                                  "Super Product One</i></b></font></center>"))
     
-        @registerRadioButton = Qt::RadioButton.new(tr("&Register your copy"))
-        @evaluateRadioButton = Qt::RadioButton.new(tr("&Evaluate our product"))
+        @registerRadioButton = Qt5::RadioButton.new(tr("&Register your copy"))
+        @evaluateRadioButton = Qt5::RadioButton.new(tr("&Evaluate our product"))
         setFocusProxy(@registerRadioButton)
     
-        layout = Qt::VBoxLayout.new
+        layout = Qt5::VBoxLayout.new
         layout.addWidget(@topLabel)
         layout.addSpacing(10)
         layout.addWidget(@registerRadioButton)
@@ -89,19 +89,19 @@ end
 class EvaluatePage < LicenseWizardPage
     def initialize(wizard)
         super(wizard)
-        @topLabel = Qt::Label.new(tr("<center><b>Evaluate Super Product One" +
+        @topLabel = Qt5::Label.new(tr("<center><b>Evaluate Super Product One" +
                                  "</b></center>"))
     
-        @nameLabel = Qt::Label.new(tr("&Name:"))
-        @nameLineEdit = Qt::LineEdit.new
+        @nameLabel = Qt5::Label.new(tr("&Name:"))
+        @nameLineEdit = Qt5::LineEdit.new
         @nameLabel.buddy = @nameLineEdit
         setFocusProxy(@nameLineEdit)
     
-        @emailLabel = Qt::Label.new(tr("&Email address:"))
-        @emailLineEdit = Qt::LineEdit.new
+        @emailLabel = Qt5::Label.new(tr("&Email address:"))
+        @emailLineEdit = Qt5::LineEdit.new
         @emailLabel.buddy = @emailLineEdit
     
-        @bottomLabel = Qt::Label.new(tr("Please fill in both fields.\nThis will " +
+        @bottomLabel = Qt5::Label.new(tr("Please fill in both fields.\nThis will " +
                                     "entitle you to a 30-day evaluation."))
     
         connect(@nameLineEdit, SIGNAL('textChanged(QString)'),
@@ -109,7 +109,7 @@ class EvaluatePage < LicenseWizardPage
         connect(@emailLineEdit, SIGNAL('textChanged(QString)'),
                 self, SIGNAL('completeStateChanged()'))
     
-        layout = Qt::GridLayout.new
+        layout = Qt5::GridLayout.new
         layout.addWidget(@topLabel, 0, 0, 1, 2)
         layout.setRowMinimumHeight(1, 10)
         layout.addWidget(@nameLabel, 2, 0)
@@ -139,25 +139,25 @@ end
 class RegisterPage < LicenseWizardPage
     def initialize(wizard)
         super(wizard)
-        @topLabel = Qt::Label.new(tr("<center><b>Register your copy of Super Product " +
+        @topLabel = Qt5::Label.new(tr("<center><b>Register your copy of Super Product " +
                                  "One</b></center>"))
     
-        @nameLabel = Qt::Label.new(tr("&Name:"))
-        @nameLineEdit = Qt::LineEdit.new
+        @nameLabel = Qt5::Label.new(tr("&Name:"))
+        @nameLineEdit = Qt5::LineEdit.new
         @nameLabel.buddy = @nameLineEdit
         setFocusProxy(@nameLineEdit)
     
-        @upgradeKeyLabel = Qt::Label.new(tr("&Upgrade key:"))
-        @upgradeKeyLineEdit = Qt::LineEdit.new
+        @upgradeKeyLabel = Qt5::Label.new(tr("&Upgrade key:"))
+        @upgradeKeyLineEdit = Qt5::LineEdit.new
         @upgradeKeyLabel.buddy = @upgradeKeyLineEdit
     
-        @bottomLabel = Qt::Label.new(tr("If you have an upgrade key, please fill in " +
+        @bottomLabel = Qt5::Label.new(tr("If you have an upgrade key, please fill in " +
                                     "the appropriate field."))
     
         connect(@nameLineEdit, SIGNAL('textChanged(QString)'),
                 self, SIGNAL('completeStateChanged()'))
     
-        layout = Qt::GridLayout.new
+        layout = Qt5::GridLayout.new
         layout.addWidget(@topLabel, 0, 0, 1, 2)
         layout.setRowMinimumHeight(1, 10)
         layout.addWidget(@nameLabel, 2, 0)
@@ -191,19 +191,19 @@ end
 class DetailsPage < LicenseWizardPage
     def initialize(wizard)
         super(wizard)
-        @topLabel = Qt::Label.new(tr("<center><b>Fill in your details</b></center>"))
+        @topLabel = Qt5::Label.new(tr("<center><b>Fill in your details</b></center>"))
     
-        @companyLabel = Qt::Label.new(tr("&Company name:"))
-        @companyLineEdit = Qt::LineEdit.new
+        @companyLabel = Qt5::Label.new(tr("&Company name:"))
+        @companyLineEdit = Qt5::LineEdit.new
         @companyLabel.buddy = @companyLineEdit
         setFocusProxy(@companyLineEdit)
     
-        @emailLabel = Qt::Label.new(tr("&Email address:"))
-        @emailLineEdit = Qt::LineEdit.new
+        @emailLabel = Qt5::Label.new(tr("&Email address:"))
+        @emailLineEdit = Qt5::LineEdit.new
         @emailLabel.buddy = @emailLineEdit
     
-        @postalLabel = Qt::Label.new(tr("&Postal address:"))
-        @postalLineEdit = Qt::LineEdit.new
+        @postalLabel = Qt5::Label.new(tr("&Postal address:"))
+        @postalLineEdit = Qt5::LineEdit.new
         @postalLabel.buddy = @postalLineEdit
     
         connect(@companyLineEdit, SIGNAL('textChanged(QString)'),
@@ -213,7 +213,7 @@ class DetailsPage < LicenseWizardPage
         connect(@postalLineEdit, SIGNAL('textChanged(QString)'),
                 self, SIGNAL('completeStateChanged()'))
     
-        layout = Qt::GridLayout.new
+        layout = Qt5::GridLayout.new
         layout.addWidget(@topLabel, 0, 0, 1, 2)
         layout.setRowMinimumHeight(1, 10)
         layout.addWidget(@companyLabel, 2, 0)
@@ -246,20 +246,20 @@ end
 class FinishPage < LicenseWizardPage
     def initialize(wizard)
         super(wizard)
-        @topLabel = Qt::Label.new(tr("<center><b>Complete your registration" +
+        @topLabel = Qt5::Label.new(tr("<center><b>Complete your registration" +
                                  "</b></center>"))
     
-        @bottomLabel = Qt::Label.new
+        @bottomLabel = Qt5::Label.new
         @bottomLabel.wordWrap = true
     
-        @agreeCheckBox = Qt::CheckBox.new(tr("I agree to the terms and conditions of " +
+        @agreeCheckBox = Qt5::CheckBox.new(tr("I agree to the terms and conditions of " +
                                          "the license"))
         setFocusProxy(@agreeCheckBox)
     
         connect(@agreeCheckBox, SIGNAL('toggled(bool)'),
                 self, SIGNAL('completeStateChanged()'))
     
-        layout = Qt::VBoxLayout.new
+        layout = Qt5::VBoxLayout.new
         layout.addWidget(@topLabel)
         layout.addSpacing(10)
         layout.addWidget(@bottomLabel)

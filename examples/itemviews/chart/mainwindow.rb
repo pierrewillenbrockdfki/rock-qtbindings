@@ -25,20 +25,20 @@
 	
 require './pieview.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 	
 	slots 'openFile(const QString)', 'openFile()',
     		'saveFile()'
 	
 	def initialize()
 		super
-	    fileMenu = Qt::Menu.new(tr("&File"), self)
+	    fileMenu = Qt5::Menu.new(tr("&File"), self)
 	    openAction = fileMenu.addAction(tr("&Open"))
-	    openAction.shortcut = Qt::KeySequence.new(tr("Ctrl+O"))
+	    openAction.shortcut = Qt5::KeySequence.new(tr("Ctrl+O"))
 	    saveAction = fileMenu.addAction(tr("&Save"))
-	    saveAction.shortcut = Qt::KeySequence.new(tr("Ctrl+S"))
+	    saveAction.shortcut = Qt5::KeySequence.new(tr("Ctrl+S"))
 	    quitAction = fileMenu.addAction(tr("E&xit"))
-	    quitAction.shortcut = Qt::KeySequence.new(tr("Ctrl+Q"))
+	    quitAction.shortcut = Qt5::KeySequence.new(tr("Ctrl+Q"))
 	
 	    setupModel()
 	    setupViews()
@@ -57,14 +57,14 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def setupModel()
-	    @model = Qt::StandardItemModel.new(8, 2, self)
-	    @model.setHeaderData(0, Qt::Horizontal, Qt::Variant.new(tr("Label")))
-	    @model.setHeaderData(1, Qt::Horizontal, Qt::Variant.new(tr("Quantity")))
+	    @model = Qt5::StandardItemModel.new(8, 2, self)
+	    @model.setHeaderData(0, Qt5::Horizontal, Qt5::Variant.new(tr("Label")))
+	    @model.setHeaderData(1, Qt5::Horizontal, Qt5::Variant.new(tr("Quantity")))
 	end
 	
 	def setupViews()
-	    splitter = Qt::Splitter.new
-	    table = Qt::TableView.new
+	    splitter = Qt5::Splitter.new
+	    table = Qt5::TableView.new
 	    @pieChart = PieView.new
 	    splitter.addWidget(table)
 	    splitter.addWidget(@pieChart)
@@ -74,7 +74,7 @@ class MainWindow < Qt::MainWindow
 	    table.model = @model
 	    @pieChart.model = @model
 	
-	    @selectionModel = Qt::ItemSelectionModel.new(@model)
+	    @selectionModel = Qt5::ItemSelectionModel.new(@model)
 	    table.selectionModel = @selectionModel
 	    @pieChart.selectionModel = @selectionModel
 	
@@ -83,33 +83,33 @@ class MainWindow < Qt::MainWindow
 	
 	def openFile(path = nil)
 	    if path.nil?
-	        fileName = Qt::FileDialog.getOpenFileName(self, tr("Choose a data file"),
+	        fileName = Qt5::FileDialog.getOpenFileName(self, tr("Choose a data file"),
 	                                                "", "*.cht")
 	    else
 	        fileName = path
 		end
 	
 	    if !fileName.nil?
-	        file = Qt::File.new(fileName)
+	        file = Qt5::File.new(fileName)
 	
-	        if file.open(Qt::File::ReadOnly | Qt::File::Text)
-	            stream = Qt::TextStream.new(file)
+	        if file.open(Qt5::File::ReadOnly | Qt5::File::Text)
+	            stream = Qt5::TextStream.new(file)
 	
-	            @model.removeRows(0, @model.rowCount(Qt::ModelIndex.new), Qt::ModelIndex.new)
+	            @model.removeRows(0, @model.rowCount(Qt5::ModelIndex.new), Qt5::ModelIndex.new)
 	
 	            row = 0
 	            line = stream.readLine()
 				while !line.nil?
-					@model.insertRows(row, 1, Qt::ModelIndex.new())
+					@model.insertRows(row, 1, Qt5::ModelIndex.new())
 
 					pieces = line.split(",")
 
-					@model.setData(@model.index(row, 0, Qt::ModelIndex.new),
-									Qt::Variant.new(pieces[0]))
-					@model.setData(@model.index(row, 1, Qt::ModelIndex.new),
-									Qt::Variant.new(pieces[1]))
-					@model.setData(@model.index(row, 0, Qt::ModelIndex.new),
-									qVariantFromValue(Qt::Color.new(pieces[2])), Qt::DecorationRole)
+					@model.setData(@model.index(row, 0, Qt5::ModelIndex.new),
+									Qt5::Variant.new(pieces[0]))
+					@model.setData(@model.index(row, 1, Qt5::ModelIndex.new),
+									Qt5::Variant.new(pieces[1]))
+					@model.setData(@model.index(row, 0, Qt5::ModelIndex.new),
+									qVariantFromValue(Qt5::Color.new(pieces[2])), Qt5::DecorationRole)
 	                row += 1
 
 	                line = stream.readLine()
@@ -122,23 +122,23 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def saveFile()
-	    fileName = Qt::FileDialog.getSaveFileName(self,
+	    fileName = Qt5::FileDialog.getSaveFileName(self,
 	        tr("Save file as"), "", "*.cht")
 	
 	    if !fileName.nil?
-	        file = Qt::File.new(fileName)
-	        stream = Qt::TextStream.new(file)
+	        file = Qt5::File.new(fileName)
+	        stream = Qt5::TextStream.new(file)
 	
-	        if file.open(Qt::File::WriteOnly | Qt::File::Text)
-				(0...@model.rowCount(Qt::ModelIndex.new)).each do |row|
+	        if file.open(Qt5::File::WriteOnly | Qt5::File::Text)
+				(0...@model.rowCount(Qt5::ModelIndex.new)).each do |row|
 	                pieces = []
 	
-	                pieces.push(@model.data(@model.index(row, 0, Qt::ModelIndex.new),
-	                                          Qt::DisplayRole).toString)
-	                pieces.push(@model.data(@model.index(row, 1, Qt::ModelIndex.new),
-	                                          Qt::DisplayRole).toString)
-	                pieces.push(@model.data(@model.index(row, 0, Qt::ModelIndex.new),
-	                                          Qt::DecorationRole).toString)
+	                pieces.push(@model.data(@model.index(row, 0, Qt5::ModelIndex.new),
+	                                          Qt5::DisplayRole).toString)
+	                pieces.push(@model.data(@model.index(row, 1, Qt5::ModelIndex.new),
+	                                          Qt5::DisplayRole).toString)
+	                pieces.push(@model.data(@model.index(row, 0, Qt5::ModelIndex.new),
+	                                          Qt5::DecorationRole).toString)
 	
 	                stream << pieces.join(",") << "\n"
 	            end

@@ -26,11 +26,11 @@
 require 'Qt5'
 require './mainwindow.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 window = MainWindow.new
 window.openImage("example.jpg")
 window.show
 GC.disable
-# Qt::Internal::setDebug Qt::QtDebugChannel::QTDB_GC
+# Qt5::Internal::setDebug Qt5::QtDebugChannel::QTDB_GC
 
 app.exec

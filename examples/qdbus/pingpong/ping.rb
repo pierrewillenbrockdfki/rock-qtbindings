@@ -26,19 +26,19 @@
 require 'Qt5'
 require './ping-common.rb'
 	
-app = Qt::CoreApplication.new(ARGV)
+app = Qt5::CoreApplication.new(ARGV)
 	
-if !Qt::DBusConnection.sessionBus.connected?
+if !Qt5::DBusConnection.sessionBus.connected?
 	$stderr.puts("Cannot connect to the D-BUS session bus.\n" \
 	                "To start it, run:\n" \
 	                "\teval `dbus-launch --auto-syntax`\n")
 	exit(1)
 end
 	
-iface = Qt::DBusInterface.new(SERVICE_NAME, "/", "", Qt::DBusConnection.sessionBus)
+iface = Qt5::DBusInterface.new(SERVICE_NAME, "/", "", Qt5::DBusConnection.sessionBus)
 if iface.valid?
 	message = iface.call("ping", ARGV.length > 0 ? ARGV[0] : "")
-	reply = Qt::DBusReply.new(message)
+	reply = Qt5::DBusReply.new(message)
 	if reply.valid?
 		puts("Reply was: %s\n" % reply.value)
 		exit(0)
@@ -48,5 +48,5 @@ if iface.valid?
 	exit(1)
 end
 	
-$stderr.puts("%s\n" % Qt::DBusConnection.sessionBus.lastError.message)
+$stderr.puts("%s\n" % Qt5::DBusConnection.sessionBus.lastError.message)
 exit(1)

@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class SpinBoxDelegate < Qt::ItemDelegate
+class SpinBoxDelegate < Qt5::ItemDelegate
 	
 	# A delegate that allows the user to change integer values from the model
 	# using a spin box widget.
@@ -33,7 +33,7 @@ class SpinBoxDelegate < Qt::ItemDelegate
 	end
 	
 	def createEditor(parent, option, index)
-	    editor = Qt::SpinBox.new(parent)
+	    editor = Qt5::SpinBox.new(parent)
 	    editor.minimum = 0
 	    editor.maximum = 100
 	    editor.installEventFilter(self)
@@ -42,7 +42,7 @@ class SpinBoxDelegate < Qt::ItemDelegate
 	end
 	
 	def setEditorData(editor, index)
-	    value = index.model().data(index, Qt::DisplayRole).to_i
+	    value = index.model().data(index, Qt5::DisplayRole).to_i
 	
 	    @spinBox = editor
 	    @spinBox.value = value
@@ -53,7 +53,7 @@ class SpinBoxDelegate < Qt::ItemDelegate
 	    @spinBox.interpretText
 	    value = @spinBox.value
 
-	    model.setData(index, Qt::Variant.new(value))
+	    model.setData(index, Qt5::Variant.new(value))
 	end
 	
 	def updateEditorGeometry(editor, option, index)

@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class Window < Qt::Widget
+class Window < Qt5::Widget
 
     slots    'setIcon(int)',
             'iconActivated(QSystemTrayIcon::ActivationReason)',
@@ -49,7 +49,7 @@ class Window < Qt::Widget
         connect(@trayIcon, SIGNAL('activated(QSystemTrayIcon::ActivationReason)'),
                 self, SLOT('iconActivated(QSystemTrayIcon::ActivationReason)'))
 
-        self.layout = Qt::VBoxLayout.new do |m|
+        self.layout = Qt5::VBoxLayout.new do |m|
             m.addWidget(@iconGroupBox)
             m.addWidget(@messageGroupBox)
         end
@@ -70,7 +70,7 @@ class Window < Qt::Widget
 
     def closeEvent(event)
         if @trayIcon.visible?
-            Qt::MessageBox.information(self, tr("Systray"),
+            Qt5::MessageBox.information(self, tr("Systray"),
                                      tr("The program will keep running in the " \
                                         "system tray. To terminate the program, " \
                                         "choose <b>Quit</b> in the context menu " \
@@ -91,10 +91,10 @@ class Window < Qt::Widget
 
     def iconActivated(reason)
         case reason
-        when Qt::SystemTrayIcon::Trigger
-        when Qt::SystemTrayIcon::DoubleClick
+        when Qt5::SystemTrayIcon::Trigger
+        when Qt5::SystemTrayIcon::DoubleClick
             @iconComboBox.currentIndex = (iconComboBox.currentIndex + 1) % @iconComboBox.length
-        when Qt::SystemTrayIcon::MiddleClick
+        when Qt5::SystemTrayIcon::MiddleClick
             showMessage()
         end
     end
@@ -106,25 +106,25 @@ class Window < Qt::Widget
     end
 
     def messageClicked()
-        Qt::MessageBox.information(nil, tr("Systray"),
+        Qt5::MessageBox.information(nil, tr("Systray"),
                                  tr("Sorry, I already gave what help I could.\n" \
                                     "Maybe you should try asking a human?"))
     end
 
     def createIconGroupBox()
-        @iconGroupBox = Qt::GroupBox.new(tr("Tray Icon"))
+        @iconGroupBox = Qt5::GroupBox.new(tr("Tray Icon"))
 
-        @iconLabel = Qt::Label.new("Icon:")
+        @iconLabel = Qt5::Label.new("Icon:")
 
-        @iconComboBox = Qt::ComboBox.new
-        @iconComboBox.addItem(Qt::Icon.new(":/images/bad.svg"), tr("Bad"))
-        @iconComboBox.addItem(Qt::Icon.new(":/images/heart.svg"), tr("Heart"))
-        @iconComboBox.addItem(Qt::Icon.new(":/images/trash.svg"), tr("Trash"))
+        @iconComboBox = Qt5::ComboBox.new
+        @iconComboBox.addItem(Qt5::Icon.new(":/images/bad.svg"), tr("Bad"))
+        @iconComboBox.addItem(Qt5::Icon.new(":/images/heart.svg"), tr("Heart"))
+        @iconComboBox.addItem(Qt5::Icon.new(":/images/trash.svg"), tr("Trash"))
 
-        @showIconCheckBox = Qt::CheckBox.new(tr("Show icon"))
+        @showIconCheckBox = Qt5::CheckBox.new(tr("Show icon"))
         @showIconCheckBox.checked = true
 
-        @iconGroupBox.layout = Qt::HBoxLayout.new do |l|
+        @iconGroupBox.layout = Qt5::HBoxLayout.new do |l|
             l.addWidget(@iconLabel)
             l.addWidget(@iconComboBox)
             l.addStretch()
@@ -133,49 +133,49 @@ class Window < Qt::Widget
     end
 
     def createMessageGroupBox()
-        @messageGroupBox = Qt::GroupBox.new(tr("Balloon Message"))
+        @messageGroupBox = Qt5::GroupBox.new(tr("Balloon Message"))
 
-        @typeLabel = Qt::Label.new(tr("Type:"))
+        @typeLabel = Qt5::Label.new(tr("Type:"))
 
-        @typeComboBox = Qt::ComboBox.new
-        @typeComboBox.addItem(tr("None"), Qt::Variant.new(Qt::SystemTrayIcon::NoIcon.to_i))
-        @typeComboBox.addItem(style().standardIcon(Qt::Style::SP_MessageBoxInformation),
+        @typeComboBox = Qt5::ComboBox.new
+        @typeComboBox.addItem(tr("None"), Qt5::Variant.new(Qt5::SystemTrayIcon::NoIcon.to_i))
+        @typeComboBox.addItem(style().standardIcon(Qt5::Style::SP_MessageBoxInformation),
                 tr("Information"),
-                Qt::Variant.new(Qt::SystemTrayIcon::Information.to_i))
-        @typeComboBox.addItem(style().standardIcon(Qt::Style::SP_MessageBoxWarning),
+                Qt5::Variant.new(Qt5::SystemTrayIcon::Information.to_i))
+        @typeComboBox.addItem(style().standardIcon(Qt5::Style::SP_MessageBoxWarning),
                               tr("Warning"),
-                              Qt::Variant.new(Qt::SystemTrayIcon::Warning.to_i))
-        @typeComboBox.addItem(style().standardIcon(Qt::Style::SP_MessageBoxCritical),
+                              Qt5::Variant.new(Qt5::SystemTrayIcon::Warning.to_i))
+        @typeComboBox.addItem(style().standardIcon(Qt5::Style::SP_MessageBoxCritical),
                               tr("Critical"),
-                              Qt::Variant.new(Qt::SystemTrayIcon::Critical.to_i))
+                              Qt5::Variant.new(Qt5::SystemTrayIcon::Critical.to_i))
         @typeComboBox.currentIndex = 1
 
-        @durationLabel = Qt::Label.new(tr("Duration:"))
+        @durationLabel = Qt5::Label.new(tr("Duration:"))
 
-        @durationSpinBox = Qt::SpinBox.new do |s|
+        @durationSpinBox = Qt5::SpinBox.new do |s|
             s.range = 5..60
             s.suffix = " s"
             s.value = 15
         end
 
-        @durationWarningLabel = Qt::Label.new(tr("(some systems might ignore self " \
+        @durationWarningLabel = Qt5::Label.new(tr("(some systems might ignore self " \
                                              "hint)"))
         @durationWarningLabel.indent = 10
 
-        @titleLabel = Qt::Label.new(tr("Title:"))
+        @titleLabel = Qt5::Label.new(tr("Title:"))
 
-        @titleEdit = Qt::LineEdit.new(tr("Cannot connect to network"))
+        @titleEdit = Qt5::LineEdit.new(tr("Cannot connect to network"))
 
-        @bodyLabel = Qt::Label.new(tr("Body:"))
+        @bodyLabel = Qt5::Label.new(tr("Body:"))
 
-        @bodyEdit = Qt::TextEdit.new
+        @bodyEdit = Qt5::TextEdit.new
         @bodyEdit.setPlainText(tr("Don't believe me. Honestly, I don't have a " \
                                   "clue.\nClick self balloon for details."))
 
-        @showMessageButton = Qt::PushButton.new(tr("Show Message"))
+        @showMessageButton = Qt5::PushButton.new(tr("Show Message"))
         @showMessageButton.default = true
 
-        @messageGroupBox.layout = Qt::GridLayout.new do |m|
+        @messageGroupBox.layout = Qt5::GridLayout.new do |m|
             m.addWidget(@typeLabel, 0, 0)
             m.addWidget(@typeComboBox, 0, 1, 1, 2)
             m.addWidget(@durationLabel, 1, 0)
@@ -192,28 +192,28 @@ class Window < Qt::Widget
     end
 
     def createActions()
-        @minimizeAction = Qt::Action.new(tr("Mi&nimize"), self)
+        @minimizeAction = Qt5::Action.new(tr("Mi&nimize"), self)
         connect(@minimizeAction, SIGNAL(:triggered), self, SLOT(:hide))
 
-        @maximizeAction = Qt::Action.new(tr("Ma&ximize"), self)
+        @maximizeAction = Qt5::Action.new(tr("Ma&ximize"), self)
         connect(@maximizeAction, SIGNAL(:triggered), self, SLOT(:showMaximized))
 
-        @restoreAction = Qt::Action.new(tr("&Restore"), self)
+        @restoreAction = Qt5::Action.new(tr("&Restore"), self)
         connect(@restoreAction, SIGNAL(:triggered), self, SLOT(:show))
 
-        @quitAction = Qt::Action.new(tr("&Quit"), self)
+        @quitAction = Qt5::Action.new(tr("&Quit"), self)
         connect(@quitAction, SIGNAL(:triggered), $qApp, SLOT(:quit))
     end
 
     def createTrayIcon()
-        @trayIconMenu = Qt::Menu.new(self) do |t|
+        @trayIconMenu = Qt5::Menu.new(self) do |t|
             t.addAction(@minimizeAction)
             t.addAction(@maximizeAction)
             t.addAction(@restoreAction)
             t.addSeparator()
             t.addAction(@quitAction)
         end
-        @trayIcon = Qt::SystemTrayIcon.new(self)
+        @trayIcon = Qt5::SystemTrayIcon.new(self)
         @trayIcon.contextMenu = @trayIconMenu
     end
 end

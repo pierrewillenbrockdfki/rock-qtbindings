@@ -25,7 +25,7 @@
 
 require './button.rb'
 
-class Calculator < Qt::Dialog
+class Calculator < Qt5::Dialog
 
     slots    'digitClicked()',
             'unaryOperatorClicked()',
@@ -51,9 +51,9 @@ class Calculator < Qt::Dialog
         @factorSoFar = 0.0
         @waitingForOperand = true
     
-        @display = Qt::LineEdit.new("0")
+        @display = Qt5::LineEdit.new("0")
         @display.readOnly = true
-        @display.alignment = Qt::AlignRight
+        @display.alignment = Qt5::AlignRight
         @display.maxLength = 15
         @display.installEventFilter(self)
     
@@ -61,10 +61,10 @@ class Calculator < Qt::Dialog
         font.pointSize += 8
         @display.font = font
     
-        digitColor = Qt::Color.new(150, 205, 205)
-        backspaceColor = Qt::Color.new(225, 185, 135)
-        memoryColor = Qt::Color.new(100, 155, 155)
-        operatorColor = Qt::Color.new(155, 175, 195)
+        digitColor = Qt5::Color.new(150, 205, 205)
+        backspaceColor = Qt5::Color.new(225, 185, 135)
+        memoryColor = Qt5::Color.new(100, 155, 155)
+        operatorColor = Qt5::Color.new(155, 175, 195)
     
         @digitButtons = []
         (0...NumDigitButtons).each do |i|
@@ -106,8 +106,8 @@ class Calculator < Qt::Dialog
         @equalButton = createButton(tr("="), operatorColor.light(120),
                                 SLOT('equalClicked()'))
     
-        mainLayout = Qt::GridLayout.new
-        mainLayout.SizeConstraint = Qt::Layout::SetFixedSize
+        mainLayout = Qt5::GridLayout.new
+        mainLayout.SizeConstraint = Qt5::Layout::SetFixedSize
     
         mainLayout.addWidget(@display, 0, 0, 1, 6)
         mainLayout.addWidget(@backspaceButton, 1, 0, 1, 2)
@@ -145,17 +145,17 @@ class Calculator < Qt::Dialog
     
     def eventFilter(target, event)
         if target == @display
-            if event.type() == Qt::Event::MouseButtonPress ||
-                    event.type() == Qt::Event::MouseButtonDblClick ||
-                    event.type() == Qt::Event::MouseButtonRelease ||
-                    event.type() == Qt::Event::ContextMenu 
-                mouseEvent = Qt::Internal.cast_object_to(event, Qt::MouseEvent)
-                if mouseEvent.buttons() & Qt::LeftButton.to_i != 0
+            if event.type() == Qt5::Event::MouseButtonPress ||
+                    event.type() == Qt5::Event::MouseButtonDblClick ||
+                    event.type() == Qt5::Event::MouseButtonRelease ||
+                    event.type() == Qt5::Event::ContextMenu 
+                mouseEvent = Qt5::Internal.cast_object_to(event, Qt5::MouseEvent)
+                if mouseEvent.buttons() & Qt5::LeftButton.to_i != 0
                     newPalette = palette()
-                    newPalette.setColor(Qt::Palette::Base,
-                                        @display.palette().color(Qt::Palette::Text))
-                    newPalette.setColor(Qt::Palette::Text,
-                                        @display.palette().color(Qt::Palette::Base))
+                    newPalette.setColor(Qt5::Palette::Base,
+                                        @display.palette().color(Qt5::Palette::Text))
+                    newPalette.setColor(Qt5::Palette::Text,
+                                        @display.palette().color(Qt5::Palette::Base))
                     @display.palette = newPalette
                 else
                     @display.palette = palette()

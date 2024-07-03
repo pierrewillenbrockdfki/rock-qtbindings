@@ -28,7 +28,7 @@
 # QObject and QGraphicsItem. As that isn't possible in Ruby, use
 # a helper class 'MouseTimer' to periodically invoke the 
 # Mouse.timerEvent() method.
-class MouseTimer < Qt::Object
+class MouseTimer < Qt5::Object
     def initialize(mouse)
         super(nil)
         @mouse = mouse
@@ -39,7 +39,7 @@ class MouseTimer < Qt::Object
     end
 end
 
-class Mouse < Qt::GraphicsItem
+class Mouse < Qt5::GraphicsItem
     TwoPi = 2.0 * Math::PI
     
     def self.normalizeAngle(angle)
@@ -57,10 +57,10 @@ class Mouse < Qt::GraphicsItem
         @angle = 0.0
         @speed = 0.0
         @mouseEyeDirection = 0.0
-        @color = Qt::Color.new(rand(256), rand(256), rand(256))
-        setTransform(Qt::Transform.new.rotate(rand(360 * 16)), true)
+        @color = Qt5::Color.new(rand(256), rand(256), rand(256))
+        setTransform(Qt5::Transform.new.rotate(rand(360 * 16)), true)
         adjust = 0.5
-        @boundingRect = Qt::RectF.new(-20 - adjust, -22 - adjust,
+        @boundingRect = Qt5::RectF.new(-20 - adjust, -22 - adjust,
                       40 + adjust, 83 + adjust)
         @timer = MouseTimer.new(self)
         @timer.startTimer(1000 / 33)
@@ -71,46 +71,46 @@ class Mouse < Qt::GraphicsItem
     end
     
     def shape
-        path = Qt::PainterPath.new
+        path = Qt5::PainterPath.new
         path.addRect(-10, -20, 20, 40)
         return path
     end
     
     def paint(painter, arg, widget)
         # Body
-        painter.brush = Qt::Brush.new(@color)
+        painter.brush = Qt5::Brush.new(@color)
         painter.drawEllipse(-10, -20, 20, 40)
     
         # Eyes
-        painter.brush = Qt::Brush.new(Qt::white)
+        painter.brush = Qt5::Brush.new(Qt5::white)
         painter.drawEllipse(-10, -17, 8, 8)
         painter.drawEllipse(2, -17, 8, 8)
     
         # Nose
-        painter.brush = Qt::Brush.new(Qt::black)
-        painter.drawEllipse(Qt::RectF.new(-2, -22, 4, 4))
+        painter.brush = Qt5::Brush.new(Qt5::black)
+        painter.drawEllipse(Qt5::RectF.new(-2, -22, 4, 4))
     
         # Pupils
-        painter.drawEllipse(Qt::RectF.new(-8.0 + @mouseEyeDirection, -17, 4, 4))
-        painter.drawEllipse(Qt::RectF.new(4.0 + @mouseEyeDirection, -17, 4, 4))
+        painter.drawEllipse(Qt5::RectF.new(-8.0 + @mouseEyeDirection, -17, 4, 4))
+        painter.drawEllipse(Qt5::RectF.new(4.0 + @mouseEyeDirection, -17, 4, 4))
     
         # Ears
-        painter.brush = Qt::Brush.new(scene.collidingItems(self).empty? ? Qt::darkYellow : Qt::red)
+        painter.brush = Qt5::Brush.new(scene.collidingItems(self).empty? ? Qt5::darkYellow : Qt5::red)
         painter.drawEllipse(-17, -12, 16, 16)
         painter.drawEllipse(1, -12, 16, 16)
     
         # Tail
-        path = Qt::PainterPath.new(Qt::PointF.new(0, 20))
+        path = Qt5::PainterPath.new(Qt5::PointF.new(0, 20))
         path.cubicTo(-5, 22, -5, 22, 0, 25)
         path.cubicTo(5, 27, 5, 32, 0, 30)
         path.cubicTo(-5, 32, -5, 42, 0, 35)
-        painter.brush = Qt::NoBrush
+        painter.brush = Qt5::NoBrush
         painter.drawPath(path)
     end
     
     def timerEvent(event)
         # Don't move too far away
-        lineToCenter = Qt::LineF.new(Qt::PointF.new(0, 0), mapFromScene(0, 0))
+        lineToCenter = Qt5::LineF.new(Qt5::PointF.new(0, 0), mapFromScene(0, 0))
         if lineToCenter.length() > 150
             angleToCenter = Math.acos(lineToCenter.dx / lineToCenter.length)
             if lineToCenter.dy < 0
@@ -132,7 +132,7 @@ class Mouse < Qt::GraphicsItem
         end
     
         # Try not to crash with any other mice
-        dangerMice = scene.items(Qt::PolygonF.new([mapToScene(0, 0),
+        dangerMice = scene.items(Qt5::PolygonF.new([mapToScene(0, 0),
                                    mapToScene(-30, -50),
                                    mapToScene(30, -50)]))
         dangerMice.each do |item|
@@ -140,7 +140,7 @@ class Mouse < Qt::GraphicsItem
                 next
             end
             
-            lineToMouse = Qt::LineF.new(Qt::PointF.new(0, 0), mapFromItem(item, 0, 0))
+            lineToMouse = Qt5::LineF.new(Qt5::PointF.new(0, 0), mapFromItem(item, 0, 0))
             angleToMouse = Math.acos(lineToMouse.dx / lineToMouse.length)
             if lineToMouse.dy < 0
                 angleToMouse = TwoPi - angleToMouse
@@ -170,7 +170,7 @@ class Mouse < Qt::GraphicsItem
         dx = Math.sin(@angle) * 10
         @mouseEyeDirection = ((dx / 5).abs < 1) ? 0 : dx / 5
     
-        setTransform(Qt::Transform.new.rotate(dx), true)
+        setTransform(Qt5::Transform.new.rotate(dx), true)
         setPos(mapToParent(0, -(3 + Math.sin(@speed) * 3)))
     end
 end

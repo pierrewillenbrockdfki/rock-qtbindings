@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 
 	slots   'newFile()',
     		'open()',
@@ -63,7 +63,7 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def open()
-	    fileName = Qt::FileDialog.getOpenFileName(self)
+	    fileName = Qt5::FileDialog.getOpenFileName(self)
 	    if !fileName.nil?
 	        existing = findMainWindow(fileName)
 	        if !existing.nil?
@@ -97,7 +97,7 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def saveAs()
-	    fileName = Qt::FileDialog.getSaveFileName(self, tr("Save As"),
+	    fileName = Qt5::FileDialog.getSaveFileName(self, tr("Save As"),
 	                                                    @curFile)
 	    if fileName.nil?
 	        return false
@@ -107,7 +107,7 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def about()
-	   Qt::MessageBox::about(self, tr("About SDI"),
+	   Qt5::MessageBox::about(self, tr("About SDI"),
 	            tr("The <b>SDI</b> example demonstrates how to write single " +
 	               "document interface applications using Qt."))
 	end
@@ -117,11 +117,11 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def init()
-	    setAttribute(Qt::WA_DeleteOnClose)
+	    setAttribute(Qt5::WA_DeleteOnClose)
 	
 	    @isUntitled = true
 	
-	    @textEdit = Qt::TextEdit.new
+	    @textEdit = Qt5::TextEdit.new
 	    setCentralWidget(@textEdit)
 	
 	    createActions()
@@ -136,58 +136,58 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def createActions()
-	    @newAct = Qt::Action.new(Qt::Icon.new("images/new.png"), tr("&New"), self)
-	    @newAct.shortcut = Qt::KeySequence.new( tr("Ctrl+N") )
+	    @newAct = Qt5::Action.new(Qt5::Icon.new("images/new.png"), tr("&New"), self)
+	    @newAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+N") )
 	    @newAct.statusTip = tr("Create a file.new")
 	    connect(@newAct, SIGNAL('triggered()'), self, SLOT('newFile()'))
 	
-	    @openAct = Qt::Action.new(Qt::Icon.new("images/open.png"), tr("&Open..."), self)
-	    @openAct.shortcut = Qt::KeySequence.new( tr("Ctrl+O") )
+	    @openAct = Qt5::Action.new(Qt5::Icon.new("images/open.png"), tr("&Open..."), self)
+	    @openAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+O") )
 	    @openAct.statusTip = tr("Open an existing file")
 	    connect(@openAct, SIGNAL('triggered()'), self, SLOT('open()'))
 	
-	    @saveAct = Qt::Action.new(Qt::Icon.new("images/save.png"), tr("&Save"), self)
-	    @saveAct.shortcut = Qt::KeySequence.new( tr("Ctrl+S") )
+	    @saveAct = Qt5::Action.new(Qt5::Icon.new("images/save.png"), tr("&Save"), self)
+	    @saveAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+S") )
 	    @saveAct.statusTip = tr("Save the document to disk")
 	    connect(@saveAct, SIGNAL('triggered()'), self, SLOT('save()'))
 	
-	    @saveAsAct = Qt::Action.new(tr("Save &As..."), self)
+	    @saveAsAct = Qt5::Action.new(tr("Save &As..."), self)
 	    @saveAsAct.statusTip = tr("Save the document under a name.new")
 	    connect(@saveAsAct, SIGNAL('triggered()'), self, SLOT('saveAs()'))
 	
-	    @closeAct = Qt::Action.new(tr("&Close"), self)
-	    @closeAct.shortcut = Qt::KeySequence.new( tr("Ctrl+W") )
+	    @closeAct = Qt5::Action.new(tr("&Close"), self)
+	    @closeAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+W") )
 	    @closeAct.statusTip = tr("Close self window")
 	    connect(@closeAct, SIGNAL('triggered()'), self, SLOT('close()'))
 	
-	    @exitAct = Qt::Action.new(tr("E&xit"), self)
-	    @exitAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Q") )
+	    @exitAct = Qt5::Action.new(tr("E&xit"), self)
+	    @exitAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Q") )
 	    @exitAct.statusTip = tr("Exit the application")
 	    connect(@exitAct, SIGNAL('triggered()'), $qApp, SLOT('closeAllWindows()'))
 	
-	    @cutAct = Qt::Action.new(Qt::Icon.new("images/cut.png"), tr("Cu&t"), self)
-	    @cutAct.shortcut = Qt::KeySequence.new( tr("Ctrl+X") )
+	    @cutAct = Qt5::Action.new(Qt5::Icon.new("images/cut.png"), tr("Cu&t"), self)
+	    @cutAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+X") )
 	    @cutAct.setStatusTip(tr("Cut the current selection's contents to the " +
 	                            "clipboard"))
 	    connect(@cutAct, SIGNAL('triggered()'), @textEdit, SLOT('cut()'))
 	
-	    @copyAct = Qt::Action.new(Qt::Icon.new("images/copy.png"), tr("&Copy"), self)
-	    @copyAct.shortcut = Qt::KeySequence.new( tr("Ctrl+C") )
+	    @copyAct = Qt5::Action.new(Qt5::Icon.new("images/copy.png"), tr("&Copy"), self)
+	    @copyAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+C") )
 	    @copyAct.setStatusTip(tr("Copy the current selection's contents to the " +
 	                             "clipboard"))
 	    connect(@copyAct, SIGNAL('triggered()'), @textEdit, SLOT('copy()'))
 	
-	    @pasteAct = Qt::Action.new(Qt::Icon.new("images/paste.png"), tr("&Paste"), self)
-	    @pasteAct.shortcut = Qt::KeySequence.new( tr("Ctrl+V") )
+	    @pasteAct = Qt5::Action.new(Qt5::Icon.new("images/paste.png"), tr("&Paste"), self)
+	    @pasteAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+V") )
 	    @pasteAct.setStatusTip(tr("Paste the clipboard's contents into the current " +
 	                              "selection"))
 	    connect(@pasteAct, SIGNAL('triggered()'), @textEdit, SLOT('paste()'))
 	
-	    @aboutAct = Qt::Action.new(tr("&About"), self)
+	    @aboutAct = Qt5::Action.new(tr("&About"), self)
 	    @aboutAct.statusTip = tr("Show the application's About box")
 	    connect(@aboutAct, SIGNAL('triggered()'), self, SLOT('about()'))
 	
-	    @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+	    @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
 	    @aboutQtAct.statusTip = tr("Show the Qt library's About box")
 	    connect(@aboutQtAct, SIGNAL('triggered()'), $qApp, SLOT('aboutQt()'))
 	
@@ -239,30 +239,30 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def readSettings()
-	    settings = Qt::Settings.new("Trolltech", "SDI Example")
-	    pos = settings.value("pos", Qt::Variant.new(Qt::Point.new(200, 200))).toPoint()
-	    size = settings.value("size", Qt::Variant.new(Qt::Size.new(400, 400))).toSize()
+	    settings = Qt5::Settings.new("Trolltech", "SDI Example")
+	    pos = settings.value("pos", Qt5::Variant.new(Qt5::Point.new(200, 200))).toPoint()
+	    size = settings.value("size", Qt5::Variant.new(Qt5::Size.new(400, 400))).toSize()
 	    move(pos)
 	    resize(size)
 	end
 	
 	def writeSettings()
-	    settings = Qt::Settings.new("Trolltech", "SDI Example")
-	    settings.setValue("pos", Qt::Variant.new(pos()))
-	    settings.setValue("size", Qt::Variant.new(size()))
+	    settings = Qt5::Settings.new("Trolltech", "SDI Example")
+	    settings.setValue("pos", Qt5::Variant.new(pos()))
+	    settings.setValue("size", Qt5::Variant.new(size()))
 	end
 	
 	def maybeSave()
 	    if @textEdit.document().isModified()
-	        ret = Qt::MessageBox.warning(self, tr("SDI"),
+	        ret = Qt5::MessageBox.warning(self, tr("SDI"),
 	                     tr("The document has been modified.\n" +
 	                        "Do you want to save your changes?"),
-	                     Qt::MessageBox::Yes | Qt::MessageBox::Default,
-	                     Qt::MessageBox::No,
-	                     Qt::MessageBox::Cancel | Qt::MessageBox::Escape)
-	        if ret == Qt::MessageBox::Yes
+	                     Qt5::MessageBox::Yes | Qt5::MessageBox::Default,
+	                     Qt5::MessageBox::No,
+	                     Qt5::MessageBox::Cancel | Qt5::MessageBox::Escape)
+	        if ret == Qt5::MessageBox::Yes
 	            return save()
-	        elsif ret == Qt::MessageBox::Cancel
+	        elsif ret == Qt5::MessageBox::Cancel
 	            return false
 			end
 	    end
@@ -270,35 +270,35 @@ class MainWindow < Qt::MainWindow
 	end
 
 	def loadFile(fileName)
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::IODevice::ReadOnly | Qt::IODevice::Text)
-	        Qt::MessageBox.warning(self, tr("SDI"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::IODevice::ReadOnly | Qt5::IODevice::Text)
+	        Qt5::MessageBox.warning(self, tr("SDI"),
 	                             tr("Cannot read file %s:\n%s." % [fileName, file.errorString]))
 	        return
 	    end
 	
-	    inf = Qt::TextStream.new(file)
-	    Qt::Application.overrideCursor = Qt::Cursor.new(Qt::WaitCursor)
+	    inf = Qt5::TextStream.new(file)
+	    Qt5::Application.overrideCursor = Qt5::Cursor.new(Qt5::WaitCursor)
 	    @textEdit.plainText = inf.readAll
-	    Qt::Application::restoreOverrideCursor
+	    Qt5::Application::restoreOverrideCursor
 	
 	    setCurrentFile(fileName)
 	    statusBar().showMessage(tr("File loaded"), 2000)
 	end
 	
 	def saveFile(fileName)
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::IODevice::WriteOnly | Qt::IODevice::Text)
-	        Qt::MessageBox.warning(self, tr("SDI"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::IODevice::WriteOnly | Qt5::IODevice::Text)
+	        Qt5::MessageBox.warning(self, tr("SDI"),
 	                             tr("Cannot write file %s:\n%s." % [fileName, file.errorString]))
 	        return
 	    end
 	
-	    outf = Qt::TextStream.new(file)
-	    Qt::Application.overrideCursor = Qt::Cursor.new(Qt::WaitCursor)
+	    outf = Qt5::TextStream.new(file)
+	    Qt5::Application.overrideCursor = Qt5::Cursor.new(Qt5::WaitCursor)
 	    outf << @textEdit.toPlainText
 		outf.flush
-	    Qt::Application.restoreOverrideCursor
+	    Qt5::Application.restoreOverrideCursor
 	
 	    setCurrentFile(fileName)
 	    statusBar().showMessage(tr("File saved"), 2000)
@@ -309,7 +309,7 @@ class MainWindow < Qt::MainWindow
 	    if @isUntitled
 	        @curFile = tr("document%d.txt" % (@@sequenceNumber += 1))
 	    else
-	        @curFile = Qt::FileInfo.new(fileName).canonicalFilePath()
+	        @curFile = Qt5::FileInfo.new(fileName).canonicalFilePath()
 	    end
 	
 	    @textEdit.document().modified = false
@@ -319,11 +319,11 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def strippedName(fullFileName)
-	    return Qt::FileInfo.new(fullFileName).fileName()
+	    return Qt5::FileInfo.new(fullFileName).fileName()
 	end
 	
 	def findMainWindow(fileName)
-	    canonicalFilePath = Qt::FileInfo.new(fileName).canonicalFilePath()
+	    canonicalFilePath = Qt5::FileInfo.new(fileName).canonicalFilePath()
 	
 	    $qApp.topLevelWidgets.each do |widget|
 	        if widget.kind_of?(MainWindow) && widget.curFile == canonicalFilePath

@@ -24,7 +24,7 @@
 =end
     
     
-class Dialog < Qt::Dialog
+class Dialog < Qt5::Dialog
         
     slots   'setInt()',
             'setDouble()',
@@ -49,78 +49,78 @@ class Dialog < Qt::Dialog
                    "and up to three buttons, each with standard or custom texts." +
                    "<p>Click a button or press Esc.")
 
-        @errorMessageDialog = Qt::ErrorMessage.new(self)
+        @errorMessageDialog = Qt5::ErrorMessage.new(self)
     
-        frameStyle = Qt::Frame::Sunken | Qt::Frame::Panel
+        frameStyle = Qt5::Frame::Sunken | Qt5::Frame::Panel
     
-        @integerLabel = Qt::Label.new
+        @integerLabel = Qt5::Label.new
         @integerLabel.frameStyle = frameStyle
-        intButton = Qt::PushButton.new(tr("Qt::InputDialog.get&Int()"))
+        intButton = Qt5::PushButton.new(tr("Qt5::InputDialog.get&Int()"))
     
-        @doubleLabel = Qt::Label.new
+        @doubleLabel = Qt5::Label.new
         @doubleLabel.frameStyle = frameStyle
         doubleButton =
-                Qt::PushButton.new(tr("Qt::InputDialog.get&Double()"))
+                Qt5::PushButton.new(tr("Qt5::InputDialog.get&Double()"))
     
-        @itemLabel = Qt::Label.new
+        @itemLabel = Qt5::Label.new
         @itemLabel.frameStyle = frameStyle
-        itemButton = Qt::PushButton.new(tr("Qt::InputDialog.getIte&m()"))
+        itemButton = Qt5::PushButton.new(tr("Qt5::InputDialog.getIte&m()"))
     
-        @textLabel = Qt::Label.new
+        @textLabel = Qt5::Label.new
         @textLabel.frameStyle = frameStyle
-        textButton = Qt::PushButton.new(tr("Qt::InputDialog.get&Text()"))
+        textButton = Qt5::PushButton.new(tr("Qt5::InputDialog.get&Text()"))
     
-        @colorLabel = Qt::Label.new
+        @colorLabel = Qt5::Label.new
         @colorLabel.frameStyle = frameStyle
-        colorButton = Qt::PushButton.new(tr("Qt::ColorDialog.get&Color()"))
+        colorButton = Qt5::PushButton.new(tr("Qt5::ColorDialog.get&Color()"))
     
-        @fontLabel = Qt::Label.new
+        @fontLabel = Qt5::Label.new
         @fontLabel.frameStyle = frameStyle
-        fontButton = Qt::PushButton.new(tr("Qt::tFontDialog.get&Font()"))
+        fontButton = Qt5::PushButton.new(tr("Qt5::tFontDialog.get&Font()"))
     
-        @directoryLabel = Qt::Label.new
+        @directoryLabel = Qt5::Label.new
         @directoryLabel.frameStyle = frameStyle
         directoryButton =
-                Qt::PushButton.new(tr("Qt::FileDialog.getE&xistingDirectory()"))
+                Qt5::PushButton.new(tr("Qt5::FileDialog.getE&xistingDirectory()"))
     
-        @openFileNameLabel = Qt::Label.new
+        @openFileNameLabel = Qt5::Label.new
         @openFileNameLabel.frameStyle = frameStyle
         openFileNameButton =
-                Qt::PushButton.new(tr("Qt::FileDialog.get&OpenFileName()"))
+                Qt5::PushButton.new(tr("Qt5::FileDialog.get&OpenFileName()"))
     
-        @openFileNamesLabel = Qt::Label.new
+        @openFileNamesLabel = Qt5::Label.new
         @openFileNamesLabel.frameStyle = frameStyle
         openFileNamesButton =
-                Qt::PushButton.new(tr("Qt::File&Dialog.getOpenFileNames()"))
+                Qt5::PushButton.new(tr("Qt5::File&Dialog.getOpenFileNames()"))
     
-        @saveFileNameLabel = Qt::Label.new
+        @saveFileNameLabel = Qt5::Label.new
         @saveFileNameLabel.frameStyle = frameStyle
         saveFileNameButton =
-                Qt::PushButton.new(tr("Qt::FileDialog.get&SaveFileName()"))
+                Qt5::PushButton.new(tr("Qt5::FileDialog.get&SaveFileName()"))
     
-        @criticalLabel = Qt::Label.new
+        @criticalLabel = Qt5::Label.new
         @criticalLabel.frameStyle = frameStyle
         criticalButton =
-                Qt::PushButton.new(tr("Qt::MessageBox.critica&l()"))
+                Qt5::PushButton.new(tr("Qt5::MessageBox.critica&l()"))
     
-        @informationLabel = Qt::Label.new
+        @informationLabel = Qt5::Label.new
         @informationLabel.frameStyle = frameStyle
         informationButton =
-                Qt::PushButton.new(tr("Qt::MessageBox.i&nformation()"))
+                Qt5::PushButton.new(tr("Qt5::MessageBox.i&nformation()"))
     
-        @questionLabel = Qt::Label.new
+        @questionLabel = Qt5::Label.new
         @questionLabel.frameStyle = frameStyle
         questionButton =
-                Qt::PushButton.new(tr("Qt::MessageBox.&question()"))
+                Qt5::PushButton.new(tr("Qt5::MessageBox.&question()"))
     
-        @warningLabel = Qt::Label.new
+        @warningLabel = Qt5::Label.new
         @warningLabel.frameStyle = frameStyle
-        warningButton = Qt::PushButton.new(tr("Qt::MessageBox.&warning()"))
+        warningButton = Qt5::PushButton.new(tr("Qt5::MessageBox.&warning()"))
     
-        @errorLabel = Qt::Label.new
+        @errorLabel = Qt5::Label.new
         @errorLabel.frameStyle = frameStyle
         errorButton =
-                Qt::PushButton.new(tr("Qt::ErrorMessage.show&M&essage()"))
+                Qt5::PushButton.new(tr("Qt5::ErrorMessage.show&M&essage()"))
     
         connect(intButton, SIGNAL('clicked()'), self, SLOT('setInt()'))
         connect(doubleButton, SIGNAL('clicked()'), self, SLOT('setDouble()'))
@@ -143,7 +143,7 @@ class Dialog < Qt::Dialog
         connect(warningButton, SIGNAL('clicked()'), self, SLOT('warningMessage()'))
         connect(errorButton, SIGNAL('clicked()'), self, SLOT('errorMessage()'))
     
-        self.layout = Qt::GridLayout.new do |l|
+        self.layout = Qt5::GridLayout.new do |l|
             l.setColumnStretch(1, 1)
             l.setColumnMinimumWidth(1, 250)
             l.addWidget(intButton, 0, 0)
@@ -182,8 +182,8 @@ class Dialog < Qt::Dialog
     end
     
     def setInt()
-        ok = Qt::Boolean.new
-        i = Qt::InputDialog.getInt(self, tr("Qt::InputDialog.getInt()"),
+        ok = Qt5::Boolean.new
+        i = Qt5::InputDialog.getInt(self, tr("Qt5::InputDialog.getInt()"),
                                     tr("Percentage:"), 25, 0, 100, 1, ok)
         if ok
             @integerLabel.text = tr("%d%%" % i)
@@ -191,8 +191,8 @@ class Dialog < Qt::Dialog
     end
     
     def setDouble()
-        ok = Qt::Boolean.new
-        d = Qt::InputDialog.getDouble(self, tr("Qt::InputDialog.getDouble()"),
+        ok = Qt5::Boolean.new
+        d = Qt5::InputDialog.getDouble(self, tr("Qt5::InputDialog.getDouble()"),
                                            tr("Amount:"), 37.56, -10000, 10000, 2, ok)
         if ok
             @doubleLabel.text = "$%f" % d
@@ -203,8 +203,8 @@ class Dialog < Qt::Dialog
         items = []
         items << tr("Spring") << tr("Summer") << tr("Fall") << tr("Winter")
     
-        ok = Qt::Boolean.new
-        item = Qt::InputDialog.getItem(self, tr("Qt::InputDialog.getItem()"),
+        ok = Qt5::Boolean.new
+        item = Qt5::InputDialog.getItem(self, tr("Qt5::InputDialog.getItem()"),
                                              tr("Season:"), items, 0, false, ok)
         if ok && !item.nil?
             @itemLabel.text = item
@@ -212,45 +212,45 @@ class Dialog < Qt::Dialog
     end
     
     def setText()
-        ok = Qt::Boolean.new
-        text = Qt::InputDialog.getText(self, tr("Qt::InputDialog.getText()"),
-                                             tr("User name:"), Qt::LineEdit::Normal,
-                                             Qt::Dir::home().dirName(), ok)
+        ok = Qt5::Boolean.new
+        text = Qt5::InputDialog.getText(self, tr("Qt5::InputDialog.getText()"),
+                                             tr("User name:"), Qt5::LineEdit::Normal,
+                                             Qt5::Dir::home().dirName(), ok)
         if ok && !text.nil?
             @textLabel.text = text
         end
     end
     
     def setColor()
-        color = Qt::ColorDialog.getColor(Qt::Color.new(Qt::green), self)
+        color = Qt5::ColorDialog.getColor(Qt5::Color.new(Qt5::green), self)
         if color.isValid()
             @colorLabel.text = color.name
-            @colorLabel.palette = Qt::Palette.new(color)
+            @colorLabel.palette = Qt5::Palette.new(color)
         end
     end
     
     def setFont()
-        ok = Qt::Boolean.new
-        font = Qt::FontDialog.getFont(ok, Qt::Font.new(@fontLabel.text), self)
+        ok = Qt5::Boolean.new
+        font = Qt5::FontDialog.getFont(ok, Qt5::Font.new(@fontLabel.text), self)
         if ok
             @fontLabel.text = font.key()
         end
     end
     
     def setExistingDirectory()
-        directory = Qt::FileDialog.getExistingDirectory(self,
-                                    tr("Qt::FileDialog.getExistingDirectory()"),
+        directory = Qt5::FileDialog.getExistingDirectory(self,
+                                    tr("Qt5::FileDialog.getExistingDirectory()"),
                                     @directoryLabel.text,
-                                    Qt::FileDialog::DontResolveSymlinks |
-                                    Qt::FileDialog::ShowDirsOnly)
+                                    Qt5::FileDialog::DontResolveSymlinks |
+                                    Qt5::FileDialog::ShowDirsOnly)
         if !directory.nil?
             @directoryLabel.text = directory
         end
     end
     
     def setOpenFileName()
-        fileName = Qt::FileDialog.getOpenFileName(self,
-                                    tr("Qt::FileDialog.getOpenFileName()"),
+        fileName = Qt5::FileDialog.getOpenFileName(self,
+                                    tr("Qt5::FileDialog.getOpenFileName()"),
                                     @openFileNameLabel.text,
                                     tr("All Files (*);;Text Files (*.txt)"))
         if !fileName.nil?
@@ -259,8 +259,8 @@ class Dialog < Qt::Dialog
     end
     
     def setOpenFileNames()
-        files = Qt::FileDialog.getOpenFileNames(
-                                    self, tr("Qt::FileDialog.getOpenFileNames()"),
+        files = Qt5::FileDialog.getOpenFileNames(
+                                    self, tr("Qt5::FileDialog.getOpenFileNames()"),
                                     @openFilesPath,
                                     tr("All Files (*);;Text Files (*.txt)"))
         if files.length != 0
@@ -270,8 +270,8 @@ class Dialog < Qt::Dialog
     end
     
     def setSaveFileName()
-        fileName = Qt::FileDialog.getSaveFileName(self,
-                                    tr("Qt::FileDialog.getSaveFileName()"),
+        fileName = Qt5::FileDialog.getSaveFileName(self,
+                                    tr("Qt5::FileDialog.getSaveFileName()"),
                                     @saveFileNameLabel.text,
                                     tr("All Files (*);;Text Files (*.txt)"))
         if !fileName.nil?
@@ -280,14 +280,14 @@ class Dialog < Qt::Dialog
     end
     
     def criticalMessage()
-        reply = Qt::MessageBox::critical(self, tr("Qt::MessageBox.showCritical()"),
+        reply = Qt5::MessageBox::critical(self, tr("Qt5::MessageBox.showCritical()"),
                                           @message,
-                                          Qt::MessageBox::Abort,
-                                          Qt::MessageBox::Retry,
-                                          Qt::MessageBox::Ignore)
-        if reply == Qt::MessageBox::Abort
+                                          Qt5::MessageBox::Abort,
+                                          Qt5::MessageBox::Retry,
+                                          Qt5::MessageBox::Ignore)
+        if reply == Qt5::MessageBox::Abort
             @criticalLabel.text = tr("Abort")
-        elsif reply == Qt::MessageBox::Retry
+        elsif reply == Qt5::MessageBox::Retry
             @criticalLabel.text = tr("Retry")
         else
             @criticalLabel.text = tr("Ignore")
@@ -295,19 +295,19 @@ class Dialog < Qt::Dialog
     end
     
     def informationMessage()
-        Qt::MessageBox::information(self, tr("Qt::MessageBox.showInformation()"), @message)
+        Qt5::MessageBox::information(self, tr("Qt5::MessageBox.showInformation()"), @message)
         @informationLabel.text = tr("Closed with OK or Esc")
     end
     
     def questionMessage()
-        reply = Qt::MessageBox.question(self, tr("Qt::MessageBox.showQuestion()"),
+        reply = Qt5::MessageBox.question(self, tr("Qt5::MessageBox.showQuestion()"),
                                           @message,
-                                          Qt::MessageBox::Yes,
-                                          Qt::MessageBox::No,
-                                          Qt::MessageBox::Cancel)
-        if reply == Qt::MessageBox::Yes
+                                          Qt5::MessageBox::Yes,
+                                          Qt5::MessageBox::No,
+                                          Qt5::MessageBox::Cancel)
+        if reply == Qt5::MessageBox::Yes
             @questionLabel.text = tr("Yes")
-        elsif reply == Qt::MessageBox::No
+        elsif reply == Qt5::MessageBox::No
             @questionLabel.text = tr("No")
         else
             @questionLabel.text = tr("Cancel")
@@ -315,7 +315,7 @@ class Dialog < Qt::Dialog
     end
     
     def warningMessage()
-        reply = Qt::MessageBox.warning(self, tr("Qt::MessageBox.showWarning()"),
+        reply = Qt5::MessageBox.warning(self, tr("Qt5::MessageBox.showWarning()"),
                                          @message,
                                          tr("Save &Again"),
                                          tr("&Continue"))
@@ -332,7 +332,7 @@ class Dialog < Qt::Dialog
                    "If the checkbox is checked (as it is by default), " +
                    "the shown message will be shown again, " +
                    "but if the user unchecks the box the message " +
-                   "will not appear again if Qt::ErrorMessage.showMessage() " +
+                   "will not appear again if Qt5::ErrorMessage.showMessage() " +
                    "is called with the same message."))
         @errorLabel.text = tr("If the box is unchecked, the message " +
                                "won't appear again.")

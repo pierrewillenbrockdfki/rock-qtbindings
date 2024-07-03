@@ -25,11 +25,11 @@
 
 require './borderlayout.rb'
 	
-class Window < Qt::Widget
+class Window < Qt5::Widget
 	
 	def initialize(parent = nil)
 		super
-	    centralWidget = Qt::TextBrowser.new
+	    centralWidget = Qt5::TextBrowser.new
 	    centralWidget.plainText = tr("Central widget")
 	
 	    self.layout = BorderLayout.new do |l|
@@ -45,8 +45,8 @@ class Window < Qt::Widget
 	end
 	
 	def createLabel(text)
-	    label = Qt::Label.new(text)
-	    label.frameStyle = Qt::Frame::Box | Qt::Frame::Raised
+	    label = Qt5::Label.new(text)
+	    label.frameStyle = Qt5::Frame::Box | Qt5::Frame::Raised
 	    return label
 	end
 end

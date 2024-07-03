@@ -5,11 +5,11 @@ require 'Qt5'
 require_relative 'lcdrange.rb'
 require_relative 'cannon.rb'
 
-class MyWidget < Qt::Widget
+class MyWidget < Qt5::Widget
   def initialize(parent = nil)
     super
-    quit = Qt::PushButton.new('Quit')
-    quit.font = Qt::Font.new('Times', 18, Qt::Font::Bold)
+    quit = Qt5::PushButton.new('Quit')
+    quit.font = Qt5::Font.new('Times', 18, Qt5::Font::Bold)
 
     connect(quit, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
 
@@ -22,7 +22,7 @@ class MyWidget < Qt::Widget
             cannonField, SLOT('setAngle(int)'))
     connect(cannonField, SIGNAL('angleChanged(int)'),
             angle, SLOT('setValue(int)'))
-    gridLayout = Qt::GridLayout.new
+    gridLayout = Qt5::GridLayout.new
 
     gridLayout.addWidget(quit, 0, 0)
     gridLayout.addWidget(angle, 1, 0)
@@ -35,7 +35,7 @@ class MyWidget < Qt::Widget
   end
 end
 
-a = Qt::Application.new(ARGV)
+a = Qt5::Application.new(ARGV)
 
 w = MyWidget.new
 w.setGeometry(100, 100, 500, 355)

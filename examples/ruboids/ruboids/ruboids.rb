@@ -12,8 +12,8 @@ require './WorldWindow'
 require './Canvas'
 require './Params'
 
-app = Qt::Application.new(ARGV)
-if (!Qt::GLFormat::hasOpenGL())
+app = Qt5::Application.new(ARGV)
+if (!Qt5::GLFormat::hasOpenGL())
     warning("This system has no OpenGL support. Exiting.")
     exit -1
 end

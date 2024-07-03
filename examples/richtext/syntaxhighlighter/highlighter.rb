@@ -24,7 +24,7 @@
 =end
 	
 	
-class Highlighter < Qt::Object
+class Highlighter < Qt5::Object
 	
 	slots	'highlight(int, int, int)'
 	
@@ -74,7 +74,7 @@ class Highlighter < Qt::Object
 	        expression = Regexp.new(pattern)
 	        i = text.index(expression)
 	        while !i.nil?
-	            range = Qt::TextLayout::FormatRange.new
+	            range = Qt5::TextLayout::FormatRange.new
 	            range.start = i
 	            range.length = $&.length
 	            range.format = value

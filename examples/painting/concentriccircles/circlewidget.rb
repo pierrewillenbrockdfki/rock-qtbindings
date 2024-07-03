@@ -24,7 +24,7 @@
 =end
 	
 		
-class CircleWidget < Qt::Widget
+class CircleWidget < Qt5::Widget
 	
 	slots 'nextAnimationFrame()'
 	
@@ -34,8 +34,8 @@ class CircleWidget < Qt::Widget
 	    @antialiased = false
 	    @frameNo = 0
 	
-	    setBackgroundRole(Qt::Palette::Base)
-	    setSizePolicy(Qt::SizePolicy::Expanding, Qt::SizePolicy::Expanding)
+	    setBackgroundRole(Qt5::Palette::Base)
+	    setSizePolicy(Qt5::SizePolicy::Expanding, Qt5::SizePolicy::Expanding)
 	end
 	
 	def floatBased=(floatBased)
@@ -49,11 +49,11 @@ class CircleWidget < Qt::Widget
 	end
 	
 	def minimumSizeHint()
-	    return Qt::Size.new(50, 50)
+	    return Qt5::Size.new(50, 50)
 	end
 	
 	def sizeHint()
-	    return Qt::Size.new(180, 180)
+	    return Qt5::Size.new(180, 180)
 	end
 	
 	def nextAnimationFrame()
@@ -62,8 +62,8 @@ class CircleWidget < Qt::Widget
 	end
 	
 	def paintEvent(event)
-	    painter = Qt::Painter.new(self)
-	    painter.setRenderHint(Qt::Painter::Antialiasing, @antialiased)
+	    painter = Qt5::Painter.new(self)
+	    painter.setRenderHint(Qt5::Painter::Antialiasing, @antialiased)
 	    painter.translate(width() / 2, height() / 2)
 	
 		diameter = 0
@@ -71,13 +71,13 @@ class CircleWidget < Qt::Widget
 	        delta = ((@frameNo % 128) - diameter / 2).abs
 	        alpha = 255 - (delta * delta) / 4 - diameter
 	        if alpha > 0
-	            painter.pen = Qt::Pen.new(Qt::Brush.new(Qt::Color.new(0, diameter / 2, 127, alpha)), 3)
+	            painter.pen = Qt5::Pen.new(Qt5::Brush.new(Qt5::Color.new(0, diameter / 2, 127, alpha)), 3)
 	
 	            if @floatBased
-	                painter.drawEllipse(Qt::RectF.new(-diameter / 2.0, -diameter / 2.0,
+	                painter.drawEllipse(Qt5::RectF.new(-diameter / 2.0, -diameter / 2.0,
 	                                           diameter, diameter))
 	            else
-	                painter.drawEllipse(Qt::Rect.new(-diameter / 2, -diameter / 2,
+	                painter.drawEllipse(Qt5::Rect.new(-diameter / 2, -diameter / 2,
 	                                          diameter, diameter))
 	            end
 	        end

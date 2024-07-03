@@ -25,13 +25,13 @@
     
 require './draglabel.rb'
 
-class DragWidget < Qt::Widget
+class DragWidget < Qt5::Widget
     
     def initialize(parent = nil)
         super(parent)
-        dictionaryFile = Qt::File.new("words.txt")
-        dictionaryFile.open(Qt::IODevice::ReadOnly.to_i)
-        inputStream = Qt::TextStream.new(dictionaryFile)
+        dictionaryFile = Qt5::File.new("words.txt")
+        dictionaryFile.open(Qt5::IODevice::ReadOnly.to_i)
+        inputStream = Qt5::TextStream.new(dictionaryFile)
     
         x = 5
         y = 5
@@ -52,7 +52,7 @@ class DragWidget < Qt::Widget
         end
     
         newPalette = palette()
-        newPalette.setColor(Qt::Palette::Background, Qt::Color.new(Qt::white))
+        newPalette.setColor(Qt5::Palette::Background, Qt5::Color.new(Qt5::white))
         setPalette(newPalette)
     
         setAcceptDrops(true)
@@ -78,11 +78,11 @@ class DragWidget < Qt::Widget
                 newLabel.move(position)
                 newLabel.show()
     
-                position += Qt::Point.new(newLabel.width(), 0)
+                position += Qt5::Point.new(newLabel.width(), 0)
             end
     
             if children().include? event.source()
-                event.dropAction = Qt::MoveAction
+                event.dropAction = Qt5::MoveAction
                 event.accept()
             else
                 event.acceptProposedAction()

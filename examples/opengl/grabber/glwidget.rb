@@ -26,7 +26,7 @@
 require 'opengl'
 include Math
 
-class GLWidget < Qt::GLWidget
+class GLWidget < Qt5::GLWidget
     
     slots   'setXRotation(int)',
             'setYRotation(int)',
@@ -44,9 +44,9 @@ class GLWidget < Qt::GLWidget
         @yRot = 0
         @zRot = 0
         @gear1Rot = 0
-        @lastPos = Qt::Point.new
+        @lastPos = Qt5::Point.new
     
-        timer = Qt::Timer.new(self)
+        timer = Qt5::Timer.new(self)
         connect(timer, SIGNAL('timeout()'), self, SLOT('advanceGears()'))
         timer.start(20)
     end
@@ -145,10 +145,10 @@ class GLWidget < Qt::GLWidget
         dx = event.x - @lastPos.x
         dy = event.y - @lastPos.y
     
-        if event.buttons & Qt::LeftButton.to_i != 0
+        if event.buttons & Qt5::LeftButton.to_i != 0
             setXRotation(@xRot + 8 * dy)
             setYRotation(@yRot + 8 * dx)
-        elsif event.buttons & Qt::RightButton.to_i != 0
+        elsif event.buttons & Qt5::RightButton.to_i != 0
             setXRotation(@xRot + 8 * dy)
             setZRotation(@zRot + 8 * dx)
         end

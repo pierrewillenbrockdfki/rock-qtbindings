@@ -1,5 +1,5 @@
 
-class ChatAdaptor < Qt::DBusAbstractAdaptor
+class ChatAdaptor < Qt5::DBusAbstractAdaptor
     q_classinfo("D-Bus Interface", "com.trolltech.chat")
 
     signals 'action(const QString&, const QString&)',

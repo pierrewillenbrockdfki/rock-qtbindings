@@ -25,31 +25,31 @@
 
 require './characterwidget.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 
     slots   'findStyles()', 'insertCharacter(const QString&)',
             'updateClipboard()'
 
     def initialize()
         super
-        centralWidget = Qt::Widget.new
+        centralWidget = Qt5::Widget.new
 
-        fontLabel = Qt::Label.new(tr("Font:"))
-        @fontCombo = Qt::ComboBox.new
-        styleLabel = Qt::Label.new(tr("Style:"))
-        @styleCombo = Qt::ComboBox.new
+        fontLabel = Qt5::Label.new(tr("Font:"))
+        @fontCombo = Qt5::ComboBox.new
+        styleLabel = Qt5::Label.new(tr("Style:"))
+        @styleCombo = Qt5::ComboBox.new
 
-        @scrollArea = Qt::ScrollArea.new
+        @scrollArea = Qt5::ScrollArea.new
         @characterWidget = CharacterWidget.new
         @scrollArea.widget = @characterWidget
 
         findFonts()
         findStyles()
 
-        @lineEdit = Qt::LineEdit.new
-        @clipboardButton = Qt::PushButton.new(tr("&To clipboard"))
+        @lineEdit = Qt5::LineEdit.new
+        @clipboardButton = Qt5::PushButton.new(tr("&To clipboard"))
 
-        @clipboard = Qt::Application.clipboard
+        @clipboard = Qt5::Application.clipboard
 
         connect(@fontCombo, SIGNAL('activated(int)'),
                 self, SLOT('findStyles()'))
@@ -61,19 +61,19 @@ class MainWindow < Qt::MainWindow
                 self, SLOT('insertCharacter(const QString&)'))
         connect(@clipboardButton, SIGNAL('clicked()'), self, SLOT('updateClipboard()'))
 
-        controlsLayout = Qt::HBoxLayout.new
+        controlsLayout = Qt5::HBoxLayout.new
         controlsLayout.addWidget(fontLabel)
         controlsLayout.addWidget(@fontCombo, 1)
         controlsLayout.addWidget(styleLabel)
         controlsLayout.addWidget(@styleCombo, 1)
         controlsLayout.addStretch(1)
 
-        lineLayout = Qt::HBoxLayout.new
+        lineLayout = Qt5::HBoxLayout.new
         lineLayout.addWidget(@lineEdit, 1)
         lineLayout.addSpacing(12)
         lineLayout.addWidget(@clipboardButton)
 
-        centralLayout = Qt::VBoxLayout.new
+        centralLayout = Qt5::VBoxLayout.new
         centralLayout.addLayout(controlsLayout)
         centralLayout.addWidget(@scrollArea, 1)
         centralLayout.addSpacing(4)
@@ -85,7 +85,7 @@ class MainWindow < Qt::MainWindow
     end
 
     def findFonts()
-        fontDatabase = Qt::FontDatabase.new
+        fontDatabase = Qt5::FontDatabase.new
         @fontCombo.clear
 
         fontDatabase.families().each do |family|
@@ -94,7 +94,7 @@ class MainWindow < Qt::MainWindow
     end
 
     def findStyles()
-        fontDatabase = Qt::FontDatabase.new
+        fontDatabase = Qt5::FontDatabase.new
         currentItem = @styleCombo.currentText()
         @styleCombo.clear()
 
@@ -112,7 +112,7 @@ class MainWindow < Qt::MainWindow
     end
 
     def updateClipboard()
-        @clipboard.setText(@lineEdit.text, Qt::Clipboard::Clipboard)
-        @clipboard.setText(@lineEdit.text, Qt::Clipboard::Selection)
+        @clipboard.setText(@lineEdit.text, Qt5::Clipboard::Clipboard)
+        @clipboard.setText(@lineEdit.text, Qt5::Clipboard::Selection)
     end
 end

@@ -26,30 +26,30 @@
 require 'Qt5'
 require './ping-common.rb'
 
-class Pong < Qt::Object
+class Pong < Qt5::Object
 	slots 'QString ping(const QString&)'
 	
 	def ping(arg)
-	    Qt::MetaObject.invokeMethod(Qt::CoreApplication.instance(), "quit")
+	    Qt5::MetaObject.invokeMethod(Qt5::CoreApplication.instance(), "quit")
 	    return 'ping("' + arg +'") got called'
 	end
 end
 	
-app = Qt::CoreApplication.new(ARGV)
+app = Qt5::CoreApplication.new(ARGV)
 	
-if !Qt::DBusConnection::sessionBus.connected?
+if !Qt5::DBusConnection::sessionBus.connected?
 	$stderr.puts("Cannot connect to the D-BUS session bus.\n" \
 	                "To start it, run:\n" \
 	                "\teval `dbus-launch --auto-syntax`\n")
 	exit(1)
 end
 	
-if !Qt::DBusConnection.sessionBus.registerService(SERVICE_NAME)
-	$stderr.puts("%s\n" %  Qt::DBusConnection.sessionBus.lastError.message)
+if !Qt5::DBusConnection.sessionBus.registerService(SERVICE_NAME)
+	$stderr.puts("%s\n" %  Qt5::DBusConnection.sessionBus.lastError.message)
 	exit(1)
 end
 	
 pong = Pong.new
-Qt::DBusConnection.sessionBus.registerObject("/", pong, Qt::DBusConnection::ExportAllSlots)
+Qt5::DBusConnection.sessionBus.registerObject("/", pong, Qt5::DBusConnection::ExportAllSlots)
 	    
 app.exec()

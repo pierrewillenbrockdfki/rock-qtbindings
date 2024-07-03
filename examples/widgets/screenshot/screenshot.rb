@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class Screenshot < Qt::Widget
+class Screenshot < Qt5::Widget
 
 	slots	'newScreenshot()',
 			'saveScreenshot()',
@@ -32,16 +32,16 @@ class Screenshot < Qt::Widget
 
 	def initialize(parent = nil)
 		super(parent)
-		@screenshotLabel = Qt::Label.new
-		@screenshotLabel.setSizePolicy(Qt::SizePolicy::Expanding,
-									Qt::SizePolicy::Expanding)
-		@screenshotLabel.alignment = Qt::AlignCenter.to_i
+		@screenshotLabel = Qt5::Label.new
+		@screenshotLabel.setSizePolicy(Qt5::SizePolicy::Expanding,
+									Qt5::SizePolicy::Expanding)
+		@screenshotLabel.alignment = Qt5::AlignCenter.to_i
 		@screenshotLabel.setMinimumSize(240, 160)
 	
 		createOptionsGroupBox()
 		createButtonsLayout()
 	
-		@mainLayout = Qt::VBoxLayout.new
+		@mainLayout = Qt5::VBoxLayout.new
 		@mainLayout.addWidget(@screenshotLabel)
 		@mainLayout.addWidget(@optionsGroupBox)
 		@mainLayout.addLayout(@buttonsLayout)
@@ -56,7 +56,7 @@ class Screenshot < Qt::Widget
 	
 	def resizeEvent(event)
 		scaledSize = @originalPixmap.size()
-		scaledSize.scale(@screenshotLabel.size(), Qt::KeepAspectRatio)
+		scaledSize.scale(@screenshotLabel.size(), Qt5::KeepAspectRatio)
 		if @screenshotLabel.pixmap.nil? ||
 				scaledSize != @screenshotLabel.pixmap().size()
 			updateScreenshotLabel()
@@ -69,14 +69,14 @@ class Screenshot < Qt::Widget
 		end
 		@newScreenshotButton.disabled = true
 	
-		Qt::Timer.singleShot(@delaySpinBox.value() * 1000, self, SLOT('shootScreen()'))
+		Qt5::Timer.singleShot(@delaySpinBox.value() * 1000, self, SLOT('shootScreen()'))
 	end
 	
 	def saveScreenshot()
 		format = "png"
-		initialPath = Qt::Dir.currentPath() + tr("/untitled.") + format
+		initialPath = Qt5::Dir.currentPath() + tr("/untitled.") + format
 	
-		fileName = Qt::FileDialog.getSaveFileName(self, tr("Save As"),
+		fileName = Qt5::FileDialog.getSaveFileName(self, tr("Save As"),
 								initialPath,
 								tr("%s Files (*.%s);;All Files (*)" % 
 									[format.upcase, format] ) )
@@ -89,7 +89,7 @@ class Screenshot < Qt::Widget
 		if @delaySpinBox.value != 0
 			$qApp.beep
 		end
-		@originalPixmap = Qt::Pixmap::grabWindow(Qt::Application::desktop().winId())
+		@originalPixmap = Qt5::Pixmap::grabWindow(Qt5::Application::desktop().winId())
 		updateScreenshotLabel()
 	
 		@newScreenshotButton.disabled = false
@@ -107,18 +107,18 @@ class Screenshot < Qt::Widget
 	end
 	
 	def createOptionsGroupBox()
-		@optionsGroupBox = Qt::GroupBox.new(tr("Options"))
+		@optionsGroupBox = Qt5::GroupBox.new(tr("Options"))
 	
-		@delaySpinBox = Qt::SpinBox.new
+		@delaySpinBox = Qt5::SpinBox.new
 		@delaySpinBox.suffix = tr(" s")
 		@delaySpinBox.maximum = 60
 		connect(@delaySpinBox, SIGNAL('valueChanged(int)'), self, SLOT('updateCheckBox()'))
 	
-		@delaySpinBoxLabel = Qt::Label.new(tr("Screenshot Delay:"))
+		@delaySpinBoxLabel = Qt5::Label.new(tr("Screenshot Delay:"))
 	
-		@hideThisWindowCheckBox = Qt::CheckBox.new(tr("Hide This Window"))
+		@hideThisWindowCheckBox = Qt5::CheckBox.new(tr("Hide This Window"))
 	
-		@optionsGroupBoxLayout = Qt::GridLayout.new
+		@optionsGroupBoxLayout = Qt5::GridLayout.new
 		@optionsGroupBoxLayout.addWidget(@delaySpinBoxLabel, 0, 0)
 		@optionsGroupBoxLayout.addWidget(@delaySpinBox, 0, 1)
 		@optionsGroupBoxLayout.addWidget(@hideThisWindowCheckBox, 1, 0, 1, 2)
@@ -134,7 +134,7 @@ class Screenshot < Qt::Widget
 	
 		@quitScreenshotButton = createButton(tr("Quit"), self, SLOT('close()'))
 	
-		@buttonsLayout = Qt::HBoxLayout.new
+		@buttonsLayout = Qt5::HBoxLayout.new
 		@buttonsLayout.addStretch()
 		@buttonsLayout.addWidget(@newScreenshotButton)
 		@buttonsLayout.addWidget(@saveScreenshotButton)
@@ -142,14 +142,14 @@ class Screenshot < Qt::Widget
 	end
 	
 	def createButton(text, receiver, member)
-		button = Qt::PushButton.new(text)
+		button = Qt5::PushButton.new(text)
 		button.connect(button, SIGNAL('clicked()'), receiver, member)
 		return button
 	end
 	
 	def updateScreenshotLabel()
 		@screenshotLabel.pixmap = @originalPixmap.scaled(	@screenshotLabel.size,
-														    Qt::KeepAspectRatio,
-														    Qt::SmoothTransformation )
+														    Qt5::KeepAspectRatio,
+														    Qt5::SmoothTransformation )
 	end
 end

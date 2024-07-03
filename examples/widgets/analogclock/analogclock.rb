@@ -27,13 +27,13 @@
 
 require 'Qt5'
 
-# an analog clock widget using an internal Qt::Timer
-class AnalogClock < Qt::Widget
+# an analog clock widget using an internal Qt5::Timer
+class AnalogClock < Qt5::Widget
 
     def initialize(parent = nil)
         super(parent)
 
-        @timer = Qt::Timer.new(self)
+        @timer = Qt5::Timer.new(self)
         connect(@timer, SIGNAL('timeout()'), self, SLOT('update()'))
         @timer.start(1000)
 
@@ -42,25 +42,25 @@ class AnalogClock < Qt::Widget
     end
 
     def paintEvent(e)
-        hourHand = Qt::Polygon.new( [   Qt::Point.new(7, 8),
-                                        Qt::Point.new(-7, 8),
-                                        Qt::Point.new(0, -40) ] )
-        minuteHand = Qt::Polygon.new(   [   Qt::Point.new(7, 8),
-                                            Qt::Point.new(-7, 8),
-                                            Qt::Point.new(0, -70) ] )
-        hourColor = Qt::Color.new(127, 0, 127)
-        minuteColor = Qt::Color.new(0, 127, 127, 191)
+        hourHand = Qt5::Polygon.new( [   Qt5::Point.new(7, 8),
+                                        Qt5::Point.new(-7, 8),
+                                        Qt5::Point.new(0, -40) ] )
+        minuteHand = Qt5::Polygon.new(   [   Qt5::Point.new(7, 8),
+                                            Qt5::Point.new(-7, 8),
+                                            Qt5::Point.new(0, -70) ] )
+        hourColor = Qt5::Color.new(127, 0, 127)
+        minuteColor = Qt5::Color.new(0, 127, 127, 191)
 
         side = width() < height() ? width() : height()
-        time = Qt::Time.currentTime
+        time = Qt5::Time.currentTime
 
-        painter = Qt::Painter.new(self)
-        painter.renderHint = Qt::Painter::Antialiasing
+        painter = Qt5::Painter.new(self)
+        painter.renderHint = Qt5::Painter::Antialiasing
         painter.translate(width() / 2, height() / 2)
         painter.scale(side / 200.0, side / 200.0)
 
-        painter.pen = Qt::NoPen
-        painter.brush = Qt::Brush.new(hourColor)
+        painter.pen = Qt5::NoPen
+        painter.brush = Qt5::Brush.new(hourColor)
 
         painter.save
         painter.rotate(30.0 * ((time.hour + time.minute / 60.0)))
@@ -73,8 +73,8 @@ class AnalogClock < Qt::Widget
             painter.rotate(30.0)
         end
 
-        painter.pen = Qt::NoPen
-        painter.brush = Qt::Brush.new(minuteColor)
+        painter.pen = Qt5::NoPen
+        painter.brush = Qt5::Brush.new(minuteColor)
 
         painter.save
         painter.rotate(6.0 * (time.minute + time.second / 60.0))

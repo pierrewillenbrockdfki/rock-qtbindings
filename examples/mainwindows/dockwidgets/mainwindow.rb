@@ -26,7 +26,7 @@
 	
 	
 	
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 	
 	slots	'newLetter()',
     		'save()',
@@ -38,7 +38,7 @@ class MainWindow < Qt::MainWindow
 	
 	def initialize()
 		super
-	    @textEdit = Qt::TextEdit.new
+	    @textEdit = Qt5::TextEdit.new
 	    setCentralWidget(@textEdit)
 	
 	    createActions()
@@ -55,23 +55,23 @@ class MainWindow < Qt::MainWindow
 	def newLetter()
 	    @textEdit.clear()
 	
-	    cursor = Qt::TextCursor.new(@textEdit.textCursor())
-	    cursor.movePosition(Qt::TextCursor::Start)
+	    cursor = Qt5::TextCursor.new(@textEdit.textCursor())
+	    cursor.movePosition(Qt5::TextCursor::Start)
 	    topFrame = cursor.currentFrame()
 	    topFrameFormat = topFrame.frameFormat()
 	    topFrameFormat.padding = 16
 	    topFrame.frameFormat = topFrameFormat
 	
-	    textFormat = Qt::TextCharFormat.new
-	    boldFormat = Qt::TextCharFormat.new
-	    boldFormat.fontWeight = Qt::Font::Bold
-	    italicFormat = Qt::TextCharFormat.new
+	    textFormat = Qt5::TextCharFormat.new
+	    boldFormat = Qt5::TextCharFormat.new
+	    boldFormat.fontWeight = Qt5::Font::Bold
+	    italicFormat = Qt5::TextCharFormat.new
 	    italicFormat.fontItalic = true
 	
-	    tableFormat = Qt::TextTableFormat.new
+	    tableFormat = Qt5::TextTableFormat.new
 	    tableFormat.border = 1
 	    tableFormat.cellPadding = 16
-	    tableFormat.alignment = Qt::AlignRight
+	    tableFormat.alignment = Qt5::AlignRight
 	    cursor.insertTable(1, 1, tableFormat)
 	    cursor.insertText("The Firm", boldFormat)
 	    cursor.insertBlock()
@@ -81,7 +81,7 @@ class MainWindow < Qt::MainWindow
 	    cursor.insertBlock()
 	    cursor.insertText("Some Country")
 	    cursor.position = topFrame.lastPosition()
-	    cursor.insertText(Qt::Date::currentDate().toString("d MMMM yyyy"), textFormat)
+	    cursor.insertText(Qt5::Date::currentDate().toString("d MMMM yyyy"), textFormat)
 	    cursor.insertBlock()
 	    cursor.insertBlock()
 	    cursor.insertText("Dear ", textFormat)
@@ -101,10 +101,10 @@ class MainWindow < Qt::MainWindow
 	
 	def print()
 	    document = @textEdit.document()
-	    printer = Qt::Printer.new
+	    printer = Qt5::Printer.new
 	
-	    dlg = Qt::PrintDialog.new(printer, self)
-	    if dlg.exec() != Qt::Dialog::Accepted
+	    dlg = Qt5::PrintDialog.new(printer, self)
+	    if dlg.exec() != Qt5::Dialog::Accepted
 	        return
 		end
 	
@@ -114,23 +114,23 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def save()
-	    fileName = Qt::FileDialog.getSaveFileName(self,
+	    fileName = Qt5::FileDialog.getSaveFileName(self,
 	                        tr("Choose a file name"), ".",
 	                        tr("HTML (*.html *.htm)"))
 	    if not fileName or fileName.empty?
 	        return
 		end
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::File::WriteOnly | Qt::File::Text)
-	        Qt::MessageBox.warning(self, tr("Dock Widgets"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::File::WriteOnly | Qt5::File::Text)
+	        Qt5::MessageBox.warning(self, tr("Dock Widgets"),
 	                             tr("Cannot write file %s:\n%s." % [fileName, errorString]))
 	        return
 	    end
 	
-	    out = Qt::TextStream.new(file)
-	    Qt::Application.setOverrideCursor(Qt::WaitCursor)
+	    out = Qt5::TextStream.new(file)
+	    Qt5::Application.setOverrideCursor(Qt5::WaitCursor)
 	    out << @textEdit.toHtml()
-	    Qt::Application.restoreOverrideCursor()
+	    Qt5::Application.restoreOverrideCursor()
 	
 	    statusBar().showMessage(tr("Saved '%1'").arg(fileName), 2000)
 	end
@@ -174,7 +174,7 @@ class MainWindow < Qt::MainWindow
 	        return
 		end
 	    cursor.beginEditBlock()
-	    cursor.movePosition(Qt::TextCursor::PreviousBlock, Qt::TextCursor::MoveAnchor, 2)
+	    cursor.movePosition(Qt5::TextCursor::PreviousBlock, Qt5::TextCursor::MoveAnchor, 2)
 	    cursor.insertBlock()
 	    cursor.insertText(paragraph)
 	    cursor.insertBlock()
@@ -182,7 +182,7 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def about()
-	   Qt::MessageBox.about(self, tr("About Dock Widgets"),
+	   Qt5::MessageBox.about(self, tr("About Dock Widgets"),
 	            tr("The <b>Dock Widgets</b> example demonstrates how to " \
 	               "use Qt's dock widgets. You can enter your own text, " \
 	               "click a customer to add a customer name and " \
@@ -190,37 +190,37 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def createActions()
-	    @newLetterAct = Qt::Action.new(Qt::Icon.new("images/new.png"), tr("&New Letter"),
+	    @newLetterAct = Qt5::Action.new(Qt5::Icon.new("images/new.png"), tr("&New Letter"),
 	                               self)
-	    @newLetterAct.shortcut = Qt::KeySequence.new(tr("Ctrl+N"))
+	    @newLetterAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+N"))
 	    @newLetterAct.statusTip = tr("Create a form.new letter")
 	    connect(@newLetterAct, SIGNAL('triggered()'), self, SLOT('newLetter()'))
 	
-	    @saveAct = Qt::Action.new(Qt::Icon.new("images/save.png"), tr("&Save..."), self)
-	    @saveAct.shortcut = Qt::KeySequence.new(tr("Ctrl+S"))
+	    @saveAct = Qt5::Action.new(Qt5::Icon.new("images/save.png"), tr("&Save..."), self)
+	    @saveAct.shortcut = Qt5::KeySequence.new(tr("Ctrl+S"))
 	    @saveAct.statusTip = tr("Save the current form letter")
 	    connect(@saveAct, SIGNAL('triggered()'), self, SLOT('save()'))
 	
-	    @printAct = Qt::Action.new(Qt::Icon.new("images/print.png"), tr("&Print..."), self)
-	    @printAct.shortcut = Qt::KeySequence.new( tr("Ctrl+P"))
+	    @printAct = Qt5::Action.new(Qt5::Icon.new("images/print.png"), tr("&Print..."), self)
+	    @printAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+P"))
 	    @printAct.statusTip = tr("Print the current form letter")
 	    connect(@printAct, SIGNAL('triggered()'), self, SLOT('print()'))
 	
-	    @undoAct = Qt::Action.new(Qt::Icon.new("images/undo.png"), tr("&Undo"), self)
-	    @undoAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Z"))
+	    @undoAct = Qt5::Action.new(Qt5::Icon.new("images/undo.png"), tr("&Undo"), self)
+	    @undoAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Z"))
 	    @undoAct.statusTip = tr("Undo the last editing action")
 	    connect(@undoAct, SIGNAL('triggered()'), self, SLOT('undo()'))
 	
-	    @quitAct = Qt::Action.new(tr("&Quit"), self)
-	    @quitAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Q"))
+	    @quitAct = Qt5::Action.new(tr("&Quit"), self)
+	    @quitAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Q"))
 	    @quitAct.statusTip = tr("Quit the application")
 	    connect(@quitAct, SIGNAL('triggered()'), self, SLOT('close()'))
 	
-	    @aboutAct = Qt::Action.new(tr("&About"), self)
+	    @aboutAct = Qt5::Action.new(tr("&About"), self)
 	    @aboutAct.statusTip = tr("Show the application's About box")
 	    connect(@aboutAct, SIGNAL('triggered()'), self, SLOT('about()'))
 	
-	    @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+	    @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
 	    @aboutQtAct.statusTip = tr("Show the Qt library's About box")
 	    connect(@aboutQtAct, SIGNAL('triggered()'), $qApp, SLOT('aboutQt()'))
 	end
@@ -258,9 +258,9 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def createDockWindows()
-	    dock = Qt::DockWidget.new(tr("Customers"), self)
-	    dock.allowedAreas = Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea
-	    @customerList = Qt::ListWidget.new(dock)
+	    dock = Qt5::DockWidget.new(tr("Customers"), self)
+	    dock.allowedAreas = Qt5::LeftDockWidgetArea | Qt5::RightDockWidgetArea
+	    @customerList = Qt5::ListWidget.new(dock)
 	    @customerList.addItems([] <<
 	            "John Doe, Harmony Enterprises, 12 Lakeside, Ambleton" <<
 	            "Jane Doe, Memorabilia, 23 Watersedge, Beaton" <<
@@ -269,10 +269,10 @@ class MainWindow < Qt::MainWindow
 	            "Sol Harvey, Chicos Coffee, 53 New Springs, Eccleston" <<
 	            "Sally Hobart, Tiroli Tea, 67 Long River, Fedula")
 	    dock.widget = @customerList
-	    addDockWidget(Qt::RightDockWidgetArea, dock)
+	    addDockWidget(Qt5::RightDockWidgetArea, dock)
 	
-	    dock = Qt::DockWidget.new(tr("Paragraphs"), self)
-	    @paragraphsList = Qt::ListWidget.new(dock)
+	    dock = Qt5::DockWidget.new(tr("Paragraphs"), self)
+	    @paragraphsList = Qt5::ListWidget.new(dock)
 	    @paragraphsList.addItems([] <<
 	               "Thank you for your payment which we have received today." <<
 	               "Your order has been dispatched and should be with you " \
@@ -292,7 +292,7 @@ class MainWindow < Qt::MainWindow
 	               "You made an overpayment (more than $5). Do you wish to " \
 	               "buy more items, or should we return the excess to you?")
 	    dock.widget = @paragraphsList
-	    addDockWidget(Qt::RightDockWidgetArea, dock)
+	    addDockWidget(Qt5::RightDockWidgetArea, dock)
 	
 	    connect(@customerList, SIGNAL('currentTextChanged(const QString&)'),
 	            self, SLOT('insertCustomer(const QString&)'))

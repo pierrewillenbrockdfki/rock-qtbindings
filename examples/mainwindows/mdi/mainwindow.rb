@@ -26,7 +26,7 @@
     
 require './mdichild.rb'
     
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
     
     slots   'newFile()',
             'open()',
@@ -43,11 +43,11 @@ class MainWindow < Qt::MainWindow
      
     def initialize()
         super
-        @mdiArea = Qt::MdiArea.new
+        @mdiArea = Qt5::MdiArea.new
         setCentralWidget(@mdiArea)
         connect(@mdiArea, SIGNAL('subWindowActivated(QMdiSubWindow*)'),
                 self, SLOT('updateMenus()'))
-        @windowMapper = Qt::SignalMapper.new(self)
+        @windowMapper = Qt5::SignalMapper.new(self)
         connect(@windowMapper, SIGNAL('mapped(QWidget*)'),
                 self, SLOT('setActiveSubWindow(QWidget*)'))
     
@@ -79,7 +79,7 @@ class MainWindow < Qt::MainWindow
     end
     
     def open()
-        fileName = Qt::FileDialog.getOpenFileName(self)
+        fileName = Qt5::FileDialog.getOpenFileName(self)
         if !fileName.nil?
             existing = findMdiChild(fileName)
             if !existing.nil?
@@ -128,7 +128,7 @@ class MainWindow < Qt::MainWindow
     end
     
     def about()
-       Qt::MessageBox::about(self, tr("About MDI"),
+       Qt5::MessageBox::about(self, tr("About MDI"),
                 tr("The <b>MDI</b> example demonstrates how to write multiple " \
                    "document interface applications using Qt."))
     end
@@ -197,88 +197,88 @@ class MainWindow < Qt::MainWindow
     end
     
     def createActions()
-        @newAct = Qt::Action.new(Qt::Icon.new("images/new.png"), tr("&New"), self)
-        @newAct.shortcut = Qt::KeySequence.new( tr("Ctrl+N"))
+        @newAct = Qt5::Action.new(Qt5::Icon.new("images/new.png"), tr("&New"), self)
+        @newAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+N"))
         @newAct.statusTip = tr("Create a file.new")
         connect(@newAct, SIGNAL('triggered()'), self, SLOT('newFile()'))
     
-        @openAct = Qt::Action.new(Qt::Icon.new("images/open.png"), tr("&Open..."), self)
-        @openAct.shortcut = Qt::KeySequence.new( tr("Ctrl+O"))
+        @openAct = Qt5::Action.new(Qt5::Icon.new("images/open.png"), tr("&Open..."), self)
+        @openAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+O"))
         @openAct.statusTip = tr("Open an existing file")
         connect(@openAct, SIGNAL('triggered()'), self, SLOT('open()'))
     
-        @saveAct = Qt::Action.new(Qt::Icon.new("images/save.png"), tr("&Save"), self)
-        @saveAct.shortcut = Qt::KeySequence.new( tr("Ctrl+S"))
+        @saveAct = Qt5::Action.new(Qt5::Icon.new("images/save.png"), tr("&Save"), self)
+        @saveAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+S"))
         @saveAct.statusTip = tr("Save the document to disk")
         connect(@saveAct, SIGNAL('triggered()'), self, SLOT('save()'))
     
-        @saveAsAct = Qt::Action.new(tr("Save &As..."), self)
+        @saveAsAct = Qt5::Action.new(tr("Save &As..."), self)
         @saveAsAct.statusTip = tr("Save the document under a name.new")
         connect(@saveAsAct, SIGNAL('triggered()'), self, SLOT('saveAs()'))
     
-        @exitAct = Qt::Action.new(tr("E&xit"), self)
-        @exitAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Q"))
+        @exitAct = Qt5::Action.new(tr("E&xit"), self)
+        @exitAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Q"))
         @exitAct.statusTip = tr("Exit the application")
         connect(@exitAct, SIGNAL('triggered()'), $qApp, SLOT('closeAllWindows()'))
     
-        @cutAct = Qt::Action.new(Qt::Icon.new("images/cut.png"), tr("Cu&t"), self)
-        @cutAct.shortcut = Qt::KeySequence.new( tr("Ctrl+X"))
+        @cutAct = Qt5::Action.new(Qt5::Icon.new("images/cut.png"), tr("Cu&t"), self)
+        @cutAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+X"))
         @cutAct.setStatusTip(tr("Cut the current selection's contents to the " \
                                 "clipboard"))
         connect(@cutAct, SIGNAL('triggered()'), self, SLOT('cut()'))
     
-        @copyAct = Qt::Action.new(Qt::Icon.new("images/copy.png"), tr("&Copy"), self)
-        @copyAct.shortcut = Qt::KeySequence.new( tr("Ctrl+C"))
+        @copyAct = Qt5::Action.new(Qt5::Icon.new("images/copy.png"), tr("&Copy"), self)
+        @copyAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+C"))
         @copyAct.setStatusTip(tr("Copy the current selection's contents to the " \
                                  "clipboard"))
         connect(@copyAct, SIGNAL('triggered()'), self, SLOT('copy()'))
     
-        @pasteAct = Qt::Action.new(Qt::Icon.new("images/paste.png"), tr("&Paste"), self)
-        @pasteAct.shortcut = Qt::KeySequence.new( tr("Ctrl+V"))
+        @pasteAct = Qt5::Action.new(Qt5::Icon.new("images/paste.png"), tr("&Paste"), self)
+        @pasteAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+V"))
         @pasteAct.setStatusTip(tr("Paste the clipboard's contents into the current " \
                                   "selection"))
         connect(@pasteAct, SIGNAL('triggered()'), self, SLOT('paste()'))
     
-        @closeAct = Qt::Action.new(tr("Cl&ose"), self)
-        @closeAct.shortcut = Qt::KeySequence.new( tr("Ctrl+F4"))
+        @closeAct = Qt5::Action.new(tr("Cl&ose"), self)
+        @closeAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+F4"))
         @closeAct.statusTip = tr("Close the active window")
         connect(@closeAct, SIGNAL('triggered()'),
                 @mdiArea, SLOT('closeActiveSubWindow()'))
     
-        @closeAllAct = Qt::Action.new(tr("Close &All"), self)
+        @closeAllAct = Qt5::Action.new(tr("Close &All"), self)
         @closeAllAct.statusTip = tr("Close all the windows")
         connect(@closeAllAct, SIGNAL('triggered()'),
                 @mdiArea, SLOT('closeAllSubWindows()'))
     
-        @tileAct = Qt::Action.new(tr("&Tile"), self)
+        @tileAct = Qt5::Action.new(tr("&Tile"), self)
         @tileAct.statusTip = tr("Tile the windows")
         connect(@tileAct, SIGNAL('triggered()'), @mdiArea, SLOT('tileSubWindows()'))
     
-        @cascadeAct = Qt::Action.new(tr("&Cascade"), self)
+        @cascadeAct = Qt5::Action.new(tr("&Cascade"), self)
         @cascadeAct.statusTip = tr("Cascade the windows")
         connect(@cascadeAct, SIGNAL('triggered()'), @mdiArea, SLOT('cascadeSubWindows()'))
     
-        @nextAct = Qt::Action.new(tr("Ne&xt"), self)
-        @nextAct.shortcut = Qt::KeySequence.new( tr("Ctrl+F6"))
+        @nextAct = Qt5::Action.new(tr("Ne&xt"), self)
+        @nextAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+F6"))
         @nextAct.statusTip = tr("Move the focus to the next window")
         connect(@nextAct, SIGNAL('triggered()'),
                 @mdiArea, SLOT('activateNextSubWindow()'))
     
-        @previousAct = Qt::Action.new(tr("Pre&vious"), self)
-        @previousAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Shift+F6"))
+        @previousAct = Qt5::Action.new(tr("Pre&vious"), self)
+        @previousAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Shift+F6"))
         @previousAct.setStatusTip(tr("Move the focus to the previous " \
                                      "window"))
         connect(@previousAct, SIGNAL('triggered()'),
                 @mdiArea, SLOT('activatePreviousSubWindow()'))
     
-        @separatorAct = Qt::Action.new(self)
+        @separatorAct = Qt5::Action.new(self)
         @separatorAct.separator = true
     
-        @aboutAct = Qt::Action.new(tr("&About"), self)
+        @aboutAct = Qt5::Action.new(tr("&About"), self)
         @aboutAct.statusTip = tr("Show the application's About box")
         connect(@aboutAct, SIGNAL('triggered()'), self, SLOT('about()'))
     
-        @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+        @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
         @aboutQtAct.statusTip = tr("Show the Qt library's About box")
         connect(@aboutQtAct, SIGNAL('triggered()'), $qApp, SLOT('aboutQt()'))
     end
@@ -325,17 +325,17 @@ class MainWindow < Qt::MainWindow
     end
     
     def readSettings()
-        settings = Qt::Settings.new("Trolltech", "MDI Example")
-        pos = settings.value("pos", Qt::Variant.new(Qt::Point.new(200, 200))).toPoint()
-        size = settings.value("size", Qt::Variant.new(Qt::Size.new(400, 400))).toSize()
+        settings = Qt5::Settings.new("Trolltech", "MDI Example")
+        pos = settings.value("pos", Qt5::Variant.new(Qt5::Point.new(200, 200))).toPoint()
+        size = settings.value("size", Qt5::Variant.new(Qt5::Size.new(400, 400))).toSize()
         move(pos)
         resize(size)
     end
     
     def writeSettings()
-        settings = Qt::Settings.new("Trolltech", "MDI Example")
-        settings.setValue("pos", Qt::Variant.new(pos()))
-        settings.setValue("size", Qt::Variant.new(size()))
+        settings = Qt5::Settings.new("Trolltech", "MDI Example")
+        settings.setValue("pos", Qt5::Variant.new(pos()))
+        settings.setValue("size", Qt5::Variant.new(size()))
     end
     
     def activeMdiChild()
@@ -347,7 +347,7 @@ class MainWindow < Qt::MainWindow
     end
     
     def findMdiChild(fileName)
-        canonicalFilePath = Qt::FileInfo.new(fileName).canonicalFilePath()
+        canonicalFilePath = Qt5::FileInfo.new(fileName).canonicalFilePath()
 
         @mdiArea.subWindowList().each do |window|
             mdiChild = window.widget

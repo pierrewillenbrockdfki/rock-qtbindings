@@ -25,19 +25,19 @@
 
 require './dommodel.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
     slots 'openFile()'
     
     def initialize()
         super
         @fileMenu = menuBar().addMenu(tr("&File"))
         @fileMenu.addAction(tr("&Open..."), self, SLOT('openFile()'),
-                            Qt::KeySequence.new(tr("Ctrl+O")))
+                            Qt5::KeySequence.new(tr("Ctrl+O")))
         @fileMenu.addAction(tr("E&xit"), self, SLOT('close()'),
-                            Qt::KeySequence.new(tr("Ctrl+Q")))
+                            Qt5::KeySequence.new(tr("Ctrl+Q")))
     
-        @model = DomModel.new(Qt::DomDocument.new, self)
-        @view = Qt::TreeView.new(self)
+        @model = DomModel.new(Qt5::DomDocument.new, self)
+        @view = Qt5::TreeView.new(self)
         @view.model = @model
     
         setCentralWidget(@view)
@@ -45,14 +45,14 @@ class MainWindow < Qt::MainWindow
     end
     
     def openFile()
-        filePath = Qt::FileDialog.getOpenFileName(self, tr("Open File"),
+        filePath = Qt5::FileDialog.getOpenFileName(self, tr("Open File"),
             @xmlPath, tr("XML files (*.xml);;HTML files (*.html);;" \
                         "SVG files (*.svg);;User Interface files (*.ui)"))
     
         if !filePath.nil?
-            file = Qt::File.new(filePath)
-            if file.open(Qt::IODevice::ReadOnly)
-                document = Qt::DomDocument.new
+            file = Qt5::File.new(filePath)
+            if file.open(Qt5::IODevice::ReadOnly)
+                document = Qt5::DomDocument.new
                 if document.setContent(file)
                     newModel = DomModel.new(document, self)
                     @view.model = newModel

@@ -23,53 +23,53 @@
 ** Translated to QtRuby by Richard Dale
 =end
 		
-class DragLabel < Qt::Label
+class DragLabel < Qt5::Label
 	
 	def initialize(text, parent = nil)
 	    super(parent)
-	    fm = Qt::FontMetrics.new(font())
-	    size = fm.size(Qt::TextSingleLine, text)
+	    fm = Qt5::FontMetrics.new(font())
+	    size = fm.size(Qt5::TextSingleLine, text)
 	
-	    image = Qt::Image.new(size.width() + 12, size.height() + 12, Qt::Image::Format_ARGB32_Premultiplied)
+	    image = Qt5::Image.new(size.width() + 12, size.height() + 12, Qt5::Image::Format_ARGB32_Premultiplied)
 	    image.fill(qRgba(0, 0, 0, 0))
 	
-	    font = Qt::Font.new
-	    font.styleStrategy = Qt::Font::ForceOutline
+	    font = Qt5::Font.new
+	    font.styleStrategy = Qt5::Font::ForceOutline
 	
-	    painter = Qt::Painter.new
+	    painter = Qt5::Painter.new
 	    painter.begin(image)
-	    painter.renderHint = Qt::Painter::Antialiasing
-	    painter.brush = Qt::Brush.new(Qt::white)
-	    painter.drawRoundRect(Qt::RectF.new(0.5, 0.5, image.width()-1, image.height()-1), 25, 25)
+	    painter.renderHint = Qt5::Painter::Antialiasing
+	    painter.brush = Qt5::Brush.new(Qt5::white)
+	    painter.drawRoundRect(Qt5::RectF.new(0.5, 0.5, image.width()-1, image.height()-1), 25, 25)
 	
 	    painter.font = font
-	    painter.brush = Qt::Brush.new(Qt::black)
-	    painter.drawText(Qt::Rect.new(Qt::Point.new(6, 6), size), Qt::AlignCenter, text)
+	    painter.brush = Qt5::Brush.new(Qt5::black)
+	    painter.drawText(Qt5::Rect.new(Qt5::Point.new(6, 6), size), Qt5::AlignCenter, text)
 	    painter.end
 	
-	    setPixmap(Qt::Pixmap.fromImage(image))
+	    setPixmap(Qt5::Pixmap.fromImage(image))
 	    @labelText = text
 	end
 	
 	def mousePressEvent(event)
-	    itemData = Qt::ByteArray.new("")
-	    dataStream = Qt::DataStream.new(itemData, Qt::IODevice::WriteOnly.to_i)
-		hotSpot = Qt::Point.new(event.pos.x, event.pos.y)
+	    itemData = Qt5::ByteArray.new("")
+	    dataStream = Qt5::DataStream.new(itemData, Qt5::IODevice::WriteOnly.to_i)
+		hotSpot = Qt5::Point.new(event.pos.x, event.pos.y)
 		hotSpot -= rect.topLeft
 	    dataStream << @labelText << hotSpot
 
-	    mimeData = Qt::MimeData.new
+	    mimeData = Qt5::MimeData.new
 	    mimeData.setData("application/x-fridgemagnet", itemData)
 	    mimeData.text = @labelText
 	
-	    drag = Qt::Drag.new(self)
+	    drag = Qt5::Drag.new(self)
 	    drag.mimeData = mimeData
 	    drag.hotSpot = hotSpot
 	    drag.pixmap = pixmap.copy
 	
 	    hide()
 	
-	    if drag.start(Qt::MoveAction.to_i) == Qt::MoveAction
+	    if drag.start(Qt5::MoveAction.to_i) == Qt5::MoveAction
 	        close()
 	    else
 	        show()

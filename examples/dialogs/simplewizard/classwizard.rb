@@ -68,7 +68,7 @@ class ClassWizard < SimpleWizard
         header = @thirdPage.headerLineEdit.text
         implementation = @thirdPage.implementationLineEdit.text
     
-        block = Qt::ByteArray.new
+        block = Qt5::ByteArray.new
     
         if comment
             block += "/*\n"
@@ -121,9 +121,9 @@ class ClassWizard < SimpleWizard
             block += "#endif\n"
         end
     
-        headerFile = Qt::File.new(outputDir + "/" + header)
-        if !headerFile.open(Qt::File::WriteOnly | Qt::File::Text)
-            Qt::MessageBox.warning(self, tr("Simple Wizard"),
+        headerFile = Qt5::File.new(outputDir + "/" + header)
+        if !headerFile.open(Qt5::File::WriteOnly | Qt5::File::Text)
+            Qt5::MessageBox.warning(self, tr("Simple Wizard"),
                                  tr(    "Cannot write file %s:\n%s" %
                                     [   headerFile.fileName(), headerFile.errorString()] ) )
             return
@@ -131,7 +131,7 @@ class ClassWizard < SimpleWizard
 
         headerFile.write(block)
     
-        block = Qt::ByteArray.new
+        block = Qt5::ByteArray.new
     
         if comment
             block += "/*\n"
@@ -178,10 +178,10 @@ class ClassWizard < SimpleWizard
             end
         end
     
-        implementationFile = Qt::File.new(outputDir + "/" + implementation)
+        implementationFile = Qt5::File.new(outputDir + "/" + implementation)
 
-        if !implementationFile.open(Qt::File::WriteOnly | Qt::File::Text)
-            Qt::MessageBox.warning(self, tr("Simple Wizard"),
+        if !implementationFile.open(Qt5::File::WriteOnly | Qt5::File::Text)
+            Qt5::MessageBox.warning(self, tr("Simple Wizard"),
                                  tr("Cannot write file %s:\n%s" %
                                        [    implementationFile.fileName(), 
                                             implementationFile.errorString() ] ) )
@@ -193,7 +193,7 @@ class ClassWizard < SimpleWizard
     end
 end
 
-class FirstPage < Qt::Widget
+class FirstPage < Qt5::Widget
 
     attr_accessor :classNameLineEdit, :baseClassLineEdit, :headerLineEdit,
                   :qobjectMacroCheckBox, :qobjectCtorRadioButton,
@@ -204,28 +204,28 @@ class FirstPage < Qt::Widget
     
     def initialize(wizard)
         super(wizard)
-        @topLabel = Qt::Label.new(tr("<center><b>Class information</b></center>" +
+        @topLabel = Qt5::Label.new(tr("<center><b>Class information</b></center>" +
                                  "<p>This wizard will generate a skeleton class " +
                                  "definition and member function definitions."))
         @topLabel.wordWrap = false
     
-        @classNameLabel = Qt::Label.new(tr("Class &name:"))
-        @classNameLineEdit = Qt::LineEdit.new
+        @classNameLabel = Qt5::Label.new(tr("Class &name:"))
+        @classNameLineEdit = Qt5::LineEdit.new
         @classNameLabel.buddy = @classNameLineEdit
         setFocusProxy(@classNameLineEdit)
     
-        @baseClassLabel = Qt::Label.new(tr("&Base class:"))
-        @baseClassLineEdit = Qt::LineEdit.new
+        @baseClassLabel = Qt5::Label.new(tr("&Base class:"))
+        @baseClassLineEdit = Qt5::LineEdit.new
         @baseClassLabel.buddy = @baseClassLineEdit
     
-        @qobjectMacroCheckBox = Qt::CheckBox.new(tr("&Generate Q_OBJECT macro"))
+        @qobjectMacroCheckBox = Qt5::CheckBox.new(tr("&Generate Q_OBJECT macro"))
     
-        @groupBox = Qt::GroupBox.new(tr("&Constructor"))
+        @groupBox = Qt5::GroupBox.new(tr("&Constructor"))
     
-        @qobjectCtorRadioButton = Qt::RadioButton.new(tr("&QObject-style constructor"))
-        @qwidgetCtorRadioButton = Qt::RadioButton.new(tr("Q&Widget-style constructor"))
-        @defaultCtorRadioButton = Qt::RadioButton.new(tr("&Default constructor"))
-        @copyCtorCheckBox = Qt::CheckBox.new(tr("&Also generate copy constructor and " +
+        @qobjectCtorRadioButton = Qt5::RadioButton.new(tr("&QObject-style constructor"))
+        @qwidgetCtorRadioButton = Qt5::RadioButton.new(tr("Q&Widget-style constructor"))
+        @defaultCtorRadioButton = Qt5::RadioButton.new(tr("&Default constructor"))
+        @copyCtorCheckBox = Qt5::CheckBox.new(tr("&Also generate copy constructor and " +
                                             "assignment operator"))
     
         @defaultCtorRadioButton.checked = true
@@ -237,14 +237,14 @@ class FirstPage < Qt::Widget
     
         wizard.buttonEnabled = false
     
-        @groupBox.layout = Qt::VBoxLayout.new do |g|
+        @groupBox.layout = Qt5::VBoxLayout.new do |g|
             g.addWidget(@qobjectCtorRadioButton)
             g.addWidget(@qwidgetCtorRadioButton)
             g.addWidget(@defaultCtorRadioButton)
             g.addWidget(@copyCtorCheckBox)
         end
     
-        self.layout = Qt::GridLayout.new do |l|
+        self.layout = Qt5::GridLayout.new do |l|
             l.addWidget(@topLabel, 0, 0, 1, 2)
             l.setRowMinimumHeight(1, 10)
             l.addWidget(@classNameLabel, 2, 0)
@@ -263,7 +263,7 @@ class FirstPage < Qt::Widget
     end
 end
 
-class SecondPage < Qt::Widget
+class SecondPage < Qt5::Widget
 
     attr_accessor :commentCheckBox, :protectCheckBox, :includeBaseCheckBox,
                   :macroNameLineEdit, :baseIncludeLineEdit,
@@ -271,23 +271,23 @@ class SecondPage < Qt::Widget
 
     def initialize(wizard)
         super(wizard)
-        @topLabel = Qt::Label.new(tr("<center><b>Code style options</b></center>"))
+        @topLabel = Qt5::Label.new(tr("<center><b>Code style options</b></center>"))
     
-        @commentCheckBox = Qt::CheckBox.new(tr("&Start generated files with a comment"))
+        @commentCheckBox = Qt5::CheckBox.new(tr("&Start generated files with a comment"))
         @commentCheckBox.checked = true
         setFocusProxy(@commentCheckBox)
     
-        @protectCheckBox = Qt::CheckBox.new(tr("&Protect header file against multiple " +
+        @protectCheckBox = Qt5::CheckBox.new(tr("&Protect header file against multiple " +
                                            "inclusions"))
         @protectCheckBox.checked = true
     
-        @macroNameLabel = Qt::Label.new(tr("&Macro name:"))
-        @macroNameLineEdit = Qt::LineEdit.new
+        @macroNameLabel = Qt5::Label.new(tr("&Macro name:"))
+        @macroNameLineEdit = Qt5::LineEdit.new
         @macroNameLabel.buddy = @macroNameLineEdit
     
-        @includeBaseCheckBox = Qt::CheckBox.new(tr("&Include base class definition"))
-        @baseIncludeLabel = Qt::Label.new(tr("Base class include:"))
-        @baseIncludeLineEdit = Qt::LineEdit.new
+        @includeBaseCheckBox = Qt5::CheckBox.new(tr("&Include base class definition"))
+        @baseIncludeLabel = Qt5::Label.new(tr("Base class include:"))
+        @baseIncludeLineEdit = Qt5::LineEdit.new
         @baseIncludeLabel.buddy = @baseIncludeLineEdit
     
         className = wizard.firstPage.classNameLineEdit.text()
@@ -316,7 +316,7 @@ class SecondPage < Qt::Widget
         connect(@includeBaseCheckBox, SIGNAL('toggled(bool)'),
                 @baseIncludeLineEdit, SLOT('setEnabled(bool)'))
     
-        self.layout = Qt::GridLayout.new do |l|
+        self.layout = Qt5::GridLayout.new do |l|
             l.setColumnMinimumWidth(0, 20)
             l.addWidget(@topLabel, 0, 0, 1, 3)
             l.setRowMinimumHeight(1, 10)
@@ -333,33 +333,33 @@ class SecondPage < Qt::Widget
 end
 
 
-class ThirdPage < Qt::Widget
+class ThirdPage < Qt5::Widget
 
     attr_accessor :outputDirLineEdit, :headerLineEdit, :implementationLineEdit
 
     def initialize(wizard)
         super(wizard)
-        @topLabel = Qt::Label.new(tr("<center><b>Output files</b></center>"))
+        @topLabel = Qt5::Label.new(tr("<center><b>Output files</b></center>"))
     
-        @outputDirLabel = Qt::Label.new(tr("&Output directory:"))
-        @outputDirLineEdit = Qt::LineEdit.new
+        @outputDirLabel = Qt5::Label.new(tr("&Output directory:"))
+        @outputDirLineEdit = Qt5::LineEdit.new
         @outputDirLabel.buddy = @outputDirLineEdit
         self.focusProxy = @outputDirLineEdit
     
-        @headerLabel = Qt::Label.new(tr("&Header file name:"))
-        @headerLineEdit = Qt::LineEdit.new
+        @headerLabel = Qt5::Label.new(tr("&Header file name:"))
+        @headerLineEdit = Qt5::LineEdit.new
         @headerLabel.buddy = @headerLineEdit
     
-        @implementationLabel = Qt::Label.new(tr("&Implementation file name:"))
-        @implementationLineEdit = Qt::LineEdit.new
+        @implementationLabel = Qt5::Label.new(tr("&Implementation file name:"))
+        @implementationLineEdit = Qt5::LineEdit.new
         @implementationLabel.buddy = @implementationLineEdit
     
         className = wizard.firstPage.classNameLineEdit.text()
         @headerLineEdit.text = className.downcase + ".h"
         @implementationLineEdit.text = className.downcase + ".cpp"
-        @outputDirLineEdit.text = Qt::Dir.toNativeSeparators(Qt::Dir.homePath())
+        @outputDirLineEdit.text = Qt5::Dir.toNativeSeparators(Qt5::Dir.homePath())
     
-        self.layout = Qt::GridLayout.new do |l|
+        self.layout = Qt5::GridLayout.new do |l|
             l.addWidget(@topLabel, 0, 0, 1, 2)
             l.setRowMinimumHeight(1, 10)
             l.addWidget(@outputDirLabel, 2, 0)

@@ -25,14 +25,14 @@
 
 require './wigglywidget.rb'
 
-class Dialog < Qt::Dialog
+class Dialog < Qt5::Dialog
     def initialize(parent = nil)
         super(parent)
 
         wigglyWidget = WigglyWidget.new
-        lineEdit = Qt::LineEdit.new
+        lineEdit = Qt5::LineEdit.new
     
-        layout = Qt::VBoxLayout.new
+        layout = Qt5::VBoxLayout.new
         layout.addWidget(wigglyWidget)
         layout.addWidget(lineEdit)
         setLayout(layout)

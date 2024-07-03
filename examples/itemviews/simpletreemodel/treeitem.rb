@@ -50,7 +50,7 @@ class TreeItem
 	end
 	
 	def data(column)
-	    return Qt::Variant.new(@itemData[column])
+	    return Qt5::Variant.new(@itemData[column])
 	end
 	
 	def parent

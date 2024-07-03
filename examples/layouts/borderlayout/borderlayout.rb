@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class BorderLayout < Qt::Layout
+class BorderLayout < Qt5::Layout
 	West = 0
 	North = 1
 	South = 2
@@ -51,11 +51,11 @@ class BorderLayout < Qt::Layout
 	end
 	
 	def addWidget(widget, position)
-	    add(Qt::WidgetItem.new(widget), position)
+	    add(Qt5::WidgetItem.new(widget), position)
 	end
 	
 	def expandingDirections()
-	    return Qt::Horizontal | Qt::Vertical
+	    return Qt5::Horizontal | Qt5::Vertical
 	end
 	
 	def hasHeightForWidth()
@@ -95,18 +95,18 @@ class BorderLayout < Qt::Layout
 	        position = wrapper.position
 	
 	        if position == North
-	            item.geometry = Qt::Rect.new(rect.x, northHeight, rect.width,
+	            item.geometry = Qt5::Rect.new(rect.x, northHeight, rect.width,
 	                                    item.sizeHint.height)
 	
 	            northHeight += item.geometry.height + spacing()
 	        elsif position == South
-	            item.geometry = Qt::Rect.new(item.geometry.x,
+	            item.geometry = Qt5::Rect.new(item.geometry.x,
 	                                    item.geometry.y, rect.width,
 	                                    item.sizeHint.height)
 	
 	            southHeight += item.geometry().height() + spacing()
 	
-	            item.geometry = Qt::Rect.new(rect.x,
+	            item.geometry = Qt5::Rect.new(rect.x,
 	                              rect.y + rect.height - southHeight + spacing(),
 	                              item.geometry.width,
 	                              item.geometry.height)
@@ -123,17 +123,17 @@ class BorderLayout < Qt::Layout
 	        position = wrapper.position
 	
 	        if position == West
-	            item.geometry = Qt::Rect.new(rect.x + westWidth, northHeight,
+	            item.geometry = Qt5::Rect.new(rect.x + westWidth, northHeight,
 	                                    item.sizeHint.width, centerHeight)
 	
 	            westWidth += item.geometry.width + spacing()
 	        elsif position == East
-	            item.geometry = Qt::Rect.new(item.geometry.x, item.geometry.y,
+	            item.geometry = Qt5::Rect.new(item.geometry.x, item.geometry.y,
 	                                    item.sizeHint.width, centerHeight)
 	
 	            eastWidth += item.geometry.width + spacing()
 	
-	            item.geometry = Qt::Rect.new(
+	            item.geometry = Qt5::Rect.new(
 	                              rect.x + rect.width - eastWidth + spacing,
 	                              northHeight, item.geometry.width,
 	                              item.geometry.height)
@@ -141,7 +141,7 @@ class BorderLayout < Qt::Layout
 	    end
 	
 	    if !center.nil?
-	        center.item.geometry = Qt::Rect.new(westWidth, northHeight,
+	        center.item.geometry = Qt5::Rect.new(westWidth, northHeight,
 	                                        rect.width - eastWidth - westWidth,
 	                                        centerHeight)
 		end
@@ -164,7 +164,7 @@ class BorderLayout < Qt::Layout
 	end
 	
 	def calculateSize(sizeType)
-	    totalSize = Qt::Size.new
+	    totalSize = Qt5::Size.new
 	
 		(0...@list.length).each do |i|
 	        wrapper = @list[i]

@@ -24,28 +24,28 @@
 =end
 	
 	
-class Receiver < Qt::Dialog
+class Receiver < Qt5::Dialog
 		
 	slots :processPendingDatagrams
 
 	def initialize(parent = nil)
 	    super(parent)
-	    @statusLabel = Qt::Label.new(tr("Listening for broadcasted messages"))
-	    @quitButton = Qt::PushButton.new(tr("&Quit"))
+	    @statusLabel = Qt5::Label.new(tr("Listening for broadcasted messages"))
+	    @quitButton = Qt5::PushButton.new(tr("&Quit"))
 	
-	    @udpSocket = Qt::UdpSocket.new(self)
+	    @udpSocket = Qt5::UdpSocket.new(self)
 	    @udpSocket.bind(45454)
 	
 	    connect(@udpSocket, SIGNAL(:readyRead),
 	            self, SLOT(:processPendingDatagrams))
 	    connect(@quitButton, SIGNAL(:clicked), self, SLOT(:close))
 	
-	    buttonLayout = Qt::HBoxLayout.new do |b|
+	    buttonLayout = Qt5::HBoxLayout.new do |b|
 	    	b.addStretch(1)
 	   		b.addWidget(@quitButton)
 		end
 	
-	    self.layout = Qt::VBoxLayout.new do |m|
+	    self.layout = Qt5::VBoxLayout.new do |m|
 	    	m.addWidget(@statusLabel)
 	    	m.addLayout(buttonLayout)
 	    end
@@ -56,7 +56,7 @@ class Receiver < Qt::Dialog
 	def processPendingDatagrams()
 	    while @udpSocket.hasPendingDatagrams do
                 # readDatagram does not work since it will fill in a copy of the
-                # string received from for example a Qt::ByteArray.data
+                # string received from for example a Qt5::ByteArray.data
 	        datagram = @udpSocket.receiveDatagram
 	        @statusLabel.text = tr('Received datagram: "%s"' % datagram.data.data)
 	    end

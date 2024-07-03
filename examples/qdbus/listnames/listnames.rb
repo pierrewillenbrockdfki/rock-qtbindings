@@ -29,7 +29,7 @@ require 'Qt5'
 def method1()
     qDebug("Method 1:")
     
-    reply = Qt::DBusConnection.sessionBus.interface.registeredServiceNames
+    reply = Qt5::DBusConnection.sessionBus.interface.registeredServiceNames
     if !reply.valid?
             qDebug("Error:" + reply.error.message)
             exit 1
@@ -40,8 +40,8 @@ end
 def method2()
     qDebug("Method 2:")
     
-    bus = Qt::DBusConnection.sessionBus
-    dbus_iface = Qt::DBusInterface.new("org.freedesktop.DBus", "/org/freedesktop/DBus", 
+    bus = Qt5::DBusConnection.sessionBus
+    dbus_iface = Qt5::DBusInterface.new("org.freedesktop.DBus", "/org/freedesktop/DBus", 
                                        "org.freedesktop.DBus", bus)
         
     qDebug(dbus_iface.call("ListNames").arguments[0].value.inspect)
@@ -49,12 +49,12 @@ end
     
 def method3()
     qDebug("Method 3:")
-    qDebug(Qt::DBusConnection.sessionBus.interface.registeredServiceNames.value.inspect)
+    qDebug(Qt5::DBusConnection.sessionBus.interface.registeredServiceNames.value.inspect)
 end
     
-app = Qt::CoreApplication.new(ARGV)
+app = Qt5::CoreApplication.new(ARGV)
     
-if !Qt::DBusConnection.sessionBus.connected?
+if !Qt5::DBusConnection.sessionBus.connected?
     $stderr.puts("Cannot connect to the D-BUS session bus.\n" \
                     "To start it, run:\n" \
                     "\teval `dbus-launch --auto-syntax`\n")

@@ -25,7 +25,7 @@
 
 require './treeitem.rb'
 
-class TreeModel < Qt::AbstractItemModel
+class TreeModel < Qt5::AbstractItemModel
 	
 	def initialize(data, parent = nil)
 	    super(parent)
@@ -45,11 +45,11 @@ class TreeModel < Qt::AbstractItemModel
 	
 	def data(index, role)
 	    if !index.valid?
-	        return Qt::Variant.new
+	        return Qt5::Variant.new
 		end
 	
-	    if role != Qt::DisplayRole
-	        return Qt::Variant.new
+	    if role != Qt5::DisplayRole
+	        return Qt5::Variant.new
 		end
 	
 	    item = index.internalPointer
@@ -58,18 +58,18 @@ class TreeModel < Qt::AbstractItemModel
 	
 	def flags(index)
 	    if !index.valid?
-	        return Qt::ItemIsEnabled
+	        return Qt5::ItemIsEnabled
 		end
 	
-	    return Qt::ItemIsEnabled | Qt::ItemIsSelectable
+	    return Qt5::ItemIsEnabled | Qt5::ItemIsSelectable
 	end
 	
 	def headerData(section, orientation, role)
-	    if orientation == Qt::Horizontal && role == Qt::DisplayRole
-	        return Qt::Variant.new(@rootItem.data(section))
+	    if orientation == Qt5::Horizontal && role == Qt5::DisplayRole
+	        return Qt5::Variant.new(@rootItem.data(section))
 		end
 	
-	    return Qt::Variant.new
+	    return Qt5::Variant.new
 	end
 	
 	def index(row, column, parent)
@@ -83,20 +83,20 @@ class TreeModel < Qt::AbstractItemModel
 	    if ! @childItem.nil?
 	        return createIndex(row, column, @childItem)
 	    else
-	        return Qt::ModelIndex.new
+	        return Qt5::ModelIndex.new
 		end
 	end
 	
 	def parent(index)
 	    if !index.valid?
-	        return Qt::ModelIndex.new
+	        return Qt5::ModelIndex.new
 		end
 	
 	    childItem = index.internalPointer
 	    parentItem = childItem.parent
 	
 	    if parentItem == @rootItem
-	        return Qt::ModelIndex.new
+	        return Qt5::ModelIndex.new
 		end
 	
 	    return createIndex(parentItem.row, 0, parentItem)

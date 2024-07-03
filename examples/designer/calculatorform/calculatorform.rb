@@ -25,7 +25,7 @@
 	
 require './ui_calculatorform.rb'	
 	
-class CalculatorForm < Qt::Widget
+class CalculatorForm < Qt5::Widget
 	
 	slots	'on_inputSpinBox1_valueChanged(int)',
     		'on_inputSpinBox2_valueChanged(int)'

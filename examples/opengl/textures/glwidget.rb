@@ -25,14 +25,14 @@
 	
 require 'opengl'
 	
-class GLWidget < Qt::GLWidget
+class GLWidget < Qt5::GLWidget
 	
 	signals	'clicked()'
 	
 	def initialize(parent, shareWidget)
 	    super(parent, shareWidget)
-	    @clearColor = Qt::Color.new(Qt::black)
-		@lastPos = Qt::Point.new
+	    @clearColor = Qt5::Color.new(Qt5::black)
+		@lastPos = Qt5::Point.new
 	    @xRot = 0
 	    @yRot = 0
 	    @zRot = 0
@@ -50,11 +50,11 @@ class GLWidget < Qt::GLWidget
 	end
 	
 	def minimumSizeHint()
-	    return Qt::Size.new(50, 50)
+	    return Qt5::Size.new(50, 50)
 	end
 	
 	def sizeHint()
-	    return Qt::Size.new(200, 200)
+	    return Qt5::Size.new(200, 200)
 	end
 	
 	def rotateBy(xAngle, yAngle, zAngle)
@@ -109,9 +109,9 @@ class GLWidget < Qt::GLWidget
 	    dx = event.x - @lastPos.x
 	    dy = event.y - @lastPos.y
 	
-	    if event.buttons & Qt::LeftButton.to_i != 0
+	    if event.buttons & Qt5::LeftButton.to_i != 0
 	        rotateBy(8 * dy, 8 * dx, 0)
-	    elsif event.buttons & Qt::RightButton.to_i != 0
+	    elsif event.buttons & Qt5::RightButton.to_i != 0
 	        rotateBy(8 * dy, 0, 8 * dx)
 	    end
 	    @lastPos = event.pos()
@@ -134,7 +134,7 @@ class GLWidget < Qt::GLWidget
 	    GL.NewList(list, GL::COMPILE)
 	
 		(0...6).each do |i|
-	        bindTexture(Qt::Pixmap.new("images/side%d.png" % (i + 1)))
+	        bindTexture(Qt5::Pixmap.new("images/side%d.png" % (i + 1)))
 	
 	        GL.Begin(GL::QUADS)
 			(0...4).each do |j|

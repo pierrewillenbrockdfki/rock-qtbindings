@@ -1,13 +1,13 @@
 require 'Qt5'
 
-class CannonField < Qt::Widget
+class CannonField < Qt5::Widget
   signals 'angleChanged(int)'
   slots 'setAngle(int)'
 
   def initialize(parent = nil)
     super
     @currentAngle = 45
-    setPalette(Qt::Palette.new(Qt::Color.new(250, 250, 200)))
+    setPalette(Qt5::Palette.new(Qt5::Color.new(250, 250, 200)))
     setAutoFillBackground(true)
   end
 
@@ -26,12 +26,12 @@ class CannonField < Qt::Widget
   end
 
   def paintEvent(event)
-    p = Qt::Painter.new(self)
+    p = Qt5::Painter.new(self)
     p.drawText(200, 200, "Angle = %d" % @currentAngle)
     p.end()
   end
 
   def sizePolicy()
-    return Qt::SizePolicy.new(Qt::SizePolicy::Expanding, Qt::SizePolicy::Expanding)
+    return Qt5::SizePolicy.new(Qt5::SizePolicy::Expanding, Qt5::SizePolicy::Expanding)
   end
 end

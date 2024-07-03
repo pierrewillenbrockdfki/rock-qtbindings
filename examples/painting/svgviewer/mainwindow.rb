@@ -25,7 +25,7 @@
     
 require './svgwindow.rb'
     
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
         
     slots 'openFile()',
           'renderer=(QAction*)'
@@ -34,15 +34,15 @@ class MainWindow < Qt::MainWindow
         super()
         @area = SvgWindow.new
     
-        fileMenu = Qt::Menu.new(tr("&File"), self)
+        fileMenu = Qt5::Menu.new(tr("&File"), self)
         openAction = fileMenu.addAction(tr("&Open..."))
-        openAction.shortcut = Qt::KeySequence.new( Qt::KeySequence.new(tr("Ctrl+O")))
+        openAction.shortcut = Qt5::KeySequence.new( Qt5::KeySequence.new(tr("Ctrl+O")))
         quitAction = fileMenu.addAction(tr("E&xit"))
-        quitAction.shortcut = Qt::KeySequence.new( Qt::KeySequence.new(tr("Ctrl+Q")))
+        quitAction.shortcut = Qt5::KeySequence.new( Qt5::KeySequence.new(tr("Ctrl+Q")))
     
         menuBar().addMenu(fileMenu)
     
-        rendererMenu = Qt::Menu.new(tr("&Renderer"), self)
+        rendererMenu = Qt5::Menu.new(tr("&Renderer"), self)
         @nativeAction = rendererMenu.addAction(tr("&Native"))
         @nativeAction.checkable = true
         @nativeAction.checked = true
@@ -54,7 +54,7 @@ class MainWindow < Qt::MainWindow
         @imageAction.checkable = true
         @imageAction.objectName = "imageAction"
     
-        rendererGroup = Qt::ActionGroup.new(self)
+        rendererGroup = Qt5::ActionGroup.new(self)
         rendererGroup.addAction(@nativeAction)
         rendererGroup.addAction(@glAction)
         rendererGroup.addAction(@imageAction)
@@ -72,7 +72,7 @@ class MainWindow < Qt::MainWindow
     
     def openFile(path = nil)
         if path.nil?
-            fileName = Qt::FileDialog.getOpenFileName(self, tr("Open SVG File"),
+            fileName = Qt5::FileDialog.getOpenFileName(self, tr("Open SVG File"),
                                                     @currentPath, "*.svg")
         else
             fileName = path

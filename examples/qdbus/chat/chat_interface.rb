@@ -1,4 +1,4 @@
-class ComTrolltechChatInterface < Qt::DBusAbstractInterface
+class ComTrolltechChatInterface < Qt5::DBusAbstractInterface
     signals 'void action(const QString&, const QString&)',
             'void message(const QString&, const QString&)'
 

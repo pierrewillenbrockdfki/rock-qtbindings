@@ -29,7 +29,7 @@ class XbelGenerator
 	
 	def initialize(treeWidget)
 	    @treeWidget = treeWidget
-		@outf = Qt::TextStream.new
+		@outf = Qt5::TextStream.new
 	end
 	
 	def write(device)
@@ -66,7 +66,7 @@ class XbelGenerator
 	end
 	
 	def generateItem(item, depth)
-	    tagName = item.data(0, Qt::UserRole).toString()
+	    tagName = item.data(0, Qt5::UserRole).toString()
 	    if tagName == "folder"
 	        folded = !@treeWidget.isItemExpanded(item)
 	        @outf << indent(depth) << "<folder folded=\"" << (folded ? "yes" : "no") <<

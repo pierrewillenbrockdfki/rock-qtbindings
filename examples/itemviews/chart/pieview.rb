@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
     
-class PieView < Qt::AbstractItemView
+class PieView < Qt5::AbstractItemView
     
     slots 'dataChanged(const QModelIndex &, const QModelIndex &)',
             'rowsInserted(const QModelIndex &, int, int)',
@@ -72,7 +72,7 @@ class PieView < Qt::AbstractItemView
     
     def indexAt(point)
         if @validItems == 0
-            return Qt::ModelIndex.new
+            return Qt5::ModelIndex.new
         end
     
         # Transform the view coordinates into contents widget coordinates.
@@ -87,7 +87,7 @@ class PieView < Qt::AbstractItemView
             d = ((cx ** 2) + (cy ** 2)) ** 0.5
     
             if d == 0 || d > @pieSize/2
-                return Qt::ModelIndex.new
+                return Qt5::ModelIndex.new
             end
     
             # Determine the angle of the point.
@@ -115,7 +115,7 @@ class PieView < Qt::AbstractItemView
                 end
             end
         else
-            itemHeight = Qt::FontMetrics.new(viewOptions().font).height()
+            itemHeight = Qt5::FontMetrics.new(viewOptions().font).height()
             listItem = ((wy - @margin) / itemHeight).to_i
             validRow = 0
     
@@ -134,7 +134,7 @@ class PieView < Qt::AbstractItemView
             end
         end
     
-        return Qt::ModelIndex.new
+        return Qt5::ModelIndex.new
     end
     
     def isIndexHidden(index)
@@ -146,12 +146,12 @@ class PieView < Qt::AbstractItemView
     
     def itemRect(index)
         if !index.isValid()
-            return Qt::Rect.new
+            return Qt5::Rect.new
         end
     
         # Check whether the index's row is in the list of rows represented
         # by slices.
-        valueIndex = Qt::ModelIndex.new
+        valueIndex = Qt5::ModelIndex.new
     
         if index.column() != 1
             valueIndex = model().index(index.row(), 1, rootIndex())
@@ -170,9 +170,9 @@ class PieView < Qt::AbstractItemView
     
             case index.column
             when 0
-                itemHeight = Qt::FontMetrics.new(viewOptions().font).height()
+                itemHeight = Qt5::FontMetrics.new(viewOptions().font).height()
     
-                return Qt::Rect.new(@totalSize,
+                return Qt5::Rect.new(@totalSize,
                              (@margin + listItem*itemHeight).to_i,
                              @totalSize - @margin, itemHeight.to_i)
             when 1
@@ -180,20 +180,20 @@ class PieView < Qt::AbstractItemView
             end
     
         end
-        return Qt::Rect.new
+        return Qt5::Rect.new
     end
     
     def itemRegion(index)
         if !index.isValid()
-            return Qt::Region.new
+            return Qt5::Region.new
         end
     
         if index.column() != 1
-            return Qt::Region.new(itemRect(index))
+            return Qt5::Region.new(itemRect(index))
         end
     
         if model().data(index).to_f <= 0.0
-            return Qt::Region.new
+            return Qt5::Region.new
         end
     
         startAngle = 0.0
@@ -206,20 +206,20 @@ class PieView < Qt::AbstractItemView
                 angle = 360*value/@totalValue
     
                 if sliceIndex == index
-                    slicePath = Qt::PainterPath.new
+                    slicePath = Qt5::PainterPath.new
                     slicePath.moveTo(@totalSize/2, @totalSize/2)
                     slicePath.arcTo(@margin, @margin, @margin+@pieSize, @margin+@pieSize,
                                     startAngle, angle)
                     slicePath.closeSubpath()
     
-                    return Qt::Region.new(slicePath.toFillPolygon().toPolygon())
+                    return Qt5::Region.new(slicePath.toFillPolygon().toPolygon())
                 end
     
                 startAngle += angle
             end
         end
     
-        return Qt::Region.new
+        return Qt5::Region.new
     end
     
     def horizontalOffset()
@@ -228,7 +228,7 @@ class PieView < Qt::AbstractItemView
     
     def mouseReleaseEvent(event)
         super(event)
-        @selectionRect = Qt::Rect.new
+        @selectionRect = Qt5::Rect.new
         viewport().update()
     end
     
@@ -263,19 +263,19 @@ class PieView < Qt::AbstractItemView
         state = option.state
  
         background = option.palette.base()
-        foreground = Qt::Pen.new(option.palette.color(Qt::Palette::Foreground))
-        textPen = Qt::Pen.new(option.palette.color(Qt::Palette::Text))
-        highlightedPen = Qt::Pen.new(option.palette.color(Qt::Palette::HighlightedText))
+        foreground = Qt5::Pen.new(option.palette.color(Qt5::Palette::Foreground))
+        textPen = Qt5::Pen.new(option.palette.color(Qt5::Palette::Text))
+        highlightedPen = Qt5::Pen.new(option.palette.color(Qt5::Palette::HighlightedText))
     
-        painter = Qt::Painter.new(viewport())
-        painter.renderHint = Qt::Painter::Antialiasing
+        painter = Qt5::Painter.new(viewport())
+        painter.renderHint = Qt5::Painter::Antialiasing
     
         painter.fillRect(event.rect(), background)
         painter.pen = foreground
     
         # Viewport rectangles
-        pieRect = Qt::Rect.new(@margin, @margin, @pieSize, @pieSize)
-        keyPoint = Qt::Point.new(@totalSize - horizontalScrollBar().value(),
+        pieRect = Qt5::Rect.new(@margin, @margin, @pieSize, @pieSize)
+        keyPoint = Qt5::Point.new(@totalSize - horizontalScrollBar().value(),
                                  @margin - verticalScrollBar().value())
     
         if @validItems > 0
@@ -293,15 +293,15 @@ class PieView < Qt::AbstractItemView
                     angle = 360*value/@totalValue
     
                     colorIndex = model().index(row, 0, rootIndex())
-                    color = Qt::Color.new(model().data(colorIndex,
-                                    Qt::DecorationRole).toString)
+                    color = Qt5::Color.new(model().data(colorIndex,
+                                    Qt5::DecorationRole).toString)
     
                     if currentIndex() == index
-                        painter.brush = Qt::Brush.new(color, Qt::Dense4Pattern)
+                        painter.brush = Qt5::Brush.new(color, Qt5::Dense4Pattern)
                     elsif selections.isSelected(index)
-                        painter.brush = Qt::Brush.new(color, Qt::Dense3Pattern)
+                        painter.brush = Qt5::Brush.new(color, Qt5::Dense3Pattern)
                     else
-                        painter.brush = Qt::Brush.new(color)
+                        painter.brush = Qt5::Brush.new(color)
                     end
     
                     painter.drawPie(0, 0, @pieSize, @pieSize, (startAngle*16).to_i,
@@ -325,10 +325,10 @@ class PieView < Qt::AbstractItemView
                     option = viewOptions()
                     option.rect = visualRect(labelIndex)
                     if selections.isSelected(labelIndex)
-                        option.state |= Qt::Style::State_Selected.to_i
+                        option.state |= Qt5::Style::State_Selected.to_i
                     end
                     if currentIndex() == labelIndex
-                        option.state |= Qt::Style::State_HasFocus.to_i
+                        option.state |= Qt5::Style::State_HasFocus.to_i
                     end
                     itemDelegate().paint(painter, option, labelIndex)
     
@@ -338,11 +338,11 @@ class PieView < Qt::AbstractItemView
         end
     
         if !@selectionRect.nil?
-            band = Qt::StyleOptionRubberBand.new
-            band.shape = Qt::RubberBand::Rectangle
+            band = Qt5::StyleOptionRubberBand.new
+            band.shape = Qt5::RubberBand::Rectangle
             band.rect = @selectionRect
             painter.save()
-            style().drawControl(Qt::Style::CE_RubberBand, band, painter)
+            style().drawControl(Qt5::Style::CE_RubberBand, band, painter)
             painter.restore()
         end
 
@@ -429,7 +429,7 @@ class PieView < Qt::AbstractItemView
             for column in 0...columns do
                 index = model.index(row, column, rootIndex)
                 region = itemRegion(index)
-                if !region.intersect(Qt::Region.new(contentsRect)).empty?
+                if !region.intersect(Qt5::Region.new(contentsRect)).empty?
                     indexes.push(index)
                 end
             end
@@ -448,13 +448,13 @@ class PieView < Qt::AbstractItemView
                 lastColumn = [lastColumn, indexes[i].column].max
             end
     
-             selection = Qt::ItemSelection.new(
+             selection = Qt5::ItemSelection.new(
                 model.index(firstRow, firstColumn, rootIndex()),
                 model.index(lastRow, lastColumn, rootIndex()))
             selectionModel.select(selection, command)
         else
-            noIndex = Qt::ModelIndex.new
-            selection = Qt::ItemSelection.new(noIndex, noIndex)
+            noIndex = Qt5::ModelIndex.new
+            selection = Qt5::ItemSelection.new(noIndex, noIndex)
             selectionModel.select(selection, command)
         end
     
@@ -477,7 +477,7 @@ class PieView < Qt::AbstractItemView
     def visualRect(index)
         rect = itemRect(index)
         if rect.valid?
-            return Qt::Rect.new(rect.left - horizontalScrollBar.value,
+            return Qt5::Rect.new(rect.left - horizontalScrollBar.value,
                          rect.top - verticalScrollBar.value,
                          rect.width, rect.height)
         else
@@ -491,7 +491,7 @@ class PieView < Qt::AbstractItemView
         ranges = selection.length
 
         if ranges == 0
-            return Qt::Region.new(Qt::Rect.new)
+            return Qt5::Region.new(Qt5::Rect.new)
         end
     
         # Note that we use the top and bottom functions of the selection range
@@ -511,6 +511,6 @@ class PieView < Qt::AbstractItemView
         firstRect = visualRect(firstItem)
         lastRect = visualRect(lastItem)
     
-        return Qt::Region.new(firstRect.united(lastRect))
+        return Qt5::Region.new(firstRect.united(lastRect))
     end
 end

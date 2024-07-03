@@ -23,27 +23,27 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class DragLabel < Qt::Label
+class DragLabel < Qt5::Label
 	
 	def initialize(text, parent = nil)
 	    super(text, parent)
-	    setFrameShape(Qt::Frame::Panel)
-	    setFrameShadow(Qt::Frame::Raised)
+	    setFrameShape(Qt5::Frame::Panel)
+	    setFrameShadow(Qt5::Frame::Raised)
 	end
 	
 	def mousePressEvent(event)
 	    plainText = text(); # for quoting purposes
 	
-	    mimeData = Qt::MimeData.new
+	    mimeData = Qt5::MimeData.new
 	    mimeData.text = plainText
 	
-	    drag = Qt::Drag.new(self)
+	    drag = Qt5::Drag.new(self)
 	    drag.mimeData = mimeData
 	    drag.hotSpot = event.pos - rect.topLeft
 	
-	    dropAction = drag.start(Qt::CopyAction | Qt::MoveAction)
+	    dropAction = drag.start(Qt5::CopyAction | Qt5::MoveAction)
 	    
-	    if dropAction == Qt::MoveAction
+	    if dropAction == Qt5::MoveAction
 	        close()
 	        update()
 	    end

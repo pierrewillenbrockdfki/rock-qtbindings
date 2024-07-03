@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class PiecesModel < Qt::AbstractListModel
+class PiecesModel < Qt5::AbstractListModel
     
 	RAND_MAX = 2147483647
 	
@@ -35,29 +35,29 @@ class PiecesModel < Qt::AbstractListModel
 	
 	def data(index, role)
 	    if !index.valid?
-	        return Qt::Variant.new
+	        return Qt5::Variant.new
 		end
 	
-	    if role == Qt::DecorationRole
-	        return qVariantFromValue(Qt::Icon.new(@pixmaps[index.row].scaled(60, 60,
-	                         Qt::KeepAspectRatio, Qt::SmoothTransformation)))
-	    elsif role == Qt::UserRole
+	    if role == Qt5::DecorationRole
+	        return qVariantFromValue(Qt5::Icon.new(@pixmaps[index.row].scaled(60, 60,
+	                         Qt5::KeepAspectRatio, Qt5::SmoothTransformation)))
+	    elsif role == Qt5::UserRole
 	        return qVariantFromValue(@pixmaps[index.row])
-	    elsif role == Qt::UserRole + 1
+	    elsif role == Qt5::UserRole + 1
 	        return qVariantFromValue(@locations[index.row])
 		end
 	
-	    return Qt::Variant.new
+	    return Qt5::Variant.new
 	end
 	
 	def addPiece(pixmap, location)
 	    if (2.0*rand(RAND_MAX)/(RAND_MAX+1.0)).to_i == 1
-	        beginInsertRows(Qt::ModelIndex.new, 0, 0)
+	        beginInsertRows(Qt5::ModelIndex.new, 0, 0)
 	        @pixmaps.unshift(pixmap)
 	        @locations.unshift(location)
 	        endInsertRows()
 	    else
-	        beginInsertRows(Qt::ModelIndex.new, @pixmaps.size, @pixmaps.size)
+	        beginInsertRows(Qt5::ModelIndex.new, @pixmaps.size, @pixmaps.size)
 	        @pixmaps.push(pixmap)
 	        @locations.push(location)
 	        endInsertRows()
@@ -67,11 +67,11 @@ class PiecesModel < Qt::AbstractListModel
 	
 	def flags(index)
 	    if index.valid?
-	        return (Qt::ItemIsEnabled | Qt::ItemIsSelectable |
-	                Qt::ItemIsDragEnabled | Qt::ItemIsSelectable | Qt::ItemIsDropEnabled)
+	        return (Qt5::ItemIsEnabled | Qt5::ItemIsSelectable |
+	                Qt5::ItemIsDragEnabled | Qt5::ItemIsSelectable | Qt5::ItemIsDropEnabled)
 	    end
 	
-	    return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled
+	    return Qt5::ItemIsEnabled | Qt5::ItemIsDropEnabled
 	end
 	
 	def removeRows(row, count, parent)
@@ -105,15 +105,15 @@ class PiecesModel < Qt::AbstractListModel
 	end
 	
 	def mimeData(indexes)
-	    mimeData = Qt::MimeData.new
-	    encodedData = Qt::ByteArray.new
+	    mimeData = Qt5::MimeData.new
+	    encodedData = Qt5::ByteArray.new
 	
-	    stream = Qt::DataStream.new(encodedData, Qt::IODevice::WriteOnly)
+	    stream = Qt5::DataStream.new(encodedData, Qt5::IODevice::WriteOnly)
 	
 	    indexes.each do |index|
 	        if index.valid?
-	            pixmap = qVariantValue(Qt::Pixmap, data(index, Qt::UserRole))
-	            location = data(index, Qt::UserRole+1).toPoint
+	            pixmap = qVariantValue(Qt5::Pixmap, data(index, Qt5::UserRole))
+	            location = data(index, Qt5::UserRole+1).toPoint
 	            stream << pixmap << location
 	        end
 	    end
@@ -127,7 +127,7 @@ class PiecesModel < Qt::AbstractListModel
 	        return false
 		end
 	
-	    if action == Qt::IgnoreAction
+	    if action == Qt5::IgnoreAction
 	        return true
 		end
 	
@@ -144,14 +144,14 @@ class PiecesModel < Qt::AbstractListModel
 		end
 	
 	    encodedData = data.data("image/x-puzzle-piece")
-	    stream = Qt::DataStream.new(encodedData, Qt::IODevice::ReadOnly)
+	    stream = Qt5::DataStream.new(encodedData, Qt5::IODevice::ReadOnly)
 	
 	    while !stream.atEnd
-	        pixmap = Qt::Pixmap.new
-	        location = Qt::Point.new
+	        pixmap = Qt5::Pixmap.new
+	        location = Qt5::Point.new
 	        stream >> pixmap >> location
 	
-	        beginInsertRows(Qt::ModelIndex.new, endRow, endRow)
+	        beginInsertRows(Qt5::ModelIndex.new, endRow, endRow)
 	        @pixmaps.insert(endRow, pixmap)
 	        @locations.insert(endRow, location)
 	        endInsertRows()
@@ -171,6 +171,6 @@ class PiecesModel < Qt::AbstractListModel
 	end
 	
 	def supportedDropActions
-	    return Qt::CopyAction | Qt::MoveAction
+	    return Qt5::CopyAction | Qt5::MoveAction
 	end
 end

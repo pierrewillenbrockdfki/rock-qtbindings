@@ -23,23 +23,23 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class ScribbleArea < Qt::Widget
+class ScribbleArea < Qt5::Widget
 
 	slots 'clearImage()'
 
 	def initialize(parent = nil)
 		super(parent)
-		setAttribute(Qt::WA_StaticContents)
+		setAttribute(Qt5::WA_StaticContents)
 		@modified = false
 		@scribbling = false
 		@myPenWidth = 1
-		@myPenColor = Qt::blue
-		@image = Qt::Image.new
-		@lastPoint = Qt::Point.new
+		@myPenColor = Qt5::blue
+		@image = Qt5::Image.new
+		@lastPoint = Qt5::Point.new
 	end
 
 	def openImage(fileName)
-		loadedImage = Qt::Image.new
+		loadedImage = Qt5::Image.new
 		if !loadedImage.load(fileName)
 			return false
 		end
@@ -85,34 +85,34 @@ class ScribbleArea < Qt::Widget
 	end
 
 	def clearImage()
-		@image.fill(Qt::Color.new(255,255,255)) #qRgb(255, 255, 255))
+		@image.fill(Qt5::Color.new(255,255,255)) #qRgb(255, 255, 255))
 		@modified = true
 		update()
 	end
 
 	def mousePressEvent(event)
-		if event.button() == Qt::LeftButton
+		if event.button() == Qt5::LeftButton
 			@lastPoint = event.pos()
 			@scribbling = true
 		end
 	end
 
 	def mouseMoveEvent(event)
-		if (Qt::LeftButton & event.buttons() != 0) && @scribbling
+		if (Qt5::LeftButton & event.buttons() != 0) && @scribbling
 			drawLineTo(event.pos())
 		end
 	end
 
 	def mouseReleaseEvent(event)
-		if event.button() == Qt::LeftButton && @scribbling
+		if event.button() == Qt5::LeftButton && @scribbling
 			drawLineTo(event.pos())
 			@scribbling = false
 		end
 	end
 
 	def paintEvent(event)
-		painter = Qt::Painter.new(self)
-		painter.drawImage(Qt::Point.new(0, 0), @image)
+		painter = Qt5::Painter.new(self)
+		painter.drawImage(Qt5::Point.new(0, 0), @image)
 		painter.end
 	end
 
@@ -120,21 +120,21 @@ class ScribbleArea < Qt::Widget
 		if width() > @image.width() || height() > @image.height()
 			newWidth = [width() + 128, @image.width()].max
 			newHeight = [height() + 128, @image.height()].max
-			resizeImage(@image, Qt::Size.new(newWidth, newHeight))
+			resizeImage(@image, Qt5::Size.new(newWidth, newHeight))
 			update()
 		end
 		super(event)
 	end
 
 	def drawLineTo(endPoint)
-		painter = Qt::Painter.new(@image)
-		painter.pen = Qt::Pen.new(Qt::Brush.new(@myPenColor), @myPenWidth, Qt::SolidLine, Qt::RoundCap,
-							Qt::RoundJoin)
+		painter = Qt5::Painter.new(@image)
+		painter.pen = Qt5::Pen.new(Qt5::Brush.new(@myPenColor), @myPenWidth, Qt5::SolidLine, Qt5::RoundCap,
+							Qt5::RoundJoin)
 		painter.drawLine(@lastPoint, endPoint)
 		@modified = true
 
 		rad = @myPenWidth / 2
-		update(Qt::Rect.new(@lastPoint, endPoint).normalized().adjusted(-rad, -rad, +rad, +rad))
+		update(Qt5::Rect.new(@lastPoint, endPoint).normalized().adjusted(-rad, -rad, +rad, +rad))
 		@lastPoint = endPoint
 		painter.end
 	end
@@ -144,10 +144,10 @@ class ScribbleArea < Qt::Widget
 			return
 		end
 
-		newImage = Qt::Image.new(newSize, Qt::Image::Format_RGB32)
-		newImage.fill(Qt::Color.new(255,255,255)) #qRgb(255, 255, 255))
-		painter = Qt::Painter.new(newImage)
-		painter.drawImage(Qt::Point.new(0, 0), image)
+		newImage = Qt5::Image.new(newSize, Qt5::Image::Format_RGB32)
+		newImage.fill(Qt5::Color.new(255,255,255)) #qRgb(255, 255, 255))
+		painter = Qt5::Painter.new(newImage)
+		painter.drawImage(Qt5::Point.new(0, 0), image)
 		@image = newImage
 		painter.end
 	end

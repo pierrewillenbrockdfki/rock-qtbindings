@@ -28,9 +28,9 @@ require './qrc_robot.rb'
 require './coloritem.rb'
 require './robot.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 
-scene = Qt::GraphicsScene.new(-200, -200, 400, 400)
+scene = Qt5::GraphicsScene.new(-200, -200, 400, 400)
 
 for i in 0...10 do
     item = ColorItem.new
@@ -40,17 +40,17 @@ for i in 0...10 do
     scene.addItem(item)
 end
 
-view = Qt::GraphicsView.new(scene)
+view = Qt5::GraphicsView.new(scene)
 
 # Pass the view to the Robot and make it the parent of the
-# Qt::GraphicsItemAnimations, to prevent them being GC'd
+# Qt5::GraphicsItemAnimations, to prevent them being GC'd
 robot = Robot.new(view)
-robot.setTransform(Qt::Transform.fromScale(1.2, 1.2), true);
+robot.setTransform(Qt5::Transform.fromScale(1.2, 1.2), true);
 robot.setPos(0, -20)
 scene.addItem(robot)
 
-view.renderHint = Qt::Painter::Antialiasing
-view.backgroundBrush = Qt::Brush.new(Qt::Color.new(230, 200, 167))
+view.renderHint = Qt5::Painter::Antialiasing
+view.backgroundBrush = Qt5::Brush.new(Qt5::Color.new(230, 200, 167))
 view.windowTitle = "Drag and Drop Robot"
 view.show
 

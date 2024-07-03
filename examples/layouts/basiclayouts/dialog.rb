@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class Dialog < Qt::Dialog
+class Dialog < Qt5::Dialog
 	
 	NumGridRows = 3 
 	NumButtons = 4
@@ -38,24 +38,24 @@ class Dialog < Qt::Dialog
 	    createHorizontalGroupBox()
 	    createGridGroupBox()
 	
-	    @bigEditor = Qt::TextEdit.new
+	    @bigEditor = Qt5::TextEdit.new
 	    @bigEditor.setPlainText(tr("This widget takes up all the remaining space " +
 	                               "in the top-level layout."))
 	
-	    @okButton = Qt::PushButton.new(tr("OK"))
-	    @cancelButton = Qt::PushButton.new(tr("Cancel"))
+	    @okButton = Qt5::PushButton.new(tr("OK"))
+	    @cancelButton = Qt5::PushButton.new(tr("Cancel"))
 	    @okButton.default = true
 	
 	    connect(@okButton, SIGNAL('clicked()'), self, SLOT('accept()'))
 	    connect(@cancelButton, SIGNAL('clicked()'), self, SLOT('reject()'))
 	
-	    buttonLayout = Qt::HBoxLayout.new do |b|
+	    buttonLayout = Qt5::HBoxLayout.new do |b|
 			b.addStretch(1)
 			b.addWidget(@okButton)
 			b.addWidget(@cancelButton)
 		end
 	
-	    self.layout = Qt::VBoxLayout.new do |m|
+	    self.layout = Qt5::VBoxLayout.new do |m|
 			m.menuBar = @menuBar
 			m.addWidget(@horizontalGroupBox)
 			m.addWidget(@gridGroupBox)
@@ -67,9 +67,9 @@ class Dialog < Qt::Dialog
 	end
 	
 	def createMenu()
-	    @menuBar = Qt::MenuBar.new
+	    @menuBar = Qt5::MenuBar.new
 	
-	    @fileMenu = Qt::Menu.new(tr("&File"), self)
+	    @fileMenu = Qt5::Menu.new(tr("&File"), self)
 	    @exitAction = @fileMenu.addAction(tr("E&xit"))
 	    @menuBar.addMenu(@fileMenu)
 	
@@ -77,28 +77,28 @@ class Dialog < Qt::Dialog
 	end
 	
 	def createHorizontalGroupBox()
-	    @horizontalGroupBox = Qt::GroupBox.new(tr("Horizontal layout"))
-	    layout = Qt::HBoxLayout.new
+	    @horizontalGroupBox = Qt5::GroupBox.new(tr("Horizontal layout"))
+	    layout = Qt5::HBoxLayout.new
 	
 		(0...NumButtons).each do |i|
-	        @buttons[i] = Qt::PushButton.new(tr("Button %d" % (i + 1)))
+	        @buttons[i] = Qt5::PushButton.new(tr("Button %d" % (i + 1)))
 			layout.addWidget(@buttons[i])
 	    end
 	    @horizontalGroupBox.layout = layout
 	end
 	
 	def createGridGroupBox()
-	    @gridGroupBox = Qt::GroupBox.new(tr("Grid layout"))
-	    layout = Qt::GridLayout.new
+	    @gridGroupBox = Qt5::GroupBox.new(tr("Grid layout"))
+	    layout = Qt5::GridLayout.new
 	
 		(0...NumGridRows).each do |i|
-			@labels[i] = Qt::Label.new(tr("Line %d:" % (i + 1)))
-			@lineEdits[i] = Qt::LineEdit.new
+			@labels[i] = Qt5::Label.new(tr("Line %d:" % (i + 1)))
+			@lineEdits[i] = Qt5::LineEdit.new
 			layout.addWidget(@labels[i], i, 0)
 			layout.addWidget(@lineEdits[i], i, 1)
 	    end
 	
-	    @smallEditor = Qt::TextEdit.new
+	    @smallEditor = Qt5::TextEdit.new
 	    @smallEditor.setPlainText(tr("This widget takes up about two thirds of the " +
 	                                 "grid layout."))
 	    layout.addWidget(@smallEditor, 0, 2, 3, 1)

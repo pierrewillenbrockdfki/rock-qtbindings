@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
     
-class Window < Qt::Widget
+class Window < Qt5::Widget
 
     slots 'browse()', 'find()'
     
@@ -35,21 +35,21 @@ class Window < Qt::Widget
     
         @fileComboBox = createComboBox(tr("*"))
         @textComboBox = createComboBox()
-        @directoryComboBox = createComboBox(Qt::Dir.currentPath())
+        @directoryComboBox = createComboBox(Qt5::Dir.currentPath())
     
-        @fileLabel = Qt::Label.new(tr("Named:"))
-        @textLabel = Qt::Label.new(tr("Containing text:"))
-        @directoryLabel = Qt::Label.new(tr("In directory:"))
-        @filesFoundLabel = Qt::Label.new
+        @fileLabel = Qt5::Label.new(tr("Named:"))
+        @textLabel = Qt5::Label.new(tr("Containing text:"))
+        @directoryLabel = Qt5::Label.new(tr("In directory:"))
+        @filesFoundLabel = Qt5::Label.new
     
         createFilesTable()
     
-        buttonsLayout = Qt::HBoxLayout.new
+        buttonsLayout = Qt5::HBoxLayout.new
         buttonsLayout.addStretch()
         buttonsLayout.addWidget(@findButton)
         buttonsLayout.addWidget(@quitButton)
     
-        mainLayout = Qt::GridLayout.new
+        mainLayout = Qt5::GridLayout.new
         mainLayout.addWidget(@fileLabel, 0, 0)
         mainLayout.addWidget(@fileComboBox, 0, 1, 1, 2)
         mainLayout.addWidget(@textLabel, 1, 0)
@@ -67,8 +67,8 @@ class Window < Qt::Widget
     end
     
     def browse()
-        directory = Qt::FileDialog.getExistingDirectory(self,
-                                   tr("Find Files"), Qt::Dir.currentPath())
+        directory = Qt5::FileDialog.getExistingDirectory(self,
+                                   tr("Find Files"), Qt5::Dir.currentPath())
         @directoryComboBox.addItem(directory)
         @directoryComboBox.currentIndex += 1
     end
@@ -80,12 +80,12 @@ class Window < Qt::Widget
         text = @textComboBox.currentText()
         path = @directoryComboBox.currentText()
     
-        directory = Qt::Dir.new(path)
+        directory = Qt5::Dir.new(path)
         if fileName.empty?
             fileName = "*"
         end
         files = directory.entryList([fileName],
-                                    Qt::Dir::Files | Qt::Dir::NoSymLinks)
+                                    Qt5::Dir::Files | Qt5::Dir::NoSymLinks)
     
         if !text.empty?
             files = findFiles(directory, files, text)
@@ -94,7 +94,7 @@ class Window < Qt::Widget
     end
     
     def findFiles(directory, files, text)
-        progressDialog = Qt::ProgressDialog.new(self) do |p|
+        progressDialog = Qt5::ProgressDialog.new(self) do |p|
             p.cancelButtonText = tr("&Cancel")
             p.range = 0..files.length
             p.windowTitle = tr("Find Files")
@@ -110,10 +110,10 @@ class Window < Qt::Widget
                 break
             end
     
-            file = Qt::File.new(directory.absoluteFilePath(files[i]))
+            file = Qt5::File.new(directory.absoluteFilePath(files[i]))
     
-            if file.open(Qt::IODevice::ReadOnly.to_i)
-                inf = Qt::TextStream.new(file)
+            if file.open(Qt5::IODevice::ReadOnly.to_i)
+                inf = Qt5::TextStream.new(file)
                 while !inf.atEnd()
                     if progressDialog.wasCanceled()
                         break
@@ -133,14 +133,14 @@ class Window < Qt::Widget
     
     def showFiles(directory, files)
         (0...files.length).each do |i|
-            file = Qt::File.new(directory.absoluteFilePath(files[i]))
-            size = Qt::FileInfo.new(file).size()
+            file = Qt5::File.new(directory.absoluteFilePath(files[i]))
+            size = Qt5::FileInfo.new(file).size()
     
-            fileNameItem = Qt::TableWidgetItem.new(files[i])
-            fileNameItem.flags = Qt::ItemIsEnabled.to_i
-            sizeItem = Qt::TableWidgetItem.new("%d KB" % ((size + 1023) / 1024))
-            sizeItem.textAlignment = Qt::AlignVCenter | Qt::AlignRight
-            sizeItem.flags = Qt::ItemIsEnabled.to_i
+            fileNameItem = Qt5::TableWidgetItem.new(files[i])
+            fileNameItem.flags = Qt5::ItemIsEnabled.to_i
+            sizeItem = Qt5::TableWidgetItem.new("%d KB" % ((size + 1023) / 1024))
+            sizeItem.textAlignment = Qt5::AlignVCenter | Qt5::AlignRight
+            sizeItem.flags = Qt5::ItemIsEnabled.to_i
     
             row = @filesTable.rowCount()
             @filesTable.insertRow(row)
@@ -151,25 +151,25 @@ class Window < Qt::Widget
     end
     
     def createButton(text,  member)
-        button = Qt::PushButton.new(text)
+        button = Qt5::PushButton.new(text)
         connect(button, SIGNAL('clicked()'), self, member)
         return button
     end
     
     def createComboBox(text = "")
-        comboBox = Qt::ComboBox.new
+        comboBox = Qt5::ComboBox.new
         comboBox.editable = true
         comboBox.addItem(text)
-        comboBox.setSizePolicy(Qt::SizePolicy::Expanding, Qt::SizePolicy::Preferred)
+        comboBox.setSizePolicy(Qt5::SizePolicy::Expanding, Qt5::SizePolicy::Preferred)
         return comboBox
     end
     
     def createFilesTable()
-        @filesTable = Qt::TableWidget.new(0, 2)
+        @filesTable = Qt5::TableWidget.new(0, 2)
         labels = []
         labels << tr("File Name") << tr("Size")
         @filesTable.horizontalHeaderLabels = labels
-        @filesTable.horizontalHeader().setSectionResizeMode(0, Qt::HeaderView::Stretch)
+        @filesTable.horizontalHeader().setSectionResizeMode(0, Qt5::HeaderView::Stretch)
         @filesTable.verticalHeader().hide()
         @filesTable.showGrid = false
     end

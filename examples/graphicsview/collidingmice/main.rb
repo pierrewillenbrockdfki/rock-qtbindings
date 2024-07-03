@@ -28,11 +28,11 @@ require './qrc_mice.rb'
 require './mouse.rb'
 
 MouseCount = 7
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 
-scene =  Qt::GraphicsScene.new
+scene =  Qt5::GraphicsScene.new
 scene.setSceneRect(-300, -300, 600, 600)
-scene.itemIndexMethod = Qt::GraphicsScene::NoIndex
+scene.itemIndexMethod = Qt5::GraphicsScene::NoIndex
 
 for i in 0...MouseCount do
     mouse = Mouse.new
@@ -41,12 +41,12 @@ for i in 0...MouseCount do
     scene.addItem(mouse)
 end
 
-view = Qt::GraphicsView.new(scene)
-view.renderHint = Qt::Painter::Antialiasing
-view.backgroundBrush = Qt::Brush.new(Qt::Pixmap.new(":/images/cheese.jpg"))
-view.cacheMode = Qt::GraphicsView::CacheBackground
-view.dragMode = Qt::GraphicsView::ScrollHandDrag
-view.setWindowTitle(QT_TRANSLATE_NOOP(Qt::GraphicsView, "Colliding Mice"))
+view = Qt5::GraphicsView.new(scene)
+view.renderHint = Qt5::Painter::Antialiasing
+view.backgroundBrush = Qt5::Brush.new(Qt5::Pixmap.new(":/images/cheese.jpg"))
+view.cacheMode = Qt5::GraphicsView::CacheBackground
+view.dragMode = Qt5::GraphicsView::ScrollHandDrag
+view.setWindowTitle(QT_TRANSLATE_NOOP(Qt5::GraphicsView, "Colliding Mice"))
 view.resize(400, 300)
 view.show
 

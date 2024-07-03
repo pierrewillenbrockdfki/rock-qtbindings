@@ -23,20 +23,20 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class WigglyWidget < Qt::Widget
+class WigglyWidget < Qt5::Widget
 
     slots 'setText(const QString&)'
 
     def initialize(parent = nil)
         super(parent)
-        setBackgroundRole(Qt::Palette::Midlight)
+        setBackgroundRole(Qt5::Palette::Midlight)
     
         newFont = font()
         newFont.pointSize += 20
         setFont(newFont)
     
         @step = 0
-        @timer = Qt::BasicTimer.new
+        @timer = Qt5::BasicTimer.new
         @timer.start(60, self)
     end
 
@@ -48,12 +48,12 @@ class WigglyWidget < Qt::Widget
         sineTable = [   0, 38, 71, 92, 100, 92, 71, 38,
                         0, -38, -71, -92, -100, -92, -71, -38 ]
 
-        metrics = Qt::FontMetrics.new(font())
+        metrics = Qt5::FontMetrics.new(font())
         x = (width() - metrics.width(@text)) / 2
         y = (height() + metrics.ascent() - metrics.descent()) / 2
-        color = Qt::Color.new
+        color = Qt5::Color.new
     
-        painter = Qt::Painter.new(self)
+        painter = Qt5::Painter.new(self)
         (0...@text.size).each do |i|
             index = (@step + i) % 16
             color.setHsv((15 - index) * 16, 255, 191)

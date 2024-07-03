@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class Screenshot < Qt::Widget
+class Screenshot < Qt5::Widget
 	
 	slots	:newScreenshot,
     		:saveScreenshot,
@@ -32,16 +32,16 @@ class Screenshot < Qt::Widget
 	
 	def initialize(parent = nil)
 		super(parent)
-	    @screenshotLabel = Qt::Label.new
-	    @screenshotLabel.setSizePolicy(Qt::SizePolicy::Expanding,
-	                                   Qt::SizePolicy::Expanding)
-	    @screenshotLabel.alignment = Qt::AlignCenter
+	    @screenshotLabel = Qt5::Label.new
+	    @screenshotLabel.setSizePolicy(Qt5::SizePolicy::Expanding,
+	                                   Qt5::SizePolicy::Expanding)
+	    @screenshotLabel.alignment = Qt5::AlignCenter
 	    @screenshotLabel.setMinimumSize(240, 160)
 	
 	    createOptionsGroupBox()
 	    createButtonsLayout()
 	
-	  self.layout = Qt::VBoxLayout.new do |m|
+	  self.layout = Qt5::VBoxLayout.new do |m|
 			m.addWidget(@screenshotLabel)
 			m.addWidget(@optionsGroupBox)
 			m.addLayout(@buttonsLayout)
@@ -56,7 +56,7 @@ class Screenshot < Qt::Widget
 	
 	def resizeEvent(event)
 	    scaledSize = @originalPixmap.size()
-	    scaledSize.scale(@screenshotLabel.size(), Qt::KeepAspectRatio)
+	    scaledSize.scale(@screenshotLabel.size(), Qt5::KeepAspectRatio)
 	    if @screenshotLabel.pixmap.nil? ||
 	            scaledSize != @screenshotLabel.pixmap.size
 	        updateScreenshotLabel()
@@ -69,14 +69,14 @@ class Screenshot < Qt::Widget
         end
 	    @newScreenshotButton.disabled = true
 	
-	    Qt::Timer.singleShot(@delaySpinBox.value() * 1000, self, SLOT(:shootScreen))
+	    Qt5::Timer.singleShot(@delaySpinBox.value() * 1000, self, SLOT(:shootScreen))
 	end
 	
 	def saveScreenshot()
 	    format = "png"
-	    initialPath = Qt::Dir.currentPath() + tr("/untitled.") + format
+	    initialPath = Qt5::Dir.currentPath() + tr("/untitled.") + format
 	
-	    fileName = Qt::FileDialog.getSaveFileName(self, tr("Save As"),
+	    fileName = Qt5::FileDialog.getSaveFileName(self, tr("Save As"),
 	                               initialPath,
 	                               tr("%s Files (*.%s);;All Files (*)" % [format.upcase, format]))
 	    if !fileName.nil?
@@ -88,8 +88,8 @@ class Screenshot < Qt::Widget
 	    if @delaySpinBox.value() != 0
 	        $qApp.beep
       end
-      Qt::Application.processEvents()
-          screen = Qt::Application.primaryScreen
+      Qt5::Application.processEvents()
+          screen = Qt5::Application.primaryScreen
           if windowHandle
               screen = windowHandle.screen
           end
@@ -111,19 +111,19 @@ class Screenshot < Qt::Widget
 	end
 	
 	def createOptionsGroupBox()
-	    @optionsGroupBox = Qt::GroupBox.new(tr("Options"))
+	    @optionsGroupBox = Qt5::GroupBox.new(tr("Options"))
 	
-	    @delaySpinBox = Qt::SpinBox.new do |s|
+	    @delaySpinBox = Qt5::SpinBox.new do |s|
 	    	s.suffix = tr(" s")
 	    	s.maximum = 60
 	  	end
 	    connect(@delaySpinBox, SIGNAL('valueChanged(int)'), self, SLOT(:updateCheckBox))
 	
-	    @delaySpinBoxLabel = Qt::Label.new(tr("Screenshot Delay:"))
+	    @delaySpinBoxLabel = Qt5::Label.new(tr("Screenshot Delay:"))
 	
-	    @hideThisWindowCheckBox = Qt::CheckBox.new(tr("Hide This Window"))
+	    @hideThisWindowCheckBox = Qt5::CheckBox.new(tr("Hide This Window"))
 	
-	  @optionsGroupBox.layout = Qt::GridLayout.new do |g|
+	  @optionsGroupBox.layout = Qt5::GridLayout.new do |g|
 			g.addWidget(@delaySpinBoxLabel, 0, 0)
 			g.addWidget(@delaySpinBox, 0, 1)
 			g.addWidget(@hideThisWindowCheckBox, 1, 0, 1, 2)
@@ -139,7 +139,7 @@ class Screenshot < Qt::Widget
 	
 	    @quitScreenshotButton = createButton(tr("Quit"), self, SLOT(:close))
 	
-	  @buttonsLayout = Qt::HBoxLayout.new do |b|
+	  @buttonsLayout = Qt5::HBoxLayout.new do |b|
 			b.addStretch()
 			b.addWidget(@newScreenshotButton)
 			b.addWidget(@saveScreenshotButton)
@@ -148,14 +148,14 @@ class Screenshot < Qt::Widget
 	end
 	
 	def createButton(text, receiver, member)
-	    button = Qt::PushButton.new(text)
+	    button = Qt5::PushButton.new(text)
 	    button.connect(button, SIGNAL(:clicked), receiver, member)
 	    return button
 	end
 	
 	def updateScreenshotLabel()
 	    @screenshotLabel.pixmap = @originalPixmap.scaled(@screenshotLabel.size,
-	                                                     Qt::KeepAspectRatio,
-	                                                     Qt::SmoothTransformation)
+	                                                     Qt5::KeepAspectRatio,
+	                                                     Qt5::SmoothTransformation)
 	end
 end

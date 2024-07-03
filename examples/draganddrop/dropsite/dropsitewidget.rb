@@ -26,7 +26,7 @@
 	
 	
 	
-class DropArea < Qt::Label
+class DropArea < Qt5::Label
 	
 	slots 'clear()'
 	
@@ -35,8 +35,8 @@ class DropArea < Qt::Label
 	def initialize(parent = nil)
 	    super(parent)
 	    setMinimumSize(200, 200)
-	    setFrameStyle(Qt::Frame::Sunken | Qt::Frame::StyledPanel)
-	    setAlignment(Qt::AlignCenter)
+	    setFrameStyle(Qt5::Frame::Sunken | Qt5::Frame::StyledPanel)
+	    setAlignment(Qt5::AlignCenter)
 	    setAcceptDrops(true)
 	    setAutoFillBackground(true)
       clear()
@@ -44,7 +44,7 @@ class DropArea < Qt::Label
 	
 	def dragEnterEvent(event)
 	    setText(tr("<drop content>"))
-	    setBackgroundRole(Qt::Palette::Highlight)
+	    setBackgroundRole(Qt5::Palette::Highlight)
 	
 	    event.acceptProposedAction()
 	    emit changed(event.mimeData())
@@ -58,13 +58,13 @@ class DropArea < Qt::Label
 	    mimeData = event.mimeData()
       if mimeData.hasText
             setText(mimeData.text())
-            setTextFormat(Qt::PlainText)
+            setTextFormat(Qt5::PlainText)
 	    end
 
 	    formats = mimeData.formats()
 	    formats.each do |format|
 	        if format.start_with?("image/")
-	            pixmap = Qt::Pixmap.new
+	            pixmap = Qt5::Pixmap.new
 	            pixmap.loadFromData(mimeData.data(format), format)
 	            if !pixmap.nil?
 	                setPixmap(pixmap)
@@ -81,7 +81,7 @@ class DropArea < Qt::Label
 	        end
 	    end
 	
-	    setBackgroundRole(Qt::Palette::Dark)
+	    setBackgroundRole(Qt5::Palette::Dark)
 	    event.acceptProposedAction()
 	end
 	
@@ -92,7 +92,7 @@ class DropArea < Qt::Label
 	
 	def clear()
 	    setText(tr("<drop content>"))
-	    setBackgroundRole(Qt::Palette::Dark)
+	    setBackgroundRole(Qt5::Palette::Dark)
 	
 	    emit changed(nil)
 	end

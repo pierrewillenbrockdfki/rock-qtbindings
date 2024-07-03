@@ -24,30 +24,30 @@
 =end
 	
 	
-class Sender < Qt::Dialog
+class Sender < Qt5::Dialog
 		
 	slots :startBroadcasting, :broadcastDatagram
 	
 	def initialize(parent = nil)
 	    super(parent)
-	    @statusLabel = Qt::Label.new(tr("Ready to broadcast datagrams on port 45454"))
-	    @startButton = Qt::PushButton.new(tr("&Start"))
-	    @quitButton = Qt::PushButton.new(tr("&Quit"))
-	    @timer = Qt::Timer.new(self)
-	    @udpSocket = Qt::UdpSocket.new(self)
+	    @statusLabel = Qt5::Label.new(tr("Ready to broadcast datagrams on port 45454"))
+	    @startButton = Qt5::PushButton.new(tr("&Start"))
+	    @quitButton = Qt5::PushButton.new(tr("&Quit"))
+	    @timer = Qt5::Timer.new(self)
+	    @udpSocket = Qt5::UdpSocket.new(self)
 	    @messageNo = 1
 	
 	    connect(@startButton, SIGNAL(:clicked), self, SLOT(:startBroadcasting))
 	    connect(@quitButton, SIGNAL(:clicked), self, SLOT(:close))
 	    connect(@timer, SIGNAL(:timeout), self, SLOT(:broadcastDatagram))
 	
-	    buttonLayout = Qt::HBoxLayout.new do |b|
+	    buttonLayout = Qt5::HBoxLayout.new do |b|
 			b.addStretch(1)
 			b.addWidget(@startButton)
 			b.addWidget(@quitButton)
 		end
 	
-	    self.layout = Qt::VBoxLayout.new do |m|
+	    self.layout = Qt5::VBoxLayout.new do |m|
 			m.addWidget(@statusLabel)
 			m.addLayout(buttonLayout)
 		end
@@ -62,7 +62,7 @@ class Sender < Qt::Dialog
 	
 	def broadcastDatagram()
 	    @statusLabel.text = tr("Now broadcasting datagram %d" % @messageNo)
-            datagram = Qt::NetworkDatagram.new(Qt::ByteArray.new("Broadcast message %d" % @messageNo), Qt::HostAddress.new(Qt::HostAddress::Broadcast), 45454)
+            datagram = Qt5::NetworkDatagram.new(Qt5::ByteArray.new("Broadcast message %d" % @messageNo), Qt5::HostAddress.new(Qt5::HostAddress::Broadcast), 45454)
 	    @udpSocket.writeDatagram(datagram)
 	    @messageNo += 1
 	end

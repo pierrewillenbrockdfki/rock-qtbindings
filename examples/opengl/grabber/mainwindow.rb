@@ -25,7 +25,7 @@
     
 require './glwidget.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
         
     slots    'renderIntoPixmap()',
             'grabFrameBuffer()',
@@ -34,24 +34,24 @@ class MainWindow < Qt::MainWindow
     
     def initialize(parent = nil)
         super
-        @centralWidget = Qt::Widget.new
+        @centralWidget = Qt5::Widget.new
         self.centralWidget = @centralWidget
     
         @glWidget = GLWidget.new(self)
-        @pixmapLabel = Qt::Label.new
+        @pixmapLabel = Qt5::Label.new
     
-        @glWidgetArea = Qt::ScrollArea.new do |a|
+        @glWidgetArea = Qt5::ScrollArea.new do |a|
             a.widget = @glWidget
             a.widgetResizable = true
-            a.horizontalScrollBarPolicy = Qt::ScrollBarAlwaysOff
-            a.verticalScrollBarPolicy = Qt::ScrollBarAlwaysOff
-            a.setSizePolicy(Qt::SizePolicy::Ignored, Qt::SizePolicy::Ignored)
+            a.horizontalScrollBarPolicy = Qt5::ScrollBarAlwaysOff
+            a.verticalScrollBarPolicy = Qt5::ScrollBarAlwaysOff
+            a.setSizePolicy(Qt5::SizePolicy::Ignored, Qt5::SizePolicy::Ignored)
             a.setMinimumSize(50, 50)
         end
     
-        @pixmapLabelArea = Qt::ScrollArea.new do |l|
+        @pixmapLabelArea = Qt5::ScrollArea.new do |l|
             l.widget = @pixmapLabel
-            l.setSizePolicy(Qt::SizePolicy::Ignored, Qt::SizePolicy::Ignored)
+            l.setSizePolicy(Qt5::SizePolicy::Ignored, Qt5::SizePolicy::Ignored)
             l.setMinimumSize(50, 50)
         end
     
@@ -65,7 +65,7 @@ class MainWindow < Qt::MainWindow
         createActions()
         createMenus()
     
-        @centralWidget.layout = Qt::GridLayout.new do |c|
+        @centralWidget.layout = Qt5::GridLayout.new do |c|
             c.addWidget(@glWidgetArea, 0, 0)
             c.addWidget(@pixmapLabelArea, 0, 1)
             c.addWidget(@xSlider, 1, 0, 1, 2)
@@ -91,42 +91,42 @@ class MainWindow < Qt::MainWindow
     
     def grabFrameBuffer()
         image = @glWidget.grabFrameBuffer()
-        setPixmap(Qt::Pixmap.fromImage(image))
+        setPixmap(Qt5::Pixmap.fromImage(image))
     end
     
     def clearPixmap()
-        setPixmap(Qt::Pixmap.new)
+        setPixmap(Qt5::Pixmap.new)
     end
     
     def about()
-        Qt::MessageBox.about(self, tr("About Grabber"),
+        Qt5::MessageBox.about(self, tr("About Grabber"),
                 tr("The <b>Grabber</b> example demonstrates two approaches for " +
                    "rendering OpenGL into a Qt pixmap."))
     end
     
     def createActions()
-        @renderIntoPixmapAct = Qt::Action.new(tr("&Render into Pixmap..."), self)
-        @renderIntoPixmapAct.shortcut = Qt::KeySequence.new( tr("Ctrl+R") )
+        @renderIntoPixmapAct = Qt5::Action.new(tr("&Render into Pixmap..."), self)
+        @renderIntoPixmapAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+R") )
         connect(@renderIntoPixmapAct, SIGNAL('triggered()'),
                 self, SLOT('renderIntoPixmap()'))
     
-        @grabFrameBufferAct = Qt::Action.new(tr("&Grab Frame Buffer"), self)
-        @grabFrameBufferAct.shortcut = Qt::KeySequence.new( tr("Ctrl+G") )
+        @grabFrameBufferAct = Qt5::Action.new(tr("&Grab Frame Buffer"), self)
+        @grabFrameBufferAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+G") )
         connect(@grabFrameBufferAct, SIGNAL('triggered()'),
                 self, SLOT('grabFrameBuffer()'))
     
-        @clearPixmapAct = Qt::Action.new(tr("&Clear Pixmap"), self)
-        @clearPixmapAct.shortcut = Qt::KeySequence.new( tr("Ctrl+L") )
+        @clearPixmapAct = Qt5::Action.new(tr("&Clear Pixmap"), self)
+        @clearPixmapAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+L") )
         connect(@clearPixmapAct, SIGNAL('triggered()'), self, SLOT('clearPixmap()'))
     
-        @exitAct = Qt::Action.new(tr("E&xit"), self)
-        @exitAct.shortcut = Qt::KeySequence.new( tr("Ctrl+Q") )
+        @exitAct = Qt5::Action.new(tr("E&xit"), self)
+        @exitAct.shortcut = Qt5::KeySequence.new( tr("Ctrl+Q") )
         connect(@exitAct, SIGNAL('triggered()'), self, SLOT('close()'))
     
-        @aboutAct = Qt::Action.new(tr("&About"), self)
+        @aboutAct = Qt5::Action.new(tr("&About"), self)
         connect(@aboutAct, SIGNAL('triggered()'), self, SLOT('about()'))
     
-        @aboutQtAct = Qt::Action.new(tr("About &Qt"), self)
+        @aboutQtAct = Qt5::Action.new(tr("About &Qt"), self)
         connect(@aboutQtAct, SIGNAL('triggered()'), $qApp, SLOT('aboutQt()'))
     end
     
@@ -144,12 +144,12 @@ class MainWindow < Qt::MainWindow
     end
     
     def createSlider(changedSignal, setterSlot)
-        slider = Qt::Slider.new(Qt::Horizontal) do |s|
+        slider = Qt5::Slider.new(Qt5::Horizontal) do |s|
             s.range = 0..(360 * 16)
             s.singleStep = 16
             s.pageStep = 15 * 16
             s.tickInterval = 15 * 16
-            s.tickPosition = Qt::Slider::TicksRight
+            s.tickPosition = Qt5::Slider::TicksRight
         end
         connect(slider, SIGNAL('valueChanged(int)'), @glWidget, setterSlot)
         connect(@glWidget, changedSignal, slider, SLOT('setValue(int)'))
@@ -159,28 +159,28 @@ class MainWindow < Qt::MainWindow
     def setPixmap(pixmap)
         @pixmapLabel.pixmap = pixmap
         size = pixmap.size()
-        if size - Qt::Size.new(1, 0) == @pixmapLabelArea.maximumViewportSize
-            size -= Qt::Size.new(1, 0)
+        if size - Qt5::Size.new(1, 0) == @pixmapLabelArea.maximumViewportSize
+            size -= Qt5::Size.new(1, 0)
         end
         @pixmapLabel.resize(size)
     end
     
     def getSize()
-        ok = Qt::Boolean.new
-        text = Qt::InputDialog.getText(self, tr("Grabber"),
+        ok = Qt5::Boolean.new
+        text = Qt5::InputDialog.getText(self, tr("Grabber"),
                                              tr("Enter pixmap size:"),
-                                             Qt::LineEdit::Normal,
+                                             Qt5::LineEdit::Normal,
                                              tr("%d x %d" % [@glWidget.width, @glWidget.height]),
                                              ok)
         if !ok
-            return Qt::Size.new
+            return Qt5::Size.new
         end
     
         if text =~ /([0-9]+) *x *([0-9]+)/
             width = $1.to_i
             height = $2.to_i
             if width > 0 && width < 2048 && height > 0 && height < 2048
-                return Qt::Size.new(width, height)
+                return Qt5::Size.new(width, height)
             end
         end
     

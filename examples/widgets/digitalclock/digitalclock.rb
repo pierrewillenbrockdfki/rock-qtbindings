@@ -1,6 +1,6 @@
 require 'Qt5'
 
-class DigitalClock < Qt::LCDNumber
+class DigitalClock < Qt5::LCDNumber
 
 	slots 'showTime()'
 
@@ -9,7 +9,7 @@ class DigitalClock < Qt::LCDNumber
 		super(parent)
 		setSegmentStyle(Filled)
 
-		@timer = Qt::Timer.new(self)
+		@timer = Qt5::Timer.new(self)
 		connect(@timer, SIGNAL('timeout()'), self, SLOT('showTime()'))
 		@timer.start(1000)
 
@@ -20,7 +20,7 @@ class DigitalClock < Qt::LCDNumber
 	end
 
 	def showTime()
-		time = Qt::Time.currentTime
+		time = Qt5::Time.currentTime
 		text = time.toString("hh:mm")
 		if time.second % 2 == 0
 			text[2] = ' '

@@ -23,19 +23,19 @@
 ** Translated to QtRuby by Richard Dale
 =end
     
-class Server < Qt::Dialog
+class Server < Qt5::Dialog
     
     slots :sendFortune
     
     def initialize(parent = nil)
         super(parent)
-        @statusLabel = Qt::Label.new
-        @quitButton = Qt::PushButton.new(tr("Quit"))
+        @statusLabel = Qt5::Label.new
+        @quitButton = Qt5::PushButton.new(tr("Quit"))
         @quitButton.autoDefault = false
     
-        @tcpServer = Qt::TcpServer.new(self)
+        @tcpServer = Qt5::TcpServer.new(self)
         if !@tcpServer.listen
-            Qt::MessageBox.critical(self, tr("Fortune Server"),
+            Qt5::MessageBox.critical(self, tr("Fortune Server"),
                 tr("Unable to start the server: %s." % @tcpServer.errorString))
             close()
             return
@@ -56,12 +56,12 @@ class Server < Qt::Dialog
         connect(@quitButton, SIGNAL(:clicked), self, SLOT(:close))
         connect(@tcpServer, SIGNAL(:newConnection), self, SLOT(:sendFortune))
     
-        buttonLayout = Qt::HBoxLayout.new do |b|
+        buttonLayout = Qt5::HBoxLayout.new do |b|
             b.addStretch(1)
             b.addWidget(@quitButton)
         end
 
-        self.layout = Qt::VBoxLayout.new do |m|
+        self.layout = Qt5::VBoxLayout.new do |m|
             m.addWidget(@statusLabel)
             m.addLayout(buttonLayout)
         end
@@ -70,9 +70,9 @@ class Server < Qt::Dialog
     end
     
     def sendFortune
-        block = Qt::ByteArray.new
-        outf = Qt::DataStream.new(block, Qt::IODevice::WriteOnly)
-        outf.version = Qt::DataStream::Qt_4_0
+        block = Qt5::ByteArray.new
+        outf = Qt5::DataStream.new(block, Qt5::IODevice::WriteOnly)
+        outf.version = Qt5::DataStream::Qt_4_0
         outf << 0  # Write a 4 byte integer
         outf << @fortunes[rand(@fortunes.length)]
         outf.device.seek(0)

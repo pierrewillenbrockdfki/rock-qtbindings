@@ -1,9 +1,9 @@
 #!/usr/bin/ruby -W
 require "Qt5"
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 
-hello = Qt::PushButton.new('Hello World!')
+hello = Qt5::PushButton.new('Hello World!')
 hello.resize(100, 30)
 hello.show()
 
@@ -12,8 +12,8 @@ hello.show()
 #Thread.new { sleep 2; hello.resize(200,50) }
 
 # This code executes because it puts the GUI code inside
-# Qt.execute_in_main_thread
-Qt.execute_in_main_thread { sleep 2; hello.resize(200,50) }
+# Qt5.execute_in_main_thread
+Qt5.execute_in_main_thread { sleep 2; hello.resize(200,50) }
 
 app.exec()
 

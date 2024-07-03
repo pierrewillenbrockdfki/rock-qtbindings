@@ -24,15 +24,15 @@
 =end
 
 
-class CalcButton < Qt::ToolButton
+class CalcButton < Qt5::ToolButton
 
 	def initialize(text, color, parent = nil)
 		super(parent)
-		setSizePolicy(Qt::SizePolicy::Expanding, Qt::SizePolicy::Preferred)
+		setSizePolicy(Qt5::SizePolicy::Expanding, Qt5::SizePolicy::Preferred)
 		setText(text)
 	
 		newPalette = palette()
-		newPalette.setColor(Qt::Palette::Button, color)
+		newPalette.setColor(Qt5::Palette::Button, color)
 		setPalette(newPalette)
 	end
 	

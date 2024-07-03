@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
     
-class PixelDelegate < Qt::AbstractItemDelegate
+class PixelDelegate < Qt5::AbstractItemDelegate
 
     ItemSize = 256
     slots 'pixelSize=(int)'
@@ -35,33 +35,33 @@ class PixelDelegate < Qt::AbstractItemDelegate
     end
 
     def paint(painter, option, index)
-        painter.renderHint = Qt::Painter::Antialiasing
-        painter.pen = Qt::NoPen
+        painter.renderHint = Qt5::Painter::Antialiasing
+        painter.pen = Qt5::NoPen
 
-        if (option.state & Qt::Style::State_Selected.to_i) != 0
+        if (option.state & Qt5::Style::State_Selected.to_i) != 0
             painter.brush = option.palette.highlight
         else
-            painter.brush = Qt::Brush.new(Qt::white)
+            painter.brush = Qt5::Brush.new(Qt5::white)
         end
 
         painter.drawRect(option.rect)
 
-        if (option.state & Qt::Style::State_Selected.to_i) != 0
+        if (option.state & Qt5::Style::State_Selected.to_i) != 0
             painter.brush = option.palette.highlightedText
         else
-            painter.brush = Qt::Brush.new(Qt::black)
+            painter.brush = Qt5::Brush.new(Qt5::black)
         end
     
         size = [option.rect.width, option.rect.height].min
-        brightness = index.model.data(index, Qt::DisplayRole).to_i
+        brightness = index.model.data(index, Qt5::DisplayRole).to_i
         radius = (size/2.0) - (brightness/255.0 * size/2.0)
 
-        painter.drawEllipse(Qt::RectF.new(option.rect.x + option.rect.width/2 - radius,
+        painter.drawEllipse(Qt5::RectF.new(option.rect.x + option.rect.width/2 - radius,
                                 option.rect.y + option.rect.height/2 - radius,
                                 2*radius, 2*radius))
     end
     
     def sizeHint(option, index)
-        return Qt::Size.new(@pixelSize, @pixelSize)
+        return Qt5::Size.new(@pixelSize, @pixelSize)
     end
 end

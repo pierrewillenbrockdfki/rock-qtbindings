@@ -24,7 +24,7 @@
 =end
     
     
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
     
     slots   'fontSize=(int)',
             'month=(int)',
@@ -32,34 +32,34 @@ class MainWindow < Qt::MainWindow
     
     def initialize(parent = nil)
         super
-        @selectedDate = Qt::Date.currentDate
+        @selectedDate = Qt5::Date.currentDate
         @fontSize = 10
     
-        centralWidget = Qt::Widget.new
+        centralWidget = Qt5::Widget.new
     
-        dateLabel = Qt::Label.new(tr("Date:"))
-        monthCombo = Qt::ComboBox.new
+        dateLabel = Qt5::Label.new(tr("Date:"))
+        monthCombo = Qt5::ComboBox.new
     
         (1..12).each do |month|
-            monthCombo.addItem(Qt::Date.longMonthName(month))
+            monthCombo.addItem(Qt5::Date.longMonthName(month))
         end
     
-        yearEdit = Qt::DateTimeEdit.new do |y|
+        yearEdit = Qt5::DateTimeEdit.new do |y|
         	y.displayFormat = "yyyy"
-        	y.setDateRange(Qt::Date.new(1753, 1, 1), Qt::Date.new(8000, 1, 1))
+        	y.setDateRange(Qt5::Date.new(1753, 1, 1), Qt5::Date.new(8000, 1, 1))
 		end
     
         monthCombo.currentIndex = @selectedDate.month - 1
         yearEdit.date = @selectedDate
     
-        fontSizeLabel = Qt::Label.new(tr("Font size:"))
+        fontSizeLabel = Qt5::Label.new(tr("Font size:"))
 
-        fontSizeSpinBox = Qt::SpinBox.new do |f|
+        fontSizeSpinBox = Qt5::SpinBox.new do |f|
         	f.range = 1..64
         	f.value = 10
 		end
     
-        @editor = Qt::TextBrowser.new
+        @editor = Qt5::TextBrowser.new
         insertCalendar()
     
         connect(monthCombo, SIGNAL('activated(int)'), self, SLOT('month=(int)'))
@@ -67,7 +67,7 @@ class MainWindow < Qt::MainWindow
         connect(fontSizeSpinBox, SIGNAL('valueChanged(int)'),
                 self, SLOT('fontSize=(int)'))
     
-        controlsLayout = Qt::HBoxLayout.new do |c|
+        controlsLayout = Qt5::HBoxLayout.new do |c|
             c.addWidget(dateLabel)
             c.addWidget(monthCombo)
             c.addWidget(yearEdit)
@@ -77,7 +77,7 @@ class MainWindow < Qt::MainWindow
             c.addStretch(1)
         end
     
-        centralWidget.layout = Qt::VBoxLayout.new do |c|
+        centralWidget.layout = Qt5::VBoxLayout.new do |c|
             c.addLayout(controlsLayout)
             c.addWidget(@editor, 1)
         end
@@ -89,23 +89,23 @@ class MainWindow < Qt::MainWindow
         @editor.clear
         cursor = @editor.textCursor
     
-        date = Qt::Date.new(@selectedDate.year(), @selectedDate.month(), 1)
+        date = Qt5::Date.new(@selectedDate.year(), @selectedDate.month(), 1)
     
-        tableFormat = Qt::TextTableFormat.new do |t|
-            t.alignment = Qt::AlignHCenter.to_i
-            t.background = Qt::Brush.new(Qt::Color.new("#e0e0e0"))
+        tableFormat = Qt5::TextTableFormat.new do |t|
+            t.alignment = Qt5::AlignHCenter.to_i
+            t.background = Qt5::Brush.new(Qt5::Color.new("#e0e0e0"))
             t.cellPadding = 2
             t.cellSpacing = 4
         end
 
         constraints = []
-        constraints << Qt::TextLength.new(Qt::TextLength::PercentageLength, 14) <<
-                    Qt::TextLength.new(Qt::TextLength::PercentageLength, 14) << 
-                    Qt::TextLength.new(Qt::TextLength::PercentageLength, 14) <<
-                    Qt::TextLength.new(Qt::TextLength::PercentageLength, 14) <<
-                    Qt::TextLength.new(Qt::TextLength::PercentageLength, 14) <<
-                    Qt::TextLength.new(Qt::TextLength::PercentageLength, 14) <<
-                    Qt::TextLength.new(Qt::TextLength::PercentageLength, 14)
+        constraints << Qt5::TextLength.new(Qt5::TextLength::PercentageLength, 14) <<
+                    Qt5::TextLength.new(Qt5::TextLength::PercentageLength, 14) << 
+                    Qt5::TextLength.new(Qt5::TextLength::PercentageLength, 14) <<
+                    Qt5::TextLength.new(Qt5::TextLength::PercentageLength, 14) <<
+                    Qt5::TextLength.new(Qt5::TextLength::PercentageLength, 14) <<
+                    Qt5::TextLength.new(Qt5::TextLength::PercentageLength, 14) <<
+                    Qt5::TextLength.new(Qt5::TextLength::PercentageLength, 14)
         tableFormat.columnWidthConstraints = constraints
     
         table = cursor.insertTable(1, 7, tableFormat)
@@ -118,18 +118,18 @@ class MainWindow < Qt::MainWindow
         format = cursor.charFormat()
         format.fontPointSize = @fontSize
     
-        boldFormat = Qt::TextCharFormat.new
+        boldFormat = Qt5::TextCharFormat.new
         boldFormat.merge(format)
-        boldFormat.fontWeight = Qt::Font::Bold
+        boldFormat.fontWeight = Qt5::Font::Bold
     
-        highlightedFormat = Qt::TextCharFormat.new
+        highlightedFormat = Qt5::TextCharFormat.new
         highlightedFormat.merge(boldFormat)
-        highlightedFormat.background = Qt::Brush.new(Qt::yellow)
+        highlightedFormat.background = Qt5::Brush.new(Qt5::yellow)
     
         (1..7).each do |weekDay|
             cell = table.cellAt(0, weekDay-1)
             cellCursor = cell.firstCursorPosition()
-            cellCursor.insertText("%s" % Qt::Date.longDayName(weekDay),
+            cellCursor.insertText("%s" % Qt5::Date.longDayName(weekDay),
                                   boldFormat)
         end
     
@@ -140,7 +140,7 @@ class MainWindow < Qt::MainWindow
             cell = table.cellAt(table.rows-1, weekDay-1)
             cellCursor = cell.firstCursorPosition
     
-            if date == Qt::Date.currentDate
+            if date == Qt5::Date.currentDate
                 cellCursor.insertText("%s" % date.day(), highlightedFormat)
             else
                 cellCursor.insertText("%s" % date.day(), format)
@@ -153,7 +153,7 @@ class MainWindow < Qt::MainWindow
         end
     
         setWindowTitle(tr("Calendar for %s %s" %
-            [Qt::Date.longMonthName(@selectedDate.month), @selectedDate.year]))
+            [Qt5::Date.longMonthName(@selectedDate.month), @selectedDate.year]))
     end
     
     def fontSize=(size)
@@ -162,12 +162,12 @@ class MainWindow < Qt::MainWindow
     end
     
     def month=(month)
-        @selectedDate = Qt::Date.new(@selectedDate.year, month + 1, @selectedDate.day)
+        @selectedDate = Qt5::Date.new(@selectedDate.year, month + 1, @selectedDate.day)
         insertCalendar()
     end
     
     def year=(date)
-        @selectedDate = Qt::Date.new(date.year, @selectedDate.month, @selectedDate.day)
+        @selectedDate = Qt5::Date.new(date.year, @selectedDate.month, @selectedDate.day)
         insertCalendar()
     end
 end

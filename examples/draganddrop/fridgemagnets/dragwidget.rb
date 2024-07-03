@@ -25,13 +25,13 @@
 
 require './draglabel.rb'
 
-class DragWidget < Qt::Widget
+class DragWidget < Qt5::Widget
 	
 	def initialize(parent = nil)
 	    super(parent)
-	    dictionaryFile = Qt::File.new("words.txt")
-	    dictionaryFile.open(Qt::File::ReadOnly.to_i)
-	    inputStream = Qt::TextStream.new(dictionaryFile)
+	    dictionaryFile = Qt5::File.new("words.txt")
+	    dictionaryFile.open(Qt5::File::ReadOnly.to_i)
+	    inputStream = Qt5::TextStream.new(dictionaryFile)
 	
 	    x = 5
 	    y = 5
@@ -52,7 +52,7 @@ class DragWidget < Qt::Widget
 	    end
 	
 	    newPalette = palette()
-	    newPalette.setColor(Qt::Palette::Background, Qt::Color.new(Qt::white))
+	    newPalette.setColor(Qt5::Palette::Background, Qt5::Color.new(Qt5::white))
 	    setPalette(newPalette)
 	
 	    setAcceptDrops(true)
@@ -63,7 +63,7 @@ class DragWidget < Qt::Widget
 	def dragEnterEvent(event)
 	    if event.mimeData().hasFormat("application/x-fridgemagnet")
 	        if children().include? event.source()
-	            event.dropAction = Qt::MoveAction
+	            event.dropAction = Qt5::MoveAction
 	            event.accept()
 	        else
 	            event.acceptProposedAction()
@@ -78,7 +78,7 @@ class DragWidget < Qt::Widget
 	def dragMoveEvent(event)
 	    if event.mimeData().hasFormat("application/x-fridgemagnet")
 	        if children().include? event.source()
-	            event.dropAction = Qt::MoveAction
+	            event.dropAction = Qt5::MoveAction
 	            event.accept()
 	        else
 	            event.acceptProposedAction()
@@ -93,10 +93,10 @@ class DragWidget < Qt::Widget
 	def dropEvent(event)
 	    if event.mimeData().hasFormat("application/x-fridgemagnet")
 	        itemData = event.mimeData().data("application/x-fridgemagnet")
-	        dataStream = Qt::DataStream.new(itemData, Qt::IODevice::ReadOnly.to_i)
+	        dataStream = Qt5::DataStream.new(itemData, Qt5::IODevice::ReadOnly.to_i)
 	        
 	        text = ""
-	        offset = Qt::Point.new
+	        offset = Qt5::Point.new
 	        dataStream >> text >> offset
 
 	        newLabel = DragLabel.new(text.to_s, self)
@@ -104,22 +104,22 @@ class DragWidget < Qt::Widget
 	        newLabel.show()
 	
 	        if children().include? event.source()
-	            event.dropAction = Qt::MoveAction
+	            event.dropAction = Qt5::MoveAction
 	            event.accept()
 	        else
 	            event.acceptProposedAction()
 	        end
 	    elsif event.mimeData().hasText()
-	        pieces = event.mimeData().text().split(Qt::RegExp("\\s+"),
-	                             Qt::String::SkipEmptyParts)
-	        position = Qt::Point.new(event.pos.x, event.pos.y)
+	        pieces = event.mimeData().text().split(Qt5::RegExp("\\s+"),
+	                             Qt5::String::SkipEmptyParts)
+	        position = Qt5::Point.new(event.pos.x, event.pos.y)
 	
 			pieces.each do |piece|
 	            newLabel = DragLabel.new(piece, self)
 	            newLabel.move(position)
 	            newLabel.show()
 	
-	            position += Qt::Point.new(newLabel.width(), 0)
+	            position += Qt5::Point.new(newLabel.width(), 0)
 	        end
 	
 	        event.acceptProposedAction()

@@ -25,7 +25,7 @@
 	
 require './highlighter.rb'
 	
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 	
 	slots	'newFile()',
 			'openFile()',
@@ -49,57 +49,57 @@ class MainWindow < Qt::MainWindow
 	    fileName = path
 	
 	    if fileName.nil?
-	        fileName = Qt::FileDialog.getOpenFileName(self,
+	        fileName = Qt5::FileDialog.getOpenFileName(self,
 	            tr("Open File"), "", "qmake Files (*.pro *.prf *.pri)")
 		end
 	
 	    if !fileName.nil?
-	        file = Qt::File.new(fileName)
-	        if file.open(Qt::File::ReadOnly | Qt::File::Text)
+	        file = Qt5::File.new(fileName)
+	        if file.open(Qt5::File::ReadOnly | Qt5::File::Text)
 	            @editor.plainText = file.readAll.to_s
 			end
 	    end
 	end
 	
 	def setupEditor()
-	    variableFormat = Qt::TextCharFormat.new
-	    variableFormat.fontWeight = Qt::Font::Bold
-	    variableFormat.foreground = Qt::Brush.new(Qt::blue)
+	    variableFormat = Qt5::TextCharFormat.new
+	    variableFormat.fontWeight = Qt5::Font::Bold
+	    variableFormat.foreground = Qt5::Brush.new(Qt5::blue)
 	    @highlighter.addMapping('\b[A-Z_]+\b', variableFormat)
 	
-	    singleLineCommentFormat = Qt::TextCharFormat.new
-	    singleLineCommentFormat.background = Qt::Brush.new(Qt::Color.new("#77ff77"))
+	    singleLineCommentFormat = Qt5::TextCharFormat.new
+	    singleLineCommentFormat.background = Qt5::Brush.new(Qt5::Color.new("#77ff77"))
 	    @highlighter.addMapping('#[^\n]*', singleLineCommentFormat)
 	
-	    quotationFormat = Qt::TextCharFormat.new
-	    quotationFormat.background = Qt::Brush.new(Qt::cyan)
-	    quotationFormat.foreground = Qt::Brush.new(Qt::blue)
+	    quotationFormat = Qt5::TextCharFormat.new
+	    quotationFormat.background = Qt5::Brush.new(Qt5::cyan)
+	    quotationFormat.foreground = Qt5::Brush.new(Qt5::blue)
 	    @highlighter.addMapping('\".*\"', quotationFormat)
 	
-	    functionFormat = Qt::TextCharFormat.new
+	    functionFormat = Qt5::TextCharFormat.new
 	    functionFormat.fontItalic = true
-	    functionFormat.foreground = Qt::Brush.new(Qt::blue)
+	    functionFormat.foreground = Qt5::Brush.new(Qt5::blue)
 	    @highlighter.addMapping('\b[a-z0-9_]+\(.*\)', functionFormat)
 	
-	    font = Qt::Font.new
+	    font = Qt5::Font.new
 	    font.family = "Courier"
 	    font.fixedPitch = true
 	    font.pointSize = 10
 	
-	    @editor = Qt::TextEdit.new
+	    @editor = Qt5::TextEdit.new
 	    @editor.font = font
 	    @highlighter.addToDocument(@editor.document())
 	end
 	
 	def setupFileMenu()
-	    fileMenu = Qt::Menu.new(tr("&File"), self)
+	    fileMenu = Qt5::Menu.new(tr("&File"), self)
 	    menuBar().addMenu(fileMenu)
 	
 	    fileMenu.addAction(tr("&New..."), self, SLOT('newFile()'),
-	                        Qt::KeySequence.new(tr("Ctrl+N", "File|New")))
+	                        Qt5::KeySequence.new(tr("Ctrl+N", "File|New")))
 	    fileMenu.addAction(tr("&Open..."), self, SLOT('openFile()'),
-	                        Qt::KeySequence.new(tr("Ctrl+O", "File|Open")))
+	                        Qt5::KeySequence.new(tr("Ctrl+O", "File|Open")))
 	    fileMenu.addAction(tr("E&xit"), $qApp, SLOT('quit()'),
-	                        Qt::KeySequence.new(tr("Ctrl+Q", "File|Exit")))
+	                        Qt5::KeySequence.new(tr("Ctrl+Q", "File|Exit")))
 	end
 end

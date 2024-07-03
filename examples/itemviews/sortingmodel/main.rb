@@ -26,30 +26,30 @@
 require 'Qt5'
 require './treemodel.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 
-file = Qt::File.new("default.txt")
-file.open(Qt::IODevice::ReadOnly)
+file = Qt5::File.new("default.txt")
+file.open(Qt5::IODevice::ReadOnly)
 model = TreeModel.new(file.readAll)
 file.close
 
-unsortedView = Qt::TreeView.new
+unsortedView = Qt5::TreeView.new
 unsortedView.model = model
-unsortedView.windowTitle = Qt::Object.tr("Unsorted Data")
+unsortedView.windowTitle = Qt5::Object.tr("Unsorted Data")
 unsortedView.show
 
-sortingModel = Qt::SortFilterProxyModel.new
+sortingModel = Qt5::SortFilterProxyModel.new
 sortingModel.sourceModel = model
 
-sortedView = Qt::TreeView.new
+sortedView = Qt5::TreeView.new
 sortedView.model = sortingModel
-sortedView.windowTitle = Qt::Object.tr("Sorted Data")
-sortedView.header.setSortIndicator(1, Qt::AscendingOrder)
+sortedView.windowTitle = Qt5::Object.tr("Sorted Data")
+sortedView.header.setSortIndicator(1, Qt5::AscendingOrder)
 sortedView.header.sortIndicatorShown = true
 sortedView.header.sectionsClickable = true
 sortedView.sortingEnabled = true
 sortedView.show
 
 
-# Qt::Internal::setDebug Qt::QtDebugChannel::QTDB_VIRTUAL
+# Qt5::Internal::setDebug Qt5::QtDebugChannel::QTDB_VIRTUAL
 app.exec

@@ -24,7 +24,7 @@
 =end
 
 
-class Window < Qt::Widget
+class Window < Qt5::Widget
 
     slots   'slotEchoChanged( int )',
             'slotValidatorChanged( int )',
@@ -34,56 +34,56 @@ class Window < Qt::Widget
 
     def initialize(parent = nil)
         super(parent)
-        echoGroup = Qt::GroupBox.new(tr("Echo"))
+        echoGroup = Qt5::GroupBox.new(tr("Echo"))
     
-        echoLabel = Qt::Label.new(tr("Mode:"))
-        echoComboBox = Qt::ComboBox.new
+        echoLabel = Qt5::Label.new(tr("Mode:"))
+        echoComboBox = Qt5::ComboBox.new
         echoComboBox.addItem(tr("Normal"))
         echoComboBox.addItem(tr("Password"))
         echoComboBox.addItem(tr("No Echo"))
     
-        @echoLineEdit = Qt::LineEdit.new
+        @echoLineEdit = Qt5::LineEdit.new
         @echoLineEdit.setFocus()
     
-        validatorGroup = Qt::GroupBox.new(tr("Validator"))
+        validatorGroup = Qt5::GroupBox.new(tr("Validator"))
     
-        validatorLabel = Qt::Label.new(tr("Type:"))
-        validatorComboBox = Qt::ComboBox.new
+        validatorLabel = Qt5::Label.new(tr("Type:"))
+        validatorComboBox = Qt5::ComboBox.new
         validatorComboBox.addItem(tr("No validator"))
         validatorComboBox.addItem(tr("Integer validator"))
         validatorComboBox.addItem(tr("Double validator"))
     
-        @validatorLineEdit = Qt::LineEdit.new
+        @validatorLineEdit = Qt5::LineEdit.new
     
-        alignmentGroup = Qt::GroupBox.new(tr("Alignment"))
+        alignmentGroup = Qt5::GroupBox.new(tr("Alignment"))
     
-        alignmentLabel = Qt::Label.new(tr("Type:"))
-        alignmentComboBox = Qt::ComboBox.new
+        alignmentLabel = Qt5::Label.new(tr("Type:"))
+        alignmentComboBox = Qt5::ComboBox.new
         alignmentComboBox.addItem(tr("Left"))
         alignmentComboBox.addItem(tr("Centered"))
         alignmentComboBox.addItem(tr("Right"))
     
-        @alignmentLineEdit = Qt::LineEdit.new
+        @alignmentLineEdit = Qt5::LineEdit.new
     
-        inputMaskGroup = Qt::GroupBox.new(tr("Input mask"))
+        inputMaskGroup = Qt5::GroupBox.new(tr("Input mask"))
     
-        inputMaskLabel = Qt::Label.new(tr("Type:"))
-        inputMaskComboBox = Qt::ComboBox.new
+        inputMaskLabel = Qt5::Label.new(tr("Type:"))
+        inputMaskComboBox = Qt5::ComboBox.new
         inputMaskComboBox.addItem(tr("No mask"))
         inputMaskComboBox.addItem(tr("Phone number"))
         inputMaskComboBox.addItem(tr("ISO date"))
         inputMaskComboBox.addItem(tr("License key"))
     
-        @inputMaskLineEdit = Qt::LineEdit.new
+        @inputMaskLineEdit = Qt5::LineEdit.new
     
-        accessGroup = Qt::GroupBox.new(tr("Access"))
+        accessGroup = Qt5::GroupBox.new(tr("Access"))
     
-        accessLabel = Qt::Label.new(tr("Read-only:"))
-        accessComboBox = Qt::ComboBox.new
+        accessLabel = Qt5::Label.new(tr("Read-only:"))
+        accessComboBox = Qt5::ComboBox.new
         accessComboBox.addItem(tr("False"))
         accessComboBox.addItem(tr("True"))
     
-        @accessLineEdit = Qt::LineEdit.new
+        @accessLineEdit = Qt5::LineEdit.new
     
         connect(echoComboBox, SIGNAL('activated(int)'),
                 self, SLOT('slotEchoChanged(int)'))
@@ -96,37 +96,37 @@ class Window < Qt::Widget
         connect(accessComboBox, SIGNAL('activated(int)'),
                 self, SLOT('slotAccessChanged(int)'))
     
-        echoLayout = Qt::GridLayout.new
+        echoLayout = Qt5::GridLayout.new
         echoLayout.addWidget(echoLabel, 0, 0)
         echoLayout.addWidget(echoComboBox, 0, 1)
         echoLayout.addWidget(@echoLineEdit, 1, 0, 1, 2)
         echoGroup.layout = echoLayout
     
-        validatorLayout = Qt::GridLayout.new
+        validatorLayout = Qt5::GridLayout.new
         validatorLayout.addWidget(validatorLabel, 0, 0)
         validatorLayout.addWidget(validatorComboBox, 0, 1)
         validatorLayout.addWidget(@validatorLineEdit, 1, 0, 1, 2)
         validatorGroup.layout = validatorLayout
     
-        alignmentLayout = Qt::GridLayout.new
+        alignmentLayout = Qt5::GridLayout.new
         alignmentLayout.addWidget(alignmentLabel, 0, 0)
         alignmentLayout.addWidget(alignmentComboBox, 0, 1)
         alignmentLayout.addWidget(@alignmentLineEdit, 1, 0, 1, 2)
         alignmentGroup.layout = alignmentLayout
     
-        inputMaskLayout = Qt::GridLayout.new
+        inputMaskLayout = Qt5::GridLayout.new
         inputMaskLayout.addWidget(inputMaskLabel, 0, 0)
         inputMaskLayout.addWidget(inputMaskComboBox, 0, 1)
         inputMaskLayout.addWidget(@inputMaskLineEdit, 1, 0, 1, 2)
         inputMaskGroup.layout = inputMaskLayout
     
-        accessLayout = Qt::GridLayout.new
+        accessLayout = Qt5::GridLayout.new
         accessLayout.addWidget(accessLabel, 0, 0)
         accessLayout.addWidget(accessComboBox, 0, 1)
         accessLayout.addWidget(@accessLineEdit, 1, 0, 1, 2)
         accessGroup.layout = accessLayout
     
-        layout = Qt::VBoxLayout.new
+        layout = Qt5::VBoxLayout.new
         layout.addWidget(echoGroup)
         layout.addWidget(validatorGroup)
         layout.addWidget(alignmentGroup)
@@ -140,11 +140,11 @@ class Window < Qt::Widget
     def slotEchoChanged(index)
         case index
         when 0
-            @echoLineEdit.echoMode = Qt::LineEdit::Normal
+            @echoLineEdit.echoMode = Qt5::LineEdit::Normal
         when 1
-            @echoLineEdit.echoMode = Qt::LineEdit::Password
+            @echoLineEdit.echoMode = Qt5::LineEdit::Password
         when 2
-            @echoLineEdit.echoMode = Qt::LineEdit::NoEcho
+            @echoLineEdit.echoMode = Qt5::LineEdit::NoEcho
         end
     end
     
@@ -153,9 +153,9 @@ class Window < Qt::Widget
         when 0
             @validatorLineEdit.validator = nil
         when 1
-            @validatorLineEdit.validator = Qt::IntValidator.new(@validatorLineEdit)
+            @validatorLineEdit.validator = Qt5::IntValidator.new(@validatorLineEdit)
         when 2
-            @validatorLineEdit.validator = Qt::DoubleValidator.new(-999.0,
+            @validatorLineEdit.validator = Qt5::DoubleValidator.new(-999.0,
                                                     999.0, 2, @validatorLineEdit)
         end
     
@@ -165,11 +165,11 @@ class Window < Qt::Widget
     def slotAlignmentChanged(index)
         case index
         when 0
-            @alignmentLineEdit.alignment = Qt::AlignLeft.to_i
+            @alignmentLineEdit.alignment = Qt5::AlignLeft.to_i
         when 1
-            @alignmentLineEdit.alignment = Qt::AlignCenter.to_i
+            @alignmentLineEdit.alignment = Qt5::AlignCenter.to_i
         when 2
-            @alignmentLineEdit.alignment = Qt::AlignRight.to_i
+            @alignmentLineEdit.alignment = Qt5::AlignRight.to_i
         end
     end
     

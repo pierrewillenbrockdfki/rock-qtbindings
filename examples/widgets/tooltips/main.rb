@@ -26,7 +26,7 @@
 require 'Qt5'
 require './sortingbox.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 sortingBox = SortingBox.new
 sortingBox.show
 app.exec

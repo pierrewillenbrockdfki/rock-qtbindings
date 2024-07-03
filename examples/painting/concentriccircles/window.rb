@@ -26,7 +26,7 @@
 	
 require './circlewidget.rb'	
 	
-class Window < Qt::Widget
+class Window < Qt5::Widget
 	
 	def initialize(parent = nil)
 		super
@@ -36,13 +36,13 @@ class Window < Qt::Widget
 	    @floatLabel = createLabel(tr("Float"))
 		@circleWidgets = Array.new(2, Array.new(2))
 	
-	    layout = Qt::GridLayout.new
+	    layout = Qt5::GridLayout.new
 	    layout.addWidget(@aliasedLabel, 0, 1)
 	    layout.addWidget(@antialiasedLabel, 0, 2)
 	    layout.addWidget(@intLabel, 1, 0)
 	    layout.addWidget(@floatLabel, 2, 0)
 	
-	    timer = Qt::Timer.new(self)
+	    timer = Qt5::Timer.new(self)
 	
 		(0...2).each do |i|
 			(0...2).each do |j|
@@ -63,10 +63,10 @@ class Window < Qt::Widget
 	end
 	
 	def createLabel(text)
-	    label = Qt::Label.new(text)
-	    label.alignment = Qt::AlignCenter.to_i
+	    label = Qt5::Label.new(text)
+	    label.alignment = Qt5::AlignCenter.to_i
 	    label.margin = 2
-	    label.frameStyle = Qt::Frame::Box | Qt::Frame::Sunken
+	    label.frameStyle = Qt5::Frame::Box | Qt5::Frame::Sunken
 	    return label
 	end
 end

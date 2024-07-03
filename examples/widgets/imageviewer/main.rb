@@ -26,7 +26,7 @@
 require 'Qt5'
 require './imageviewer.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 imageViewer = ImageViewer.new
 imageViewer.show
 app.exec

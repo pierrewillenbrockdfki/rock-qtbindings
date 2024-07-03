@@ -25,17 +25,17 @@
 
 require './flowlayout.rb'
 
-class Window < Qt::Widget
+class Window < Qt5::Widget
 	
 	def initialize(parent = nil)
 		super
 	    flowLayout = FlowLayout.new
 	
-	    flowLayout.addWidget(Qt::PushButton.new(tr("Short")))
-	    flowLayout.addWidget(Qt::PushButton.new(tr("Longer")))
-	    flowLayout.addWidget(Qt::PushButton.new(tr("Different text")))
-	    flowLayout.addWidget(Qt::PushButton.new(tr("More text")))
-	    flowLayout.addWidget(Qt::PushButton.new(tr("Even longer button text")))
+	    flowLayout.addWidget(Qt5::PushButton.new(tr("Short")))
+	    flowLayout.addWidget(Qt5::PushButton.new(tr("Longer")))
+	    flowLayout.addWidget(Qt5::PushButton.new(tr("Different text")))
+	    flowLayout.addWidget(Qt5::PushButton.new(tr("More text")))
+	    flowLayout.addWidget(Qt5::PushButton.new(tr("Even longer button text")))
 	    setLayout(flowLayout)
 	
 	    setWindowTitle(tr("Flow Layout"))

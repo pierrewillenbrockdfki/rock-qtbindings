@@ -2,13 +2,13 @@ require 'Qt5'
 require_relative 'lcdrange.rb'
 require_relative 'cannon.rb'
 
-class GameBoard < Qt::Widget
+class GameBoard < Qt5::Widget
   slots 'fire()', 'hit()', 'missed()', 'newGame()'
 
   def initialize(parent = nil)
     super
-    quit = Qt::PushButton.new('&Quit')
-    quit.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+    quit = Qt5::PushButton.new('&Quit')
+    quit.setFont(Qt5::Font.new('Times', 18, Qt5::Font::Bold))
 
     connect(quit, SIGNAL('clicked()'), $qApp, SLOT('quit()'))
 
@@ -35,24 +35,24 @@ class GameBoard < Qt::Widget
     connect(@cannonField, SIGNAL('missed()'),
                 self, SLOT('missed()'))
 
-    shoot = Qt::PushButton.new('&Shoot', self)
-    shoot.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+    shoot = Qt5::PushButton.new('&Shoot', self)
+    shoot.setFont(Qt5::Font.new('Times', 18, Qt5::Font::Bold))
 
     connect(shoot, SIGNAL('clicked()'), SLOT('fire()'))
     connect(@cannonField, SIGNAL('canShoot(bool)'),
                 shoot, SLOT('setEnabled(bool)'))
 
-    restart = Qt::PushButton.new('&New Game', self)
-    restart.setFont(Qt::Font.new('Times', 18, Qt::Font::Bold))
+    restart = Qt5::PushButton.new('&New Game', self)
+    restart.setFont(Qt5::Font.new('Times', 18, Qt5::Font::Bold))
 
     connect(restart, SIGNAL('clicked()'), self, SLOT('newGame()'))
 
-    @hits = Qt::LCDNumber.new(2, self)
-    @shotsLeft = Qt::LCDNumber.new(2, self)
-    hitsLabel = Qt::Label.new('HITS', self)
-    shotsLeftLabel = Qt::Label.new('SHOTS LEFT', self)
+    @hits = Qt5::LCDNumber.new(2, self)
+    @shotsLeft = Qt5::LCDNumber.new(2, self)
+    hitsLabel = Qt5::Label.new('HITS', self)
+    shotsLeftLabel = Qt5::Label.new('SHOTS LEFT', self)
 
-    topLayout = Qt::HBoxLayout.new
+    topLayout = Qt5::HBoxLayout.new
     topLayout.addWidget(shoot)
     topLayout.addWidget(@hits)
     topLayout.addWidget(hitsLabel)
@@ -61,11 +61,11 @@ class GameBoard < Qt::Widget
     topLayout.addStretch(1)
     topLayout.addWidget(restart)
 
-    leftLayout = Qt::VBoxLayout.new()
+    leftLayout = Qt5::VBoxLayout.new()
     leftLayout.addWidget(angle)
     leftLayout.addWidget(force)
 
-    gridLayout = Qt::GridLayout.new
+    gridLayout = Qt5::GridLayout.new
     gridLayout.addWidget(quit, 0, 0)
     gridLayout.addLayout(topLayout, 0, 1)
     gridLayout.addLayout(leftLayout, 1, 0)

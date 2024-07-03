@@ -25,7 +25,7 @@
         
 require './domitem.rb'
     
-class DomModel < Qt::AbstractItemModel
+class DomModel < Qt5::AbstractItemModel
 
     def initialize(document, parent)
         super(parent)
@@ -33,17 +33,17 @@ class DomModel < Qt::AbstractItemModel
         @rootItem = DomItem.new(@domDocument, 0)
     end
     
-    def columnCount(parent = Qt::ModelIndex.new)
+    def columnCount(parent = Qt5::ModelIndex.new)
         return 3
     end
     
     def data(index, role)
         if !index.valid?
-            return Qt::Variant.new
+            return Qt5::Variant.new
         end
     
-        if role != Qt::DisplayRole
-            return Qt::Variant.new
+        if role != Qt5::DisplayRole
+            return Qt5::Variant.new
         end
     
         item = index.internalPointer
@@ -53,51 +53,51 @@ class DomModel < Qt::AbstractItemModel
     
         case index.column
         when 0
-            return Qt::Variant.new(node.nodeName)
+            return Qt5::Variant.new(node.nodeName)
         when 1
             for i in 0...attributeMap.length
                 attribute = attributeMap.item(i)
                 attributes << attribute.nodeName() + '="' + 
                                 attribute.nodeValue() + '"'
             end
-            return Qt::Variant.new(attributes.join(" "))
+            return Qt5::Variant.new(attributes.join(" "))
         when 2
             if node.nodeValue.nil?
-                return Qt::Variant.new
+                return Qt5::Variant.new
             else
-                return Qt::Variant.new(node.nodeValue().split("\n").join(" "))
+                return Qt5::Variant.new(node.nodeValue().split("\n").join(" "))
             end
         else
-            return Qt::Variant.new
+            return Qt5::Variant.new
         end
     end
     
     def flags(index)
         if !index.valid?
-            return Qt::ItemIsEnabled
+            return Qt5::ItemIsEnabled
         end
     
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable
+        return Qt5::ItemIsEnabled | Qt5::ItemIsSelectable
     end
     
-    def headerData(section, orientation, role = Qt::DisplayRole)
-        if orientation == Qt::Horizontal && role == Qt::DisplayRole
+    def headerData(section, orientation, role = Qt5::DisplayRole)
+        if orientation == Qt5::Horizontal && role == Qt5::DisplayRole
             case section
             when 0
-                return Qt::Variant.new(tr("Name"))
+                return Qt5::Variant.new(tr("Name"))
             when 1
-                return Qt::Variant.new(tr("Attributes"))
+                return Qt5::Variant.new(tr("Attributes"))
             when 2
-                return Qt::Variant.new(tr("Value"))
+                return Qt5::Variant.new(tr("Value"))
             else
-                return Qt::Variant.new
+                return Qt5::Variant.new
             end
         end
     
-        return Qt::Variant.new
+        return Qt5::Variant.new
     end
     
-    def index(row, column, parent = Qt::ModelIndex.new)
+    def index(row, column, parent = Qt5::ModelIndex.new)
         if !parent.valid?
             parentItem = @rootItem
         else
@@ -108,26 +108,26 @@ class DomModel < Qt::AbstractItemModel
         if ! childItem.nil?
             return createIndex(row, column, childItem)
         else
-            return Qt::ModelIndex.new
+            return Qt5::ModelIndex.new
         end
     end
     
     def parent(child)
         if !child.valid?
-            return Qt::ModelIndex.new
+            return Qt5::ModelIndex.new
         end
     
         childItem = child.internalPointer()
         parentItem = childItem.parent()
     
         if parentItem.nil? || parentItem == @rootItem
-            return Qt::ModelIndex.new
+            return Qt5::ModelIndex.new
         end
     
         return createIndex(parentItem.row(), 0, parentItem)
     end
     
-    def rowCount(parent = Qt::ModelIndex.new)
+    def rowCount(parent = Qt5::ModelIndex.new)
         if !parent.valid?
             parentItem = @rootItem
         else

@@ -25,7 +25,7 @@
 
 require './shapeitem.rb'
 
-class SortingBox < Qt::Widget
+class SortingBox < Qt5::Widget
 	
 	slots	:createNewCircle,
     		:createNewSquare,
@@ -35,30 +35,30 @@ class SortingBox < Qt::Widget
 	
 	def initialize(parent = nil)
 		super(parent)
-	    setAttribute(Qt::WA_StaticContents)
+	    setAttribute(Qt5::WA_StaticContents)
 	    setMouseTracking(true)
-	    setBackgroundRole(Qt::Palette::Base)
+	    setBackgroundRole(Qt5::Palette::Base)
 	
 	    @itemInMotion = nil
 		@shapeItems = []
-		@circlePath = Qt::PainterPath.new
-		@squarePath = Qt::PainterPath.new
-		@trianglePath = Qt::PainterPath.new
+		@circlePath = Qt5::PainterPath.new
+		@squarePath = Qt5::PainterPath.new
+		@trianglePath = Qt5::PainterPath.new
 
 	    @newCircleButton = createToolButton(tr("New Circle"),
-	                                       Qt::Icon.new("images/circle.png"),
+	                                       Qt5::Icon.new("images/circle.png"),
 	                                       SLOT(:createNewCircle))
 	
 	    @newSquareButton = createToolButton(tr("New Square"),
-	                                       Qt::Icon.new("images/square.png"),
+	                                       Qt5::Icon.new("images/square.png"),
 	                                       SLOT(:createNewSquare))
 	
 	    @newTriangleButton = createToolButton(tr("New Triangle"),
-	                                         Qt::Icon.new("images/triangle.png"),
+	                                         Qt5::Icon.new("images/triangle.png"),
 	                                         SLOT(:createNewTriangle))
 	
-	    @circlePath.addEllipse(Qt::RectF.new(0.0, 0.0, 100.0, 100.0))
-	    @squarePath.addRect(Qt::RectF.new(0.0, 0.0, 100.0, 100.0))
+	    @circlePath.addEllipse(Qt5::RectF.new(0.0, 0.0, 100.0, 100.0))
+	    @squarePath.addRect(Qt5::RectF.new(0.0, 0.0, 100.0, 100.0))
 	
 	    x = @trianglePath.currentPosition().x()
 	    y = @trianglePath.currentPosition().y()
@@ -79,19 +79,19 @@ class SortingBox < Qt::Widget
 	end
 	
 	def event(event)
-	    if event.type == Qt::Event::ToolTip
+	    if event.type == Qt5::Event::ToolTip
 	        index = itemAt(event.pos())
 	        if index != -1
-	            Qt::ToolTip.showText(event.globalPos(), @shapeItems[index].toolTip())
+	            Qt5::ToolTip.showText(event.globalPos(), @shapeItems[index].toolTip())
 	        else
-	            Qt::ToolTip.showText(event.globalPos(), "")
+	            Qt5::ToolTip.showText(event.globalPos(), "")
 			end
 	    end
 	    super(event)
 	end
 	
 	def resizeEvent(event)
-	    margin = style().pixelMetric(Qt::Style::PM_DefaultTopLevelMargin)
+	    margin = style().pixelMetric(Qt5::Style::PM_DefaultTopLevelMargin)
 	    x = width() - margin
 	    y = height() - margin
 	
@@ -101,10 +101,10 @@ class SortingBox < Qt::Widget
 	end
 	
 	def paintEvent(event)
-	    painter = Qt::Painter.new(self)
+	    painter = Qt5::Painter.new(self)
 		@shapeItems.each do |shapeItem|
 	        painter.translate(shapeItem.position())
-	        painter.brush = Qt::Brush.new(shapeItem.color)
+	        painter.brush = Qt5::Brush.new(shapeItem.color)
 	        painter.drawPath(shapeItem.path())
 	        painter.translate(-shapeItem.position())
 	    end
@@ -112,7 +112,7 @@ class SortingBox < Qt::Widget
 	end
 	
 	def mousePressEvent(event)
-	    if event.button == Qt::LeftButton
+	    if event.button == Qt5::LeftButton
 	        index = itemAt(event.pos)
 	        if index != -1
 	            @itemInMotion = @shapeItems[index]
@@ -124,13 +124,13 @@ class SortingBox < Qt::Widget
 	end
 	
 	def mouseMoveEvent(event)
-	    if (event.buttons & Qt::LeftButton.to_i) && !@itemInMotion.nil?
+	    if (event.buttons & Qt5::LeftButton.to_i) && !@itemInMotion.nil?
 	        moveItemTo(event.pos)
 		end
 	end
 	
 	def mouseReleaseEvent(event)
-	    if event.button == Qt::LeftButton && !@itemInMotion.nil?
+	    if event.button == Qt5::LeftButton && !@itemInMotion.nil?
 	        moveItemTo(event.pos)
 	        @itemInMotion = nil
 	    end
@@ -154,7 +154,7 @@ class SortingBox < Qt::Widget
 	def itemAt(pos)
 		(@shapeItems.length - 1).downto(0) do |i|
 	        item = @shapeItems[i]
-	        if item.path.contains(Qt::PointF.new(pos - item.position))
+	        if item.path.contains(Qt5::PointF.new(pos - item.position))
 	            return i
 			end
 	    end
@@ -174,7 +174,7 @@ class SortingBox < Qt::Widget
 	                        size.rwidth, size.rheight)
 	
 	    return y - size.rheight - 
-				style().pixelMetric(Qt::Style::PM_DefaultLayoutSpacing)
+				style().pixelMetric(Qt5::Style::PM_DefaultLayoutSpacing)
 	end
 	
 	def createShapeItem(path, toolTip, pos, color)
@@ -188,10 +188,10 @@ class SortingBox < Qt::Widget
 	end
 	
 	def createToolButton(toolTip, icon, member)
-	    button = Qt::ToolButton.new(self)
+	    button = Qt5::ToolButton.new(self)
 	    button.toolTip = toolTip
 	    button.icon = icon
-	    button.setIconSize(Qt::Size.new(32, 32))
+	    button.setIconSize(Qt5::Size.new(32, 32))
 	    connect(button, SIGNAL(:clicked), self, member)
 	
 	    return button
@@ -205,18 +205,18 @@ class SortingBox < Qt::Widget
 	        x = (width() / @shapeItems.size -
 	             path.controlPointRect.width) / 2
 		end
-	    return Qt::Point.new(x, y)
+	    return Qt5::Point.new(x, y)
 	end
 	
 	def randomItemPosition()
-	    return Qt::Point.new(rand(RAND_MAX) % (width() - 120), rand(RAND_MAX) % (height() - 120))
+	    return Qt5::Point.new(rand(RAND_MAX) % (width() - 120), rand(RAND_MAX) % (height() - 120))
 	end
 	
 	def initialItemColor()
-	    return Qt::Color::fromHsv(((@shapeItems.size() + 1) * 85) % 256, 255, 190)
+	    return Qt5::Color::fromHsv(((@shapeItems.size() + 1) * 85) % 256, 255, 190)
 	end
 	
 	def randomItemColor()
-	    return Qt::Color::fromHsv(rand(RAND_MAX) % 256, 255, 190)
+	    return Qt5::Color::fromHsv(rand(RAND_MAX) % 256, 255, 190)
 	end
 end

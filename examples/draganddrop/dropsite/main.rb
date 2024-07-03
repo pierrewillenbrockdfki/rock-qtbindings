@@ -26,8 +26,8 @@
 require 'Qt5'
 require './dropsitewindow.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 window = DropSiteWindow.new
 window.show
-# Qt::debug_level = Qt::DebugLevel::High
+# Qt5::debug_level = Qt5::DebugLevel::High
 app.exec

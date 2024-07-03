@@ -23,38 +23,38 @@
 ** Translated to QtRuby by Richard Dale
 =end
     
-class ImageComposer < Qt::Widget
+class ImageComposer < Qt5::Widget
     
-    @@resultSize = Qt::Size.new(200, 200)
+    @@resultSize = Qt5::Size.new(200, 200)
 
     slots :chooseSource, :chooseDestination, :recalculateResult
 
     def initialize()
         super()
 
-        @sourceButton = Qt::ToolButton.new
+        @sourceButton = Qt5::ToolButton.new
         @sourceButton.iconSize = @@resultSize
     
-        @operatorComboBox = Qt::ComboBox.new
-        addOp(Qt::Painter::CompositionMode_SourceOver, tr("SourceOver"))
-        addOp(Qt::Painter::CompositionMode_DestinationOver, tr("DestinationOver"))
-        addOp(Qt::Painter::CompositionMode_Clear, tr("Clear"))
-        addOp(Qt::Painter::CompositionMode_Source, tr("Source"))
-        addOp(Qt::Painter::CompositionMode_Destination, tr("Destination"))
-        addOp(Qt::Painter::CompositionMode_SourceIn, tr("SourceIn"))
-        addOp(Qt::Painter::CompositionMode_DestinationIn, tr("DestinationIn"))
-        addOp(Qt::Painter::CompositionMode_SourceOut, tr("SourceOut"))
-        addOp(Qt::Painter::CompositionMode_DestinationOut, tr("DestinationOut"))
-        addOp(Qt::Painter::CompositionMode_SourceAtop, tr("SourceAtop"))
-        addOp(Qt::Painter::CompositionMode_DestinationAtop, tr("DestinationAtop"))
-        addOp(Qt::Painter::CompositionMode_Xor, tr("Xor"))
+        @operatorComboBox = Qt5::ComboBox.new
+        addOp(Qt5::Painter::CompositionMode_SourceOver, tr("SourceOver"))
+        addOp(Qt5::Painter::CompositionMode_DestinationOver, tr("DestinationOver"))
+        addOp(Qt5::Painter::CompositionMode_Clear, tr("Clear"))
+        addOp(Qt5::Painter::CompositionMode_Source, tr("Source"))
+        addOp(Qt5::Painter::CompositionMode_Destination, tr("Destination"))
+        addOp(Qt5::Painter::CompositionMode_SourceIn, tr("SourceIn"))
+        addOp(Qt5::Painter::CompositionMode_DestinationIn, tr("DestinationIn"))
+        addOp(Qt5::Painter::CompositionMode_SourceOut, tr("SourceOut"))
+        addOp(Qt5::Painter::CompositionMode_DestinationOut, tr("DestinationOut"))
+        addOp(Qt5::Painter::CompositionMode_SourceAtop, tr("SourceAtop"))
+        addOp(Qt5::Painter::CompositionMode_DestinationAtop, tr("DestinationAtop"))
+        addOp(Qt5::Painter::CompositionMode_Xor, tr("Xor"))
     
-        @destinationButton = Qt::ToolButton.new
+        @destinationButton = Qt5::ToolButton.new
         @destinationButton.iconSize = @@resultSize
     
-        @equalLabel = Qt::Label.new(tr("="))
+        @equalLabel = Qt5::Label.new(tr("="))
     
-        @resultLabel = Qt::Label.new
+        @resultLabel = Qt5::Label.new
         @resultLabel.minimumWidth = @@resultSize.width()
     
         connect(@sourceButton, SIGNAL(:clicked), self, SLOT(:chooseSource))
@@ -63,19 +63,19 @@ class ImageComposer < Qt::Widget
         connect(@destinationButton, SIGNAL(:clicked),
                 self, SLOT(:chooseDestination))
     
-        self.layout = Qt::GridLayout.new do |m|
+        self.layout = Qt5::GridLayout.new do |m|
             m.addWidget(@sourceButton, 0, 0, 3, 1)
             m.addWidget(@operatorComboBox, 1, 1)
             m.addWidget(@destinationButton, 0, 2, 3, 1)
             m.addWidget(@equalLabel, 1, 3)
             m.addWidget(@resultLabel, 0, 4, 3, 1)
-            m.sizeConstraint = Qt::Layout::SetFixedSize
+            m.sizeConstraint = Qt5::Layout::SetFixedSize
         end
     
-        @resultImage = Qt::Image.new(@@resultSize, Qt::Image::Format_ARGB32_Premultiplied)
+        @resultImage = Qt5::Image.new(@@resultSize, Qt5::Image::Format_ARGB32_Premultiplied)
     
-        @sourceImage = Qt::Image.new
-        @destinationImage = Qt::Image.new
+        @sourceImage = Qt5::Image.new
+        @destinationImage = Qt5::Image.new
 
         loadImage(":/images/butterfly.png", @sourceImage, @sourceButton)
         loadImage(":/images/checker.png", @destinationImage, @destinationButton)
@@ -96,26 +96,26 @@ class ImageComposer < Qt::Widget
     def recalculateResult()
         mode = currentMode()
     
-        painter = Qt::Painter.new(@resultImage)
-        painter.compositionMode = Qt::Painter::CompositionMode_Source
-        painter.fillRect(@resultImage.rect(), Qt::Brush.new(Qt::transparent))
-        painter.compositionMode = Qt::Painter::CompositionMode_SourceOver
+        painter = Qt5::Painter.new(@resultImage)
+        painter.compositionMode = Qt5::Painter::CompositionMode_Source
+        painter.fillRect(@resultImage.rect(), Qt5::Brush.new(Qt5::transparent))
+        painter.compositionMode = Qt5::Painter::CompositionMode_SourceOver
         painter.drawImage(0, 0, @destinationImage)
         painter.compositionMode = mode
         painter.drawImage(0, 0, @sourceImage)
-        painter.compositionMode = Qt::Painter::CompositionMode_DestinationOver
-        painter.fillRect(@resultImage.rect(), Qt::Brush.new(Qt::white))
+        painter.compositionMode = Qt5::Painter::CompositionMode_DestinationOver
+        painter.fillRect(@resultImage.rect(), Qt5::Brush.new(Qt5::white))
         painter.end
     
-        @resultLabel.pixmap = Qt::Pixmap.fromImage(@resultImage)
+        @resultLabel.pixmap = Qt5::Pixmap.fromImage(@resultImage)
     end
     
     def addOp(mode, name)
-        @operatorComboBox.addItem(name, Qt::Variant.new(mode.to_i))
+        @operatorComboBox.addItem(name, Qt5::Variant.new(mode.to_i))
     end
     
     def chooseImage(title, image, button)
-        fileName = Qt::FileDialog.getOpenFileName(self, title)
+        fileName = Qt5::FileDialog.getOpenFileName(self, title)
         if !fileName.nil?
             loadImage(fileName, image, button)
         end
@@ -124,17 +124,17 @@ class ImageComposer < Qt::Widget
     def loadImage(fileName, image, button)
         image.load(fileName)
     
-        fixedImage = Qt::Image.new(@@resultSize, Qt::Image::Format_ARGB32_Premultiplied)
-        painter = Qt::Painter.new(fixedImage)
-        painter.compositionMode = Qt::Painter::CompositionMode_Source
-        painter.fillRect(fixedImage.rect(), Qt::Brush.new(Qt::transparent))
-        painter.compositionMode = Qt::Painter::CompositionMode_SourceOver
+        fixedImage = Qt5::Image.new(@@resultSize, Qt5::Image::Format_ARGB32_Premultiplied)
+        painter = Qt5::Painter.new(fixedImage)
+        painter.compositionMode = Qt5::Painter::CompositionMode_Source
+        painter.fillRect(fixedImage.rect(), Qt5::Brush.new(Qt5::transparent))
+        painter.compositionMode = Qt5::Painter::CompositionMode_SourceOver
         painter.drawImage(imagePos(image), image)
         painter.end
-        button.icon = Qt::Icon.new(Qt::Pixmap.fromImage(fixedImage))
+        button.icon = Qt5::Icon.new(Qt5::Pixmap.fromImage(fixedImage))
     
 #       The 'QImage::operator=()' method to use as an assignment isn't easily called
-#       in QtRuby, so use the convenience method Qt::Image.fromImage() instead
+#       in QtRuby, so use the convenience method Qt5::Image.fromImage() instead
 #       image = fixedImage
         image.fromImage(fixedImage)
 
@@ -146,7 +146,7 @@ class ImageComposer < Qt::Widget
     end
     
     def imagePos(image)
-        return Qt::Point.new((@@resultSize.width() - image.width()) / 2,
+        return Qt5::Point.new((@@resultSize.width() - image.width()) / 2,
                       (@@resultSize.height() - image.height()) / 2)
     end
 end

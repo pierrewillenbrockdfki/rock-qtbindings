@@ -26,7 +26,7 @@
 require 'Qt5'
 require './dragwidget.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 
 window = DragWidget.new
 window.show

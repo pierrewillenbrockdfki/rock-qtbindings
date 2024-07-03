@@ -25,24 +25,24 @@
 	
 require './detailsdialog.rb'
 
-class MainWindow < Qt::MainWindow
+class MainWindow < Qt5::MainWindow
 	
 	slots   'openDialog()',
     		'printFile()'
 	
 	def initialize(parent = nil)
 		super
-	    fileMenu = Qt::Menu.new(tr("&File"), self)
+	    fileMenu = Qt5::Menu.new(tr("&File"), self)
 	    newAction = fileMenu.addAction(tr("&New..."))
-	    newAction.shortcut = Qt::KeySequence.new( tr("Ctrl+N") )
+	    newAction.shortcut = Qt5::KeySequence.new( tr("Ctrl+N") )
 	    @printAction = fileMenu.addAction(tr("&Print..."), self, SLOT('printFile()'))
-	    @printAction.shortcut = Qt::KeySequence.new( tr("Ctrl+P") )
+	    @printAction.shortcut = Qt5::KeySequence.new( tr("Ctrl+P") )
 	    @printAction.enabled = false
 	    quitAction = fileMenu.addAction(tr("E&xit"))
-	    quitAction.shortcut = Qt::KeySequence.new( tr("Ctrl+Q") )
+	    quitAction.shortcut = Qt5::KeySequence.new( tr("Ctrl+Q") )
 	    menuBar().addMenu(fileMenu)
 	
-	    @letters = Qt::TabWidget.new
+	    @letters = Qt5::TabWidget.new
 	
 	    connect(newAction, SIGNAL('triggered()'), self, SLOT('openDialog()'))
 	    connect(quitAction, SIGNAL('triggered()'), self, SLOT('close()'))
@@ -52,26 +52,26 @@ class MainWindow < Qt::MainWindow
 	end
 	
 	def createLetter(name, address, orderItems, sendOffers)
-	    editor = Qt::TextEdit.new
+	    editor = Qt5::TextEdit.new
 	    tabIndex = @letters.addTab(editor, name)
 	    @letters.currentIndex = tabIndex
 	
-	    cursor = Qt::TextCursor.new(editor.textCursor())
-	    cursor.movePosition(Qt::TextCursor::Start)
+	    cursor = Qt5::TextCursor.new(editor.textCursor())
+	    cursor.movePosition(Qt5::TextCursor::Start)
 	    topFrame = cursor.currentFrame()
 	    topFrameFormat = topFrame.frameFormat()
 	    topFrameFormat.padding = 16
 	    topFrame.frameFormat = topFrameFormat
 	
-	    textFormat = Qt::TextCharFormat.new
-	    boldFormat = Qt::TextCharFormat.new
-	    boldFormat.fontWeight = Qt::Font::Bold
+	    textFormat = Qt5::TextCharFormat.new
+	    boldFormat = Qt5::TextCharFormat.new
+	    boldFormat.fontWeight = Qt5::Font::Bold
 	
-	    referenceFrameFormat = Qt::TextFrameFormat.new do |r|
+	    referenceFrameFormat = Qt5::TextFrameFormat.new do |r|
 			r.border = 1
 			r.padding = 8
-			r.position = Qt::TextFrameFormat::FloatRight
-			r.width = Qt::TextLength.new(Qt::TextLength::PercentageLength, 40)
+			r.position = Qt5::TextFrameFormat::FloatRight
+			r.width = Qt5::TextLength.new(Qt5::TextLength::PercentageLength, 40)
 		end
 	    cursor.insertFrame(referenceFrameFormat)
 	
@@ -93,21 +93,21 @@ class MainWindow < Qt::MainWindow
 	    cursor.insertBlock()
 	    cursor.insertBlock()
 	
-	    date = Qt::Date.currentDate()
+	    date = Qt5::Date.currentDate()
 	    cursor.insertText(tr("Date: %s" % date.toString("d MMMM yyyy")),
 	                      textFormat)
 	    cursor.insertBlock()
 	
-	    bodyFrameFormat = Qt::TextFrameFormat.new
-	    bodyFrameFormat.setWidth(Qt::TextLength.new(Qt::TextLength::PercentageLength, 100))
+	    bodyFrameFormat = Qt5::TextFrameFormat.new
+	    bodyFrameFormat.setWidth(Qt5::TextLength.new(Qt5::TextLength::PercentageLength, 100))
 	    cursor.insertFrame(bodyFrameFormat)
 	
 	    cursor.insertText(tr("I would like to place an order for the following " +
 	                         "items:"), textFormat)
 	    cursor.insertBlock()
 	
-	    orderTableFormat = Qt::TextTableFormat.new
-	    orderTableFormat.alignment = Qt::AlignHCenter.to_i
+	    orderTableFormat = Qt5::TextTableFormat.new
+	    orderTableFormat.alignment = Qt5::AlignHCenter.to_i
 	    orderTable = cursor.insertTable(1, 2, orderTableFormat)
 	
 	    orderFrameFormat = cursor.currentFrame().frameFormat()
@@ -173,7 +173,7 @@ class MainWindow < Qt::MainWindow
 	def openDialog()
 	    dialog = DetailsDialog.new(tr("Enter Customer Details"), self)
 	
-	    if dialog.exec == Qt::Dialog::Accepted
+	    if dialog.exec == Qt5::Dialog::Accepted
 	        createLetter(dialog.senderName, dialog.senderAddress,
 	                     dialog.orderItems, dialog.sendOffers)
 		end
@@ -182,10 +182,10 @@ class MainWindow < Qt::MainWindow
 	def printFile()
 	    editor = @letters.currentWidget
 	    document = editor.document
-	    printer = Qt::Printer.new
+	    printer = Qt5::Printer.new
 	
-	    dialog = Qt::PrintDialog.new(printer, self)
-	    if dialog.exec != Qt::Dialog::Accepted
+	    dialog = Qt5::PrintDialog.new(printer, self)
+	    if dialog.exec != Qt5::Dialog::Accepted
 	        return
 		end
 	

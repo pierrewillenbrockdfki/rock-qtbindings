@@ -26,7 +26,7 @@
 	
 require './renderarea.rb'	
 	
-class Window < Qt::Widget
+class Window < Qt5::Widget
 	
 	slots   'shapeChanged()',
     		'penChanged()',
@@ -34,94 +34,94 @@ class Window < Qt::Widget
 	
 	def initialize(parent = nil)
 		super
-	 	@idRole = Qt::UserRole
+	 	@idRole = Qt5::UserRole
 	    @renderArea = RenderArea.new
 	
-	    @shapeComboBox = Qt::ComboBox.new do |s|
-			s.addItem(tr("Rectangle"), Qt::Variant.new(RenderArea::Rect))
-			s.addItem(tr("Round Rectangle"), Qt::Variant.new(RenderArea::RoundRect))
-			s.addItem(tr("Ellipse"), Qt::Variant.new(RenderArea::Ellipse))
-			s.addItem(tr("Pie"), Qt::Variant.new(RenderArea::Pie))
-			s.addItem(tr("Chord"), Qt::Variant.new(RenderArea::Chord))
-			s.addItem(tr("Polygon"), Qt::Variant.new(RenderArea::Polygon))
-			s.addItem(tr("Path"), Qt::Variant.new(RenderArea::Path))
-			s.addItem(tr("Line"), Qt::Variant.new(RenderArea::Line))
-			s.addItem(tr("Polyline"), Qt::Variant.new(RenderArea::Polyline))
-			s.addItem(tr("Arc"), Qt::Variant.new(RenderArea::Arc))
-			s.addItem(tr("Points"), Qt::Variant.new(RenderArea::Points))
-			s.addItem(tr("Text"), Qt::Variant.new(RenderArea::Text))
-			s.addItem(tr("Pixmap"), Qt::Variant.new(RenderArea::Pixmap))
+	    @shapeComboBox = Qt5::ComboBox.new do |s|
+			s.addItem(tr("Rectangle"), Qt5::Variant.new(RenderArea::Rect))
+			s.addItem(tr("Round Rectangle"), Qt5::Variant.new(RenderArea::RoundRect))
+			s.addItem(tr("Ellipse"), Qt5::Variant.new(RenderArea::Ellipse))
+			s.addItem(tr("Pie"), Qt5::Variant.new(RenderArea::Pie))
+			s.addItem(tr("Chord"), Qt5::Variant.new(RenderArea::Chord))
+			s.addItem(tr("Polygon"), Qt5::Variant.new(RenderArea::Polygon))
+			s.addItem(tr("Path"), Qt5::Variant.new(RenderArea::Path))
+			s.addItem(tr("Line"), Qt5::Variant.new(RenderArea::Line))
+			s.addItem(tr("Polyline"), Qt5::Variant.new(RenderArea::Polyline))
+			s.addItem(tr("Arc"), Qt5::Variant.new(RenderArea::Arc))
+			s.addItem(tr("Points"), Qt5::Variant.new(RenderArea::Points))
+			s.addItem(tr("Text"), Qt5::Variant.new(RenderArea::Text))
+			s.addItem(tr("Pixmap"), Qt5::Variant.new(RenderArea::Pixmap))
 		end
 	
-	    @shapeLabel = Qt::Label.new(tr("&Shape:"))
+	    @shapeLabel = Qt5::Label.new(tr("&Shape:"))
 	    @shapeLabel.buddy = @shapeComboBox
 	
-	    @penWidthSpinBox = Qt::SpinBox.new
+	    @penWidthSpinBox = Qt5::SpinBox.new
 	    @penWidthSpinBox.range = 0..20
 	
-	    @penWidthLabel = Qt::Label.new(tr("Pen &Width:"))
+	    @penWidthLabel = Qt5::Label.new(tr("Pen &Width:"))
 	    @penWidthLabel.buddy = @penWidthSpinBox
 	
-	    @penStyleComboBox = Qt::ComboBox.new do |p|
-			p.addItem(tr("Solid"), Qt::Variant.new(Qt::SolidLine.to_i))
-			p.addItem(tr("Dash"), Qt::Variant.new(Qt::DashLine.to_i))
-			p.addItem(tr("Dot"), Qt::Variant.new(Qt::DotLine.to_i))
-			p.addItem(tr("Dash Dot"), Qt::Variant.new(Qt::DashDotLine.to_i))
-			p.addItem(tr("Dash Dot Dot"), Qt::Variant.new(Qt::DashDotDotLine.to_i))
-			p.addItem(tr("None"), Qt::Variant.new(Qt::NoPen.to_i))
+	    @penStyleComboBox = Qt5::ComboBox.new do |p|
+			p.addItem(tr("Solid"), Qt5::Variant.new(Qt5::SolidLine.to_i))
+			p.addItem(tr("Dash"), Qt5::Variant.new(Qt5::DashLine.to_i))
+			p.addItem(tr("Dot"), Qt5::Variant.new(Qt5::DotLine.to_i))
+			p.addItem(tr("Dash Dot"), Qt5::Variant.new(Qt5::DashDotLine.to_i))
+			p.addItem(tr("Dash Dot Dot"), Qt5::Variant.new(Qt5::DashDotDotLine.to_i))
+			p.addItem(tr("None"), Qt5::Variant.new(Qt5::NoPen.to_i))
 		end
 	
-	    @penStyleLabel = Qt::Label.new(tr("&Pen Style:"))
+	    @penStyleLabel = Qt5::Label.new(tr("&Pen Style:"))
 	    @penStyleLabel.buddy = @penStyleComboBox
 	
-	    @penCapComboBox = Qt::ComboBox.new do |p|
-	    	p.addItem(tr("Flat"), Qt::Variant.new(Qt::FlatCap.to_i))
-	    	p.addItem(tr("Square"), Qt::Variant.new(Qt::SquareCap.to_i))
-	    	p.addItem(tr("Round"), Qt::Variant.new(Qt::RoundCap.to_i))
+	    @penCapComboBox = Qt5::ComboBox.new do |p|
+	    	p.addItem(tr("Flat"), Qt5::Variant.new(Qt5::FlatCap.to_i))
+	    	p.addItem(tr("Square"), Qt5::Variant.new(Qt5::SquareCap.to_i))
+	    	p.addItem(tr("Round"), Qt5::Variant.new(Qt5::RoundCap.to_i))
 		end
 	
-	    @penCapLabel = Qt::Label.new(tr("Pen &Cap:"))
+	    @penCapLabel = Qt5::Label.new(tr("Pen &Cap:"))
 	    @penCapLabel.buddy = @penCapComboBox
 	
-	    @penJoinComboBox = Qt::ComboBox.new do |p|
-	    	p.addItem(tr("Miter"), Qt::Variant.new(Qt::MiterJoin.to_i))
-	    	p.addItem(tr("Bevel"), Qt::Variant.new(Qt::BevelJoin.to_i))
-	    	p.addItem(tr("Round"), Qt::Variant.new(Qt::RoundJoin.to_i))
+	    @penJoinComboBox = Qt5::ComboBox.new do |p|
+	    	p.addItem(tr("Miter"), Qt5::Variant.new(Qt5::MiterJoin.to_i))
+	    	p.addItem(tr("Bevel"), Qt5::Variant.new(Qt5::BevelJoin.to_i))
+	    	p.addItem(tr("Round"), Qt5::Variant.new(Qt5::RoundJoin.to_i))
 		end
 	
-	    @penJoinLabel = Qt::Label.new(tr("Pen &Join:"))
+	    @penJoinLabel = Qt5::Label.new(tr("Pen &Join:"))
 	    @penJoinLabel.buddy = @penJoinComboBox
 	
-	    @brushStyleComboBox = Qt::ComboBox.new do |b|
+	    @brushStyleComboBox = Qt5::ComboBox.new do |b|
 			b.addItem(tr("Linear Gradient"),
-					Qt::Variant.new(Qt::LinearGradientPattern.to_i))
+					Qt5::Variant.new(Qt5::LinearGradientPattern.to_i))
 			b.addItem(tr("Radial Gradient"),
-					Qt::Variant.new(Qt::RadialGradientPattern.to_i))
+					Qt5::Variant.new(Qt5::RadialGradientPattern.to_i))
 			b.addItem(tr("Conical Gradient"),
-					Qt::Variant.new(Qt::ConicalGradientPattern.to_i))
-			b.addItem(tr("Texture"), Qt::Variant.new(Qt::TexturePattern.to_i))
-			b.addItem(tr("Solid"), Qt::Variant.new(Qt::SolidPattern.to_i))
-			b.addItem(tr("Horizontal"), Qt::Variant.new(Qt::HorPattern.to_i))
-			b.addItem(tr("Vertical"), Qt::Variant.new(Qt::VerPattern.to_i))
-			b.addItem(tr("Cross"), Qt::Variant.new(Qt::CrossPattern.to_i))
-			b.addItem(tr("Backward Diagonal"), Qt::Variant.new(Qt::BDiagPattern.to_i))
-			b.addItem(tr("Forward Diagonal"), Qt::Variant.new(Qt::FDiagPattern.to_i))
-			b.addItem(tr("Diagonal Cross"), Qt::Variant.new(Qt::DiagCrossPattern.to_i))
-			b.addItem(tr("Dense 1"), Qt::Variant.new(Qt::Dense1Pattern.to_i))
-			b.addItem(tr("Dense 2"), Qt::Variant.new(Qt::Dense2Pattern.to_i))
-			b.addItem(tr("Dense 3"), Qt::Variant.new(Qt::Dense3Pattern.to_i))
-			b.addItem(tr("Dense 4"), Qt::Variant.new(Qt::Dense4Pattern.to_i))
-			b.addItem(tr("Dense 5"), Qt::Variant.new(Qt::Dense5Pattern.to_i))
-			b.addItem(tr("Dense 6"), Qt::Variant.new(Qt::Dense6Pattern.to_i))
-			b.addItem(tr("Dense 7"), Qt::Variant.new(Qt::Dense7Pattern.to_i))
-			b.addItem(tr("None"), Qt::Variant.new(Qt::NoBrush.to_i))
+					Qt5::Variant.new(Qt5::ConicalGradientPattern.to_i))
+			b.addItem(tr("Texture"), Qt5::Variant.new(Qt5::TexturePattern.to_i))
+			b.addItem(tr("Solid"), Qt5::Variant.new(Qt5::SolidPattern.to_i))
+			b.addItem(tr("Horizontal"), Qt5::Variant.new(Qt5::HorPattern.to_i))
+			b.addItem(tr("Vertical"), Qt5::Variant.new(Qt5::VerPattern.to_i))
+			b.addItem(tr("Cross"), Qt5::Variant.new(Qt5::CrossPattern.to_i))
+			b.addItem(tr("Backward Diagonal"), Qt5::Variant.new(Qt5::BDiagPattern.to_i))
+			b.addItem(tr("Forward Diagonal"), Qt5::Variant.new(Qt5::FDiagPattern.to_i))
+			b.addItem(tr("Diagonal Cross"), Qt5::Variant.new(Qt5::DiagCrossPattern.to_i))
+			b.addItem(tr("Dense 1"), Qt5::Variant.new(Qt5::Dense1Pattern.to_i))
+			b.addItem(tr("Dense 2"), Qt5::Variant.new(Qt5::Dense2Pattern.to_i))
+			b.addItem(tr("Dense 3"), Qt5::Variant.new(Qt5::Dense3Pattern.to_i))
+			b.addItem(tr("Dense 4"), Qt5::Variant.new(Qt5::Dense4Pattern.to_i))
+			b.addItem(tr("Dense 5"), Qt5::Variant.new(Qt5::Dense5Pattern.to_i))
+			b.addItem(tr("Dense 6"), Qt5::Variant.new(Qt5::Dense6Pattern.to_i))
+			b.addItem(tr("Dense 7"), Qt5::Variant.new(Qt5::Dense7Pattern.to_i))
+			b.addItem(tr("None"), Qt5::Variant.new(Qt5::NoBrush.to_i))
 		end
 	
-	    @brushStyleLabel = Qt::Label.new(tr("&Brush Style:"))
+	    @brushStyleLabel = Qt5::Label.new(tr("&Brush Style:"))
 	    @brushStyleLabel.buddy = @brushStyleComboBox
 	
-	    @antialiasingCheckBox = Qt::CheckBox.new(tr("&Antialiasing"))
-	    @transformationsCheckBox = Qt::CheckBox.new(tr("&Transformations"))
+	    @antialiasingCheckBox = Qt5::CheckBox.new(tr("&Antialiasing"))
+	    @transformationsCheckBox = Qt5::CheckBox.new(tr("&Transformations"))
 	
 	    connect(@shapeComboBox, SIGNAL('activated(int)'),
 	            self, SLOT('shapeChanged()'))
@@ -140,12 +140,12 @@ class Window < Qt::Widget
 	    connect(@transformationsCheckBox, SIGNAL('toggled(bool)'),
 	            @renderArea, SLOT('transformed=(bool)'))
 	
-	    checkBoxLayout = Qt::HBoxLayout.new do |c|
+	    checkBoxLayout = Qt5::HBoxLayout.new do |c|
 	    	c.addWidget(@antialiasingCheckBox)
 	    	c.addWidget(@transformationsCheckBox)
 		end
 	
-	    self.layout = Qt::GridLayout.new do |l|
+	    self.layout = Qt5::GridLayout.new do |l|
 			l.addWidget(@renderArea, 0, 0, 1, 2)
 			l.addWidget(@shapeLabel, 1, 0)
 			l.addWidget(@shapeComboBox, 1, 1)
@@ -182,34 +182,34 @@ class Window < Qt::Widget
 	    cap = @penCapComboBox.itemData(@penCapComboBox.currentIndex(), @idRole).toInt
 	    join = @penJoinComboBox.itemData(@penJoinComboBox.currentIndex(), @idRole).toInt
 	
-	    @renderArea.pen = Qt::Pen.new(Qt::Brush.new(Qt::blue), width, style, cap, join)
+	    @renderArea.pen = Qt5::Pen.new(Qt5::Brush.new(Qt5::blue), width, style, cap, join)
 	end
 	
 	def brushChanged()
 	    style = @brushStyleComboBox.itemData(@brushStyleComboBox.currentIndex(), @idRole).toInt
 	
-	    if style == Qt::LinearGradientPattern
-	        linearGradient = Qt::LinearGradient.new(0, 0, 100, 100)
-	        linearGradient.setColorAt(0.0, Qt::Color.new(Qt::white))
-	        linearGradient.setColorAt(0.2, Qt::Color.new(Qt::green))
-	        linearGradient.setColorAt(1.0, Qt::Color.new(Qt::black))
-	        @renderArea.brush = Qt::Brush.new(linearGradient)
-	    elsif style == Qt::RadialGradientPattern
-	        radialGradient = Qt::RadialGradient.new(50, 50, 50, 50, 50)
-	        radialGradient.setColorAt(0.0, Qt::Color.new(Qt::white))
-	        radialGradient.setColorAt(0.2, Qt::Color.new(Qt::green))
-	        radialGradient.setColorAt(1.0, Qt::Color.new(Qt::black))
-	        @renderArea.brush = Qt::Brush.new(radialGradient)
-	    elsif style == Qt::ConicalGradientPattern
-	        conicalGradient = Qt::ConicalGradient.new(50, 50, 150)
-	        conicalGradient.setColorAt(0.0, Qt::Color.new(Qt::white))
-	        conicalGradient.setColorAt(0.2, Qt::Color.new(Qt::green))
-	        conicalGradient.setColorAt(1.0, Qt::Color.new(Qt::black))
-	        @renderArea.brush = Qt::Brush.new(conicalGradient)
-	    elsif style == Qt::TexturePattern
-	        @renderArea.brush = Qt::Brush.new(Qt::Pixmap.new("images/brick.png"))
+	    if style == Qt5::LinearGradientPattern
+	        linearGradient = Qt5::LinearGradient.new(0, 0, 100, 100)
+	        linearGradient.setColorAt(0.0, Qt5::Color.new(Qt5::white))
+	        linearGradient.setColorAt(0.2, Qt5::Color.new(Qt5::green))
+	        linearGradient.setColorAt(1.0, Qt5::Color.new(Qt5::black))
+	        @renderArea.brush = Qt5::Brush.new(linearGradient)
+	    elsif style == Qt5::RadialGradientPattern
+	        radialGradient = Qt5::RadialGradient.new(50, 50, 50, 50, 50)
+	        radialGradient.setColorAt(0.0, Qt5::Color.new(Qt5::white))
+	        radialGradient.setColorAt(0.2, Qt5::Color.new(Qt5::green))
+	        radialGradient.setColorAt(1.0, Qt5::Color.new(Qt5::black))
+	        @renderArea.brush = Qt5::Brush.new(radialGradient)
+	    elsif style == Qt5::ConicalGradientPattern
+	        conicalGradient = Qt5::ConicalGradient.new(50, 50, 150)
+	        conicalGradient.setColorAt(0.0, Qt5::Color.new(Qt5::white))
+	        conicalGradient.setColorAt(0.2, Qt5::Color.new(Qt5::green))
+	        conicalGradient.setColorAt(1.0, Qt5::Color.new(Qt5::black))
+	        @renderArea.brush = Qt5::Brush.new(conicalGradient)
+	    elsif style == Qt5::TexturePattern
+	        @renderArea.brush = Qt5::Brush.new(Qt5::Pixmap.new("images/brick.png"))
 	    else
-	        @renderArea.brush = Qt::Brush.new(Qt::green, style)
+	        @renderArea.brush = Qt5::Brush.new(Qt5::green, style)
 	    end
 	end
 end

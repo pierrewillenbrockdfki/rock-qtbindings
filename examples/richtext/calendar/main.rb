@@ -26,7 +26,7 @@
 require 'Qt5'
 require './mainwindow.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 window = MainWindow.new
 window.resize(640, 256)
 window.show

@@ -23,9 +23,9 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class RenderArea < Qt::Widget
+class RenderArea < Qt5::Widget
 	
-	slots	'fillRule=(Qt::FillRule)',
+	slots	'fillRule=(Qt5::FillRule)',
     		'setFillGradient(const QColor &, const QColor &)',
     		'penWidth=(int)',
     		'penColor=(const QColor &)',
@@ -36,19 +36,19 @@ class RenderArea < Qt::Widget
 	    @penWidth = 1
 	    @rotationAngle = 0
 		@path = path
-		@fillColor1 = Qt::Color.new
-		@fillColor2 = Qt::Color.new
+		@fillColor1 = Qt5::Color.new
+		@fillColor2 = Qt5::Color.new
 		@penWidth = 0
-		@penColor = Qt::Color.new
-	    setBackgroundRole(Qt::Palette::Base)
+		@penColor = Qt5::Color.new
+	    setBackgroundRole(Qt5::Palette::Base)
 	end
 	
 	def minimumSizeHint()
-	    return Qt::Size.new(50, 50)
+	    return Qt5::Size.new(50, 50)
 	end
 	
 	def sizeHint()
-	    return Qt::Size.new(100, 100)
+	    return Qt5::Size.new(100, 100)
 	end
 	
 	def fillRule=(rule)
@@ -78,19 +78,19 @@ class RenderArea < Qt::Widget
 	end
 	
 	def paintEvent(event)
-	    painter = Qt::Painter.new(self)
-	    painter.renderHint = Qt::Painter::Antialiasing
+	    painter = Qt5::Painter.new(self)
+	    painter.renderHint = Qt5::Painter::Antialiasing
 	    painter.scale(width() / 100.0, height() / 100.0)
 	    painter.translate(50.0, 50.0)
 	    painter.rotate(-@rotationAngle)
 	    painter.translate(-50.0, -50.0)
 	
-	    painter.pen = Qt::Pen.new(Qt::Brush.new(@penColor), @penWidth, Qt::SolidLine, Qt::RoundCap,
-	                        Qt::RoundJoin)
-	    gradient = Qt::LinearGradient.new(0, 0, 0, 100)
+	    painter.pen = Qt5::Pen.new(Qt5::Brush.new(@penColor), @penWidth, Qt5::SolidLine, Qt5::RoundCap,
+	                        Qt5::RoundJoin)
+	    gradient = Qt5::LinearGradient.new(0, 0, 0, 100)
 	    gradient.setColorAt(0.0, @fillColor1)
 	    gradient.setColorAt(1.0, @fillColor2)
-	    painter.brush = Qt::Brush.new(gradient)
+	    painter.brush = Qt5::Brush.new(gradient)
 	    painter.drawPath(@path)
 		painter.end
 	end

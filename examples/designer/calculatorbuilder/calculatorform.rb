@@ -23,27 +23,27 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-class CalculatorForm < Qt::Widget
+class CalculatorForm < Qt5::Widget
 		
 	slots	'on_inputSpinBox1_valueChanged(int)',
     		'on_inputSpinBox2_valueChanged(int)'
 	
 	def initialize(parent = nil)
 	    super(parent)
-	    loader = Qt::UiLoader.new
+	    loader = Qt5::UiLoader.new
 	
-	    file = Qt::File.new(":/forms/calculatorform.ui")
-	    file.open(Qt::File::ReadOnly)
+	    file = Qt5::File.new(":/forms/calculatorform.ui")
+	    file.open(Qt5::File::ReadOnly)
 	    formWidget = loader.load(file, self)
 	    file.close
 	
-	    @ui_inputSpinBox1 = findChild(Qt::SpinBox, "inputSpinBox1")
-	    @ui_inputSpinBox2 = findChild(Qt::SpinBox, "inputSpinBox2")
-	    @ui_outputWidget = findChild(Qt::Label, "outputWidget")
+	    @ui_inputSpinBox1 = findChild(Qt5::SpinBox, "inputSpinBox1")
+	    @ui_inputSpinBox2 = findChild(Qt5::SpinBox, "inputSpinBox2")
+	    @ui_outputWidget = findChild(Qt5::Label, "outputWidget")
 	
-	    Qt::MetaObject.connectSlotsByName(self)
+	    Qt5::MetaObject.connectSlotsByName(self)
 	
-	    self.layout = Qt::VBoxLayout.new do |l|
+	    self.layout = Qt5::VBoxLayout.new do |l|
 	    	l.addWidget(formWidget)
 		end
 	

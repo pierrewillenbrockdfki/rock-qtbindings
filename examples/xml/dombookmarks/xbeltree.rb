@@ -25,7 +25,7 @@
 	
 	
 	
-class XbelTree < Qt::TreeWidget
+class XbelTree < Qt5::TreeWidget
 	
 	slots	'updateDomElement(QTreeWidgetItem *, int)'
 	
@@ -36,29 +36,29 @@ class XbelTree < Qt::TreeWidget
 	    labels = []
 	    labels << tr("Title") << tr("Location")
 	
-	    header().setSectionResizeMode(0, Qt::HeaderView::Stretch)
+	    header().setSectionResizeMode(0, Qt5::HeaderView::Stretch)
 	    setHeaderLabels(labels)
 	
-		@folderIcon = Qt::Icon.new
-	    @folderIcon.addPixmap(style().standardPixmap(Qt::Style::SP_DirClosedIcon),
-	                         Qt::Icon::Normal, Qt::Icon::Off)
-	    @folderIcon.addPixmap(style().standardPixmap(Qt::Style::SP_DirOpenIcon),
-	                         Qt::Icon::Normal, Qt::Icon::On)
-		@bookmarkIcon = Qt::Icon.new
-	    @bookmarkIcon.addPixmap(style().standardPixmap(Qt::Style::SP_FileIcon))
+		@folderIcon = Qt5::Icon.new
+	    @folderIcon.addPixmap(style().standardPixmap(Qt5::Style::SP_DirClosedIcon),
+	                         Qt5::Icon::Normal, Qt5::Icon::Off)
+	    @folderIcon.addPixmap(style().standardPixmap(Qt5::Style::SP_DirOpenIcon),
+	                         Qt5::Icon::Normal, Qt5::Icon::On)
+		@bookmarkIcon = Qt5::Icon.new
+	    @bookmarkIcon.addPixmap(style().standardPixmap(Qt5::Style::SP_FileIcon))
 
 		@domElementForItem = {}
-		@domDocument = Qt::DomDocument.new
+		@domDocument = Qt5::DomDocument.new
 	end
 	
 	def read(device)
 	    errorStr = ""
-	    errorLine = Qt::Integer.new
-	    errorColumn = Qt::Integer.new
+	    errorLine = Qt5::Integer.new
+	    errorColumn = Qt5::Integer.new
 	
 	    if !@domDocument.setContent(device, true, errorStr, errorLine,
 	                                errorColumn)
-	        Qt::MessageBox.information(window(), tr("DOM Bookmarks"),
+	        Qt5::MessageBox.information(window(), tr("DOM Bookmarks"),
 	                                 tr("Parse error at line %d, column %d:\n%s" %
 	                                 [errorLine, errorColumn, errorStr]))
 	        return false
@@ -66,12 +66,12 @@ class XbelTree < Qt::TreeWidget
 	
 	    root = @domDocument.documentElement()
 	    if root.tagName() != "xbel"
-	        Qt::MessageBox.information(window(), tr("DOM Bookmarks"),
+	        Qt5::MessageBox.information(window(), tr("DOM Bookmarks"),
 	                                 tr("The file is not an XBEL file."))
 	        return false
 	    elsif root.hasAttribute("version") &&
 	               root.attribute("version") != "1.0"
-	        Qt::MessageBox.information(window(), tr("DOM Bookmarks"),
+	        Qt5::MessageBox.information(window(), tr("DOM Bookmarks"),
 	                                 tr("The file is not an XBEL version 1.0 " \
 	                                    "file."))
 	        return false
@@ -95,7 +95,7 @@ class XbelTree < Qt::TreeWidget
 	end
 	
 	def write(device)
-	    outf = Qt::TextStream.new(device)
+	    outf = Qt5::TextStream.new(device)
 	    @domDocument.save(outf, IndentSize)
 	    return true
 	end
@@ -124,10 +124,10 @@ class XbelTree < Qt::TreeWidget
 	
 	    title = element.firstChildElement("title").text()
 	    if title.nil?
-	        title = Qt::Object.tr("Folder")
+	        title = Qt5::Object.tr("Folder")
 		end
 	
-	    item.flags = item.flags | Qt::ItemIsEditable.to_i
+	    item.flags = item.flags | Qt5::ItemIsEditable.to_i
 	    item.setIcon(0, @folderIcon)
 	    item.setText(0, title)
 	
@@ -143,17 +143,17 @@ class XbelTree < Qt::TreeWidget
 	
 	            title = child.firstChildElement("title").text()
 	            if title.empty?
-	                title = Qt::Object.tr("Folder")
+	                title = Qt5::Object.tr("Folder")
 				end
 	
-	            childItem.flags = item.flags | Qt::ItemIsEditable.to_i
+	            childItem.flags = item.flags | Qt5::ItemIsEditable.to_i
 	            childItem.setIcon(0, @bookmarkIcon)
 	            childItem.setText(0, title)
 	            childItem.setText(1, child.attribute("href"))
 	        elsif child.tagName() == "separator"
 	            childItem = createItem(child, item)
-	            childItem.flags = item.flags & ~(Qt::ItemIsSelectable.to_i | Qt::ItemIsEditable.to_i)
-#	            childItem.setText(0, Qt::String(30, 0xB7))
+	            childItem.flags = item.flags & ~(Qt5::ItemIsSelectable.to_i | Qt5::ItemIsEditable.to_i)
+#	            childItem.setText(0, Qt5::String(30, 0xB7))
 	            childItem.setText(0, "..............................")
 	        end
 	        child = child.nextSiblingElement()
@@ -162,9 +162,9 @@ class XbelTree < Qt::TreeWidget
 	
 	def createItem(element, parentItem)
 	    if !parentItem.nil?
-	        item = Qt::TreeWidgetItem.new(parentItem, Qt::TreeWidgetItem::Type)
+	        item = Qt5::TreeWidgetItem.new(parentItem, Qt5::TreeWidgetItem::Type)
 	    else
-	        item = Qt::TreeWidgetItem.new(self)
+	        item = Qt5::TreeWidgetItem.new(self)
 	    end
 	    @domElementForItem[item] = element
 	    return item

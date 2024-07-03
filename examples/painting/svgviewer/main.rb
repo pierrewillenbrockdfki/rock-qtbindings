@@ -27,7 +27,7 @@ require 'Qt5'
 require './mainwindow.rb'
 require './qrc_svgviewer.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 window = MainWindow.new
 if ARGV.length == 1
     window.openFile(ARGV[0])

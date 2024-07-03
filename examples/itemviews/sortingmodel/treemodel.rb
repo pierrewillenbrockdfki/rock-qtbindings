@@ -27,12 +27,12 @@ require './treeitem.rb'
 	
 #	Provides a simple tree model to show how to create and use hierarchical
 #	models.
-class TreeModel < Qt::AbstractItemModel
+class TreeModel < Qt5::AbstractItemModel
 
 	def initialize(data, parent = nil)
 	    super(parent)
 	    rootData = []
-	    rootData << Qt::Variant.new("Title") << Qt::Variant.new("Summary")
+	    rootData << Qt5::Variant.new("Title") << Qt5::Variant.new("Summary")
 	    @rootItem = TreeItem.new(rootData)
 	    setupModelData(data.to_s.split("\n"), @rootItem)
 	end
@@ -47,31 +47,31 @@ class TreeModel < Qt::AbstractItemModel
 	
 	def data(index, role)
 	    if !index.valid?
-	        return Qt::Variant.new
+	        return Qt5::Variant.new
 		end
 
-	    if role != Qt::DisplayRole
-	        return Qt::Variant.new
+	    if role != Qt5::DisplayRole
+	        return Qt5::Variant.new
 		end
 	
 	    item = index.internalPointer
-	    return Qt::Variant.new(item.data(index.column))
+	    return Qt5::Variant.new(item.data(index.column))
 	end
 	
 	def flags(index)
 	    if !index.valid?
-	        return Qt::ItemIsEnabled
+	        return Qt5::ItemIsEnabled
 		end
 	
-	    return Qt::ItemIsEnabled | Qt::ItemIsSelectable
+	    return Qt5::ItemIsEnabled | Qt5::ItemIsSelectable
 	end
 	
-	def headerData(section, orientation, role = Qt::DisplayRole)
-	    if orientation == Qt::Horizontal && role == Qt::DisplayRole
+	def headerData(section, orientation, role = Qt5::DisplayRole)
+	    if orientation == Qt5::Horizontal && role == Qt5::DisplayRole
 	        return @rootItem.data(section)
 		end
 	
-	    return Qt::Variant.new
+	    return Qt5::Variant.new
 	end
 	
 	def index(row, column, parent)
@@ -85,20 +85,20 @@ class TreeModel < Qt::AbstractItemModel
 	    if ! @childItem.nil?
 	        return createIndex(row, column, @childItem)
 	    else
-	        return Qt::ModelIndex.new
+	        return Qt5::ModelIndex.new
 		end
 	end
 	
 	def parent(index)
 	    if !index.valid?
-	        return Qt::ModelIndex.new
+	        return Qt5::ModelIndex.new
 		end
 	
 	    childItem = index.internalPointer
 	    parentItem = childItem.parent
 	
 	    if parentItem == @rootItem
-	        return Qt::ModelIndex.new
+	        return Qt5::ModelIndex.new
 		end
 	
 	    return createIndex(parentItem.row, 0, parentItem)

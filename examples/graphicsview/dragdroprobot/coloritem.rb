@@ -23,62 +23,62 @@
 ** Translated to QtRuby by Richard Dale
 =end
     
-class ColorItem < Qt::GraphicsItem
+class ColorItem < Qt5::GraphicsItem
     @@n = 0
 
     def initialize
         super
-        @color = Qt::Color.new(rand(256), rand(256), rand(256))
-        setToolTip("Qt::Color(%d, %d, %d)\n%s" %
+        @color = Qt5::Color.new(rand(256), rand(256), rand(256))
+        setToolTip("Qt5::Color(%d, %d, %d)\n%s" %
                [@color.red, @color.green, @color.blue,
                "Click and drag this color onto the robot!"])
-        setCursor(Qt::Cursor.new(Qt::OpenHandCursor))
+        setCursor(Qt5::Cursor.new(Qt5::OpenHandCursor))
     end
     
     def boundingRect
-        return Qt::RectF.new(-15.5, -15.5, 34, 34)
+        return Qt5::RectF.new(-15.5, -15.5, 34, 34)
     end
     
     def paint(painter, option, widget)
-        painter.pen = Qt::NoPen
-        painter.brush = Qt::Brush.new(Qt::darkGray)
+        painter.pen = Qt5::NoPen
+        painter.brush = Qt5::Brush.new(Qt5::darkGray)
         painter.drawEllipse(-12, -12, 30, 30)
-        painter.pen = Qt::Pen.new(Qt::Brush.new(Qt::black), 1)
-        painter.brush = Qt::Brush.new(@color)
+        painter.pen = Qt5::Pen.new(Qt5::Brush.new(Qt5::black), 1)
+        painter.brush = Qt5::Brush.new(@color)
         painter.drawEllipse(-15, -15, 30, 30)
     end
     
     def mousePressEvent(event)
-        if event.button != Qt::LeftButton
+        if event.button != Qt5::LeftButton
             event.ignore
             return
         end
     
-        drag = Qt::Drag.new(event.widget)
-        mime = Qt::MimeData.new
+        drag = Qt5::Drag.new(event.widget)
+        mime = Qt5::MimeData.new
         drag.mimeData = mime
     
         @@n += 1
         if @@n > 2 && rand(3) == 0
-            image = Qt::Image.new(":/images/head.png")
+            image = Qt5::Image.new(":/images/head.png")
             mime.imageData = qVariantFromValue(image)
     
-            drag.pixmap = Qt::Pixmap.fromImage(image.scaled(30, 40))
-            drag.setHotSpot(Qt::Point.new(30, 40))
+            drag.pixmap = Qt5::Pixmap.fromImage(image.scaled(30, 40))
+            drag.setHotSpot(Qt5::Point.new(30, 40))
         else
             mime.colorData = qVariantFromValue(@color)
             mime.text = "#%2.2x%2.2x%2.2x" % [@color.red, @color.green, @color.blue]
 
-            pixmap = Qt::Pixmap.new(34, 34)
-            pixmap.fill(Qt::Color.new(Qt::transparent))
-            painter = Qt::Painter.new(pixmap)
+            pixmap = Qt5::Pixmap.new(34, 34)
+            pixmap.fill(Qt5::Color.new(Qt5::transparent))
+            painter = Qt5::Painter.new(pixmap)
             painter.translate(15, 15)
-            painter.renderHint = Qt::Painter::Antialiasing
+            painter.renderHint = Qt5::Painter::Antialiasing
             paint(painter, 0, 0)
             painter.end
         
             drag.pixmap = pixmap
-            drag.hotSpot = Qt::Point.new(15, 20)
+            drag.hotSpot = Qt5::Point.new(15, 20)
         end
         drag.start
     end

@@ -25,7 +25,7 @@
 	
 require './ui_controller.rb'
 
-class Controller < Qt::Widget
+class Controller < Qt5::Widget
 	
 	slots :on_accelerate_clicked, :on_decelerate_clicked,
     		:on_left_clicked, :on_right_clicked
@@ -34,9 +34,9 @@ class Controller < Qt::Widget
 	    super(parent)
 		@ui = Ui_Controller.new
 	    @ui.setupUi(self)
-	    @car = Qt::DBusInterface.new("com.trolltech.CarExample", "/Car", 
+	    @car = Qt5::DBusInterface.new("com.trolltech.CarExample", "/Car", 
                                      "com.trolltech.Examples.CarInterface",
-	                                  Qt::DBusConnection::sessionBus(), self)
+	                                  Qt5::DBusConnection::sessionBus(), self)
 	    startTimer(1000)
 	end
 	

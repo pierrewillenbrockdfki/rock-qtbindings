@@ -26,7 +26,7 @@
 require 'Qt5'
 require './calculatorform.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 calculator = CalculatorForm.new
 calculator.show
 app.exec

@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class Dialog < Qt::Dialog
+class Dialog < Qt5::Dialog
 	
 	slots	:start,
     		:acceptConnection,
@@ -37,15 +37,15 @@ class Dialog < Qt::Dialog
 	
 	def initialize(parent = nil)
 	    super(parent)
-		@tcpServer = Qt::TcpServer.new
-		@tcpClient = Qt::TcpSocket.new
-	    @clientProgressBar = Qt::ProgressBar.new
-	    @clientStatusLabel = Qt::Label.new(tr("Client ready"))
-	    @serverProgressBar = Qt::ProgressBar.new
-	    @serverStatusLabel = Qt::Label.new(tr("Server ready"))
+		@tcpServer = Qt5::TcpServer.new
+		@tcpClient = Qt5::TcpSocket.new
+	    @clientProgressBar = Qt5::ProgressBar.new
+	    @clientStatusLabel = Qt5::Label.new(tr("Client ready"))
+	    @serverProgressBar = Qt5::ProgressBar.new
+	    @serverStatusLabel = Qt5::Label.new(tr("Server ready"))
 	
-	    @startButton = Qt::PushButton.new(tr("&Start"))
-	    @quitButton = Qt::PushButton.new(tr("&Quit"))
+	    @startButton = Qt5::PushButton.new(tr("&Start"))
+	    @quitButton = Qt5::PushButton.new(tr("&Quit"))
 	
 	    connect(@startButton, SIGNAL(:clicked), self, SLOT(:start))
 	    connect(@quitButton, SIGNAL(:clicked), self, SLOT(:close))
@@ -57,13 +57,13 @@ class Dialog < Qt::Dialog
 	    connect(@tcpClient, SIGNAL('error(QAbstractSocket::SocketError)'),
 	            self, SLOT('displayError(QAbstractSocket::SocketError)'))
 	
-	    buttonLayout = Qt::HBoxLayout.new do |b|
+	    buttonLayout = Qt5::HBoxLayout.new do |b|
 	    	b.addStretch(1)
 	    	b.addWidget(@startButton)
 	    	b.addWidget(@quitButton)
 		end
 	
-	    self.layout = Qt::VBoxLayout.new do |m|
+	    self.layout = Qt5::VBoxLayout.new do |m|
 			m.addWidget(@clientProgressBar)
 			m.addWidget(@clientStatusLabel)
 			m.addWidget(@serverProgressBar)
@@ -77,24 +77,24 @@ class Dialog < Qt::Dialog
 	def start()
 	    @startButton.enabled = false
 	
-	    Qt::Application.overrideCursor = Qt::Cursor.new(Qt::WaitCursor)
+	    Qt5::Application.overrideCursor = Qt5::Cursor.new(Qt5::WaitCursor)
 	
 	    @bytesWritten = 0
 	    @bytesReceived = 0
 	
 	    while !@tcpServer.isListening && !@tcpServer.listen do
-	        ret = Qt::MessageBox.critical(self, tr("Loopback"),
+	        ret = Qt5::MessageBox.critical(self, tr("Loopback"),
 	                                        tr("Unable to start the test: %s." % @tcpServer.errorString),
-	                                        Qt::MessageBox::Retry,
-						                    Qt::MessageBox::Cancel)
-	        if ret == Qt::MessageBox::Cancel
+	                                        Qt5::MessageBox::Retry,
+						                    Qt5::MessageBox::Cancel)
+	        if ret == Qt5::MessageBox::Cancel
 	            return
 			end
 	    end
 	
 	    @serverStatusLabel.text = tr("Listening")
 	    @clientStatusLabel.text = tr("Connecting")
-	    @tcpClient.connectToHost(Qt::HostAddress.new(Qt::HostAddress::LocalHost), 
+	    @tcpClient.connectToHost(Qt5::HostAddress.new(Qt5::HostAddress::LocalHost), 
 								@tcpServer.serverPort)
 	end
 	
@@ -110,7 +110,7 @@ class Dialog < Qt::Dialog
 	end
 	
 	def startTransfer()
-	    @bytesToWrite = TotalBytes - @tcpClient.write(Qt::ByteArray.new('@' * PayloadSize))
+	    @bytesToWrite = TotalBytes - @tcpClient.write(Qt5::ByteArray.new('@' * PayloadSize))
 	    @clientStatusLabel.text = tr("Connected")
 	end
 	
@@ -126,14 +126,14 @@ class Dialog < Qt::Dialog
 	    if @bytesReceived == TotalBytes
 	        @tcpServerConnection.close
 	        @startButton.enabled = true
-	        Qt::Application.restoreOverrideCursor
+	        Qt5::Application.restoreOverrideCursor
 	    end
 	end
 	
 	def updateClientProgress(numBytes)
 	    @bytesWritten += numBytes
 	    if @bytesToWrite > 0
-	        @bytesToWrite -= @tcpClient.write(Qt::ByteArray.new('@' * [@bytesToWrite, PayloadSize].min))
+	        @bytesToWrite -= @tcpClient.write(Qt5::ByteArray.new('@' * [@bytesToWrite, PayloadSize].min))
 		end
 
 	    @clientProgressBar.maximum = TotalBytes
@@ -143,11 +143,11 @@ class Dialog < Qt::Dialog
 	end
 	
 	def displayError(socketError)
-	    if socketError == Qt::TcpSocket::RemoteHostClosedError
+	    if socketError == Qt5::TcpSocket::RemoteHostClosedError
 	        return
 		end
 	
-	    Qt::MessageBox.information(self, tr("Network error"),
+	    Qt5::MessageBox.information(self, tr("Network error"),
 	                             tr("The following error occurred: %s." %
 	                                 tcpClient.errorString))
 	
@@ -158,6 +158,6 @@ class Dialog < Qt::Dialog
 	    @clientStatusLabel.text = tr("Client ready")
 	    @serverStatusLabel.text = tr("Server ready")
 	    @startButton.enabled = true
-	    Qt::Application.restoreOverrideCursor
+	    Qt5::Application.restoreOverrideCursor
 	end
 end

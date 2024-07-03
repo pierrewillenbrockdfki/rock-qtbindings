@@ -25,7 +25,7 @@
 	
 	
 	
-class MdiChild < Qt::TextEdit
+class MdiChild < Qt5::TextEdit
 	
 	attr_reader :currentFile
 
@@ -33,7 +33,7 @@ class MdiChild < Qt::TextEdit
 	
 	def initialize()
 		super
-	    setAttribute(Qt::WA_DeleteOnClose)
+	    setAttribute(Qt5::WA_DeleteOnClose)
 	    @isUntitled = true
 	end
 	
@@ -49,17 +49,17 @@ class MdiChild < Qt::TextEdit
 	end
 	
 	def loadFile(fileName)
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::IODevice::ReadOnly | Qt::IODevice::Text)
-	        Qt::MessageBox.warning(self, tr("MDI"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::IODevice::ReadOnly | Qt5::IODevice::Text)
+	        Qt5::MessageBox.warning(self, tr("MDI"),
 	                             tr("Cannot read file %s:\n%s." % [fileName, file.errorString]))
 	        return false
 	    end
 	
-	    inf = Qt::TextStream.new(file)
-	    Qt::Application.overrideCursor = Qt::Cursor.new(Qt::WaitCursor)
+	    inf = Qt5::TextStream.new(file)
+	    Qt5::Application.overrideCursor = Qt5::Cursor.new(Qt5::WaitCursor)
 	    setPlainText(inf.readAll())
-	    Qt::Application.restoreOverrideCursor()
+	    Qt5::Application.restoreOverrideCursor()
 	
 	    setCurrentFile(fileName)
 	
@@ -78,7 +78,7 @@ class MdiChild < Qt::TextEdit
 	end
 	
 	def saveAs()
-	    fileName = Qt::FileDialog.getSaveFileName(self, tr("Save As"),
+	    fileName = Qt5::FileDialog.getSaveFileName(self, tr("Save As"),
 	                                                    @currentFile)
 	    if not fileName or fileName.empty?
 	        return false
@@ -88,17 +88,17 @@ class MdiChild < Qt::TextEdit
 	end
 	
 	def saveFile(fileName)
-	    file = Qt::File.new(fileName)
-	    if !file.open(Qt::IODevice::WriteOnly | Qt::IODevice::Text)
-	        Qt::MessageBox::warning(self, tr("MDI"),
+	    file = Qt5::File.new(fileName)
+	    if !file.open(Qt5::IODevice::WriteOnly | Qt5::IODevice::Text)
+	        Qt5::MessageBox::warning(self, tr("MDI"),
 	                             tr("Cannot write file %s:\n%s." % [fileName, file.errorString]))
 	        return false
 	    end
 	
-	    outf = Qt::TextStream.new(file)
-	    Qt::Application.setOverrideCursor(Qt::WaitCursor)
+	    outf = Qt5::TextStream.new(file)
+	    Qt5::Application.setOverrideCursor(Qt5::WaitCursor)
 	    outf << toPlainText()
-	    Qt::Application.restoreOverrideCursor()
+	    Qt5::Application.restoreOverrideCursor()
 	
 	    setCurrentFile(fileName)
 	    return true
@@ -122,16 +122,16 @@ class MdiChild < Qt::TextEdit
 	
 	def maybeSave()
 	    if document().isModified()
-	        ret = Qt::MessageBox::warning(self, tr("MDI"),
+	        ret = Qt5::MessageBox::warning(self, tr("MDI"),
 	                     tr("'%s' has been modified.\n" \
 	                        "Do you want to save your changes?" % 
                               userFriendlyCurrentFile()),
-	                     Qt::MessageBox::Yes | Qt::MessageBox::Default,
-	                     Qt::MessageBox::No,
-	                     Qt::MessageBox::Cancel | Qt::MessageBox::Escape)
-	        if ret == Qt::MessageBox::Yes
+	                     Qt5::MessageBox::Yes | Qt5::MessageBox::Default,
+	                     Qt5::MessageBox::No,
+	                     Qt5::MessageBox::Cancel | Qt5::MessageBox::Escape)
+	        if ret == Qt5::MessageBox::Yes
 	            return save()
-	        elsif ret == Qt::MessageBox::Cancel
+	        elsif ret == Qt5::MessageBox::Cancel
 	            return false
 			end
 	    end
@@ -139,7 +139,7 @@ class MdiChild < Qt::TextEdit
 	end
 	
 	def setCurrentFile(fileName)
-	    @currentFile = Qt::FileInfo.new(fileName).canonicalFilePath()
+	    @currentFile = Qt5::FileInfo.new(fileName).canonicalFilePath()
 	    @isUntitled = false
 	    document().modified = false
 	    setWindowModified(false)
@@ -147,6 +147,6 @@ class MdiChild < Qt::TextEdit
 	end
 	
 	def strippedName(fullFileName)
-	    return Qt::FileInfo.new(fullFileName).fileName()
+	    return Qt5::FileInfo.new(fullFileName).fileName()
 	end
 end

@@ -25,7 +25,7 @@
 		
 require './xbelgenerator.rb'
 
-class XbelHandler < Qt::XmlDefaultHandler
+class XbelHandler < Qt5::XmlDefaultHandler
 	
 	def initialize(treeWidget)
 	    super()
@@ -36,45 +36,45 @@ class XbelHandler < Qt::XmlDefaultHandler
 	
 	    style = @treeWidget.style()
 	
-		@folderIcon = Qt::Icon.new
-	    @folderIcon.addPixmap(style.standardPixmap(Qt::Style::SP_DirClosedIcon),
-	                         Qt::Icon::Normal, Qt::Icon::Off)
-	    @folderIcon.addPixmap(style.standardPixmap(Qt::Style::SP_DirOpenIcon),
-	                         Qt::Icon::Normal, Qt::Icon::On)
-		@bookmarkIcon = Qt::Icon.new
-	    @bookmarkIcon.addPixmap(style.standardPixmap(Qt::Style::SP_FileIcon))
+		@folderIcon = Qt5::Icon.new
+	    @folderIcon.addPixmap(style.standardPixmap(Qt5::Style::SP_DirClosedIcon),
+	                         Qt5::Icon::Normal, Qt5::Icon::Off)
+	    @folderIcon.addPixmap(style.standardPixmap(Qt5::Style::SP_DirOpenIcon),
+	                         Qt5::Icon::Normal, Qt5::Icon::On)
+		@bookmarkIcon = Qt5::Icon.new
+	    @bookmarkIcon.addPixmap(style.standardPixmap(Qt5::Style::SP_FileIcon))
 	end
 	
 	def startElement(namespaceURI, localName, qName, attributes)
 	    if !@metXbelTag && qName != "xbel"
-	        @errorStr = Qt::Object.tr("The file is not an XBEL file.")
+	        @errorStr = Qt5::Object.tr("The file is not an XBEL file.")
 	        return false
 	    end
 	
 	    if qName == "xbel"
 	        version = attributes.value("version")
 	        if !version.empty? && version != "1.0"
-	            @errorStr = Qt::Object.tr("The file is not an XBEL version 1.0 file.")
+	            @errorStr = Qt5::Object.tr("The file is not an XBEL version 1.0 file.")
 	            return false
 	        end
 	        @metXbelTag = true
 	    elsif qName == "folder"
 	        @item = createChildItem(qName)
-	        @item.flags = @item.flags | Qt::ItemIsEditable.to_i
+	        @item.flags = @item.flags | Qt5::ItemIsEditable.to_i
 	        @item.setIcon(0, @folderIcon)
-	        @item.setText(0, Qt::Object.tr("Folder"))
+	        @item.setText(0, Qt5::Object.tr("Folder"))
 	        folded = (attributes.value("folded") != "no")
 	        @treeWidget.setItemExpanded(@item, !folded)
 	    elsif qName == "bookmark"
 	        @item = createChildItem(qName)
-	        @item.flags = @item.flags | Qt::ItemIsEditable.to_i
+	        @item.flags = @item.flags | Qt5::ItemIsEditable.to_i
 	        @item.setIcon(0, @bookmarkIcon)
-	        @item.setText(0, Qt::Object.tr("Unknown title"))
+	        @item.setText(0, Qt5::Object.tr("Unknown title"))
 	        @item.setText(1, attributes.value("href"))
 	    elsif qName == "separator"
 	        @item = createChildItem(qName)
-	        @item.flags = @item.flags & ~Qt::ItemIsSelectable.to_i
-#	        @item.setText(0, Qt::String(30, 0xB7))
+	        @item.flags = @item.flags & ~Qt5::ItemIsSelectable.to_i
+#	        @item.setText(0, Qt5::String(30, 0xB7))
 	        @item.setText(0, "..............................")
 	    end
 	
@@ -100,8 +100,8 @@ class XbelHandler < Qt::XmlDefaultHandler
 	end
 	
 	def fatalError(exception)
-	    Qt::MessageBox.information(@treeWidget.window(), Qt::Object.tr("SAX Bookmarks"),
-	                             Qt::Object::tr("Parse error at line %s, column %s:\n%s" %
+	    Qt5::MessageBox.information(@treeWidget.window(), Qt5::Object.tr("SAX Bookmarks"),
+	                             Qt5::Object::tr("Parse error at line %s, column %s:\n%s" %
 	                             [exception.lineNumber, exception.columnNumber,exception.message]))
 	    return false
 	end
@@ -112,11 +112,11 @@ class XbelHandler < Qt::XmlDefaultHandler
 	
 	def createChildItem(tagName)
 	    if !@item.nil?
-	        childItem = Qt::TreeWidgetItem.new(@item, Qt::TreeWidgetItem::Type)
+	        childItem = Qt5::TreeWidgetItem.new(@item, Qt5::TreeWidgetItem::Type)
 	    else
-	        childItem = Qt::TreeWidgetItem.new(@treeWidget)
+	        childItem = Qt5::TreeWidgetItem.new(@treeWidget)
 	    end
-	    childItem.setData(0, Qt::UserRole, Qt::Variant.new(tagName))
+	    childItem.setData(0, Qt5::UserRole, Qt5::Variant.new(tagName))
 	    return childItem
 	end
 end

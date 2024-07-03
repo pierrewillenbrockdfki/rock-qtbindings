@@ -24,7 +24,7 @@
 =end
     
     
-class Window < Qt::Widget
+class Window < Qt5::Widget
         
     slots 'changePrecision(int)',
           'setFormatString(const QString&)'
@@ -35,7 +35,7 @@ class Window < Qt::Widget
         createDateTimeEdits()
         createDoubleSpinBoxes()
     
-        layout = Qt::HBoxLayout.new do |l|
+        layout = Qt5::HBoxLayout.new do |l|
             l.addWidget(@spinBoxesGroup)
             l.addWidget(@editsGroup)
             l.addWidget(@doubleSpinBoxesGroup)
@@ -47,19 +47,19 @@ class Window < Qt::Widget
     end
     
     def createSpinBoxes()
-        @spinBoxesGroup = Qt::GroupBox.new(tr("Spinboxes"))
+        @spinBoxesGroup = Qt5::GroupBox.new(tr("Spinboxes"))
     
-        integerLabel = Qt::Label.new(tr("Enter a value between %d and %d:" % [-20, 20]))
+        integerLabel = Qt5::Label.new(tr("Enter a value between %d and %d:" % [-20, 20]))
 
-        integerSpinBox = Qt::SpinBox.new do |i|
+        integerSpinBox = Qt5::SpinBox.new do |i|
             i.range = -20..20
             i.singleStep = 1
             i.value = 0
         end
     
-        zoomLabel = Qt::Label.new(tr("Enter a zoom value between %d and %d:" % [0, 1000]))
+        zoomLabel = Qt5::Label.new(tr("Enter a zoom value between %d and %d:" % [0, 1000]))
 
-        zoomSpinBox = Qt::SpinBox.new do |z|
+        zoomSpinBox = Qt5::SpinBox.new do |z|
             z.range = 0..1000
             z.singleStep = 10
             z.suffix = "%"
@@ -67,16 +67,16 @@ class Window < Qt::Widget
             z.value = 100
         end
     
-        priceLabel = Qt::Label.new(tr("Enter a price between %d and %d:" % [0, 999]))
+        priceLabel = Qt5::Label.new(tr("Enter a price between %d and %d:" % [0, 999]))
 
-        @priceSpinBox = Qt::SpinBox.new do |s|
+        @priceSpinBox = Qt5::SpinBox.new do |s|
             s.range = 0..999
             s.singleStep = 1
             s.prefix = "$"
             s.value = 99
         end
     
-        spinBoxLayout = Qt::VBoxLayout.new do |s|
+        spinBoxLayout = Qt5::VBoxLayout.new do |s|
             s.addWidget(integerLabel)
             s.addWidget(integerSpinBox)
             s.addWidget(zoomLabel)
@@ -89,27 +89,27 @@ class Window < Qt::Widget
     end
     
     def createDateTimeEdits()
-        @editsGroup = Qt::GroupBox.new(tr("Date and time spin boxes"))
+        @editsGroup = Qt5::GroupBox.new(tr("Date and time spin boxes"))
     
-        dateLabel = Qt::Label.new
-        dateEdit = Qt::DateTimeEdit.new(Qt::Date.currentDate())
-        dateEdit.setDateRange(Qt::Date.new(2005, 1, 1), Qt::Date.new(2010, 12, 31))
+        dateLabel = Qt5::Label.new
+        dateEdit = Qt5::DateTimeEdit.new(Qt5::Date.currentDate())
+        dateEdit.setDateRange(Qt5::Date.new(2005, 1, 1), Qt5::Date.new(2010, 12, 31))
         dateLabel.text = tr("Appointment date (between %s and %s:" %
-                           [dateEdit.minimumDate().toString(Qt::ISODate),
-                            dateEdit.maximumDate().toString(Qt::ISODate) ] )
+                           [dateEdit.minimumDate().toString(Qt5::ISODate),
+                            dateEdit.maximumDate().toString(Qt5::ISODate) ] )
     
-        timeLabel = Qt::Label.new
-        timeEdit = Qt::DateTimeEdit.new(Qt::Time.currentTime())
-        timeEdit.setTimeRange(Qt::Time.new(9, 0, 0, 0), Qt::Time.new(16, 30, 0, 0))
+        timeLabel = Qt5::Label.new
+        timeEdit = Qt5::DateTimeEdit.new(Qt5::Time.currentTime())
+        timeEdit.setTimeRange(Qt5::Time.new(9, 0, 0, 0), Qt5::Time.new(16, 30, 0, 0))
         timeLabel.text = tr("Appointment time (between %s and %s:" %
-                           [timeEdit.minimumTime().toString(Qt::ISODate),
-                            timeEdit.maximumTime().toString(Qt::ISODate) ] )
+                           [timeEdit.minimumTime().toString(Qt5::ISODate),
+                            timeEdit.maximumTime().toString(Qt5::ISODate) ] )
     
-        @meetingLabel = Qt::Label.new
-        @meetingEdit = Qt::DateTimeEdit.new(Qt::DateTime.currentDateTime())
+        @meetingLabel = Qt5::Label.new
+        @meetingEdit = Qt5::DateTimeEdit.new(Qt5::DateTime.currentDateTime())
     
-        formatLabel = Qt::Label.new(tr("Format string for the meeting date and time:"))
-        formatComboBox = Qt::ComboBox.new do |f|
+        formatLabel = Qt5::Label.new(tr("Format string for the meeting date and time:"))
+        formatComboBox = Qt5::ComboBox.new do |f|
             f.addItem("yyyy-MM-dd hh:mm:ss (zzz ms)")
             f.addItem("hh:mm:ss MM/dd/yyyy")
             f.addItem("hh:mm:ss dd/MM/yyyy")
@@ -122,7 +122,7 @@ class Window < Qt::Widget
     
         setFormatString(formatComboBox.currentText())
     
-        editsLayout = Qt::VBoxLayout.new do |l|
+        editsLayout = Qt5::VBoxLayout.new do |l|
             l.addWidget(dateLabel)
             l.addWidget(dateEdit)
             l.addWidget(timeLabel)
@@ -138,40 +138,40 @@ class Window < Qt::Widget
     
     def setFormatString(formatString)
         @meetingEdit.displayFormat = formatString
-        if @meetingEdit.displayedSections() & Qt::DateTimeEdit::DateSections_Mask.to_i
-            @meetingEdit.setDateRange(Qt::Date.new(2004, 11, 1), Qt::Date.new(2005, 11, 30))
+        if @meetingEdit.displayedSections() & Qt5::DateTimeEdit::DateSections_Mask.to_i
+            @meetingEdit.setDateRange(Qt5::Date.new(2004, 11, 1), Qt5::Date.new(2005, 11, 30))
             @meetingLabel.text = tr("Meeting date (between %s and %s:" %
-                [@meetingEdit.minimumDate().toString(Qt::ISODate),
-                 @meetingEdit.maximumDate().toString(Qt::ISODate) ] )
+                [@meetingEdit.minimumDate().toString(Qt5::ISODate),
+                 @meetingEdit.maximumDate().toString(Qt5::ISODate) ] )
         else
-            @meetingEdit.setTimeRange(Qt::Time.new(0, 7, 20, 0), Qt::Time.new(21, 0, 0, 0))
+            @meetingEdit.setTimeRange(Qt5::Time.new(0, 7, 20, 0), Qt5::Time.new(21, 0, 0, 0))
             @meetingLabel.text = tr("Meeting time (between %s and %s:" %
-                [@meetingEdit.minimumTime().toString(Qt::ISODate),
-                 @meetingEdit.maximumTime().toString(Qt::ISODate) ] )
+                [@meetingEdit.minimumTime().toString(Qt5::ISODate),
+                 @meetingEdit.maximumTime().toString(Qt5::ISODate) ] )
         end
     end
     
     def createDoubleSpinBoxes()
-        @doubleSpinBoxesGroup = Qt::GroupBox.new(tr("Double precision spinboxes"))
+        @doubleSpinBoxesGroup = Qt5::GroupBox.new(tr("Double precision spinboxes"))
     
-        precisionLabel = Qt::Label.new(tr("Number of decimal places to show:"))
+        precisionLabel = Qt5::Label.new(tr("Number of decimal places to show:"))
 
-        precisionSpinBox = Qt::SpinBox.new do |s|
+        precisionSpinBox = Qt5::SpinBox.new do |s|
             s.range = 0..14
             s.value = 2
         end
     
-        doubleLabel = Qt::Label.new(tr("Enter a value between %d and %d:" % [-20, 20]))
+        doubleLabel = Qt5::Label.new(tr("Enter a value between %d and %d:" % [-20, 20]))
 
-        @doubleSpinBox = Qt::DoubleSpinBox.new do |s|
+        @doubleSpinBox = Qt5::DoubleSpinBox.new do |s|
             s.range = -20.0..20.0
             s.singleStep = 1.0
             s.value = 0.0
         end
     
-        scaleLabel = Qt::Label.new(tr("Enter a scale factor between %2f and %2f:" % [0.0, 1000.0]))
+        scaleLabel = Qt5::Label.new(tr("Enter a scale factor between %2f and %2f:" % [0.0, 1000.0]))
 
-        @scaleSpinBox = Qt::DoubleSpinBox.new do |s|
+        @scaleSpinBox = Qt5::DoubleSpinBox.new do |s|
             s.range = 0.0..1000.0
             s.singleStep = 10.0
             s.suffix = "%"
@@ -179,9 +179,9 @@ class Window < Qt::Widget
             s.value = 100.0
         end
     
-        priceLabel = Qt::Label.new(tr("Enter a price between %2f and %2f:" % [0.0, 1000.0]))
+        priceLabel = Qt5::Label.new(tr("Enter a price between %2f and %2f:" % [0.0, 1000.0]))
 
-        @priceSpinBox = Qt::DoubleSpinBox.new do |s|
+        @priceSpinBox = Qt5::DoubleSpinBox.new do |s|
             s.range = 0.0..1000.0
             s.singleStep = 1.0
             s.prefix = "$"
@@ -191,7 +191,7 @@ class Window < Qt::Widget
         connect(precisionSpinBox, SIGNAL('valueChanged(int)'),
                 self, SLOT('changePrecision(int)'))
     
-        spinBoxLayout = Qt::VBoxLayout.new do |s|
+        spinBoxLayout = Qt5::VBoxLayout.new do |s|
             s.addWidget(precisionLabel)
             s.addWidget(precisionSpinBox)
             s.addWidget(doubleLabel)

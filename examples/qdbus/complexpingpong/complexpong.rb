@@ -28,7 +28,7 @@
 require 'Qt5'
 require './ping-common.rb'
 
-class Pong < Qt::DBusAbstractAdaptor
+class Pong < Qt5::DBusAbstractAdaptor
     q_classinfo("D-Bus Interface", "com.trolltech.QtDBus.ComplexPong.Pong")
 
     signals :aboutToQuit
@@ -45,38 +45,38 @@ class Pong < Qt::DBusAbstractAdaptor
     end
     
     def quit
-        Qt::Timer.singleShot(0, Qt::CoreApplication.instance, SLOT(:quit))
+        Qt5::Timer.singleShot(0, Qt5::CoreApplication.instance, SLOT(:quit))
     end
     
     def query(query)
         q = query.downcase
         if q == "hello"
-            return Qt::DBusVariant.new("World")
+            return Qt5::DBusVariant.new("World")
         elsif q == "ping"
-            return Qt::DBusVariant.new("Pong")
+            return Qt5::DBusVariant.new("Pong")
         elsif q == "the answer to life, the universe and everything"
-            return Qt::DBusVariant.new(42)
+            return Qt5::DBusVariant.new(42)
         elsif !q.index("unladen swallow").nil?
             if !q.index("european").nil?
-                return Qt::DBusVariant.new(11.0)
+                return Qt5::DBusVariant.new(11.0)
             end
-            return Qt::DBusVariant.new(Qt::ByteArray.new("african or european?"))
+            return Qt5::DBusVariant.new(Qt5::ByteArray.new("african or european?"))
         end
     
-        return Qt::DBusVariant.new("Sorry, I don't know the answer")
+        return Qt5::DBusVariant.new("Sorry, I don't know the answer")
     end
 end
 
-app = Qt::CoreApplication.new(ARGV)
+app = Qt5::CoreApplication.new(ARGV)
     
-obj = Qt::Object.new
+obj = Qt5::Object.new
 pong = Pong.new(obj)
 pong.connect(app, SIGNAL(:aboutToQuit), SIGNAL(:aboutToQuit))
 pong.setValue("initial value")
-Qt::DBusConnection.sessionBus.registerObject("/", obj)
+Qt5::DBusConnection.sessionBus.registerObject("/", obj)
     
-if !Qt::DBusConnection.sessionBus.registerService(SERVICE_NAME)
-    $stderr.puts("%s" % Qt::DBusConnection.sessionBus.lastError.message)
+if !Qt5::DBusConnection.sessionBus.registerService(SERVICE_NAME)
+    $stderr.puts("%s" % Qt5::DBusConnection.sessionBus.lastError.message)
     exit(1)
 end
         

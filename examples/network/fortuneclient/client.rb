@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
         
-class Client < Qt::Dialog
+class Client < Qt5::Dialog
     
     slots   'requestNewFortune()',
             'readFortune()',
@@ -32,27 +32,27 @@ class Client < Qt::Dialog
     
     def initialize(parent = nil)
         super(parent)
-        @hostLabel = Qt::Label.new(tr("&Server name:"))
-        @portLabel = Qt::Label.new(tr("S&erver port:"))
+        @hostLabel = Qt5::Label.new(tr("&Server name:"))
+        @portLabel = Qt5::Label.new(tr("S&erver port:"))
     
-        @hostLineEdit = Qt::LineEdit.new("Localhost")
-        @portLineEdit = Qt::LineEdit.new
-        @portLineEdit.validator = Qt::IntValidator.new(1, 65535, self)
+        @hostLineEdit = Qt5::LineEdit.new("Localhost")
+        @portLineEdit = Qt5::LineEdit.new
+        @portLineEdit.validator = Qt5::IntValidator.new(1, 65535, self)
     
         @hostLabel.buddy = @hostLineEdit
         @portLabel.buddy = @portLineEdit
     
-        @statusLabel = Qt::Label.new(tr("This example requires that you run the " +
+        @statusLabel = Qt5::Label.new(tr("This example requires that you run the " +
                                     "Fortune Server example as well."))
     
-        @getFortuneButton = Qt::PushButton.new(tr("Get Fortune")) do |b|
+        @getFortuneButton = Qt5::PushButton.new(tr("Get Fortune")) do |b|
             b.default = true
             b.enabled = false
         end
     
-        @quitButton = Qt::PushButton.new(tr("Quit"))
+        @quitButton = Qt5::PushButton.new(tr("Quit"))
     
-        @tcpSocket = Qt::TcpSocket.new(self)
+        @tcpSocket = Qt5::TcpSocket.new(self)
     
         connect(@hostLineEdit, SIGNAL('textChanged(const QString &)'),
                 self, SLOT('enableGetFortuneButton()'))
@@ -64,13 +64,13 @@ class Client < Qt::Dialog
         connect(@tcpSocket, SIGNAL('readyRead()'), self, SLOT('readFortune()'))
         connect(@tcpSocket, SIGNAL('error(QAbstractSocket::SocketError)'), self, SLOT('displayError(QAbstractSocket::SocketError)'))
     
-        buttonLayout = Qt::HBoxLayout.new do |b|
+        buttonLayout = Qt5::HBoxLayout.new do |b|
             b.addStretch(1)
             b.addWidget(@getFortuneButton)
             b.addWidget(@quitButton)
         end
     
-        self.layout = Qt::GridLayout.new do |m|
+        self.layout = Qt5::GridLayout.new do |m|
             m.addWidget(@hostLabel, 0, 0)
             m.addWidget(@hostLineEdit, 0, 1)
             m.addWidget(@portLabel, 1, 0)
@@ -92,8 +92,8 @@ class Client < Qt::Dialog
     end
     
     def readFortune
-        inf = Qt::DataStream.new(@tcpSocket)
-        inf.version = Qt::DataStream::Qt_5_0
+        inf = Qt5::DataStream.new(@tcpSocket)
+        inf.version = Qt5::DataStream::Qt_5_0
     
         if @blockSize == 0
             if @tcpSocket.bytesAvailable < 4
@@ -113,7 +113,7 @@ class Client < Qt::Dialog
         inf >> nextFortune
     
         if nextFortune == @currentFortune
-            Qt::Timer.singleShot(0, self, SLOT('requestNewFortune()'))
+            Qt5::Timer.singleShot(0, self, SLOT('requestNewFortune()'))
             return
         end
     
@@ -124,19 +124,19 @@ class Client < Qt::Dialog
     
     def displayError(socketError)
         case socketError
-        when Qt::AbstractSocket::RemoteHostClosedError
-        when Qt::AbstractSocket::HostNotFoundError
-            Qt::MessageBox.information(self, tr("Fortune Client"),
+        when Qt5::AbstractSocket::RemoteHostClosedError
+        when Qt5::AbstractSocket::HostNotFoundError
+            Qt5::MessageBox.information(self, tr("Fortune Client"),
                                      tr("The host was not found. Please check the " +
                                         "host name and port settings."))
-        when Qt::AbstractSocket::ConnectionRefusedError
-            Qt::MessageBox.information(self, tr("Fortune Client"),
+        when Qt5::AbstractSocket::ConnectionRefusedError
+            Qt5::MessageBox.information(self, tr("Fortune Client"),
                                      tr("The connection was refused by the peer. " +
                                         "Make sure the fortune server is running, " +
                                         "and check that the host name and port " +
                                         "settings are correct."))
         else
-            Qt::MessageBox.information(self, tr("Fortune Client"),
+            Qt5::MessageBox.information(self, tr("Fortune Client"),
                                      tr("The following error occurred: %s." %
                                      @tcpSocket.errorString))
         end

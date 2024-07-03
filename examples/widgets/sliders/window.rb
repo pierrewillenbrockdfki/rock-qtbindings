@@ -25,14 +25,14 @@
 
 require './slidersgroup.rb'
 
-class Window < Qt::Widget
+class Window < Qt5::Widget
     
     def initialize()
         super
-        @horizontalSliders = SlidersGroup.new(Qt::Horizontal, tr("Horizontal"))
-        @verticalSliders = SlidersGroup.new(Qt::Vertical, tr("Vertical"))
+        @horizontalSliders = SlidersGroup.new(Qt5::Horizontal, tr("Horizontal"))
+        @verticalSliders = SlidersGroup.new(Qt5::Vertical, tr("Vertical"))
     
-        @stackedWidget = Qt::StackedWidget.new
+        @stackedWidget = Qt5::StackedWidget.new
         @stackedWidget.addWidget(@horizontalSliders)
         @stackedWidget.addWidget(@verticalSliders)
     
@@ -45,7 +45,7 @@ class Window < Qt::Widget
         connect(@valueSpinBox, SIGNAL('valueChanged(int)'),
                 @horizontalSliders, SLOT('value=(int)'))
     
-        layout = Qt::HBoxLayout.new do |l|
+        layout = Qt5::HBoxLayout.new do |l|
             l.addWidget(@controlsGroup)
             l.addWidget(@stackedWidget)
         end
@@ -60,31 +60,31 @@ class Window < Qt::Widget
     end
     
     def createControls(title)
-        @controlsGroup = Qt::GroupBox.new(title)
+        @controlsGroup = Qt5::GroupBox.new(title)
     
-        @minimumLabel = Qt::Label.new(tr("Minimum value:"))
-        @maximumLabel = Qt::Label.new(tr("Maximum value:"))
-        @valueLabel = Qt::Label.new(tr("Current value:"))
+        @minimumLabel = Qt5::Label.new(tr("Minimum value:"))
+        @maximumLabel = Qt5::Label.new(tr("Maximum value:"))
+        @valueLabel = Qt5::Label.new(tr("Current value:"))
     
-        @invertedAppearance = Qt::CheckBox.new(tr("Inverted appearance"))
-        @invertedKeyBindings = Qt::CheckBox.new(tr("Inverted key bindings"))
+        @invertedAppearance = Qt5::CheckBox.new(tr("Inverted appearance"))
+        @invertedKeyBindings = Qt5::CheckBox.new(tr("Inverted key bindings"))
     
-        @minimumSpinBox = Qt::SpinBox.new do |s|
+        @minimumSpinBox = Qt5::SpinBox.new do |s|
             s.range = -100..100
             s.singleStep = 1
         end
     
-        @maximumSpinBox = Qt::SpinBox.new do |s|
+        @maximumSpinBox = Qt5::SpinBox.new do |s|
             s.range = -100..100
             s.singleStep = 1
         end
 
-        @valueSpinBox = Qt::SpinBox.new do |s|
+        @valueSpinBox = Qt5::SpinBox.new do |s|
             s.range = -100..100
             s.singleStep = 1
         end
     
-        @orientationCombo = Qt::ComboBox.new
+        @orientationCombo = Qt5::ComboBox.new
         @orientationCombo.addItem(tr("Horizontal slider-like widgets"))
         @orientationCombo.addItem(tr("Vertical slider-like widgets"))
     
@@ -107,7 +107,7 @@ class Window < Qt::Widget
         connect(@invertedKeyBindings, SIGNAL('toggled(bool)'),
                 @verticalSliders, SLOT('invertKeyBindings(bool)'))
     
-        controlsLayout = Qt::GridLayout.new do |c|
+        controlsLayout = Qt5::GridLayout.new do |c|
             c.addWidget(@minimumLabel, 0, 0)
             c.addWidget(@maximumLabel, 1, 0)
             c.addWidget(@valueLabel, 2, 0)

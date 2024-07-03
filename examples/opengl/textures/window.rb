@@ -25,7 +25,7 @@
 
 require './glwidget.rb'
 
-class Window < Qt::Widget
+class Window < Qt5::Widget
 	
 	slots   'currentGlWidget=()',
     		'rotateOneStep()'
@@ -35,13 +35,13 @@ class Window < Qt::Widget
 	
 	def initialize(parent = nil)
 		super
-	    mainLayout = Qt::GridLayout.new
+	    mainLayout = Qt5::GridLayout.new
 	
 	    @glWidgets = [[], []]
 
 		(0...NumRows).each do |i|
 			(0...NumColumns).each do |j|
-	            clearColor = Qt::Color.new
+	            clearColor = Qt5::Color.new
 	            clearColor.setHsv((i * NumColumns + j) * 255 / (NumRows * NumColumns - 1),
 	                              255, 63)
 	
@@ -58,7 +58,7 @@ class Window < Qt::Widget
 
 	    @currentGlWidget = @glWidgets[0][0]
 	
-	    timer = Qt::Timer.new(self)
+	    timer = Qt5::Timer.new(self)
 	    connect(timer, SIGNAL('timeout()'), self, SLOT('rotateOneStep()'))
 	    timer.start(20)
 	

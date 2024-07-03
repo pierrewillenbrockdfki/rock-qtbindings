@@ -26,10 +26,10 @@
 require 'Qt5'
 require './spinboxdelegate.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 	
-model = Qt::StandardItemModel.new(4, 2)
-tableView = Qt::TableView.new
+model = Qt5::StandardItemModel.new(4, 2)
+tableView = Qt5::TableView.new
 tableView.model = model
 	
 delegate = SpinBoxDelegate.new
@@ -37,8 +37,8 @@ tableView.itemDelegate = delegate
 	
 (0...4).each do |row|
 	(0...2).each do |column|
-		index = model.index(row, column, Qt::ModelIndex.new)
-		model.setData(index, Qt::Variant.new((row+1) * (column+1)))
+		index = model.index(row, column, Qt5::ModelIndex.new)
+		model.setData(index, Qt5::Variant.new((row+1) * (column+1)))
 	end
 end
 	

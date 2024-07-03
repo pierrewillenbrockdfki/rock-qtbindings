@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-class ImageDelegate < Qt::ItemDelegate
+class ImageDelegate < Qt5::ItemDelegate
 
 	slots 'emitCommitData()'
 
@@ -32,7 +32,7 @@ class ImageDelegate < Qt::ItemDelegate
 	end
 	
 	def createEditor(parent, option, index)
-		comboBox = Qt::ComboBox.new(parent)
+		comboBox = Qt5::ComboBox.new(parent)
 		if index.column() == 1
 			comboBox.addItem(tr("Normal"))
 			comboBox.addItem(tr("Active"))
@@ -54,7 +54,7 @@ class ImageDelegate < Qt::ItemDelegate
 		end
 	
 		pos = comboBox.findText(index.model().data(index).toString(),
-									Qt::MatchExactly.to_i)
+									Qt5::MatchExactly.to_i)
 		comboBox.currentIndex = pos
 	end
 	
@@ -64,7 +64,7 @@ class ImageDelegate < Qt::ItemDelegate
 			return
 		end
 	
-		model.setData(index, Qt::Variant.new(comboBox.currentText()), Qt::EditRole)
+		model.setData(index, Qt5::Variant.new(comboBox.currentText()), Qt5::EditRole)
 	end
 	
 	def emitCommitData()

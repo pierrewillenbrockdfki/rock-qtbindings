@@ -26,6 +26,6 @@
 require 'Qt5'
 require './classwizard.rb'
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 wizard = ClassWizard.new
 wizard.exec
