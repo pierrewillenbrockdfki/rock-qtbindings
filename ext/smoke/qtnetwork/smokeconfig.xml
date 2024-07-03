@@ -19,14 +19,48 @@
         <signature>.*::d_ptr</signature>
         <signature>.*::q_ptr</signature>
         <signature>.*\(.*Private.*\).*</signature>
+        <!-- unsigned char[] cast needs local typedef to work -->
+        <signature>unsigned char\[16\] QIPv6Address::c</signature>
+        <!-- parser found an unnamed field -->
+        <signature>DnsEligibilityStatus QNetworkAddressEntry::</signature>
+        <!-- Private classes -->
+        <signature>.*ALPNProtocolHTTP2.*</signature>
+        <signature>.*NextProtocolSpdy3_0.*</signature>
+        <signature>.*NextProtocolHttp1_1.*</signature>
         <!-- Thread related stuff belongs to the bindings language -->
         <signature>.*QtConcurrent.*</signature>
         <!-- this doesn't link, internal stuff.. -->
         <signature>.*qFindString.*</signature>
         <!-- windows internal helper functions -->
         <signature>.*qFrom.*Endian_helper.*</signature>
-         <signature>.*QIPv6Address::c.*</signature>
-   </exclude>
+        <!-- QGlobalSpace: "static" and "QGlobalSpace::" strings are not present when filtering -->
+        <!-- Some of these are the result of parse errors. -->
+        <!-- There seems to be a parsing problem with the QCbor* classes -->
+        <!-- operator[] does not make sense in global space? -->
+        <signature>const QCborValue operator\[\]\(.*</signature>
+        <signature>QCborValueRef operator\[\]\(.*</signature>
+        <signature>QCborArray operator\+\(const QCborValue&amp;\)</signature>
+        <signature>QCborArray&amp; operator&lt;&lt;\(const QCborValue&amp;\)</signature>
+        <signature>QCborArray&amp; operator\+=\(const QCborValue&amp;\)</signature>
+        <signature>QCborValue&amp; operator=\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborArray&amp;\)</signature>
+        <signature>bool operator!=\(const QCborValue&amp;\)</signature>
+        <signature>bool operator==\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborMap&amp;\)</signature>
+        <signature>bool operator!\(\)</signature>
+        <signature>void\* operator-&gt;\(\)</signature>
+        <!-- This function is templated -->
+        <signature>QDebug operator&lt;&lt;\(QDebug,.*</signature>
+        <!-- QUrlTwoFlags is templated -->
+        <signature>QUrlTwoFlags operator.*</signature>
+        <signature>QUrlTwoFlags&amp; operator.*</signature>
+        <!-- More template functions -->
+        <signature>Code operator Code\(\)</signature>
+        <signature>E2 operator int\(\)</signature>
+        <signature>E2 operator QFlags&lt;E2&gt;\(\)</signature>
+        <signature>E2 operator QFlags&lt;E1&gt;\(\)</signature>
+    </exclude>
     <functions>
         <!-- include functions starting with 'q' -->
         <name>^q.*</name>
@@ -38,15 +72,19 @@
         <class>QAbstractNetworkCache</class>
         <class>QAbstractSocket</class>
         <class>QAuthenticator</class>
-        <class>QFtp</class>
+        <class>QDnsDomainNameRecord</class>
+        <class>QDnsHostAddressRecord</class>
+        <class>QDnsLookup</class>
+        <class>QDnsMailExchangeRecord</class>
+        <class>QDnsServiceRecord</class>
+        <class>QDnsTextRecord</class>
+        <class>QDtls</class>
+        <class>QDtlsClientVerifier</class>
+        <class>QHstsPolicy</class>
         <class>QHostAddress</class>
         <class>QHostInfo</class>
-        <class>QHttp</class>
-        <class>QHttpHeader</class>
         <class>QHttpMultiPart</class>
         <class>QHttpPart</class>
-        <class>QHttpRequestHeader</class>
-        <class>QHttpResponseHeader</class>
         <class>QIPv6Address</class>
         <class>QLocalServer</class>
         <class>QLocalSocket</class>
@@ -57,6 +95,7 @@
         <class>QNetworkCookieJar</class>
         <class>QNetworkConfiguration</class>
         <class>QNetworkConfigurationManager</class>
+        <class>QNetworkDatagram</class>
         <class>QNetworkDiskCache</class>
         <class>QNetworkInterface</class>
         <class>QNetworkProxy</class>
@@ -65,7 +104,10 @@
         <class>QNetworkReply</class>
         <class>QNetworkRequest</class>
         <class>QNetworkSession</class>
+        <class>QSctpServer</class>
+        <class>QSctpSocket</class>
         <class>QSslCertificate</class>
+        <class>QSslCertificateExtension</class>
         <class>QSslCipher</class>
         <class>QSslConfiguration</class>
         <class>QSslError</class>
@@ -74,7 +116,7 @@
         <class>QTcpServer</class>
         <class>QTcpSocket</class>
         <class>QUdpSocket</class>
-        <class>QUrlInfo</class>
+
         <!-- namespaces -->
         <class>QSsl</class>
      </classList>

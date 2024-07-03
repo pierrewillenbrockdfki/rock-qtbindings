@@ -18,40 +18,46 @@
         <signature>.*::d</signature>
         <signature>.*::d_ptr</signature>
         <signature>.*::q_ptr</signature>
-        <signature>.*\(.*Private.*\).*</signature>
+        <!-- For Q*Application::compressEvent, which is internal, can be
+             called from any thread and cannot meaningfully be overridden
+             because that needs access to qt internals -->
+        <signature>.*compressEvent.*</signature>
         <!-- Thread related stuff belongs to the bindings language -->
         <signature>.*QtConcurrent.*</signature>
         <signature>.*QAbstractXmlForwardIterator.*</signature>
         <signature>.*QPatternist::ItemType.*</signature>
-        <!-- The following methods aren't in the lib -->
-        <signature>.*QXmlNodeModelIndex::namespaceBindings.*</signature>
-        <signature>.*QXmlNodeModelIndex::sendNamespaces.*</signature>
-        <signature>.*QXmlNodeModelIndex::compareOrder.*</signature>
-        <signature>.*QXmlNodeModelIndex::isDeepEqual.*</signature>
-        <signature>.*QXmlNodeModelIndex::kind.*</signature>
-        <signature>.*QXmlNodeModelIndex::baseUri.*</signature>
-        <signature>.*QXmlNodeModelIndex::documentUri.*</signature>
-        <signature>.*QXmlNodeModelIndex::root.*</signature>
-        <signature>.*QXmlNodeModelIndex::name.*</signature>
-        <signature>.*QXmlNodeModelIndex::is\(.*</signature>
-        <signature>.*QXmlNodeModelIndex::stringValue.*</signature>
-        <signature>.*QXmlNodeModelIndex::namespaceForPrefix.*</signature>         
-        <signature>.*QXmlName::QXmlName.*short.*</signature>
-        <signature>.*QXmlName::code().*</signature>
-        <signature>.*QXmlName::setLocalName.*short.*</signature>
-        <signature>.*QXmlName::setNamespaceURI.*</signature>
-        <signature>.*QXmlName::setPrefix.*short.*</signature>
-        <signature>.*QXmlName::isLexicallyEqual.*</signature>
-        <signature>.*short.*QXmlName::namespaceURI().*</signature>
-        <signature>.*QXmlName::hasNamespace().*</signature>
-        <signature>.*QXmlName::hasPrefix().*</signature>
-        <signature>.*short.*QXmlName::prefix().*</signature>
-        <signature>.*short.*QXmlName::localName().*</signature>
         <!-- this doesn't link, internal stuff.. -->
         <signature>.*qFindString.*</signature>
         <!-- windows internal helper functions -->
         <signature>.*qFrom.*Endian_helper.*</signature>
-   </exclude>
+        <!-- QGlobalSpace: "static" and "QGlobalSpace::" strings are not present when filtering -->
+        <!-- Some of these are the result of parse errors. -->
+        <!-- There seems to be a parsing problem with the QCbor* classes -->
+        <!-- operator[] does not make sense in global space? -->
+        <signature>const QCborValue operator\[\]\(.*</signature>
+        <signature>QCborValueRef operator\[\]\(.*</signature>
+        <signature>QCborArray operator\+\(const QCborValue&amp;\)</signature>
+        <signature>QCborArray&amp; operator&lt;&lt;\(const QCborValue&amp;\)</signature>
+        <signature>QCborArray&amp; operator\+=\(const QCborValue&amp;\)</signature>
+        <signature>QCborValue&amp; operator=\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborArray&amp;\)</signature>
+        <signature>bool operator!=\(const QCborValue&amp;\)</signature>
+        <signature>bool operator==\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborMap&amp;\)</signature>
+        <signature>bool operator!\(\)</signature>
+        <signature>void\* operator-&gt;\(\)</signature>
+        <!-- This function is templated -->
+        <signature>QDebug operator&lt;&lt;\(QDebug,.*</signature>
+        <!-- QUrlTwoFlags is templated -->
+        <signature>QUrlTwoFlags operator.*</signature>
+        <signature>QUrlTwoFlags&amp; operator.*</signature>
+        <!-- More template functions -->
+        <signature>Code operator Code\(\)</signature>
+        <signature>E2 operator int\(\)</signature>
+        <signature>E2 operator QFlags&lt;E2&gt;\(\)</signature>
+        <signature>E2 operator QFlags&lt;E1&gt;\(\)</signature>
+    </exclude>
     <functions>
         <!-- include functions starting with 'q' -->
         <name>^q.*</name>

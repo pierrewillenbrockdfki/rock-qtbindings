@@ -14,7 +14,36 @@
         <typeName>QString</typeName>
     </voidpTypes>
     <exclude>
-        <signature>QTest::QTouchEventSequence QTest::touchEvent.*</signature>
+        <!-- abstract class not recognized as such -->
+        <signature>QTestEvent\* QTestEvent::QTestEvent\(\)</signature>
+        <signature>QTestEvent\* QTestEvent::QTestEvent\(const QTestEvent&amp;\)</signature>
+        <!-- QGlobalSpace: "static" and "QGlobalSpace::" strings are not present when filtering -->
+        <!-- Some of these are the result of parse errors. -->
+        <!-- There seems to be a parsing problem with the QCbor* classes -->
+        <!-- operator[] does not make sense in global space? -->
+        <signature>const QCborValue operator\[\]\(.*</signature>
+        <signature>QCborValueRef operator\[\]\(.*</signature>
+        <signature>QCborArray operator\+\(const QCborValue&amp;\)</signature>
+        <signature>QCborArray&amp; operator&lt;&lt;\(const QCborValue&amp;\)</signature>
+        <signature>QCborArray&amp; operator\+=\(const QCborValue&amp;\)</signature>
+        <signature>QCborValue&amp; operator=\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborArray&amp;\)</signature>
+        <signature>bool operator!=\(const QCborValue&amp;\)</signature>
+        <signature>bool operator==\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborValue&amp;\)</signature>
+        <signature>bool operator&lt;\(const QCborMap&amp;\)</signature>
+        <signature>bool operator!\(\)</signature>
+        <signature>void\* operator-&gt;\(\)</signature>
+        <!-- This function is templated -->
+        <signature>QDebug operator&lt;&lt;\(QDebug,.*</signature>
+        <!-- QUrlTwoFlags is templated -->
+        <signature>QUrlTwoFlags operator.*</signature>
+        <signature>QUrlTwoFlags&amp; operator.*</signature>
+        <!-- More template functions -->
+        <signature>Code operator Code\(\)</signature>
+        <signature>E2 operator int\(\)</signature>
+        <signature>E2 operator QFlags&lt;E2&gt;\(\)</signature>
+        <signature>E2 operator QFlags&lt;E1&gt;\(\)</signature>
     </exclude>
     <functions>
         <name>^QTest::.*</name>
