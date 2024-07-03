@@ -485,7 +485,8 @@ QChar Util::munge(const Type *type) {
         return '?';
     } else if (type->isIntegral() || type->getEnum() || Options::scalarTypes.contains(type->name()) ||
                 (Options::qtMode && !type->isRef() && type->pointerDepth() == 0 &&
-                (type->getClass() && type->getClass()->isTemplate() && type->getClass()->name() == "QFlags")))
+                (type->getClass() && type->getClass()->isTemplate() && type->getClass()->name() == "QFlags")) ||
+	      (!type->getClass() && !type->getEnum() && type->name() == "QIntegerForSizeof< void* >::Unsigned"))
     {
         // plain scalar
         return '$';
