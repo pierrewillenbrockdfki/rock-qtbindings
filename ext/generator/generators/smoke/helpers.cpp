@@ -535,7 +535,7 @@ QString Util::stackItemField(const Type* type)
     // replace the unsigned stuff, look the type up in Util::typeMap and if
     // necessary, add a 'u' for unsigned types at the beginning again
     bool _unsigned = false;
-    if (typeName.startsWith("unsigned ")) {
+    if (typeName.contains("unsigned ")) {
         typeName.replace("unsigned ", "");
         _unsigned = true;
     }
