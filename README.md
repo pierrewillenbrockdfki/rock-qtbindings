@@ -1,3 +1,9 @@
+# Important notice
+
+This is a work in progress repository for adding support for qt5 (and maybe
+qt6). The readme below is for the qt4 version, and all or parts may be
+inaccurate and misleading.
+
 # qtbindings - Ruby bindings to QT
 
 [![qtbindings Version](https://badge.fury.io/rb/qtbindings.svg)](https://badge.fury.io/rb/qtbindings)
