@@ -2559,6 +2559,7 @@ Q_DECL_EXPORT TypeHandler Qt_handlers[] = {
     { "QVector<QVariant>&", marshall_QVariantVector },
     { "QWidgetList", marshall_QWidgetList },
     { "QWidgetList&", marshall_QWidgetList },
+    { "QIntegerForSizeof< void* >::Unsigned", marshall_it<QIntegerForSizeof< void* >::Unsigned> },
     { "QwtArray<double>", marshall_QVectorqreal },
     { "QwtArray<double>&", marshall_QVectorqreal },
     { "QwtArray<int>", marshall_QVectorint },
