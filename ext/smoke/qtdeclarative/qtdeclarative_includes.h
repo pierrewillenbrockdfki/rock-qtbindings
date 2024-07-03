@@ -1,3 +1,4 @@
 #include <QtCore>
 #include <QtGui>
-#include <QtDeclarative>
+#include <QtQml>
+#include <QtQuick>
