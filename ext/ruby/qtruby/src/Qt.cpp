@@ -154,29 +154,27 @@ VALUE getPointerObject(void *ptr) {
 }
 
 SmokeValue getSmokeValue(void *ptr) {
-  pointer_map_mutex.lock();
+	QMutexLocker locker(&pointer_map_mutex);
 
 	if (!pointer_map.contains(ptr)) {
 		if (do_debug & qtdb_gc) {
 			qWarning("getPointerObject %p -> nil", ptr);
 		}
-      pointer_map_mutex.unlock();
 	    return SmokeValue();
 	} else {
 		if (do_debug & qtdb_gc) {
 			qWarning("getPointerObject %p -> %p", ptr, (void *) pointer_map.operator[](ptr).value);
 		}
-    pointer_map_mutex.unlock();
 		return pointer_map.operator[](ptr);
 	}
 }
 
 void unmapPointer(void *ptr, Smoke *smoke, Smoke::Index fromClassId, Smoke::Index toClassId, void *lastptr) {
-  pointer_map_mutex.lock();
 	ptr = smoke->cast(ptr, fromClassId, toClassId);
 
 	if (ptr != lastptr) {
 		lastptr = ptr;
+		QMutexLocker locker(&pointer_map_mutex);
 		if (pointer_map.contains(ptr)) {
 			VALUE obj_ptr = pointer_map.operator[](ptr).value;
 
@@ -198,7 +196,6 @@ void unmapPointer(void *ptr, Smoke *smoke, Smoke::Index fromClassId, Smoke::Inde
 		toClassId = mi.index;
 	}
 
-  pointer_map_mutex.unlock();
 	for (Smoke::Index *i = smoke->inheritanceList + smoke->classes[toClassId].parents; *i; i++) {
 		unmapPointer(ptr, smoke, toClassId, *i, lastptr);
 	}
@@ -213,12 +210,12 @@ void unmapPointer(smokeruby_object *o, Smoke::Index classId, void *lastptr) {
 // Recurse to store it also as casted to its parent classes.
 
 void mapPointer(VALUE obj, smokeruby_object* o, void *ptr, Smoke *smoke, Smoke::Index fromClassId, Smoke::Index toClassId, void *lastptr) {
-  pointer_map_mutex.unlock();
-
 	ptr = smoke->cast(ptr, fromClassId, toClassId);
 
     if (ptr != lastptr) {
 		lastptr = ptr;
+
+		QMutexLocker locker(&pointer_map_mutex);
 
 		if (do_debug & qtdb_gc) {
 			const char *className = smoke->classes[fromClassId].className;
@@ -238,7 +235,6 @@ void mapPointer(VALUE obj, smokeruby_object* o, void *ptr, Smoke *smoke, Smoke::
 		toClassId = mi.index;
 	}
 
-  pointer_map_mutex.unlock();
 	for (Smoke::Index *i = smoke->inheritanceList + smoke->classes[toClassId].parents; *i; i++) {
 		mapPointer(obj, o, ptr, smoke, toClassId, *i, lastptr);
 	}
