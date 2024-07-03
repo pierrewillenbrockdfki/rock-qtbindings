@@ -58,7 +58,7 @@ VALUE qtscript_internal_module;
 static QtRuby::Binding binding;
 
 Q_DECL_EXPORT void
-Init_qtscript()
+Init_qtscript5()
 {
     init_qtscript_Smoke();
 

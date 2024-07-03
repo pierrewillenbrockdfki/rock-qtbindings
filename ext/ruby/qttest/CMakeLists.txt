@@ -1,18 +1,18 @@
 include_directories( ${CMAKE_SOURCE_DIR}/smoke ${RUBY_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/ruby/qtruby/src)
 
-set(qttest_LIBRARY_SRC qttest.cpp)
+set(qttest5_LIBRARY_SRC qttest.cpp)
 
-add_library(qttest MODULE ${qttest_LIBRARY_SRC})
-target_link_libraries(qttest
+add_library(qttest5 MODULE ${qttest5_LIBRARY_SRC})
+target_link_libraries(qttest5
     smokeqttest
-    qtruby4shared
+    qtruby5shared
 )
-target_compile_options(qttest PRIVATE -Wall)
-set_target_properties(qttest PROPERTIES PREFIX "")
-install(TARGETS qttest DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})
-install(FILES qttest.rb DESTINATION ${CUSTOM_RUBY_SITE_LIB_DIR}/qttest)
+target_compile_options(qttest5 PRIVATE -Wall)
+set_target_properties(qttest5 PROPERTIES PREFIX "")
+install(TARGETS qttest5 DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})
+install(FILES qttest5.rb DESTINATION ${CUSTOM_RUBY_SITE_LIB_DIR}/qttest5)
 
 if (Q_WS_MAC)
-    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink \"${CUSTOM_RUBY_SITE_ARCH_DIR}/qttest.so\"  \"${CUSTOM_RUBY_SITE_ARCH_DIR}/qttest.bundle\" )" )
+    install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink \"${CUSTOM_RUBY_SITE_ARCH_DIR}/qttest5.so\"  \"${CUSTOM_RUBY_SITE_ARCH_DIR}/qttest5.bundle\" )" )
 endif (Q_WS_MAC)
 

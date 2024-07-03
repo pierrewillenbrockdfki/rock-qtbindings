@@ -59,7 +59,7 @@ VALUE qttest_internal_module;
 static QtRuby::Binding binding;
 
 Q_DECL_EXPORT void
-Init_qttest()
+Init_qttest5()
 {
     init_qttest_Smoke();
 

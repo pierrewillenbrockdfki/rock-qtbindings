@@ -22,7 +22,7 @@ if windows
   end
 end
 $: << File.join(File.dirname(__FILE__), "../lib/#{ruby_version}")
-require "#{ruby_version}/qtruby4"
+require "#{ruby_version}/qtruby5"
 
 module Qt
   class RubyThreadFix < Qt::Object

@@ -58,7 +58,7 @@ VALUE qtuitools_internal_module;
 static QtRuby::Binding binding;
 
 Q_DECL_EXPORT void
-Init_qtuitools()
+Init_qtuitools5()
 {
     init_qtuitools_Smoke();
 

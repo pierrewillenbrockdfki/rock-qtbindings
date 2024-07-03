@@ -42,7 +42,7 @@ VALUE qtdeclarative_internal_module;
 static QtRuby::Binding binding;
 
 Q_DECL_EXPORT void
-Init_qtdeclarative()
+Init_qtdeclarative5()
 {
     init_qtdeclarative_Smoke();
 

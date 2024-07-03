@@ -2680,7 +2680,7 @@ set_qtruby_embedded_wrapped(VALUE /*self*/, VALUE yn)
 	smokeList << module##_Smoke;
 
 extern Q_DECL_EXPORT void
-Init_qtruby4()
+Init_qtruby5()
 {
 	init_qtcore_Smoke();
 	init_qtgui_Smoke();

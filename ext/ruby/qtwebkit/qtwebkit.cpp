@@ -42,7 +42,7 @@ VALUE qtwebkit_internal_module;
 static QtRuby::Binding binding;
 
 Q_DECL_EXPORT void
-Init_qtwebkit()
+Init_qtwebkit5()
 {
     init_qtwebkit_Smoke();
 
