@@ -28,9 +28,9 @@
 
 #include <QtQml/QQmlError>
 
-DEF_VALUELIST_MARSHALLER( QDeclarativeErrorList, QList<QDeclarativeError>, QDeclarativeError )
+DEF_VALUELIST_MARSHALLER( QQmlErrorList, QList<QQmlError>, QQmlError )
 
 TypeHandler QtDeclarative_handlers[] = {
-    { "QList<QDeclarativeError>", marshall_QDeclarativeErrorList },
+    { "QList<QQmlError>", marshall_QQmlErrorList },
     { 0, 0 }
 };
