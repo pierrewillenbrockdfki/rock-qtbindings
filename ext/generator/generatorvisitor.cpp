@@ -747,8 +747,10 @@ void GeneratorVisitor::visitSimpleDeclaration(SimpleDeclarationAST* node)
         kind = Class::Kind_Class;
     } else if (_kind == Token_struct) {
         kind = Class::Kind_Struct;
+    } else if (_kind == Token_union) {
+        kind = Class::Kind_Union;
     }
-    if (_kind == Token_class || _kind == Token_struct) {
+    if (_kind == Token_class || _kind == Token_struct || _kind == Token_union) {
         tc->run(node->type_specifier);
         if (tc->qualifiedName().isEmpty()) return;
         // for nested classes
@@ -837,7 +839,7 @@ void GeneratorVisitor::visitTemplateDeclaration(TemplateDeclarationAST* node)
     if (!node->declaration)
         return;
     int kind = token(node->declaration->start_token).kind;
-    if (kind == Token_class || kind == Token_struct) {
+    if (kind == Token_class || kind == Token_struct || kind == Token_union) {
         inTemplate = true;
         visit(node->declaration);
         inTemplate = false;
