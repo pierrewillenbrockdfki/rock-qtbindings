@@ -569,8 +569,9 @@ resolve_classname(smokeruby_object * o)
 VALUE
 findMethod(VALUE /*self*/, VALUE c_value, VALUE name_value)
 {
-    char *c = StringValuePtr(c_value);
-    char *name = StringValuePtr(name_value);
+    const char *c = StringValuePtr(c_value);
+    const char *name = StringValuePtr(name_value);
+    if(strcmp(c,"Qt5") == 0) c = "Qt";
     VALUE result = rb_ary_new();
     Smoke::ModuleIndex classId = Smoke::findClass(c);
     Smoke::ModuleIndex meth = Smoke::NullModuleIndex;
