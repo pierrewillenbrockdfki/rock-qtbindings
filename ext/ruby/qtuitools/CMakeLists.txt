@@ -7,6 +7,7 @@ target_link_libraries(rubyqtuitools
     smokeqtuitools
     qtruby4shared
 )
+target_compile_options(rubyqtuitools PRIVATE -Wall)
 set_target_properties(rubyqtuitools PROPERTIES PREFIX "" OUTPUT_NAME qtuitools)
 install(TARGETS rubyqtuitools DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})
 install(FILES qtuitools.rb DESTINATION ${CUSTOM_RUBY_SITE_LIB_DIR}/qtuitools)

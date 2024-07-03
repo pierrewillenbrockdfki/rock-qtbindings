@@ -28,6 +28,7 @@ target_link_libraries(  smokeqttest
                         ${QT_QTGUI_LIBRARY} 
                         ${QT_QTTEST_LIBRARY}
 )
+target_compile_options(smokeqttest PRIVATE -Wall)
 
 set_target_properties(smokeqttest PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

@@ -9,6 +9,7 @@ target_link_libraries(qtscript
     smokeqtscript
     qtruby4shared
 )
+target_compile_options(qtscript PRIVATE -Wall)
 set_target_properties(qtscript PROPERTIES PREFIX "")
 install(TARGETS qtscript DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})
 install(FILES qtscript.rb DESTINATION ${CUSTOM_RUBY_SITE_LIB_DIR}/qtscript)

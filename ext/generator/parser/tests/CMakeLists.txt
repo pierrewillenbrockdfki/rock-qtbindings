@@ -18,6 +18,7 @@ if (WIN32)
 endif (WIN32)
 
 target_link_libraries(parsertest ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} cppparser)
+target_compile_options(parsertest PRIVATE -Wall)
 
 ########### next target ###############
 
@@ -31,6 +32,7 @@ if (WIN32)
 endif (WIN32)
 
 target_link_libraries(generatortest ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} cppparser)
+target_compile_options(generatortest PRIVATE -Wall)
 
 ########### next target ###############
 
@@ -44,3 +46,4 @@ if (WIN32)
 endif (WIN32)
 
 target_link_libraries(pooltest ${QT_QTCORE_LIBRARY} ${QT_QTTEST_LIBRARY} cppparser)
+target_compile_options(pooltest PRIVATE -Wall)

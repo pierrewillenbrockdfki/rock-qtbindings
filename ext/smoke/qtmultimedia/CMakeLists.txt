@@ -33,6 +33,7 @@ target_link_libraries(  smokeqtmultimedia
                         ${QT_QTCORE_LIBRARY} 
                         ${QT_QTGUI_LIBRARY} 
                         ${QT_QTMULTIMEDIA_LIBRARY} )
+target_compile_options(smokeqtmultimedia PRIVATE -Wall)
 
 set_target_properties(smokeqtmultimedia PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

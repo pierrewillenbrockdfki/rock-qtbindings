@@ -9,6 +9,7 @@ set(generator_smoke_SRC
 add_library(generator_smoke MODULE ${generator_smoke_SRC})
 target_link_libraries(generator_smoke ${QT_QTCORE_LIBRARY} ${QT_QTXML_LIBRARY} smokegen)
 set_target_properties(generator_smoke PROPERTIES PREFIX "")
+target_compile_options(generator_smoke PRIVATE -Wall)
 
 if (WIN32)
 	# Realign the stack, for compatibility with an older ABI.

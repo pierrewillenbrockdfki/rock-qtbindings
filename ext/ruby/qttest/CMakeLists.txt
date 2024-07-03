@@ -8,6 +8,7 @@ target_link_libraries(qttest
     smokeqttest
     qtruby4shared
 )
+target_compile_options(qttest PRIVATE -Wall)
 set_target_properties(qttest PROPERTIES PREFIX "")
 install(TARGETS qttest DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})
 install(FILES qttest.rb DESTINATION ${CUSTOM_RUBY_SITE_LIB_DIR}/qttest)

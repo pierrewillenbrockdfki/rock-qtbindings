@@ -88,6 +88,8 @@ else(QT_DBUS_FOUND)
                               qtruby4shared )
 endif(QT_DBUS_FOUND)
 
+target_compile_options(qtruby4 PRIVATE -Wall)
+target_compile_options(qtruby4shared PRIVATE -Wall)
 # target_link_libraries(qtrubyinternal ${QT_QTCORE_LIBRARY} ${RUBY_LIBRARY} ${QT_QTNETWORK_LIBRARY})
 
 set_target_properties(qtruby4 PROPERTIES PREFIX "")

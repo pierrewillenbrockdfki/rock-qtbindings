@@ -29,6 +29,7 @@ ENDIF(CMAKE_CXX_FLAGS MATCHES "-fvisibility")
 add_library(smokeqtnetwork SHARED ${smokeqtnetwork_LIB_SRCS})
 
 target_link_libraries(smokeqtnetwork smokeqtcore ${QT_QTCORE_LIBRARY} ${QT_QTNETWORK_LIBRARY} )
+target_compile_options(smokeqtnetwork PRIVATE -Wall)
 
 set_target_properties(smokeqtnetwork PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

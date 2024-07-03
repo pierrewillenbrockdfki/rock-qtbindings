@@ -33,6 +33,7 @@ target_link_libraries(smokeqtxmlpatterns
                         ${QT_QTCORE_LIBRARY} 
                         ${QT_QTNETWORK_LIBRARY} 
                         ${QT_QTXMLPATTERNS_LIBRARY} )
+target_compile_options(smokeqtxmlpatterns PRIVATE -Wall)
 
 set_target_properties(smokeqtxmlpatterns PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

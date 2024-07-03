@@ -5,6 +5,7 @@ set(generator_dump_SRC
 
 add_library(generator_dump MODULE ${generator_dump_SRC})
 target_link_libraries(generator_dump ${QT_QTCORE_LIBRARY} smokegen)
+target_compile_options(generator_dump PRIVATE -Wall)
 set_target_properties(generator_dump PROPERTIES PREFIX "")
 
 if (WIN32)

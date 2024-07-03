@@ -29,6 +29,7 @@ ENDIF(CMAKE_CXX_FLAGS MATCHES "-fvisibility")
 add_library(smokeqtdbus SHARED ${smokeqtdbus_LIB_SRCS})
 
 target_link_libraries(smokeqtdbus smokeqtcore ${QT_QTCORE_LIBRARY} ${QT_QTDBUS_LIBRARY} )
+target_compile_options(smokeqtdbus PRIVATE -Wall)
 
 set_target_properties(smokeqtdbus PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

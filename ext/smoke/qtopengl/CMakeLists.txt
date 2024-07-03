@@ -35,6 +35,8 @@ target_link_libraries(smokeqtopengl
                         ${QT_QTGUI_LIBRARY}
                         ${QT_QTOPENGL_LIBRARY} )
 
+target_compile_options(smokeqtopengl PRIVATE -Wall)
+
 set_target_properties(smokeqtopengl PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 
 # Don't use the KDE ${LIB_INSTALL_DIR} macro here as this file is

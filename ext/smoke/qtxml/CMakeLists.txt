@@ -32,6 +32,7 @@ target_link_libraries(smokeqtxml
                         smokeqtcore 
                         ${QT_QTCORE_LIBRARY} 
                         ${QT_QTXML_LIBRARY} )
+target_compile_options(smokeqtxml PRIVATE -Wall)
 
 set_target_properties(smokeqtxml PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

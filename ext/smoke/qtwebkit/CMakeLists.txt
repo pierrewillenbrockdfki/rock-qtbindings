@@ -29,6 +29,7 @@ target_link_libraries(  smokeqtwebkit
                         ${QT_QTGUI_LIBRARY} 
                         ${QT_QTNETWORK_LIBRARY} 
                         ${QT_QTWEBKIT_LIBRARY} )
+target_compile_options(smokeqtwebkit PRIVATE -Wall)
 
 set_target_properties(smokeqtwebkit PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

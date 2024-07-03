@@ -37,6 +37,7 @@ set(cppparser_LIB_SRCS
 add_definitions(-D__CPPPARSER_BUILDING)
 add_library(cppparser SHARED ${cppparser_LIB_SRCS})
 target_link_libraries(cppparser ${QT_QTCORE_LIBRARY})
+target_compile_options(cppparser PRIVATE -Wall)
 
 install(TARGETS cppparser LIBRARY DESTINATION ${LIB_INSTALL_DIR}
     ARCHIVE DESTINATION ${LIB_INSTALL_DIR}

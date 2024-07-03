@@ -36,6 +36,7 @@ target_link_libraries(  smokeqtdeclarative
                         ${QT_QTNETWORK_LIBRARY} 
                         ${QT_QTSCRIPT_LIBRARY} 
                         ${QT_QTDECLARATIVE_LIBRARY} )
+target_compile_options(smokeqtdeclarative PRIVATE -Wall)
 
 set_target_properties(smokeqtdeclarative PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

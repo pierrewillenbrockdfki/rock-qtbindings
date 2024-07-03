@@ -25,6 +25,7 @@ set_target_properties(rbuic4_bin PROPERTIES OUTPUT_NAME rbuic4)
 set_target_properties(rbuic4_bin PROPERTIES COMPILE_FLAGS -DQT_UIC_RB_GENERATOR)
 
 target_link_libraries(rbuic4_bin  ${QT_QTCORE_LIBRARY} ${QT_QTXML_LIBRARY} )
+target_compile_options(rbuic4_bin PRIVATE -Wall)
 
 install(TARGETS rbuic4_bin DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 

@@ -67,6 +67,7 @@ ENDIF(CMAKE_CXX_FLAGS MATCHES "-fvisibility")
 add_library(smokeqtgui SHARED ${smokeqtgui_LIB_SRCS})
 
 target_link_libraries(smokeqtgui smokeqtcore ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} )
+target_compile_options(smokeqtgui PRIVATE -Wall)
 
 set_target_properties(smokeqtgui PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

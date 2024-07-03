@@ -10,6 +10,7 @@ set(pp_SRCS
 
 kde4_add_executable(pp TEST ${pp_SRCS})
 target_link_libraries(pp ${KDE4_KDECORE_LIBS} kdev4cpprpp)
+target_compile_options(pp PRIVATE -Wall)
 
 if (WIN32)
 	# Realign the stack, for compatibility with an older ABI.

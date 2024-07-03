@@ -8,6 +8,7 @@ target_link_libraries(rubyqtwebkit
     smokeqtwebkit
     qtruby4shared
 )
+target_compile_options(rubyqtwebkit PRIVATE -Wall)
 set_target_properties(rubyqtwebkit PROPERTIES PREFIX "" OUTPUT_NAME qtwebkit)
 install(TARGETS rubyqtwebkit DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})
 install(FILES qtwebkit.rb DESTINATION ${CUSTOM_RUBY_SITE_LIB_DIR}/qtwebkit)

@@ -8,6 +8,7 @@ target_link_libraries(rubyqtdeclarative
     smokeqtdeclarative
     qtruby4shared
 )
+target_compile_options(rubyqtdeclarative PRIVATE -Wall)
 set_target_properties(rubyqtdeclarative PROPERTIES PREFIX "" OUTPUT_NAME qtdeclarative)
 install(TARGETS rubyqtdeclarative DESTINATION ${CUSTOM_RUBY_SITE_ARCH_DIR})
 install(FILES qtdeclarative.rb DESTINATION ${CUSTOM_RUBY_SITE_LIB_DIR}/qtdeclarative)

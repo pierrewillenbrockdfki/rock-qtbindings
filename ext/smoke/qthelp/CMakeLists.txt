@@ -36,6 +36,7 @@ target_link_libraries(smokeqthelp
                         ${QT_QTGUI_LIBRARY} 
                         ${QT_QTSQL_LIBRARY} 
                         ${QT_QTHELP_LIBRARY} )
+target_compile_options(smokeqthelp PRIVATE -Wall)
 
 set_target_properties(smokeqthelp PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 

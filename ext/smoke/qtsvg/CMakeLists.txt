@@ -34,6 +34,7 @@ target_link_libraries(smokeqtsvg
                         ${QT_QTCORE_LIBRARY} 
                         ${QT_QTGUI_LIBRARY} 
                         ${QT_QTSVG_LIBRARY} )
+target_compile_options(smokeqtsvg PRIVATE -Wall)
 
 set_target_properties(smokeqtsvg PROPERTIES VERSION 3.0.0 SOVERSION 3 )
 
