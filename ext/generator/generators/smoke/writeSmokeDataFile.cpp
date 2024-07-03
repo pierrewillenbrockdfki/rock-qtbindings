@@ -661,7 +661,7 @@ void SmokeDataFile::write()
                 out << "    " << methodIdx[member] << ',';
                 
                 // comment
-                out << "  // " << klass->toString() << "::" << member->name();
+                out << "  // Member \"" << klass->toString() << "::" << member->name();
                 const Method* meth = 0;
                 if ((meth = dynamic_cast<const Method*>(member))) {
                     out << '(';
@@ -672,7 +672,8 @@ void SmokeDataFile::write()
                     out << ')';
                     if (meth->isConst()) out << " const";
                 }
-                out << "\n";
+                out << "\"\n";
+                out << "  // Filter: \"" << member->toString() << "\"\n";
             }
             out << "    0,\n";
             ambigiousIds[klass][munged_it.key()] = i;

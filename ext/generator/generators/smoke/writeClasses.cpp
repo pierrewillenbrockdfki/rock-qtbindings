@@ -184,7 +184,7 @@ void SmokeClassFiles::generateMethod(QTextStream& out, const QString& className,
     if ((meth.flags() & Method::Static) || meth.isConstructor())
         out << "static ";
     out << QString("void x_%1(Smoke::Stack x) {\n").arg(index);
-    out << "        // " << meth.toString() << "\n";
+    out << "        // Method: \"" << meth.toString(false, true) << "\"\n";
 
     bool dynamicDispatch = ((meth.flags() & Method::PureVirtual) || (meth.flags() & Method::DynamicDispatch));
 
@@ -233,7 +233,7 @@ void SmokeClassFiles::generateGetAccessor(QTextStream& out, const QString& class
     }
     fieldName += className + "::" + field.name();
     out << "void x_" << index << "(Smoke::Stack x) {\n"
-        << "        // " << field.toString() << "\n"
+        << "        // Field \"" << field.toString(false, true) << "\" getter\n"
         << "        x[0]." << Util::stackItemField(type) << " = "
             << Util::assignmentString(type, fieldName) << ";\n"
         << "    }\n";
@@ -251,7 +251,7 @@ void SmokeClassFiles::generateSetAccessor(QTextStream& out, const QString& class
     }
     fieldName += className + "::" + field.name();
     out << "void x_" << index << "(Smoke::Stack x) {\n"
-        << "        // " << field.toString() << "=\n"
+        << "        // Field \"" << field.toString() << "\" setter\n"
         << "        " << fieldName << " = ";
     QString unionField = Util::stackItemField(type);
     QString cast = type->toString();
@@ -267,6 +267,7 @@ void SmokeClassFiles::generateSetAccessor(QTextStream& out, const QString& class
 void SmokeClassFiles::generateEnumMemberCall(QTextStream& out, const QString& className, const EnumMember& member, int index)
 {
     out << "    static void x_" << index << "(Smoke::Stack x) {\n"
+        << "        // Enum: \"" << member.toString() << "\"\n"
         << "        x[0].s_enum = (long)";
     
     if (!className.isEmpty())
