@@ -1,2 +1,9 @@
-Makefile
-ext/build/*
+/Makefile
+/ext/build/*
+/bin/2.*/*
+/bin/3.*/*
+/lib/2.*/*
+/lib/3.*/*
+/examples/**/qrc_*.rb
+/examples/**/ui_*.rb
+/qt*bindings*.gem
