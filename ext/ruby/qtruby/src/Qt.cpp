@@ -100,9 +100,8 @@ int do_debug = qtdb_gc;
 int do_debug = qtdb_none;
 #endif
 
-typedef QHash<void *, SmokeValue> PointerMap;
 static QMutex pointer_map_mutex;
-Q_GLOBAL_STATIC(PointerMap, pointer_map)
+static QHash<void *, SmokeValue> pointer_map;
 int object_count = 0;
 
 // FIXME:
@@ -157,21 +156,18 @@ VALUE getPointerObject(void *ptr) {
 SmokeValue getSmokeValue(void *ptr) {
   pointer_map_mutex.lock();
 
-	if (!pointer_map() || !pointer_map()->contains(ptr)) {
+	if (!pointer_map.contains(ptr)) {
 		if (do_debug & qtdb_gc) {
 			qWarning("getPointerObject %p -> nil", ptr);
-			if (!pointer_map()) {
-				qWarning("getPointerObject pointer_map deleted");
-			}
 		}
       pointer_map_mutex.unlock();
 	    return SmokeValue();
 	} else {
 		if (do_debug & qtdb_gc) {
-			qWarning("getPointerObject %p -> %p", ptr, (void *) pointer_map()->operator[](ptr).value);
+			qWarning("getPointerObject %p -> %p", ptr, (void *) pointer_map.operator[](ptr).value);
 		}
     pointer_map_mutex.unlock();
-		return pointer_map()->operator[](ptr);
+		return pointer_map.operator[](ptr);
 	}
 }
 
@@ -181,15 +177,15 @@ void unmapPointer(void *ptr, Smoke *smoke, Smoke::Index fromClassId, Smoke::Inde
 
 	if (ptr != lastptr) {
 		lastptr = ptr;
-		if (pointer_map() && pointer_map()->contains(ptr)) {
-			VALUE obj_ptr = pointer_map()->operator[](ptr).value;
+		if (pointer_map.contains(ptr)) {
+			VALUE obj_ptr = pointer_map.operator[](ptr).value;
 
 			if (do_debug & qtdb_gc) {
 				const char *className = smoke->classes[fromClassId].className;
-				qWarning("unmapPointer (%s*)%p -> %p size: %d", className, ptr, (void*)(&obj_ptr), pointer_map()->size() - 1);
+				qWarning("unmapPointer (%s*)%p -> %p size: %d", className, ptr, (void *)(&obj_ptr), pointer_map.size() - 1);
 			}
 
-			pointer_map()->remove(ptr);
+			pointer_map.remove(ptr);
 		}
 	}
 
@@ -226,12 +222,12 @@ void mapPointer(VALUE obj, smokeruby_object* o, void *ptr, Smoke *smoke, Smoke::
 
 		if (do_debug & qtdb_gc) {
 			const char *className = smoke->classes[fromClassId].className;
-			qWarning("mapPointer (%s*)%p -> %p size: %d", className, ptr, (void*)obj, pointer_map()->size() + 1);
+			qWarning("mapPointer (%s*)%p -> %p size: %d", className, ptr, (void *)obj, pointer_map.size() + 1);
 		}
 
         SmokeValue value(obj, o);
-		pointer_map()->insert(ptr, value);
-    }
+		pointer_map.insert(ptr, value);
+	}
 
 	if (smoke->classes[toClassId].external) {
 		// encountered external class
@@ -261,10 +257,6 @@ Binding::Binding(Smoke *s) : SmokeBinding(s) {}
 
 void
 Binding::deleted(Smoke::Index classId, void *ptr) {
-	if (!pointer_map()) {
-	return;
-	}
-
 	smokeruby_object *o = getSmokeValue(ptr).o;
 	if (do_debug & qtdb_gc) {
 	  	qWarning("unmapping: o = %p, ptr = %p\n", o, ptr);
