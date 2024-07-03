@@ -266,7 +266,7 @@ Binding::deleted(Smoke::Index classId, void *ptr) {
 }
 
 bool
-Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool /*isAbstract*/) {
+Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool isAbstract) {
 	VALUE obj = getPointerObject(ptr);
 	smokeruby_object *o = value_obj_info(obj);
 
@@ -292,6 +292,8 @@ Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool /*is
 	if (o == 0) {
 		if (do_debug & qtdb_virtual)  // if not in global destruction
 			qWarning("Cannot find object for virtual method %p -> %p", ptr, &obj);
+		if (isAbstract)
+			rb_raise(rb_eFatal, "Trying to call pure virtual c++ method");
 		return false;
 	}
 	const char *methodName = smoke->methodNames[smoke->methods[method].name];
@@ -299,19 +301,27 @@ Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool /*is
 		methodName += (sizeof("operator") - 1);
 	}
 
-  // If not in a ruby thread, just call the C++ version
+	// If not in a ruby thread, just call the C++ version
 	// During GC, avoid checking for override and just call the C++ version
-  // If the virtual method hasn't been overriden, just call the C++ one.
-#ifdef HAVE_RUBY_RUBY_H
-  int ruby_thread = ruby_native_thread_p();
-	if ((ruby_thread == 0) || rb_during_gc() || rb_respond_to(obj, rb_intern(methodName)) == 0) {
-    return false;
+	// If the virtual method hasn't been overriden, just call the C++ one.
+	if (rb_during_gc()) {
+		return false;
 	}
+#ifdef HAVE_RUBY_RUBY_H
+	int ruby_thread = ruby_native_thread_p();
+	if (ruby_thread == 0)
 #else
-  if (rb_during_gc() || ruby_stack_check() || rb_respond_to(obj, rb_intern(methodName)) == 0) {
-    return false;
-  }
+	if (ruby_stack_check())
 #endif
+	{
+		return false;
+	}
+	// If the virtual method hasn't been overriden, just call the C++ one.
+	if (rb_respond_to(obj, rb_intern(methodName)) == 0) {
+		if (isAbstract)
+			rb_raise(rb_eFatal, "Trying to call pure virtual c++ method");
+		return false;
+	}
 
 	QtRuby::VirtualMethodCall c(smoke, method, args, obj, ALLOCA_N(VALUE, smoke->methods[method].numArgs));
 	c.next();
