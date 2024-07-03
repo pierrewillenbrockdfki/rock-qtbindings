@@ -181,7 +181,7 @@ QString Driver::rubyClassName(const QString &name)
 	}
 
 	if (!qname.contains("|Qt::")) {
-    	qname.replace("|Q", "|Qt::");
+		qname.replace("|Q", "|Qt::");
 	} else if (!qname.contains("|KDE::")) {
     	qname.replace("|K", "|KDE::");
 	}
@@ -211,7 +211,7 @@ QString Driver::qtify(const QString &name)
 
 static bool isAnsiCCharacter(const QChar& c)
 {
-    return c.toUpper() >= QLatin1Char('A') && c.toUpper() <= QLatin1Char('Z')
+    return (c.toUpper() >= QLatin1Char('A') && c.toUpper() <= QLatin1Char('Z'))
            || c.isDigit() || c == QLatin1Char('_');
 }
 

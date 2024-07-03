@@ -152,26 +152,26 @@ void Uic::writeCopyrightHeader(DomUI *ui)
     if (comment.size())
         out << "=begin\n" << comment << "\n=end\n\n";
 
-	out << "=begin\n";
-	out << "** Form generated from reading ui file '" << QFileInfo(opt.inputFile).fileName() << "'\n";
-	out << "**\n";
-	out << "** Created: " << QDateTime::currentDateTime().toString() << "\n";
-	out << "**      " << QString("by: Qt User Interface Compiler version %1\n").arg(QT_VERSION_STR);
-	out << "**\n";
-	out << "** WARNING! All changes made in this file will be lost when recompiling ui file!\n";
-	out << "=end\n\n";
+    out << "=begin\n";
+    out << "** Form generated from reading ui file '" << QFileInfo(opt.inputFile).fileName() << "'\n";
+    out << "**\n";
+    out << "** Created: " << QDateTime::currentDateTime().toString() << "\n";
+    out << "**      " << QString("by: Qt User Interface Compiler version %1\n").arg(QT_VERSION_STR);
+    out << "**\n";
+    out << "** WARNING! All changes made in this file will be lost when recompiling ui file!\n";
+    out << "=end\n\n";
 #else
     if (comment.size())
         out << "/*\n" << comment << "\n*/\n\n";
 
-        out << "/********************************************************************************\n";
-        out << "** Form generated from reading ui file '" << QFileInfo(opt.inputFile).fileName() << "'\n";
-        out << "**\n";
-        out << "** Created: " << QDateTime::currentDateTime().toString() << "\n";
-        out << "**      " << QString::fromLatin1("by: Qt User Interface Compiler version %1\n").arg(QLatin1String(QT_VERSION_STR));
-        out << "**\n";
-        out << "** WARNING! All changes made in this file will be lost when recompiling ui file!\n";
-        out << "********************************************************************************/\n\n";
+    out << "/********************************************************************************\n";
+    out << "** Form generated from reading ui file '" << QFileInfo(opt.inputFile).fileName() << "'\n";
+    out << "**\n";
+    out << "** Created: " << QDateTime::currentDateTime().toString() << "\n";
+    out << "**      " << QString::fromLatin1("by: Qt User Interface Compiler version %1\n").arg(QLatin1String(QT_VERSION_STR));
+    out << "**\n";
+    out << "** WARNING! All changes made in this file will be lost when recompiling ui file!\n";
+    out << "********************************************************************************/\n\n";
 #endif
 }
 

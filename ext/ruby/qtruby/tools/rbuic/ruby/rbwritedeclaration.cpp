@@ -167,8 +167,8 @@ void WriteDeclaration::acceptWidget(DomWidget *node)
     if (node->hasAttributeClass())
         className = node->attributeClass();
 
-	QString item = m_driver->findOrInsertWidget(node);
-	item = item.mid(0, 1).toLower() + item.mid(1);
+    QString item = m_driver->findOrInsertWidget(node);
+    item = item.mid(0, 1).toLower() + item.mid(1);
     m_output << m_option.indent << "attr_reader :" << item << "\n";
 
     TreeWalker::acceptWidget(node);
@@ -180,8 +180,8 @@ void WriteDeclaration::acceptLayout(DomLayout *node)
     if (node->hasAttributeClass())
         className = node->attributeClass();
 
-	QString item = m_driver->findOrInsertLayout(node);
-	item = item.mid(0, 1).toLower() + item.mid(1);
+    QString item = m_driver->findOrInsertLayout(node);
+    item = item.mid(0, 1).toLower() + item.mid(1);
     m_output << m_option.indent << "attr_reader :" << item << "\n";
 
     TreeWalker::acceptLayout(node);
@@ -189,8 +189,8 @@ void WriteDeclaration::acceptLayout(DomLayout *node)
 
 void WriteDeclaration::acceptSpacer(DomSpacer *node)
 {
-	QString item = m_driver->findOrInsertSpacer(node);
-	item = item.mid(0, 1).toLower() + item.mid(1);
+    QString item = m_driver->findOrInsertSpacer(node);
+    item = item.mid(0, 1).toLower() + item.mid(1);
     m_output << m_option.indent << "attr_reader :" << item << "\n";
 
     TreeWalker::acceptSpacer(node);
@@ -198,8 +198,8 @@ void WriteDeclaration::acceptSpacer(DomSpacer *node)
 
 void WriteDeclaration::acceptActionGroup(DomActionGroup *node)
 {
-	QString item = m_driver->findOrInsertActionGroup(node);
-	item = item.mid(0, 1).toLower() + item.mid(1);
+    QString item = m_driver->findOrInsertActionGroup(node);
+    item = item.mid(0, 1).toLower() + item.mid(1);
     m_output << m_option.indent << "attr_reader :" << item << "\n";
 
     TreeWalker::acceptActionGroup(node);
@@ -207,8 +207,8 @@ void WriteDeclaration::acceptActionGroup(DomActionGroup *node)
 
 void WriteDeclaration::acceptAction(DomAction *node)
 {
-	QString item = m_driver->findOrInsertAction(node);
-	item = item.mid(0, 1).toLower() + item.mid(1);
+    QString item = m_driver->findOrInsertAction(node);
+    item = item.mid(0, 1).toLower() + item.mid(1);
     m_output << m_option.indent << "attr_reader :" << item << "\n";
 
     TreeWalker::acceptAction(node);

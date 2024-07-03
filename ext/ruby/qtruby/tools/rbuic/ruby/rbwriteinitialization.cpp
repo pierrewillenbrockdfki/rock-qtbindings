@@ -1628,13 +1628,13 @@ void WriteInitialization::writeBrush(const DomBrush *brush, const QString &brush
         QString gradientType = gradient->attributeType();
         QString gradientName = m_driver->unique(QLatin1String("gradient"));
         if (gradientType == QLatin1String("LinearGradient")) {
-            m_output << m_option.indent << gradientName << " = Qt::LinearGradient.new" 
+            m_output << m_option.indent << gradientName << " = Qt::LinearGradient.new"
                 << "(" << gradient->attributeStartX()
                 << ", " << gradient->attributeStartY()
                 << ", " << gradient->attributeEndX()
                 << ", " << gradient->attributeEndY() << ")\n";
         } else if (gradientType == QLatin1String("RadialGradient")) {
-            m_output << m_option.indent << gradientName << " = Qt::RadialGradient.new" 
+            m_output << m_option.indent << gradientName << " = Qt::RadialGradient.new"
                 << "(" << gradient->attributeCentralX()
                 << ", " << gradient->attributeCentralY()
                 << ", " << gradient->attributeRadius()
