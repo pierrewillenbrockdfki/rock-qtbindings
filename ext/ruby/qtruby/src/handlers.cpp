@@ -1785,7 +1785,7 @@ void marshall_QVectorint(Marshall *m) {
     }
 }
 
-void marshall_voidP(Marshall *m) {
+void marshall_numericP(Marshall *m) {
     switch(m->action()) {
       case Marshall::FromVALUE:
 	{
@@ -1812,6 +1812,24 @@ void marshall_voidP(Marshall *m) {
 	break;
       default:
 	m->unsupported();
+	break;
+    }
+}
+
+void marshall_voidP(Marshall *m) {
+    switch(m->action()) {
+	case Marshall::FromVALUE:
+	{
+		m->item().s_voidp = (void*)(uintptr_t)*(m->var());
+	}
+	break;
+	case Marshall::ToVALUE:
+	{
+		*(m->var()) = (VALUE)(uintptr_t)m->item().s_voidp;
+	}
+	break;
+		default:
+		m->unsupported();
 	break;
     }
 }
@@ -2562,16 +2580,17 @@ Q_DECL_EXPORT TypeHandler Qt_handlers[] = {
     { "void", marshall_void },
     { "void**", marshall_voidP_array },
     { "WId", marshall_it<WId> },
-    { "HBITMAP__*", marshall_voidP },
-    { "HDC__*", marshall_voidP },
-    { "HFONT__*", marshall_voidP },
-    { "HICON__*", marshall_voidP },
-    { "HINSTANCE__*", marshall_voidP },
-    { "HPALETTE__*", marshall_voidP },
-    { "HRGN__*", marshall_voidP },
-    { "HWND__*", marshall_voidP },
-    { "tagMSG*", marshall_voidP },
-    { "long*", marshall_voidP },
+    { "HBITMAP__*", marshall_numericP },
+    { "HDC__*", marshall_numericP },
+    { "HFONT__*", marshall_numericP },
+    { "HICON__*", marshall_numericP },
+    { "HINSTANCE__*", marshall_numericP },
+    { "HPALETTE__*", marshall_numericP },
+    { "HRGN__*", marshall_numericP },
+    { "HWND__*", marshall_numericP },
+    { "tagMSG*", marshall_numericP },
+    { "long*", marshall_numericP },
+    { "void*", marshall_voidP },
     { "QFlags&", marshall_it<int *> },
     { "GLenum", marshall_it<unsigned int> },
     { "GLboolean", marshall_it<unsigned char> },
