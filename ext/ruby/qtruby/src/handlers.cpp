@@ -593,9 +593,6 @@ resolve_classname_qt(smokeruby_object * o)
 		case QEvent::InputMethod:
    			SET_SMOKERUBY_OBJECT("QInputMethodEvent")
 			break;
-		case QEvent::AccessibilityPrepare:
-   			SET_SMOKERUBY_OBJECT("QEvent")
-			break;
 		case QEvent::TabletMove:
 		case QEvent::TabletPress:
 		case QEvent::TabletRelease:
@@ -663,10 +660,6 @@ resolve_classname_qt(smokeruby_object * o)
 		case QEvent::HoverMove:
    			SET_SMOKERUBY_OBJECT("QHoverEvent")
 			break;
-		case QEvent::AccessibilityHelp:
-		case QEvent::AccessibilityDescription:
-   			SET_SMOKERUBY_OBJECT("QEvent")
-#if QT_VERSION >= 0x40200
 		case QEvent::GraphicsSceneMouseMove:
 		case QEvent::GraphicsSceneMousePress:
 		case QEvent::GraphicsSceneMouseRelease:
@@ -696,7 +689,6 @@ resolve_classname_qt(smokeruby_object * o)
 		case QEvent::KeyboardLayoutChange:
    			SET_SMOKERUBY_OBJECT("QEvent")
 			break;
-#endif
 		default:
 			break;
 		}
@@ -2375,7 +2367,6 @@ DEF_LIST_MARSHALLER( QMdiSubWindowList, QList<QMdiSubWindow*>, QMdiSubWindow )
 DEF_VALUELIST_MARSHALLER( QColorVector, QVector<QColor>, QColor )
 DEF_VALUELIST_MARSHALLER( QFileInfoList, QFileInfoList, QFileInfo )
 DEF_VALUELIST_MARSHALLER( QHostAddressList, QList<QHostAddress>, QHostAddress )
-DEF_VALUELIST_MARSHALLER( QImageTextKeyLangList, QList<QImageTextKeyLang>, QImageTextKeyLang )
 DEF_VALUELIST_MARSHALLER( QKeySequenceList, QList<QKeySequence>, QKeySequence )
 DEF_VALUELIST_MARSHALLER( QLineFVector, QVector<QLineF>, QLineF )
 DEF_VALUELIST_MARSHALLER( QLineVector, QVector<QLine>, QLine )
@@ -2454,7 +2445,6 @@ Q_DECL_EXPORT TypeHandler Qt_handlers[] = {
     { "QList<QByteArray>&", marshall_QByteArrayList },
     { "QList<QHostAddress>", marshall_QHostAddressList },
     { "QList<QHostAddress>&", marshall_QHostAddressList },
-    { "QList<QImageTextKeyLang>", marshall_QImageTextKeyLangList },
     { "QList<QKeySequence>", marshall_QKeySequenceList },
     { "QList<QKeySequence>&", marshall_QKeySequenceList },
     { "QList<QListWidgetItem*>", marshall_QListWidgetItemList },
