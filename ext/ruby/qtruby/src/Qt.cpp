@@ -324,7 +324,25 @@ Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool isAb
 	if (ruby_stack_check())
 #endif
 	{
-		return false;
+		//throw std::runtime_error("Qt tries to call object while not running on a ruby thread");
+		// Make sure things run on the main thread. this is slow and prone to deadlock.
+		// Better idea would be to be able to tell us which functions definitely have been overriden,
+		// which would avoid calling rb_respond_to and, for functions not overriden, the call into ruby.
+		bool result = false;
+		QMetaObject::invokeMethod(static_cast<QObject*>(ptr), [&result, obj, methodName, isAbstract, args, method, this](){
+			if (rb_respond_to(obj, rb_intern(methodName)) == 0) {
+				if (isAbstract)
+					rb_raise(rb_eFatal, "Trying to call pure virtual c++ method");
+				result = false;
+				return;
+			}
+
+			QtRuby::VirtualMethodCall c(smoke, method, args, obj, ALLOCA_N(VALUE, smoke->methods[method].numArgs));
+			c.next();
+			result = true;
+			return;
+		}, Qt::BlockingQueuedConnection);
+		return result;
 	}
 	// If the virtual method hasn't been overriden, just call the C++ one.
 	if (rb_respond_to(obj, rb_intern(methodName)) == 0) {
