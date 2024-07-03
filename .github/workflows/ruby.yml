@@ -7,13 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Ruby 2.6
-      uses: actions/setup-ruby@v1
+    - name: Set up Ruby 2.7
+      uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.7
     - name: Install Package Dependencies
       uses: mstksg/get-package@v1
       with:
-        apt-get: ruby-dev libqt4-dev
+        apt-get: ruby-dev qtbase5-dev libqt5opengl5-dev qttools5-dev qtscript5-dev libqt5svg5-dev libqt5webkit5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtmultimedia5-dev qtdeclarative5-dev
     - name: Build and test with Rake
       run: rake
