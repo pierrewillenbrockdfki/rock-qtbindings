@@ -76,7 +76,7 @@ void WriteDeclaration::acceptUI(DomUI *node)
     if (!exportMacro.isEmpty())
         exportMacro.append(QLatin1Char(' '));
 
-    QStringList namespaceList = qualifiedClassName.split(QLatin1String("::"));
+    QStringList namespaceList = qualifiedClassName.split(QStringLiteral("::"));
     if (namespaceList.count()) {
         className = namespaceList.last().mid(0, 1).toUpper() + namespaceList.last().mid(1);
         namespaceList.removeLast();
@@ -98,7 +98,7 @@ void WriteDeclaration::acceptUI(DomUI *node)
     for (int i=0; i<connections.size(); ++i) {
         const QString connection = connections.at(i);
 
-        if (connection == QLatin1String("(default)"))
+        if (connection == QStringLiteral("(default)"))
             continue;
 
         m_output << m_option.indent << "@" << connection << "Connection = Qt::SqlDatabase.new\n";
@@ -133,7 +133,7 @@ void WriteDeclaration::acceptUI(DomUI *node)
         m_output << "\n";
 
     if (m_option.generateNamespace && !m_option.prefix.isEmpty()) {
-        namespaceList.append(QLatin1String("Ui"));
+        namespaceList.append(QStringLiteral("Ui"));
 
         QListIterator<QString> it(namespaceList);
         while (it.hasNext()) {
@@ -163,7 +163,7 @@ void WriteDeclaration::acceptUI(DomUI *node)
 
 void WriteDeclaration::acceptWidget(DomWidget *node)
 {
-    QString className = QLatin1String("Qt::Widget");
+    QString className = QStringLiteral("Qt::Widget");
     if (node->hasAttributeClass())
         className = node->attributeClass();
 
@@ -176,7 +176,7 @@ void WriteDeclaration::acceptWidget(DomWidget *node)
 
 void WriteDeclaration::acceptLayout(DomLayout *node)
 {
-    QString className = QLatin1String("Qt::Layout");
+    QString className = QStringLiteral("Qt::Layout");
     if (node->hasAttributeClass())
         className = node->attributeClass();
 

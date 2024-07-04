@@ -218,7 +218,7 @@ RCCResourceLibrary::~RCCResourceLibrary()
 
 bool RCCResourceLibrary::interpretResourceFile(QIODevice *inputDevice, QString fname, QString currentPath, bool ignoreErrors)
 {
-    if (!currentPath.isEmpty() && !currentPath.endsWith(QLatin1String("/")))
+    if (!currentPath.isEmpty() && !currentPath.endsWith(QStringLiteral("/")))
         currentPath += '/';
 
     QDomDocument document;
@@ -235,12 +235,12 @@ bool RCCResourceLibrary::interpretResourceFile(QIODevice *inputDevice, QString f
     }
     for(QDomElement root = document.firstChild().toElement(); !root.isNull();
         root = root.nextSibling().toElement()) {
-        if (root.tagName() != QLatin1String(TAG_RCC))
+        if (root.tagName() != QStringLiteral(TAG_RCC))
             continue;
 
         for (QDomElement child = root.firstChild().toElement(); !child.isNull();
              child = child.nextSibling().toElement()) {
-            if (child.tagName() == QLatin1String(TAG_RESOURCE)) {
+            if (child.tagName() == QStringLiteral(TAG_RESOURCE)) {
                 QLocale::Language language = QLocale::c().language();
                 QLocale::Country country = QLocale::c().country();
 
@@ -259,13 +259,13 @@ bool RCCResourceLibrary::interpretResourceFile(QIODevice *inputDevice, QString f
                 QString prefix;
                 if (child.hasAttribute(ATTRIBUTE_PREFIX))
                     prefix = child.attribute(ATTRIBUTE_PREFIX);
-                if (!prefix.startsWith(QLatin1String("/")))
+                if (!prefix.startsWith(QStringLiteral("/")))
                     prefix.prepend('/');
-                if (!prefix.endsWith(QLatin1String("/")))
+                if (!prefix.endsWith(QStringLiteral("/")))
                     prefix += '/';
 
                 for (QDomNode res = child.firstChild(); !res.isNull(); res = res.nextSibling()) {
-                    if (res.toElement().tagName() == QLatin1String(TAG_FILE)) {
+                    if (res.toElement().tagName() == QStringLiteral(TAG_FILE)) {
 
                         QString fileName(res.firstChild().toText().data());
                         if (ignoreErrors && fileName.isEmpty())
@@ -312,12 +312,12 @@ bool RCCResourceLibrary::interpretResourceFile(QIODevice *inputDevice, QString f
                                 if(alias.endsWith(file.fileName()))
                                     alias = alias.left(alias.length()-file.fileName().length());
                             }
-                            if (!alias.endsWith(QLatin1String("/")))
+                            if (!alias.endsWith(QStringLiteral("/")))
                                 alias += '/';
                             QFileInfoList children = dir.entryInfoList();
                             for(int i = 0; i < children.size(); ++i) {
-                                if(children[i].fileName() != QLatin1String(".") &&
-                                   children[i].fileName() != QLatin1String(".."))
+                                if(children[i].fileName() != QStringLiteral(".") &&
+                                   children[i].fileName() != QStringLiteral(".."))
                                     addFile(alias + children[i].fileName(),
                                             RCCFileInfo(children[i].fileName(), children[i], language, country,
                                                         RCCFileInfo::NoFlags, compressLevel, compressThreshold));

@@ -75,7 +75,7 @@ QString Driver::findOrInsertSpacer(DomSpacer *ui_spacer)
 {
     if (!m_spacers.contains(ui_spacer)) {
         const QString name = ui_spacer->hasAttributeName() ? ui_spacer->attributeName() : QString();
-        m_spacers.insert(ui_spacer, unique(name, QLatin1String("QSpacerItem")));
+        m_spacers.insert(ui_spacer, unique(name, QStringLiteral("QSpacerItem")));
     }
 
     return m_spacers.value(ui_spacer);
@@ -112,7 +112,7 @@ QString Driver::findOrInsertLayoutItem(DomLayoutItem *ui_layoutItem)
 QString Driver::findOrInsertActionGroup(DomActionGroup *ui_group)
 {
     if (!m_actionGroups.contains(ui_group))
-        m_actionGroups.insert(ui_group, unique(ui_group->attributeName(), QLatin1String("QActionGroup")));
+        m_actionGroups.insert(ui_group, unique(ui_group->attributeName(), QStringLiteral("QActionGroup")));
 
     return m_actionGroups.value(ui_group);
 }
@@ -120,7 +120,7 @@ QString Driver::findOrInsertActionGroup(DomActionGroup *ui_group)
 QString Driver::findOrInsertAction(DomAction *ui_action)
 {
     if (!m_actions.contains(ui_action))
-        m_actions.insert(ui_action, unique(ui_action->attributeName(), QLatin1String("QAction")));
+        m_actions.insert(ui_action, unique(ui_action->attributeName(), QStringLiteral("QAction")));
 
     return m_actions.value(ui_action);
 }
@@ -133,7 +133,7 @@ QString Driver::findOrInsertName(const QString &name)
 QString Driver::normalizedName(const QString &name)
 {
     QString result = name;
-    result.replace(QRegExp(QLatin1String("[^a-zA-Z_0-9]")), QString(QLatin1Char('_')));
+    result.replace(QRegExp(QStringLiteral("[^a-zA-Z_0-9]")), QString(QLatin1Char('_')));
     return result;
 }
 
@@ -155,7 +155,7 @@ QString Driver::unique(const QString &instanceName, const QString &className)
     } else if (className.size()) {
         name = unique(qtify(className));
     } else {
-        name = unique(QLatin1String("var"));
+        name = unique(QStringLiteral("var"));
     }
 
     if (alreadyUsed && className.size()) {
@@ -220,7 +220,7 @@ QString Driver::headerFileName() const
     QString name = m_option.outputFile;
 
     if (name.isEmpty()) {
-        name = QLatin1String("ui_"); // ### use ui_ as prefix.
+        name = QStringLiteral("ui_"); // ### use ui_ as prefix.
         name.append(m_option.inputFile);
     }
 
@@ -230,7 +230,7 @@ QString Driver::headerFileName() const
 QString Driver::headerFileName(const QString &fileName)
 {
     if (fileName.isEmpty())
-        return headerFileName(QLatin1String("noname"));
+        return headerFileName(QStringLiteral("noname"));
 
     QFileInfo info(fileName);
     QString baseName = info.baseName();
@@ -246,7 +246,7 @@ QString Driver::headerFileName(const QString &fileName)
             i += hex.size() + 1;
         }
     }
-    return baseName.toUpper() + QLatin1String("_H");
+    return baseName.toUpper() + QStringLiteral("_H");
 }
 
 bool Driver::printDependencies(const QString &fileName)

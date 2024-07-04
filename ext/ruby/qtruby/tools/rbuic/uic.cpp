@@ -168,7 +168,7 @@ void Uic::writeCopyrightHeader(DomUI *ui)
     out << "** Form generated from reading ui file '" << QFileInfo(opt.inputFile).fileName() << "'\n";
     out << "**\n";
     out << "** Created: " << QDateTime::currentDateTime().toString() << "\n";
-    out << "**      " << QString::fromLatin1("by: Qt User Interface Compiler version %1\n").arg(QLatin1String(QT_VERSION_STR));
+    out << "**      " << QString::fromLatin1("by: Qt User Interface Compiler version %1\n").arg(QStringLiteral(QT_VERSION_STR));
     out << "**\n";
     out << "** WARNING! All changes made in this file will be lost when recompiling ui file!\n";
     out << "********************************************************************************/\n\n";
@@ -205,7 +205,7 @@ bool Uic::write(QIODevice *in)
 
     if (option().generator == Option::JavaGenerator) {
 #ifdef QT_UIC_JAVA_GENERATOR
-        if (language.toLower() != QLatin1String("jambi")) {
+        if (language.toLower() != QStringLiteral("jambi")) {
             fprintf(stderr, "uic: File is not a 'jambi' form\n");
             return false;
         }
@@ -221,7 +221,7 @@ bool Uic::write(QIODevice *in)
 #endif
     } else {
 #ifdef QT_UIC_CPP_GENERATOR
-        if (!language.isEmpty() && language.toLower() != QLatin1String("c++")) {
+        if (!language.isEmpty() && language.toLower() != QStringLiteral("c++")) {
             fprintf(stderr, "uic: File is not a 'c++' ui file, language=%s\n", qPrintable(language));
             return false;
         }
@@ -254,8 +254,8 @@ bool Uic::write(DomUI *ui)
     }
 
     pixFunction = ui->elementPixmapFunction();
-    if (pixFunction == QLatin1String("QPixmap::fromMimeSource"))
-        pixFunction = QLatin1String("qPixmapFromMimeSource");
+    if (pixFunction == QStringLiteral("QPixmap::fromMimeSource"))
+        pixFunction = QStringLiteral("qPixmapFromMimeSource");
 
     externalPix = ui->elementImages() == 0;
 
@@ -286,8 +286,8 @@ bool Uic::jwrite(DomUI *ui)
         writeCopyrightHeader(ui);
 
     pixFunction = ui->elementPixmapFunction();
-    if (pixFunction == QLatin1String("QPixmap::fromMimeSource"))
-        pixFunction = QLatin1String("qPixmapFromMimeSource");
+    if (pixFunction == QStringLiteral("QPixmap::fromMimeSource"))
+        pixFunction = QStringLiteral("qPixmapFromMimeSource");
 
     externalPix = ui->elementImages() == 0;
 
@@ -314,8 +314,8 @@ bool Uic::rbwrite(DomUI *ui)
         writeCopyrightHeader(ui);
 
     pixFunction = ui->elementPixmapFunction();
-    if (pixFunction == QLatin1String("Qt::Pixmap::fromMimeSource"))
-        pixFunction = QLatin1String("qPixmapFromMimeSource");
+    if (pixFunction == QStringLiteral("Qt::Pixmap::fromMimeSource"))
+        pixFunction = QStringLiteral("qPixmapFromMimeSource");
 
     externalPix = ui->elementImages() == 0;
 
@@ -389,48 +389,48 @@ void Uic::writeHeaderProtectionEnd()
 
 bool Uic::isMainWindow(const QString &className) const
 {
-    return customWidgetsInfo()->extends(className, QLatin1String("Q3MainWindow"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QMainWindow"));
+    return customWidgetsInfo()->extends(className, QStringLiteral("Q3MainWindow"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QMainWindow"));
 }
 
 bool Uic::isToolBar(const QString &className) const
 {
-    return customWidgetsInfo()->extends(className, QLatin1String("Q3ToolBar"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QToolBar"));
+    return customWidgetsInfo()->extends(className, QStringLiteral("Q3ToolBar"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QToolBar"));
 }
 
 bool Uic::isButton(const QString &className) const
 {
-    return customWidgetsInfo()->extends(className, QLatin1String("QRadioButton"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QToolButton"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QCheckBox"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QPushButton"));
+    return customWidgetsInfo()->extends(className, QStringLiteral("QRadioButton"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QToolButton"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QCheckBox"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QPushButton"));
 }
 
 bool Uic::isContainer(const QString &className) const
 {
-    return customWidgetsInfo()->extends(className, QLatin1String("QStackedWidget"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QToolBox"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QTabWidget"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QScrollArea"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QMdiArea"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QWizard"));
+    return customWidgetsInfo()->extends(className, QStringLiteral("QStackedWidget"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QToolBox"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QTabWidget"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QScrollArea"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QMdiArea"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QWizard"));
 }
 
 bool Uic::isStatusBar(const QString &className) const
 {
-    return customWidgetsInfo()->extends(className, QLatin1String("QStatusBar"));
+    return customWidgetsInfo()->extends(className, QStringLiteral("QStatusBar"));
 }
 
 bool Uic::isMenuBar(const QString &className) const
 {
-    return customWidgetsInfo()->extends(className, QLatin1String("QMenuBar"));
+    return customWidgetsInfo()->extends(className, QStringLiteral("QMenuBar"));
 }
 
 bool Uic::isMenu(const QString &className) const
 {
-    return customWidgetsInfo()->extends(className, QLatin1String("QMenu"))
-        || customWidgetsInfo()->extends(className, QLatin1String("QPopupMenu"));
+    return customWidgetsInfo()->extends(className, QStringLiteral("QMenu"))
+        || customWidgetsInfo()->extends(className, QStringLiteral("QPopupMenu"));
 }
 
 #if defined(QT_END_NAMESPACE)

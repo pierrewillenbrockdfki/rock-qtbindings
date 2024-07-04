@@ -123,12 +123,12 @@ void WriteIconData::acceptImage(DomImage *image)
 
 void WriteIconData::writeImage(QTextStream &output, const QString &indent, DomImage *image)
 {
-    QString img = image->attributeName() + QLatin1String("_data");
+    QString img = image->attributeName() + QStringLiteral("_data");
     QString data = image->elementData()->text();
     QString fmt = image->elementData()->attributeFormat();
     int size = image->elementData()->attributeLength();
 
-    if (fmt == QLatin1String("XPM.GZ")) {
+    if (fmt == QStringLiteral("XPM.GZ")) {
         ulong length = size;
         QByteArray baunzip = unzipXPM(data, length);
         length = baunzip.size();

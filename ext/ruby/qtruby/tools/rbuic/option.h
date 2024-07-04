@@ -99,7 +99,7 @@ struct Option
           useKDE(0),
 #endif
           generator(RubyGenerator),
-          prefix(QLatin1String("Ui_"))
+          prefix(QStringLiteral("Ui_"))
     { indent.fill(QLatin1Char(' '), 4); }
 };
 

@@ -62,10 +62,11 @@ int main(int argc, char** argv)
     }
 
     for (int i = 1; i < argc; i++) {
-        if (QLatin1String(argv[i]) == "--xml") {
+        if (QString::fromLocal8Bit(argv[i]) == QStringLiteral("--xml")) {
             generateXml = true;
             continue;
-        } else if (QLatin1String(argv[i]) == "--help" || QLatin1String(argv[i]) == "-h") {
+        } else if (QString::fromLocal8Bit(argv[i]) == QStringLiteral("--help") ||
+            QString::fromLocal8Bit(argv[i]) == QStringLiteral("-h")) {
             PRINT_USAGE();
             continue;
         }

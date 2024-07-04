@@ -52,7 +52,7 @@ bool processResourceFile(const QStringList &filenamesIn, const QString &filename
 
     //open output
     FILE *out_fd = stdout;
-    if (!filenameOut.isEmpty() && filenameOut != QLatin1String("-")) {
+    if (!filenameOut.isEmpty() && filenameOut != QStringLiteral("-")) {
 #if defined(_MSC_VER) && _MSC_VER >= 1400
 		if (fopen_s(&out_fd, filenameOut.toLocal8Bit().constData(), "w")) {
 #else
@@ -112,33 +112,33 @@ int main(int argc, char *argv[])
             QByteArray opt = argv[i] + 1;
             if (opt == "o") {
                 if (!(i < argc-1)) {
-                    errorMsg = QLatin1String("Missing output name");
+                    errorMsg = QStringLiteral("Missing output name");
                     break;
                 }
                 outFilename = argv[++i];
             } else if(opt == "name") {
                 if (!(i < argc-1)) {
-                    errorMsg = QLatin1String("Missing target name");
+                    errorMsg = QStringLiteral("Missing target name");
                     break;
                 }
                 initName = argv[++i];
             } else if(opt == "root") {
                 if (!(i < argc-1)) {
-                    errorMsg = QLatin1String("Missing root path");
+                    errorMsg = QStringLiteral("Missing root path");
                     break;
                 }
                 resourceRoot = QDir::cleanPath(argv[++i]);
                 if(resourceRoot.isEmpty() || resourceRoot[0] != '/')
-                    errorMsg = QLatin1String("Root must start with a /");
+                    errorMsg = QStringLiteral("Root must start with a /");
             } else if(opt == "compress") {
                 if (!(i < argc-1)) {
-                    errorMsg = QLatin1String("Missing compression level");
+                    errorMsg = QStringLiteral("Missing compression level");
                     break;
                 }
                 compressLevel = QString(argv[++i]).toInt();
             } else if(opt == "threshold") {
                 if (!(i < argc-1)) {
-                    errorMsg = QLatin1String("Missing compression threshold");
+                    errorMsg = QStringLiteral("Missing compression threshold");
                     break;
                 }
                 compressThreshold = QString(argv[++i]).toInt();
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
             } else if(opt == "no-compress") {
                 compressLevel = -2;
             } else {
-                errorMsg = QString(QLatin1String("Unknown option: '%1'")).arg(argv[i]);
+                errorMsg = QString(QStringLiteral("Unknown option: '%1'")).arg(argv[i]);
             }
         } else {
             if(!QFile::exists(argv[i])) {

@@ -50,7 +50,7 @@
 #include <QtCore/QHash>
 
 inline bool toBool(const QString &str)
-{ return str.toLower() == QLatin1String("true"); }
+{ return str.toLower() == QStringLiteral("true"); }
 
 inline QString toString(const DomString *str)
 { return str ? str->text() : QString(); }
@@ -65,17 +65,17 @@ inline QString fixString(const QString &str, const QString &indent)
     for (int i = 0; i < utf8.length(); ++i) {
         cbyte = utf8.at(i);
         if (cbyte >= 0x80) {
-            cursegment += QLatin1String("\\") + QString::number(cbyte, 8);
+            cursegment += QStringLiteral("\\") + QString::number(cbyte, 8);
         } else {
             switch(cbyte) {
             case '\\':
-                cursegment += QLatin1String("\\\\"); break;
+                cursegment += QStringLiteral("\\\\"); break;
             case '\"':
-                cursegment += QLatin1String("\\\""); break;
+                cursegment += QStringLiteral("\\\""); break;
             case '\r':
                 break;
             case '\n':
-                cursegment += QLatin1String("\\n\" \\\n\""); break;
+                cursegment += QStringLiteral("\\n\" \\\n\""); break;
             default:
                 cursegment += QChar(cbyte);
             }
@@ -90,8 +90,8 @@ inline QString fixString(const QString &str, const QString &indent)
     if (!cursegment.isEmpty())
         result << cursegment;
 
-    QString joinstr = QLatin1String("\"\n") + indent + indent + QLatin1Char('\"');
-    return QLatin1String("\"") + result.join(joinstr) + QLatin1String("\"");
+    QString joinstr = QStringLiteral("\"\n") + indent + indent + QLatin1Char('\"');
+    return QStringLiteral("\"") + result.join(joinstr) + QStringLiteral("\"");
 }
 
 inline QHash<QString, DomProperty *> propertyMap(const QList<DomProperty *> &properties)

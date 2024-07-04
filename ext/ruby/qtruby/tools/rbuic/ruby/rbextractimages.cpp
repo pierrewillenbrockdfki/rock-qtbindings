@@ -86,11 +86,11 @@ void ExtractImages::acceptUI(DomUI *node)
 
         QFileInfo fi(m_option.qrcOutputFile);
         QDir dir = fi.absoluteDir();
-        if (!dir.exists(QLatin1String("images")) && !dir.mkdir(QLatin1String("images"))) {
+        if (!dir.exists(QStringLiteral("images")) && !dir.mkdir(QStringLiteral("images"))) {
             fprintf(stderr, "Could not create image dir\n");
             return;
         }
-        dir.cd(QLatin1String("images"));
+        dir.cd(QStringLiteral("images"));
         m_imagesDir = dir;
 
         m_output = new QTextStream(&f);
@@ -130,7 +130,7 @@ void ExtractImages::acceptImage(DomImage *image)
         return;
     }
 
-    if (format == QLatin1String("XPM.GZ")) {
+    if (format == QStringLiteral("XPM.GZ")) {
         QTextStream *imageOut = new QTextStream(&f);
         imageOut->setCodec(QTextCodec::codecForName("UTF-8"));
 

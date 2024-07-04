@@ -87,7 +87,7 @@ void WriteIconInitialization::acceptUI(DomUI *node)
 
 QString WriteIconInitialization::iconFromDataFunction()
 {
-    return QLatin1String("qt_get_icon");
+    return QStringLiteral("qt_get_icon");
 }
 
 void WriteIconInitialization::acceptImages(DomImages *images)
@@ -97,17 +97,17 @@ void WriteIconInitialization::acceptImages(DomImages *images)
 
 void WriteIconInitialization::acceptImage(DomImage *image)
 {
-    QString img = image->attributeName() + QLatin1String("_data");
+    QString img = image->attributeName() + QStringLiteral("_data");
     QString data = image->elementData()->text();
     QString fmt = image->elementData()->attributeFormat();
 
-    QString imageId = image->attributeName() + QLatin1String("_ID");
-    QString imageData = image->attributeName() + QLatin1String("_data");
+    QString imageId = image->attributeName() + QStringLiteral("_ID");
+    QString imageData = image->attributeName() + QStringLiteral("_data");
     QString ind = option.indent + option.indent;
 
     output << ind << "when " << imageId << "\n";
 
-    if (fmt == QLatin1String("XPM.GZ")) {
+    if (fmt == QStringLiteral("XPM.GZ")) {
         output << option.indent << option.indent << option.indent << "return " << "Qt::Pixmap.new(" << imageData << ")\n";
     } else {
         output << option.indent << option.indent << option.indent << 

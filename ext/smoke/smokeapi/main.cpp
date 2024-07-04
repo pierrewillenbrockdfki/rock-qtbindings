@@ -232,25 +232,25 @@ int main(int argc, char** argv)
 
     int i = 1;
     while (i < arguments.length()) {
-        if (arguments[i] == QLatin1String("-h") || arguments[i] == QLatin1String("--help")) {
+        if (arguments[i] == QStringLiteral("-h") || arguments[i] == QStringLiteral("--help")) {
             PRINT_USAGE();
             return 0;
-        } else if (arguments[i] == QLatin1String("-r") || arguments[i] == QLatin1String("--require")) {
+        } else if (arguments[i] == QStringLiteral("-r") || arguments[i] == QStringLiteral("--require")) {
             i++;
             if (i < arguments.length()) {
                 smokeModules << loadSmokeModule(arguments[i]);
             }
             i++;
-        } else if (arguments[i] == QLatin1String("-c") || arguments[i] == QLatin1String("--classes")) {
+        } else if (arguments[i] == QStringLiteral("-c") || arguments[i] == QStringLiteral("--classes")) {
             showClassNamesOnly = true;
             i++;
-        } else if (arguments[i] == QLatin1String("-p") || arguments[i] == QLatin1String("--parents")) {
+        } else if (arguments[i] == QStringLiteral("-p") || arguments[i] == QStringLiteral("--parents")) {
             showParents = true;
             i++;
-        } else if (arguments[i] == QLatin1String("-i") || arguments[i] == QLatin1String("--insensitive")) {
+        } else if (arguments[i] == QStringLiteral("-i") || arguments[i] == QStringLiteral("--insensitive")) {
             caseInsensitive = true;
             i++;
-        } else if (arguments[i] == QLatin1String("-m") || arguments[i] == QLatin1String("--match")) {
+        } else if (arguments[i] == QStringLiteral("-m") || arguments[i] == QStringLiteral("--match")) {
             i++;
             if (i < arguments.length()) {
                 targetPattern = QRegExp(arguments[i]);

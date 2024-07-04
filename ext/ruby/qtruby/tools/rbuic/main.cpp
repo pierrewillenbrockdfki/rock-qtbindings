@@ -83,15 +83,15 @@ int runUic(int argc, char *argv[])
     int arg = 1;
     while (arg < argc) {
         QString opt = QString::fromLocal8Bit(argv[arg]);
-        if (opt == QLatin1String("-h") || opt == QLatin1String("-help")) {
+        if (opt == QStringLiteral("-h") || opt == QStringLiteral("-help")) {
             showHelp(argv[0]);
             return 0;
-        } else if (opt == QLatin1String("-d") || opt == QLatin1String("-dependencies")) {
+        } else if (opt == QStringLiteral("-d") || opt == QStringLiteral("-dependencies")) {
             driver.option().dependencies = true;
-        } else if (opt == QLatin1String("-v") || opt == QLatin1String("-version")) {
+        } else if (opt == QStringLiteral("-v") || opt == QStringLiteral("-version")) {
             fprintf(stderr, "Qt User Interface Compiler version %s\n", QT_VERSION_STR);
             return 0;
-        } else if (opt == QLatin1String("-o") || opt == QLatin1String("-output")) {
+        } else if (opt == QStringLiteral("-o") || opt == QStringLiteral("-output")) {
             ++arg;
             if (!argv[arg]) {
                 showHelp(argv[0]);
@@ -99,44 +99,44 @@ int runUic(int argc, char *argv[])
             }
             driver.option().outputFile = QFile::decodeName(argv[arg]);
 #ifdef QT_UIC_RUBY_GENERATOR
-        } else if (opt == QLatin1String("-x")) {
+        } else if (opt == QStringLiteral("-x")) {
             driver.option().execCode = 1;
-        } else if (opt == QLatin1String("-k") || opt == QLatin1String("-kde")) {
+        } else if (opt == QStringLiteral("-k") || opt == QStringLiteral("-kde")) {
             driver.option().useKDE = 1;
 #endif
-        } else if (opt == QLatin1String("-p") || opt == QLatin1String("-no-protection")) {
+        } else if (opt == QStringLiteral("-p") || opt == QStringLiteral("-no-protection")) {
             driver.option().headerProtection = false;
-        } else if (opt == QLatin1String("-postfix")) {
+        } else if (opt == QStringLiteral("-postfix")) {
             ++arg;
             if (!argv[arg]) {
                 showHelp(argv[0]);
                 return 1;
             }
-            driver.option().postfix = QLatin1String(argv[arg]);
-        } else if (opt == QLatin1String("-3")) {
+            driver.option().postfix = QString::fromLocal8Bit(argv[arg]);
+        } else if (opt == QStringLiteral("-3")) {
             ++arg;
             if (!argv[arg]) {
                 showHelp(argv[0]);
                 return 1;
             }
             driver.option().uic3 = QFile::decodeName(argv[arg]);
-        } else if (opt == QLatin1String("-tr") || opt == QLatin1String("-translate")) {
+        } else if (opt == QStringLiteral("-tr") || opt == QStringLiteral("-translate")) {
             ++arg;
             if (!argv[arg]) {
                 showHelp(argv[0]);
                 return 1;
             }
-            driver.option().translateFunction = QLatin1String(argv[arg]);
-        } else if (opt == QLatin1String("-g") || opt == QLatin1String("-generator")) {
+            driver.option().translateFunction = QString::fromLocal8Bit(argv[arg]);
+        } else if (opt == QStringLiteral("-g") || opt == QStringLiteral("-generator")) {
             ++arg;
             if (!argv[arg]) {
                 showHelp(argv[0]);
                 return 1;
             }
             QString name = QString::fromLocal8Bit(argv[arg]).toLower ();
-            if (name == QLatin1String("java")) {
+            if (name == QStringLiteral("java")) {
                 driver.option().generator = Option::JavaGenerator;
-            } else if (name == QLatin1String("ruby")) {
+            } else if (name == QStringLiteral("ruby")) {
                 driver.option().generator = Option::RubyGenerator;
             } else {
                 driver.option().generator = Option::CppGenerator;
