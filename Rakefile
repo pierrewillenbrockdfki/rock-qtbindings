@@ -88,7 +88,7 @@ task :install => [:extconf] do
   sh("#{MAKE} install")
 end
 
-task :gem => [:distclean] do
+task :gem => [:install] do
   warn_version()
   set_version()
   sh("gem build qt5bindings.gemspec")
