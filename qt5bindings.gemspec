@@ -7,7 +7,7 @@ spec = Gem::Specification.new do |s|
   s.summary = "Qt bindings for ruby"
   s.homepage = "http://github.com/ryanmelt/qtbindings"
   s.name = 'qt5bindings'
-  s.version = QTBINDINGS_VERSION
+  s.version = QT5BINDINGS_VERSION
   s.requirements << 'none'
   s.require_path = 'lib'
   s.files = Dir['lib/**/*', 'bin/**/*', 'examples/**/*', 'ext/**/*', '*.txt', 'extconf.rb', '*.gemspec', 'Rakefile'].to_a

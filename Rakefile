@@ -23,12 +23,12 @@ end
 def set_version
   if ENV['VERSION']
     File.open('lib/qt5bindings_version.rb', 'w') do |file|
-      file.write("QTBINDINGS_VERSION = '#{ENV['VERSION']}'\n")
-      file.write("QTBINDINGS_RELEASE_DATE = '#{Time.now}'\n")
+      file.write("QT5BINDINGS_VERSION = '#{ENV['VERSION']}'\n")
+      file.write("QT5BINDINGS_RELEASE_DATE = '#{Time.now}'\n")
     end
     File.open('qtlib/qt5bindings_qt_version.rb', 'w') do |file|
-      file.write("QTBINDINGS_QT_VERSION = '#{ENV['VERSION']}'\n")
-      file.write("QTBINDINGS_QT_RELEASE_DATE = '#{Time.now}'\n")
+      file.write("QT5BINDINGS_QT_VERSION = '#{ENV['VERSION']}'\n")
+      file.write("QT5BINDINGS_QT_RELEASE_DATE = '#{Time.now}'\n")
     end
   end
 end
@@ -36,12 +36,12 @@ end
 def clear_version
   if ENV['VERSION']
     File.open('lib/qt5bindings_version.rb', 'w') do |file|
-      file.write("QTBINDINGS_VERSION = '0.0.0.0'\n")
-      file.write("QTBINDINGS_RELEASE_DATE = ''\n")
+      file.write("QT5BINDINGS_VERSION = '0.0.0.0'\n")
+      file.write("QT5BINDINGS_RELEASE_DATE = ''\n")
     end
     File.open('qtlib/qt5bindings_qt_version.rb', 'w') do |file|
-      file.write("QTBINDINGS_QT_VERSION = '0.0.0.0'\n")
-      file.write("QTBINDINGS_QT_RELEASE_DATE = ''\n")
+      file.write("QT5BINDINGS_QT_VERSION = '0.0.0.0'\n")
+      file.write("QT5BINDINGS_QT_RELEASE_DATE = ''\n")
     end
   end
 end
