@@ -2549,9 +2549,7 @@ module Qt
           return ret
         end
       end
-      if classname =~ /^Q3/
-        ruby_classname = classname.sub(/^Q3(?=[A-Z])/,'Qt3::')
-      elsif classname =~ /^Q/
+      if classname =~ /^Q/
         ruby_classname = classname.sub(/^Q(?=[A-Z])/,'Qt::')
       else
         ruby_classname = classname
