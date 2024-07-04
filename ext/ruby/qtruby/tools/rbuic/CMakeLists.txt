@@ -9,7 +9,7 @@ set(rbuic5_bin_SRCS
    databaseinfo.cpp 
    driver.cpp 
    treewalker.cpp 
-   ui4.cpp 
+   ui5.cpp
    uic.cpp 
    validator.cpp 
    ruby/rbextractimages.cpp 

@@ -8,7 +8,7 @@ HEADERS += \
            $$PWD/globaldefs.h \
            $$PWD/option.h \
            $$PWD/treewalker.h \
-           $$PWD/ui4.h \
+           $$PWD/ui5.h \
            $$PWD/uic.h \
            $$PWD/utils.h \
            $$PWD/validator.h
@@ -18,6 +18,6 @@ SOURCES += \
            $$PWD/databaseinfo.cpp \
            $$PWD/driver.cpp \
            $$PWD/treewalker.cpp \
-           $$PWD/ui4.cpp \
+           $$PWD/ui5.cpp \
            $$PWD/uic.cpp \
            $$PWD/validator.cpp
