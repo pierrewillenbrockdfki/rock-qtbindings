@@ -8,7 +8,7 @@ class TestQtRuby < Test::Unit::TestCase
     assert @app
   end
 
-  def test_link_against_qt4
+  def test_link_against_qt5
     assert_raise(NoMethodError) { @app.setMainWidget(nil) }
   end
 
