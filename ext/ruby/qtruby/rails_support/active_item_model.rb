@@ -1,13 +1,13 @@
 =begin
-This Qt::AbstractItemModel based model allows an ActiveRecord or ActiveResource
-data set be used for viewing in a Qt::TreeView. 
+This Qt5::AbstractItemModel based model allows an ActiveRecord or ActiveResource
+data set be used for viewing in a Qt5::TreeView.
 
 Example usage:
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 agencies = TravelAgency.find(:all)
 model = ActiveItemModel.new(agencies)
-tree = Qt::TreeView.new
+tree = Qt5::TreeView.new
 tree.model = model
 tree.show
 app.exec
@@ -67,7 +67,7 @@ class TreeItem
     end
     
     def data(column)
-        return Qt::Variant.new(@itemData[@keys[column]])
+        return Qt5::Variant.new(@itemData[@keys[column]])
     end
     
     def parent
@@ -83,7 +83,7 @@ class TreeItem
     end
 end
 
-class ActiveItemModel < Qt::AbstractItemModel    
+class ActiveItemModel < Qt5::AbstractItemModel
     def initialize(collection, columns=nil)
         super()
         @collection = collection
@@ -110,7 +110,7 @@ class ActiveItemModel < Qt::AbstractItemModel
     end
 
     def [](row)
-        row = row.row if row.is_a?Qt::ModelIndex
+        row = row.row if row.is_a?Qt5::ModelIndex
         @collection[row]
     end
 
@@ -128,19 +128,19 @@ class ActiveItemModel < Qt::AbstractItemModel
     
     def data(index, role)
         if !index.valid?
-            return Qt::Variant.new
+            return Qt5::Variant.new
         end
     
-        if role != Qt::DisplayRole
-            return Qt::Variant.new
+        if role != Qt5::DisplayRole
+            return Qt5::Variant.new
         end
     
         item = index.internalPointer
         return item.data(index.column)
     end
 
-    def setData(index, variant, role=Qt::EditRole)
-        if index.valid? and role == Qt::EditRole
+    def setData(index, variant, role=Qt5::EditRole)
+        if index.valid? and role == Qt5::EditRole
             raise "invalid column #{index.column}" if (index.column < 0 ||
                 index.column >= @keys.size)
 
@@ -153,9 +153,9 @@ class ActiveItemModel < Qt::AbstractItemModel
 
             value = variant.value
 
-            if value.class.name == "Qt::Date"
+            if value.class.name == "Qt5::Date"
                 value = Date.new(value.year, value.month, value.day)
-            elsif value.class.name == "Qt::Time"
+            elsif value.class.name == "Qt5::Time"
                 value = Time.new(value.hour, value.min, value.sec)
             end
 
@@ -176,18 +176,18 @@ class ActiveItemModel < Qt::AbstractItemModel
     
     def flags(index)
         if !index.valid?
-            return Qt::ItemIsEnabled
+            return Qt5::ItemIsEnabled
         end
     
-        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable
+        return Qt5::ItemIsEnabled | Qt5::ItemIsSelectable | Qt5::ItemIsEditable
     end
     
     def headerData(section, orientation, role)
-        if orientation == Qt::Horizontal && role == Qt::DisplayRole
-            return Qt::Variant.new(@labels[@keys[section]])
+        if orientation == Qt5::Horizontal && role == Qt5::DisplayRole
+            return Qt5::Variant.new(@labels[@keys[section]])
         end
     
-        return Qt::Variant.new
+        return Qt5::Variant.new
     end
     
     def index(row, column, parent)
@@ -201,20 +201,20 @@ class ActiveItemModel < Qt::AbstractItemModel
         if ! @childItem.nil?
             return createIndex(row, column, @childItem)
         else
-            return Qt::ModelIndex.new
+            return Qt5::ModelIndex.new
         end
     end
     
     def parent(index)
         if !index.valid?
-            return Qt::ModelIndex.new
+            return Qt5::ModelIndex.new
         end
     
         childItem = index.internalPointer
         parentItem = childItem.parent
     
         if parentItem == @rootItem
-            return Qt::ModelIndex.new
+            return Qt5::ModelIndex.new
         end
     
         return createIndex(parentItem.row, 0, parentItem)

@@ -21,25 +21,25 @@ module Qt5Test
   module Internal
     def self.init_all_classes
       getClassList.each do |c|
-        classname = Qt::Internal::normalize_classname(c)
-        id = Qt::Internal::findClass(c);
-        Qt::Internal::insert_pclassid(classname, id)
-        Qt::Internal::cpp_names[classname] = c
-        klass = Qt::Internal::isQObject(c) ? Qt::Internal::create_qobject_class(classname, Qt)  : Qt::Internal::create_qt_class(classname, Qt)
-        Qt::Internal::classes[classname] = klass unless klass.nil?
+        classname = Qt5::Internal::normalize_classname(c)
+        id = Qt5::Internal::findClass(c);
+        Qt5::Internal::insert_pclassid(classname, id)
+        Qt5::Internal::cpp_names[classname] = c
+        klass = Qt5::Internal::isQObject(c) ? Qt5::Internal::create_qobject_class(classname, Qt)  : Qt5::Internal::create_qt_class(classname, Qt)
+        Qt5::Internal::classes[classname] = klass unless klass.nil?
       end
     end
   end
 end
 
-module Qt
+module Qt5
   class Test < Base
       
     # This is the isValidSlot() function in testlib/qtestcase.cpp translated
     # to Ruby. Probably could be a bit shorter in Ruby..
     def self.validSlot?(sl)
-      if sl.access != Qt::MetaMethod::Private || !sl.parameterTypes.empty? ||
-         sl.typeName != "" || sl.methodType != Qt::MetaMethod::Slot
+      if sl.access != Qt5::MetaMethod::Private || !sl.parameterTypes.empty? ||
+         sl.typeName != "" || sl.methodType != Qt5::MetaMethod::Slot
         return false
       end
       
@@ -107,59 +107,59 @@ module Qt
   class Base
     def QVERIFY(statement)
       file, line = caller(1)[0].split(':')
-      if !Qt::Test.qVerify(eval(statement, Qt::Test.current_binding), statement, "", file, line.to_i)
-          return eval('return', Qt::Test.current_binding)
+      if !Qt5::Test.qVerify(eval(statement, Qt5::Test.current_binding), statement, "", file, line.to_i)
+          return eval('return', Qt5::Test.current_binding)
       end
     end
     
     def QFAIL(message)
       file, line = caller(1)[0].split(':')
-      Qt::Test.qFail(message, file, line.to_i)
-      return eval('return', Qt::Test.current_binding)
+      Qt5::Test.qFail(message, file, line.to_i)
+      return eval('return', Qt5::Test.current_binding)
     end
     
     def QVERIFY2(statement, description)
       file, line = caller(1)[0].split(':')
-      if eval(statement, Qt::Test.current_binding)
-        if !Qt::Test.qVerify(true, statement, description, file, line.to_i)
-          return eval('return', Qt::Test.current_binding)
+      if eval(statement, Qt5::Test.current_binding)
+        if !Qt5::Test.qVerify(true, statement, description, file, line.to_i)
+          return eval('return', Qt5::Test.current_binding)
         end
       else
-        if !Qt::Test.qVerify(false, statement, description, file, line.to_i)
-          return eval('return', Qt::Test.current_binding)
+        if !Qt5::Test.qVerify(false, statement, description, file, line.to_i)
+          return eval('return', Qt5::Test.current_binding)
         end
       end
     end
     
     def QCOMPARE(actual, expected)
       file, line = caller(1)[0].split(':')
-      if !Qt::Test.qCompare(eval(actual, Qt::Test.current_binding), eval(expected, Qt::Test.current_binding), actual, expected, file, line.to_i)    
-        return eval('return', Qt::Test.current_binding)
+      if !Qt5::Test.qCompare(eval(actual, Qt5::Test.current_binding), eval(expected, Qt5::Test.current_binding), actual, expected, file, line.to_i)    
+        return eval('return', Qt5::Test.current_binding)
       end
     end
     
     def QSKIP(statement, mode)
       file, line = caller(1)[0].split(':')
-      Qt::Test.qSkip(statement, mode, file, line.to_i)
-      return eval('return', Qt::Test.current_binding)
+      Qt5::Test.qSkip(statement, mode, file, line.to_i)
+      return eval('return', Qt5::Test.current_binding)
     end
     
     def QEXPECT_FAIL(dataIndex, comment, mode)
       file, line = caller(1)[0].split(':')
-      if !Qt::Test.qExpectFail(dataIndex, comment, mode, file, line.to_i)
-        return eval('return', Qt::Test.current_binding)
+      if !Qt5::Test.qExpectFail(dataIndex, comment, mode, file, line.to_i)
+        return eval('return', Qt5::Test.current_binding)
       end
     end
   
     def QTEST(actual, testElement)
       file, line = caller(1)[0].split(':')
-      if !Qt::Test.qTest(eval(actual, Qt::Test.current_binding), eval(testElement, Qt::Test.current_binding), actual, testElement, file, line.to_i)
-        return eval('return', Qt::Test.current_binding)
+      if !Qt5::Test.qTest(eval(actual, Qt5::Test.current_binding), eval(testElement, Qt5::Test.current_binding), actual, testElement, file, line.to_i)
+        return eval('return', Qt5::Test.current_binding)
       end
     end
     
     def QWARN(msg)
-      Qt::Test.qWarn(msg)
+      Qt5::Test.qWarn(msg)
     end
   end
 end

@@ -1,12 +1,12 @@
 =begin
 This table model allows an ActiveRecord or ActiveResource to be used as a
-basis for a Qt::AbstractTableModel for viewing in a Qt::TableView. Example
+basis for a Qt5::AbstractTableModel for viewing in a Qt5::TableView. Example
 usage:
 
-app = Qt::Application.new(ARGV)
+app = Qt5::Application.new(ARGV)
 agencies = TravelAgency.find(:all, :conditions => [:name => 'Another Agency'])
 model = ActiveTableModel.new(agencies)
-table = Qt::TableView.new
+table = Qt5::TableView.new
 table.model = model
 table.show
 app.exec
@@ -18,7 +18,7 @@ Written by Richard Dale and Silvio Fonseca
 require 'Qt5'
 require 'date'
 
-class ActiveTableModel < Qt::AbstractTableModel
+class ActiveTableModel < Qt5::AbstractTableModel
     def initialize(collection, columns=nil)
         super()
         @collection = collection
@@ -55,7 +55,7 @@ class ActiveTableModel < Qt::AbstractTableModel
 
 
     def [](row)
-        row = row.row if row.is_a?Qt::ModelIndex
+        row = row.row if row.is_a?Qt5::ModelIndex
         @collection[row]
     end
 
@@ -63,35 +63,35 @@ class ActiveTableModel < Qt::AbstractTableModel
         @keys.index name
     end
 
-    def data(index, role=Qt::DisplayRole)
-        invalid = Qt::Variant.new
-        return invalid unless role == Qt::DisplayRole or role == Qt::EditRole
+    def data(index, role=Qt5::DisplayRole)
+        invalid = Qt5::Variant.new
+        return invalid unless role == Qt5::DisplayRole or role == Qt5::EditRole
         item = @collection[index.row]
         return invalid if item.nil?
         raise "invalid column #{index.column}" if (index.column < 0 ||
             index.column >= @keys.size)
         value = eval("item.attributes['%s']" % @keys[index.column].gsub(/\./, "'].attributes['"))
-        return Qt::Variant.new(value)
+        return Qt5::Variant.new(value)
     end
 
-    def headerData(section, orientation, role=Qt::DisplayRole)
-        invalid = Qt::Variant.new
-        return invalid unless role == Qt::DisplayRole
+    def headerData(section, orientation, role=Qt5::DisplayRole)
+        invalid = Qt5::Variant.new
+        return invalid unless role == Qt5::DisplayRole
         v = case orientation
-        when Qt::Horizontal
+        when Qt5::Horizontal
             @labels[section]
         else
             section
         end
-        return Qt::Variant.new(v)
+        return Qt5::Variant.new(v)
     end
 
     def flags(index)
-        return Qt::ItemIsEditable | super(index)
+        return Qt5::ItemIsEditable | super(index)
     end
 
-    def setData(index, variant, role=Qt::EditRole)
-        if index.valid? and role == Qt::EditRole
+    def setData(index, variant, role=Qt5::EditRole)
+        if index.valid? and role == Qt5::EditRole
             att = @keys[index.column]
             # Don't allow the primary key to be changed
             if att == 'id'
@@ -103,9 +103,9 @@ class ActiveTableModel < Qt::AbstractTableModel
                 index.column >= @keys.size)
             value = variant.value
 
-            if value.class.name == "Qt::Date"
+            if value.class.name == "Qt5::Date"
                 value = Date.new(value.year, value.month, value.day)
-            elsif value.class.name == "Qt::Time"
+            elsif value.class.name == "Qt5::Time"
                 value = Time.new(value.hour, value.min, value.sec)
             end
 
