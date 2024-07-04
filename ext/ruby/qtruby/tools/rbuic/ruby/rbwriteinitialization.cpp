@@ -59,10 +59,10 @@
 
 namespace {
     // Fixup an enumeration name from class Qt.
-    // They are currently stored as "BottomToolBarArea" instead of "Qt::BottomToolBarArea".
+    // They are currently stored as "BottomToolBarArea" instead of "Qt5::BottomToolBarArea".
     // due to MO issues. This might be fixed in the future.
     void fixQtEnumerationName(QString& name) {
-        static const QString prefix = QStringLiteral("Qt::");
+        static const QString prefix = QStringLiteral("Qt5::");
         if (name.indexOf(prefix) != 0)
             name.prepend(prefix);
     }
@@ -95,7 +95,7 @@ namespace {
     // Write a statement to create a spacer item.
     void writeSpacerItem(const DomSpacer *node, QTextStream &output) {
         const QHash<QString, DomProperty *> properties = propertyMap(node->elementProperty());
-                output << "Qt::SpacerItem.new(";
+                output << "Qt5::SpacerItem.new(";
 
         if (properties.contains(QStringLiteral("sizeHint"))) {
             const DomSize *sizeHint = properties.value(QStringLiteral("sizeHint"))->elementSize();
@@ -107,20 +107,20 @@ namespace {
                            properties.value(QStringLiteral("sizeType"))->elementEnum() :
                            QStringLiteral("Expanding");
 
-        sizeType.replace("QSizePolicy", "Qt::SizePolicy");
-        if (!sizeType.startsWith(QStringLiteral("Qt::SizePolicy::")))
-            sizeType.prepend(QStringLiteral("Qt::SizePolicy::"));
+        sizeType.replace("QSizePolicy", "Qt5::SizePolicy");
+        if (!sizeType.startsWith(QStringLiteral("Qt5::SizePolicy::")))
+            sizeType.prepend(QStringLiteral("Qt5::SizePolicy::"));
         // orientation
         bool isVspacer = false;
         if (properties.contains(QStringLiteral("orientation"))) {
             const QString orientation = properties.value(QStringLiteral("orientation"))->elementEnum();
-            if (orientation == QStringLiteral("Qt::Vertical") || orientation == QStringLiteral("Vertical"))  isVspacer = true;
+            if (orientation == QStringLiteral("Qt5::Vertical") || orientation == QStringLiteral("Vertical"))  isVspacer = true;
         }
 
         if (isVspacer)
-            output << "Qt::SizePolicy::Minimum, " << sizeType << ')';
+            output << "Qt5::SizePolicy::Minimum, " << sizeType << ')';
         else
-            output << sizeType << ", Qt::SizePolicy::Minimum)";
+            output << sizeType << ", Qt5::SizePolicy::Minimum)";
     }
 
 
@@ -481,7 +481,7 @@ void WriteInitialization::acceptUI(DomUI *node)
             continue;
 
         QString varConn = QStringLiteral("@") + connection + QStringLiteral("Connection");
-        m_output << m_option.indent << varConn << " = Qt::SqlDatabase.database(" << fixString(connection, m_option.indent) << ")\n";
+        m_output << m_option.indent << varConn << " = Qt5::SqlDatabase.database(" << fixString(connection, m_option.indent) << ")\n";
     }
 
     acceptWidget(node->elementWidget());
@@ -519,7 +519,7 @@ void WriteInitialization::acceptUI(DomUI *node)
         m_output << "\n" << m_delayedInitialization << "\n";
 
     if (m_option.autoConnection)
-        m_output << "\n" << m_option.indent << "Qt::MetaObject.connectSlotsByName(" << m_mainWidget << ")\n";
+        m_output << "\n" << m_option.indent << "Qt5::MetaObject.connectSlotsByName(" << m_mainWidget << ")\n";
 
     m_output << m_option.indent << "end # setupUi\n\n";
 
@@ -603,7 +603,7 @@ void WriteInitialization::acceptWidget(DomWidget *node)
             if (!m_buttonGroups.contains(groupName)) {
                 m_buttonGroups.insert(groupName, m_driver->findOrInsertName(groupName));
                 const QString g = QStringLiteral("@") + m_buttonGroups.value(groupName);
-                m_output << m_option.indent << g << " = Qt::ButtonGroup.new(" << m_generatedClass << ")\n";
+                m_output << m_option.indent << g << " = Qt5::ButtonGroup.new(" << m_generatedClass << ")\n";
             }
 
             const QString g = QStringLiteral("@") + m_buttonGroups.value(groupName);
@@ -785,7 +785,7 @@ void WriteInitialization::acceptLayout(DomLayout *node)
             isGroupBox = true;
             // special case for group box
 
-            m_output << m_option.indent << parent << ".setColumnLayout(0, Qt::Vertical)\n";
+            m_output << m_option.indent << parent << ".setColumnLayout(0, Qt5::Vertical)\n";
             QString objectName = parent;
             objectName += QStringLiteral(".layout");
             int marginType = Use43UiFile;
@@ -824,7 +824,7 @@ void WriteInitialization::acceptLayout(DomLayout *node)
     }
 
     if (isGroupBox) {
-        m_output << m_option.indent << varName << ".alignment = Qt::AlignTop\n";
+        m_output << m_option.indent << varName << ".alignment = Qt5::AlignTop\n";
     } else {
        // Suppress margin on a read child layout
         const bool suppressMarginDefault = m_layoutChain.top();
@@ -925,7 +925,7 @@ void WriteInitialization::acceptLayoutItem(DomLayoutItem *node)
         if (layout->attributeClass() == QStringLiteral("QFormLayout")) {
             methodPrefix = QStringLiteral("set");
             const int row = node->attributeRow();
-            const QString role = node->attributeColumn() == 0 ? QStringLiteral("Qt::FormLayout::LabelRole") : QStringLiteral("Qt::FormLayout::FieldRole");
+            const QString role = node->attributeColumn() == 0 ? QStringLiteral("Qt5::FormLayout::LabelRole") : QStringLiteral("Qt5::FormLayout::FieldRole");
             addArgs = QStringLiteral("%1, %2, %3").arg(row).arg(role).arg(itemName);
         } else {
             addArgs = itemName;
@@ -990,7 +990,7 @@ void WriteInitialization::acceptAction(DomAction *node)
         varName = toRubyIdentifier(m_driver->findOrInsertActionGroup(m_actionGroupChain.top()));
     }
 
-    m_output << m_option.indent << actionName << " = Qt::Action.new(" << varName << ")\n";
+    m_output << m_option.indent << actionName << " = Qt5::Action.new(" << varName << ")\n";
     writeProperties(actionName, QStringLiteral("QAction"), node->elementProperty());
 }
 
@@ -1123,14 +1123,14 @@ void WriteInitialization::writeProperties(const QString &varName,
         } else if (propertyName == QStringLiteral("orientation")
                     && m_uic->customWidgetsInfo()->extends(className, QStringLiteral("Line"))) {
             // Line support
-            QString shape = QStringLiteral("Qt::Frame::HLine");
-            if (p->elementEnum() == QStringLiteral("Qt::Vertical"))
-                shape = QStringLiteral("Qt::Frame::VLine");
+            QString shape = QStringLiteral("Qt5::Frame::HLine");
+            if (p->elementEnum() == QStringLiteral("Qt5::Vertical"))
+                shape = QStringLiteral("Qt5::Frame::VLine");
 
             m_output << m_option.indent << varName << ".setFrameShape(" << shape << ")\n";
             // QFrame Default is 'Plain'. Make the line 'Sunken' unless otherwise specified
             if (!frameShadowEncountered)
-                m_output << m_option.indent << varName << ".setFrameShadow(Qt::Frame::Sunken)\n";
+                m_output << m_option.indent << varName << ".setFrameShadow(Qt5::Frame::Sunken)\n";
             continue;
         } else if ((flags & WritePropertyIgnoreMargin)  && propertyName == QStringLiteral("margin")) {
             continue;
@@ -1164,7 +1164,7 @@ void WriteInitialization::writeProperties(const QString &varName,
         } else {
             setFunction = QStringLiteral(".setProperty(\"")
                 + propertyName
-                + QStringLiteral("\", Qt::Variant.new(");
+                + QStringLiteral("\", Qt5::Variant.new(");
         }
 
         QString varNewName = varName;
@@ -1176,7 +1176,7 @@ void WriteInitialization::writeProperties(const QString &varName,
         }
         case DomProperty::Color: {
             DomColor *c = p->elementColor();
-            propertyValue = QStringLiteral("Qt::Color.new(%1, %2, %3)")
+            propertyValue = QStringLiteral("Qt5::Color.new(%1, %2, %3)")
                   .arg(c->elementRed())
                   .arg(c->elementGreen())
                   .arg(c->elementBlue()); }
@@ -1188,17 +1188,17 @@ void WriteInitialization::writeProperties(const QString &varName,
                 if (stdset)
                     propertyValue = fixString(p->elementCstring(), m_option.indent);
                 else
-                    propertyValue = QStringLiteral("Qt::ByteArray.new(") + fixString(p->elementCstring(), m_option.indent) + QStringLiteral(")");
+                    propertyValue = QStringLiteral("Qt5::ByteArray.new(") + fixString(p->elementCstring(), m_option.indent) + QStringLiteral(")");
             }
             break;
         case DomProperty::Cursor:
-            propertyValue = QStringLiteral("Qt::Cursor.new(%1)")
+            propertyValue = QStringLiteral("Qt5::Cursor.new(%1)")
                             .arg(p->elementCursor());
             break;
         case DomProperty::CursorShape:
             if (p->hasAttributeStdset() && !p->attributeStdset())
                 varNewName += QStringLiteral(".viewport()");
-            propertyValue = QStringLiteral("Qt::Cursor.new(Qt::%1)")
+            propertyValue = QStringLiteral("Qt5::Cursor.new(Qt5::%1)")
                             .arg(p->elementCursorShape());
             break;
         case DomProperty::Enum:
@@ -1228,44 +1228,44 @@ void WriteInitialization::writeProperties(const QString &varName,
         case DomProperty::Palette: {
             DomPalette *pal = p->elementPalette();
             QString paletteName = QStringLiteral("@") + m_driver->unique(QStringLiteral("palette"));
-            m_output << m_option.indent << paletteName << " = Qt::Palette.new\n";
+            m_output << m_option.indent << paletteName << " = Qt5::Palette.new\n";
 
-            writeColorGroup(pal->elementActive(), QStringLiteral("Qt::Palette::Active"), paletteName);
-            writeColorGroup(pal->elementInactive(), QStringLiteral("Qt::Palette::Inactive"), paletteName);
-            writeColorGroup(pal->elementDisabled(), QStringLiteral("Qt::Palette::Disabled"), paletteName);
+            writeColorGroup(pal->elementActive(), QStringLiteral("Qt5::Palette::Active"), paletteName);
+            writeColorGroup(pal->elementInactive(), QStringLiteral("Qt5::Palette::Inactive"), paletteName);
+            writeColorGroup(pal->elementDisabled(), QStringLiteral("Qt5::Palette::Disabled"), paletteName);
 
             propertyValue = paletteName;
             break;
         }
         case DomProperty::Point: {
             DomPoint *po = p->elementPoint();
-            propertyValue = QStringLiteral("Qt::Point.new(%1, %2)")
+            propertyValue = QStringLiteral("Qt5::Point.new(%1, %2)")
                             .arg(po->elementX()).arg(po->elementY());
             break;
         }
         case DomProperty::PointF: {
             DomPointF *pof = p->elementPointF();
-            propertyValue = QStringLiteral("Qt::PointF.new(%1, %2)")
+            propertyValue = QStringLiteral("Qt5::PointF.new(%1, %2)")
                             .arg(pof->elementX()).arg(pof->elementY());
             break;
         }
         case DomProperty::Rect: {
             DomRect *r = p->elementRect();
-            propertyValue = QStringLiteral("Qt::Rect.new(%1, %2, %3, %4)")
+            propertyValue = QStringLiteral("Qt5::Rect.new(%1, %2, %3, %4)")
                             .arg(r->elementX()).arg(r->elementY())
                             .arg(r->elementWidth()).arg(r->elementHeight());
             break;
         }
         case DomProperty::RectF: {
             DomRectF *rf = p->elementRectF();
-            propertyValue = QStringLiteral("Qt::RectF.new(%1, %2, %3, %4)")
+            propertyValue = QStringLiteral("Qt5::RectF.new(%1, %2, %3, %4)")
                             .arg(rf->elementX()).arg(rf->elementY())
                             .arg(rf->elementWidth()).arg(rf->elementHeight());
             break;
         }
         case DomProperty::Locale: {
              const DomLocale *locale = p->elementLocale();
-             propertyValue = QStringLiteral("Qt::Locale.new(Qt::Locale::%1, Qt::Locale::%2)")
+             propertyValue = QStringLiteral("Qt5::Locale.new(Qt5::Locale::%1, Qt5::Locale::%2)")
                              .arg(locale->attributeLanguage()).arg(locale->attributeCountry());
             break;
         }
@@ -1280,13 +1280,13 @@ void WriteInitialization::writeProperties(const QString &varName,
         }
         case DomProperty::Size: {
              DomSize *s = p->elementSize();
-              propertyValue = QStringLiteral("Qt::Size.new(%1, %2)")
+              propertyValue = QStringLiteral("Qt5::Size.new(%1, %2)")
                              .arg(s->elementWidth()).arg(s->elementHeight());
             break;
         }
         case DomProperty::SizeF: {
             DomSizeF *sf = p->elementSizeF();
-             propertyValue = QStringLiteral("Qt::SizeF.new(%1, %2)")
+             propertyValue = QStringLiteral("Qt5::SizeF.new(%1, %2)")
                             .arg(sf->elementWidth()).arg(sf->elementHeight());
             break;
         }
@@ -1328,13 +1328,13 @@ void WriteInitialization::writeProperties(const QString &varName,
             break;
         case DomProperty::Char: {
             DomChar *c = p->elementChar();
-            propertyValue = QStringLiteral("Qt::Char.new(%1)")
+            propertyValue = QStringLiteral("Qt5::Char.new(%1)")
                             .arg(c->elementUnicode());
             break;
         }
         case DomProperty::Date: {
             DomDate *d = p->elementDate();
-            propertyValue = QStringLiteral("Qt::Date.new(%1, %2, %3)")
+            propertyValue = QStringLiteral("Qt5::Date.new(%1, %2, %3)")
                             .arg(d->elementYear())
                             .arg(d->elementMonth())
                             .arg(d->elementDay());
@@ -1342,7 +1342,7 @@ void WriteInitialization::writeProperties(const QString &varName,
         }
         case DomProperty::Time: {
             DomTime *t = p->elementTime();
-            propertyValue = QStringLiteral("Qt::Time.new(%1, %2, %3)")
+            propertyValue = QStringLiteral("Qt5::Time.new(%1, %2, %3)")
                             .arg(t->elementHour())
                             .arg(t->elementMinute())
                             .arg(t->elementSecond());
@@ -1350,7 +1350,7 @@ void WriteInitialization::writeProperties(const QString &varName,
         }
         case DomProperty::DateTime: {
             DomDateTime *dt = p->elementDateTime();
-            propertyValue = QStringLiteral("Qt::DateTime.new(Qt::Date.new(%1, %2, %3), Qt::Time.new(%4, %5, %6))")
+            propertyValue = QStringLiteral("Qt5::DateTime.new(Qt5::Date.new(%1, %2, %3), Qt5::Time.new(%4, %5, %6))")
                             .arg(dt->elementYear())
                             .arg(dt->elementMonth())
                             .arg(dt->elementDay())
@@ -1371,7 +1371,7 @@ void WriteInitialization::writeProperties(const QString &varName,
 
         case DomProperty::Url: {
             DomUrl* u = p->elementUrl();
-            propertyValue = QStringLiteral("Qt::Url.new(%1)")
+            propertyValue = QStringLiteral("Qt5::Url.new(%1)")
                             .arg(fixString(u->elementString()->text(), m_option.indent));
             break;
         }
@@ -1427,7 +1427,7 @@ QString  WriteInitialization::writeSizePolicy(const DomSizePolicy *sp)
     const QString spName = QStringLiteral("@") + m_driver->unique(QStringLiteral("sizePolicy"));
     m_sizePolicyNameMap.insert(sizePolicyHandle, spName);
 
-    m_output << m_option.indent << spName << " = Qt::SizePolicy.new";
+    m_output << m_option.indent << spName << " = Qt5::SizePolicy.new";
     do {
         if (sp->hasElementHSizeType() && sp->hasElementVSizeType()) {
             m_output << "(" << sp->elementHSizeType()
@@ -1435,7 +1435,7 @@ QString  WriteInitialization::writeSizePolicy(const DomSizePolicy *sp)
             break;
         }
         if (sp->hasAttributeHSizeType() && sp->hasAttributeVSizeType()) {
-                m_output << "(Qt::SizePolicy::" << sp->attributeHSizeType() << ", Qt::SizePolicy::"
+                m_output << "(Qt5::SizePolicy::" << sp->attributeHSizeType() << ", Qt5::SizePolicy::"
                 << sp->attributeVSizeType() << ")\n";
             break;
         }
@@ -1464,7 +1464,7 @@ QString WriteInitialization::writeFontProperties(const DomFont *f)
     const QString fontName = QStringLiteral("@") + m_driver->unique(QStringLiteral("font"));
     m_fontPropertiesNameMap.insert(FontHandle(f), fontName);
 
-    m_output << m_option.indent << fontName << " = Qt::Font.new\n";
+    m_output << m_option.indent << fontName << " = Qt5::Font.new\n";
     if (f->hasElementFamily() && !f->elementFamily().isEmpty()) {
         m_output << m_option.indent << fontName << ".family = " << fixString(f->elementFamily(), m_option.indent)
             << "\n";
@@ -1500,10 +1500,10 @@ QString WriteInitialization::writeFontProperties(const DomFont *f)
     }
     if (f->hasElementAntialiasing()) {
         m_output << m_option.indent << fontName << ".styleStrategy = "
-            << (f->elementAntialiasing() ? "Qt::Font::PreferDefault" : "Qt::Font::NoAntialias") << "\n";
+            << (f->elementAntialiasing() ? "Qt5::Font::PreferDefault" : "Qt5::Font::NoAntialias") << "\n";
     }
     if (f->hasElementStyleStrategy()) {
-         m_output << m_option.indent << fontName << ".styleStrategy = Qt::Font::"
+         m_output << m_option.indent << fontName << ".styleStrategy = Qt5::Font::"
             << f->elementStyleStrategy() << "\n";
     }
     return  fontName;
@@ -1522,26 +1522,26 @@ QString WriteInitialization::writeIconProperties(const DomResourceIcon *i)
     const QString iconName = m_driver->unique(QStringLiteral("icon"));
     m_iconPropertiesNameMap.insert(IconHandle(i), iconName);
     if (isIconFormat44(i)) {
-        const QString pixmap = QStringLiteral("Qt::Pixmap.new");
-        m_output << m_option.indent << iconName << " = Qt::Icon.new\n";
+        const QString pixmap = QStringLiteral("Qt5::Pixmap.new");
+        m_output << m_option.indent << iconName << " = Qt5::Icon.new\n";
         if (i->hasElementNormalOff())
-            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementNormalOff()->text()) << ", Qt::Icon::Normal, Qt::Icon::Off)\n";
+            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementNormalOff()->text()) << ", Qt5::Icon::Normal, Qt5::Icon::Off)\n";
         if (i->hasElementNormalOn())
-            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementNormalOn()->text()) << ", Qt::Icon::Normal, Qt::Icon::On)\n";
+            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementNormalOn()->text()) << ", Qt5::Icon::Normal, Qt5::Icon::On)\n";
         if (i->hasElementDisabledOff())
-            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementDisabledOff()->text()) << ", Qt::Icon::Disabled, Qt::Icon::Off)\n";
+            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementDisabledOff()->text()) << ", Qt5::Icon::Disabled, Qt5::Icon::Off)\n";
         if (i->hasElementDisabledOn())
-            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementDisabledOn()->text()) << ", Qt::Icon::Disabled, Qt::Icon::On)\n";
+            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementDisabledOn()->text()) << ", Qt5::Icon::Disabled, Qt5::Icon::On)\n";
         if (i->hasElementActiveOff())
-            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementActiveOff()->text()) << ", Qt::Icon::Active, Qt::Icon::Off)\n";
+            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementActiveOff()->text()) << ", Qt5::Icon::Active, Qt5::Icon::Off)\n";
         if (i->hasElementActiveOn())
-            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementActiveOn()->text()) << ", Qt::Icon::Active, Qt::Icon::On)\n";
+            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementActiveOn()->text()) << ", Qt5::Icon::Active, Qt5::Icon::On)\n";
         if (i->hasElementSelectedOff())
-            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementSelectedOff()->text()) << ", Qt::Icon::Selected, Qt::Icon::Off)\n";
+            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementSelectedOff()->text()) << ", Qt5::Icon::Selected, Qt5::Icon::Off)\n";
         if (i->hasElementSelectedOn())
-            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementSelectedOn()->text()) << ", Qt::Icon::Selected, Qt::Icon::On)\n";
+            m_output << m_option.indent << iconName << ".addPixmap(" << pixCall(pixmap, i->elementSelectedOn()->text()) << ", Qt5::Icon::Selected, Qt5::Icon::On)\n";
     } else { // pre-4.4 legacy
-        m_output <<  m_option.indent << iconName << " = " << pixCall(QStringLiteral("Qt::Icon.new"), i->text())<< "\n";
+        m_output <<  m_option.indent << iconName << " = " << pixCall(QStringLiteral("Qt5::Icon.new"), i->text())<< "\n";
     }
     return iconName;
 }
@@ -1549,12 +1549,12 @@ QString WriteInitialization::writeIconProperties(const DomResourceIcon *i)
 QString WriteInitialization::domColor2QString(const DomColor *c)
 {
     if (c->hasAttributeAlpha())
-        return QStringLiteral("Qt::Color.new(%1, %2, %3, %4)")
+        return QStringLiteral("Qt5::Color.new(%1, %2, %3, %4)")
             .arg(c->elementRed())
             .arg(c->elementGreen())
             .arg(c->elementBlue())
             .arg(c->attributeAlpha());
-    return QStringLiteral("Qt::Color.new(%1, %2, %3)")
+    return QStringLiteral("Qt5::Color.new(%1, %2, %3)")
         .arg(c->elementRed())
         .arg(c->elementGreen())
         .arg(c->elementBlue());
@@ -1584,7 +1584,7 @@ void WriteInitialization::writeColorGroup(DomColorGroup *colorGroup, const QStri
         if (colorRole->hasAttributeRole()) {
             const QString brushName = writeBrushInitialization(colorRole->elementBrush());
             m_output << m_option.indent << paletteName << ".setBrush(" << group
-                << ", " << "Qt::Palette::" << colorRole->attributeRole()
+                << ", " << "Qt5::Palette::" << colorRole->attributeRole()
                 << ", " << brushName << ")\n";
         }
     }
@@ -1628,30 +1628,30 @@ void WriteInitialization::writeBrush(const DomBrush *brush, const QString &brush
         QString gradientType = gradient->attributeType();
         QString gradientName = m_driver->unique(QStringLiteral("gradient"));
         if (gradientType == QStringLiteral("LinearGradient")) {
-            m_output << m_option.indent << gradientName << " = Qt::LinearGradient.new"
+            m_output << m_option.indent << gradientName << " = Qt5::LinearGradient.new"
                 << "(" << gradient->attributeStartX()
                 << ", " << gradient->attributeStartY()
                 << ", " << gradient->attributeEndX()
                 << ", " << gradient->attributeEndY() << ")\n";
         } else if (gradientType == QStringLiteral("RadialGradient")) {
-            m_output << m_option.indent << gradientName << " = Qt::RadialGradient.new"
+            m_output << m_option.indent << gradientName << " = Qt5::RadialGradient.new"
                 << "(" << gradient->attributeCentralX()
                 << ", " << gradient->attributeCentralY()
                 << ", " << gradient->attributeRadius()
                 << ", " << gradient->attributeFocalX()
                 << ", " << gradient->attributeFocalY() << ")\n";
         } else if (gradientType == QStringLiteral("ConicalGradient")) {
-            m_output << m_option.indent << gradientName << " = Qt::ConicalGradient.new"
+            m_output << m_option.indent << gradientName << " = Qt5::ConicalGradient.new"
                 << "(" << gradient->attributeCentralX()
                 << ", " << gradient->attributeCentralY()
                 << ", " << gradient->attributeAngle() << ")\n";
         }
 
-        m_output << m_option.indent << gradientName << ".spread = Qt::Gradient::"
+        m_output << m_option.indent << gradientName << ".spread = Qt5::Gradient::"
             << gradient->attributeSpread() << "\n";
 
         if (gradient->hasAttributeCoordinateMode()) {
-            m_output << m_option.indent << gradientName << ".coordinateMode = Qt::Gradient::"
+            m_output << m_option.indent << gradientName << ".coordinateMode = Qt5::Gradient::"
                 << gradient->attributeCoordinateMode() << "\n";
         }
 
@@ -1664,20 +1664,20 @@ void WriteInitialization::writeBrush(const DomBrush *brush, const QString &brush
                 << stop->attributePosition() << ", "
                 << domColor2QString(color) << ")\n";
         }
-        m_output << m_option.indent << brushName << " = Qt::Brush.new" << "("
+        m_output << m_option.indent << brushName << " = Qt5::Brush.new" << "("
             << gradientName << ")\n";
     } else if (style == QStringLiteral("TexturePattern")) {
         DomProperty *property = brush->elementTexture();
 
-        m_output << m_option.indent << brushName << " = Qt::Brush.new" <<  "("
+        m_output << m_option.indent << brushName << " = Qt5::Brush.new" <<  "("
             << pixCall(property) << ")\n";
     } else {
         DomColor *color = brush->elementColor();
-        m_output << m_option.indent << brushName << " = Qt::Brush.new" <<  "("
+        m_output << m_option.indent << brushName << " = Qt5::Brush.new" <<  "("
             << domColor2QString(color) << ")\n";
 
         m_output << m_option.indent << brushName << ".style = "
-            << "Qt::" << style << "\n";
+            << "Qt5::" << style << "\n";
     }
 }
 
@@ -1711,7 +1711,7 @@ void WriteInitialization::acceptTabStops(DomTabStops *tabStops)
             continue;
         }
 
-        m_output << m_option.indent << "Qt::Widget.setTabOrder(@" << lastName << ", @" << name << ")\n";
+        m_output << m_option.indent << "Qt5::Widget.setTabOrder(@" << lastName << ", @" << name << ")\n";
 
         lastName = name;
     }
@@ -1774,7 +1774,7 @@ void WriteInitialization::initializeQ3IconView(DomWidget *w)
 
         QString itemName = m_driver->unique(QStringLiteral("__item"));
         m_refreshOut << "\n";
-        m_refreshOut << m_option.indent << itemName << " = Qt::3IconViewItem.new(" << varName << ")\n";
+        m_refreshOut << m_option.indent << itemName << " = Qt5::3IconViewItem.new(" << varName << ")\n";
 
         if (pixmap) {
             m_refreshOut << m_option.indent << itemName << ".pixmap = " << pixCall(pixmap) << "\n";
@@ -1921,11 +1921,11 @@ QString WriteInitialization::pixCall(const DomProperty *p) const
     QString type, s;
     switch (p->kind()) {
     case DomProperty::IconSet:
-        type = QStringLiteral("Qt::Icon.new");
+        type = QStringLiteral("Qt5::Icon.new");
         s = p->elementIconSet()->text();
         break;
     case DomProperty::Pixmap:
-        type = QStringLiteral("Qt::Pixmap.new");
+        type = QStringLiteral("Qt5::Pixmap.new");
         s = p->elementPixmap()->text();
         break;
     default:
@@ -1948,7 +1948,7 @@ QString WriteInitialization::pixCall(const QString &t, const QString &text) cons
         if (m_option.extractImages) {
             const QString format = image->elementData()->attributeFormat();
             const QString extension = format.left(format.indexOf(QLatin1Char('.'))).toLower();
-            QString rc = QStringLiteral("Qt::Pixmap.new(\":/");
+            QString rc = QStringLiteral("Qt5::Pixmap.new(\":/");
             rc += m_generatedClass;
             rc += QStringLiteral("/images/");
             rc += text;
@@ -2071,7 +2071,7 @@ void WriteInitialization::initializeListWidget(DomWidget *w)
         const DomProperty *text = properties.value(QStringLiteral("text"));
         const DomProperty *icon = properties.value(QStringLiteral("icon"));
 
-        QString itemCreation = QStringLiteral("Qt::ListWidgetItem.new(") + varName + QStringLiteral(")\n");
+        QString itemCreation = QStringLiteral("Qt5::ListWidgetItem.new(") + varName + QStringLiteral(")\n");
         if (icon) {
             const QString iconValue = iconCall(icon);
             const QString itemName = m_driver->unique(QStringLiteral("__listItem"));
@@ -2153,10 +2153,10 @@ void WriteInitialization::initializeTreeWidgetItems(const QString &className, co
             }
         }
         if (icons.isEmpty() && (item->elementItem().size() == 0)) {
-            m_output << m_option.indent << "Qt::TreeWidgetItem.new(" << varName << ")\n";
+            m_output << m_option.indent << "Qt5::TreeWidgetItem.new(" << varName << ")\n";
         } else {
             const QString itemName = m_driver->unique(QStringLiteral("__treeItem"));
-            m_output << m_option.indent << itemName << " = Qt::TreeWidgetItem.new(" << varName << ")\n";
+            m_output << m_option.indent << itemName << " = Qt5::TreeWidgetItem.new(" << varName << ")\n";
 
             QStringListIterator it(icons);
             while (it.hasNext())
@@ -2196,7 +2196,7 @@ void WriteInitialization::initializeTableWidget(DomWidget *w)
             QString itemName = m_driver->unique(QStringLiteral("__colItem"));
             m_refreshOut << "\n";
             m_refreshOut << m_option.indent 
-                           << itemName << " = Qt::TableWidgetItem.new\n";
+                           << itemName << " = Qt5::TableWidgetItem.new\n";
 
             if (text && text->attributeName() == QStringLiteral("text"))
                 m_refreshOut << m_option.indent << itemName << ".setText("
@@ -2229,7 +2229,7 @@ void WriteInitialization::initializeTableWidget(DomWidget *w)
             QString itemName = m_driver->unique(QStringLiteral("__rowItem"));
             m_refreshOut << "\n";
             m_refreshOut << m_option.indent
-                           << itemName << " = Qt::TableWidgetItem.new\n";
+                           << itemName << " = Qt5::TableWidgetItem.new\n";
 
             if (text && text->attributeName() == QStringLiteral("text"))
                 m_refreshOut << m_option.indent << itemName << ".setText("
@@ -2255,7 +2255,7 @@ void WriteInitialization::initializeTableWidget(DomWidget *w)
                 QString itemName = m_driver->unique(QStringLiteral("__item"));
                 m_refreshOut << "\n";
                 m_refreshOut << m_option.indent
-                    << itemName << " = Qt::TableWidgetItem.new\n";
+                    << itemName << " = Qt5::TableWidgetItem.new\n";
 
                 if (text && text->attributeName() == QStringLiteral("text"))
                     m_refreshOut << m_option.indent << itemName << ".setText("
@@ -2282,7 +2282,7 @@ QString WriteInitialization::trCall(const QString &str, const QString &commentHi
     QString comment = commentHint.isEmpty() ? QString::fromUtf8("nil") : fixString(commentHint, m_option.indent);
 
     if (m_option.translateFunction.isEmpty()) {
-        result = QStringLiteral("Qt::Application.translate(\"");
+        result = QStringLiteral("Qt5::Application.translate(\"");
         result += m_generatedClass;
         result += QStringLiteral("\"");
         result += QStringLiteral(", ");
@@ -2370,9 +2370,9 @@ void WriteInitialization::initializeQ3SqlDataBrowser(DomWidget *w)
     m_output << m_option.indent << m_option.indent << varName << ".setSqlCursor(";
 
     if (connection == QStringLiteral("(default)")) {
-        m_output << "Qt::SqlCursor.new(" << fixString(table, m_option.indent) << "), true)\n";
+        m_output << "Qt5::SqlCursor.new(" << fixString(table, m_option.indent) << "), true)\n";
     } else {
-        m_output << "Qt::SqlCursor.new(" << fixString(table, m_option.indent) << ", true, " << connection << "Connection" << "), false, true)\n";
+        m_output << "Qt5::SqlCursor.new(" << fixString(table, m_option.indent) << ", true, " << connection << "Connection" << "), false, true)\n";
     }
     m_output << m_option.indent << m_option.indent << varName << ".refresh\n";
     m_output << m_option.indent << "end\n";
@@ -2430,7 +2430,7 @@ void WriteInitialization::acceptConnection(DomConnection *connection)
     if (sender.isEmpty() || receiver.isEmpty())
         return;
 
-    m_output << m_option.indent << "Qt::Object.connect("
+    m_output << m_option.indent << "Qt5::Object.connect("
         << sender
         << ", "
         << "SIGNAL('" << connection->elementSignal() << "')"

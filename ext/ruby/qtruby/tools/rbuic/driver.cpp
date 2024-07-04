@@ -174,17 +174,21 @@ QString Driver::rubyClassName(const QString &name)
 		qname = QStringLiteral("Qt3::") + qname.mid(2);
 	} else if (qname.startsWith("Qwt") && !qname.startsWith("Qwt::")) {
 		qname = QStringLiteral("Qwt::") + qname.mid(3);
-	} else if (qname.startsWith("Q") && !qname.startsWith("Qt::")) {
-		qname = QStringLiteral("Qt::") + qname.mid(1);
+	} else if (qname.startsWith("Q") && !qname.startsWith("Qt::") && !qname.startsWith("Qt5::")) {
+		qname = QStringLiteral("Qt5::") + qname.mid(1);
+	} else if (qname.startsWith("Qt::Q")) {
+		qname = QStringLiteral("Qt5::") + qname.mid(5);
 	} else if (qname.startsWith("K") && !qname.startsWith("KDE::")) {
 		qname = QStringLiteral("KDE::") + qname.mid(1);
 	}
 
-	if (!qname.contains("|Qt::")) {
-		qname.replace("|Q", "|Qt::");
+	if (!qname.contains("|Qt::") && !qname.contains("|Qt5::")) {
+		qname.replace("|Q", "|Qt5::");
 	} else if (!qname.contains("|KDE::")) {
     	qname.replace("|K", "|KDE::");
 	}
+
+		qname.replace("Qt::", "Qt5::");
 
 	return qname;
 }
