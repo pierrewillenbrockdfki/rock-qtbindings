@@ -137,13 +137,13 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Color:
 	{
 		QColor c = value.value<QColor>();
-		return QStringLiteral(" %1=#<Qt::Color:0x0 %2>").arg(name).arg(c.name());
+		return QStringLiteral(" %1=#<Qt5::Color:0x0 %2>").arg(name).arg(c.name());
 	}
 
 	case QVariant::Cursor:
 	{
 		QCursor c = value.value<QCursor>();
-		return QStringLiteral(" %1=#<Qt::Cursor:0x0 shape=%2>").arg(name).arg(c.shape());
+		return QStringLiteral(" %1=#<Qt5::Cursor:0x0 shape=%2>").arg(name).arg(c.shape());
 	}
 
 	case QVariant::Double:
@@ -154,7 +154,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Font:
 	{
 		QFont f = value.value<QFont>();
-		return QString(	" %1=#<Qt::Font:0x0 family=%2, pointSize=%3, weight=%4, italic=%5, bold=%6, underline=%7, strikeOut=%8>")
+		return QString(	" %1=#<Qt5::Font:0x0 family=%2, pointSize=%3, weight=%4, italic=%5, bold=%6, underline=%7, strikeOut=%8>")
 			.arg(name)
 			.arg(f.family())
 			.arg(f.pointSize())
@@ -168,7 +168,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Line:
 	{
 		QLine l = value.toLine();
-		return QStringLiteral(" %1=#<Qt::Line:0x0 x1=%2, y1=%3, x2=%4, y2=%5>")
+		return QStringLiteral(" %1=#<Qt5::Line:0x0 x1=%2, y1=%3, x2=%4, y2=%5>")
 			.arg(name)
 			.arg(l.x1())
 			.arg(l.y1())
@@ -179,7 +179,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::LineF:
 	{
 		QLineF l = value.toLineF();
-		return QStringLiteral(" %1=#<Qt::LineF:0x0 x1=%2, y1=%3, x2=%4, y2=%5>")
+		return QStringLiteral(" %1=#<Qt5::LineF:0x0 x1=%2, y1=%3, x2=%4, y2=%5>")
 			.arg(name)
 			.arg(l.x1())
 			.arg(l.y1())
@@ -190,19 +190,19 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Point:
 	{
 		QPoint p = value.toPoint();
-		return QStringLiteral(" %1=#<Qt::Point:0x0 x=%2, y=%3>").arg(name).arg(p.x()).arg(p.y());
+		return QStringLiteral(" %1=#<Qt5::Point:0x0 x=%2, y=%3>").arg(name).arg(p.x()).arg(p.y());
 	}
 
 	case QVariant::PointF:
 	{
 		QPointF p = value.toPointF();
-		return QStringLiteral(" %1=#<Qt::PointF:0x0 x=%2, y=%3>").arg(name).arg(p.x()).arg(p.y());
+		return QStringLiteral(" %1=#<Qt5::PointF:0x0 x=%2, y=%3>").arg(name).arg(p.x()).arg(p.y());
 	}
 
 	case QVariant::Rect:
 	{
 		QRect r = value.toRect();
-		return QStringLiteral(" %1=#<Qt::Rect:0x0 left=%2, right=%3, top=%4, bottom=%5>")
+		return QStringLiteral(" %1=#<Qt5::Rect:0x0 left=%2, right=%3, top=%4, bottom=%5>")
 			.arg(name)
 			.arg(r.left()).arg(r.right()).arg(r.top()).arg(r.bottom());
 	}
@@ -210,7 +210,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::RectF:
 	{
 		QRectF r = value.toRectF();
-		return QStringLiteral(" %1=#<Qt::RectF:0x0 left=%2, right=%3, top=%4, bottom=%5>")
+		return QStringLiteral(" %1=#<Qt5::RectF:0x0 left=%2, right=%3, top=%4, bottom=%5>")
 			.arg(name)
 			.arg(r.left()).arg(r.right()).arg(r.top()).arg(r.bottom());
 	}
@@ -218,7 +218,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Size:
 	{
 		QSize s = value.toSize();
-		return QStringLiteral(" %1=#<Qt::Size:0x0 width=%2, height=%3>")
+		return QStringLiteral(" %1=#<Qt5::Size:0x0 width=%2, height=%3>")
 			.arg(name)
 			.arg(s.width()).arg(s.height());
 	}
@@ -226,7 +226,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::SizeF:
 	{
 		QSizeF s = value.toSizeF();
-		return QStringLiteral(" %1=#<Qt::SizeF:0x0 width=%2, height=%3>")
+		return QStringLiteral(" %1=#<Qt5::SizeF:0x0 width=%2, height=%3>")
 			.arg(name)
 			.arg(s.width()).arg(s.height());
 	}
@@ -234,7 +234,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::SizePolicy:
 	{
 		QSizePolicy s = value.value<QSizePolicy>();
-		return QStringLiteral(" %1=#<Qt::SizePolicy:0x0 horizontalPolicy=%2, verticalPolicy=%3>")
+		return QStringLiteral(" %1=#<Qt5::SizePolicy:0x0 horizontalPolicy=%2, verticalPolicy=%3>")
 			.arg(name)
 			.arg(s.horizontalPolicy())
 			.arg(s.verticalPolicy());
@@ -247,7 +247,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Pixmap:
 	case QVariant::Region:
 	{
-		return QStringLiteral(" %1=#<Qt::%2:0x0>").arg(name).arg(value.typeName() + 1);
+		return QStringLiteral(" %1=#<Qt5::%2:0x0>").arg(name).arg(value.typeName() + 1);
 	}
 
 	default:
@@ -259,7 +259,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 // Retrieves the properties for a QObject and returns them as 'name=value' pairs
 // in a ruby inspect string. For example:
 //
-//		#<Qt::HBoxLayout:0x30139030 name=unnamed, margin=0, spacing=0, resizeMode=3>
+//		#<Qt5::HBoxLayout:0x30139030 name=unnamed, margin=0, spacing=0, resizeMode=3>
 //
 static VALUE
 inspect_qobject(VALUE self)
@@ -268,7 +268,7 @@ inspect_qobject(VALUE self)
 		return Qnil;
 	}
 
-	// Start with #<Qt::HBoxLayout:0x30139030> from the original inspect() call
+	// Start with #<Qt5::HBoxLayout:0x30139030> from the original inspect() call
 	// Drop the closing '>'
 	VALUE inspect_str = rb_call_super(0, 0);
 	rb_str_resize(inspect_str, RSTRING_LEN(inspect_str) - 1);
@@ -298,7 +298,7 @@ inspect_qobject(VALUE self)
 // Retrieves the properties for a QObject and pretty_prints them as 'name=value' pairs
 // For example:
 //
-//		#<Qt::HBoxLayout:0x30139030
+//		#<Qt5::HBoxLayout:0x30139030
 //		 name=unnamed,
 //		 margin=0,
 //		 spacing=0,
@@ -311,7 +311,7 @@ pretty_print_qobject(VALUE self, VALUE pp)
 		return Qnil;
 	}
 
-	// Start with #<Qt::HBoxLayout:0x30139030>
+	// Start with #<Qt5::HBoxLayout:0x30139030>
 	// Drop the closing '>'
 	VALUE inspect_str = rb_funcall(self, rb_intern("to_s"), 0, 0);
 	rb_str_resize(inspect_str, RSTRING_LEN(inspect_str) - 1);
@@ -359,11 +359,11 @@ pretty_print_qobject(VALUE self, VALUE pp)
 		rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLocal8Bit()));
 	}
 
-	value_list = QStringLiteral("  metaObject=#<Qt::MetaObject:0x0");
+	value_list = QStringLiteral("  metaObject=#<Qt5::MetaObject:0x0");
 	value_list.append(QStringLiteral(" className=%1").arg(qobject->metaObject()->className()));
 
 	if (qobject->metaObject()->superClass() != 0) {
-		value_list.append(	QStringLiteral(", superClass=#<Qt::MetaObject:0x0 className=%1>")
+		value_list.append(	QStringLiteral(", superClass=#<Qt5::MetaObject:0x0 className=%1>")
 			.arg(qobject->metaObject()->superClass()->className()) );
 	}
 
@@ -476,7 +476,7 @@ qabstract_item_model_data(int argc, VALUE * argv, VALUE self)
 								o->smoke,
 															o->smoke->findClass("QVariant").index,
 															new QVariant(value) );
-	return set_obj_info("Qt::Variant", result);
+	return set_obj_info("Qt5::Variant", result);
 }
 
 static VALUE
@@ -684,8 +684,8 @@ qdbusargument_endstructurewrite(VALUE self)
 
 // The QtRuby runtime's overloaded method resolution mechanism can't currently
 // distinguish between Ruby Arrays containing different sort of instances.
-// Unfortunately Qt::Painter.drawLines() and Qt::Painter.drawRects() methods can
-// be passed a Ruby Array as an argument containing either Qt::Points or Qt::PointFs
+// Unfortunately Qt5::Painter.drawLines() and Qt5::Painter.drawRects() methods can
+// be passed a Ruby Array as an argument containing either Qt5::Points or Qt5::PointFs
 // for instance. These methods need to call the correct Qt C++ methods, so special case
 // the overload method resolution for now..
 static VALUE
@@ -819,7 +819,7 @@ qabstractitemmodel_createindex(int argc, VALUE * argv, VALUE self)
 																		o->smoke->idClass("QModelIndex").index,
 																		stack[0].s_voidp );
 
-				return set_obj_info("Qt::ModelIndex", result);
+				return set_obj_info("Qt5::ModelIndex", result);
 			}
 
 			i++;
@@ -876,7 +876,7 @@ qitemselection_at(VALUE self, VALUE i)
 															o->smoke->idClass("QItemSelectionRange").index,
 															new QItemSelectionRange(range) );
 
-	return set_obj_info("Qt::ItemSelectionRange", result);
+	return set_obj_info("Qt5::ItemSelectionRange", result);
 }
 
 static VALUE
@@ -899,7 +899,7 @@ qpolygon_at(VALUE self, VALUE i)
 															qtcore_Smoke->idClass("QPoint").index,
 															new QPoint(point) );
 
-	return set_obj_info("Qt::Point", result);
+	return set_obj_info("Qt5::Point", result);
 }
 
 static VALUE
@@ -922,7 +922,7 @@ qpolygonf_at(VALUE self, VALUE i)
 															qtcore_Smoke->idClass("QPointF").index,
 															new QPointF(point) );
 
-	return set_obj_info("Qt::PointF", result);
+	return set_obj_info("Qt5::PointF", result);
 }
 
 static VALUE
@@ -955,7 +955,7 @@ qobject_staticmetaobject(VALUE /*klass*/)
 							qtcore_Smoke->idClass("QMetaObject").index,
 							meta );
 
-	VALUE obj = set_obj_info("Qt::MetaObject", m);
+	VALUE obj = set_obj_info("Qt5::MetaObject", m);
 	return obj;
 }
 
@@ -1133,7 +1133,7 @@ qvariant_value(VALUE /*self*/, VALUE variant_value_klass, VALUE variant_value)
 	} else if (variant->userType() == qMetaTypeId<QDBusVariant>()) {
 		QVariant *ptr = new QVariant(variant->value<QDBusVariant>().variant());
 		vo = alloc_smokeruby_object(true, qtcore_Smoke, qtcore_Smoke->idClass("QVariant").index, ptr);
-		return set_obj_info("Qt::Variant", vo);
+		return set_obj_info("Qt5::Variant", vo);
 #endif
 	} else if (variant->type() >= QVariant::UserType) {
 		// If the QVariant contains a user type, don't bother to look at the Ruby class argument
@@ -1149,62 +1149,62 @@ qvariant_value(VALUE /*self*/, VALUE variant_value_klass, VALUE variant_value)
 		return Qnil;
 	}
 
-	if (qstrcmp(classname, "Qt::Pixmap") == 0) {
+	if (qstrcmp(classname, "Qt5::Pixmap") == 0) {
 		QPixmap v = variant->value<QPixmap>();
 		value_ptr = (void *) new QPixmap(v);
-	} else if (qstrcmp(classname, "Qt::Font") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Font") == 0) {
 		QFont v = variant->value<QFont>();
 		value_ptr = (void *) new QFont(v);
-	} else if (qstrcmp(classname, "Qt::Brush") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Brush") == 0) {
 		QBrush v = variant->value<QBrush>();
 		value_ptr = (void *) new QBrush(v);
-	} else if (qstrcmp(classname, "Qt::Color") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Color") == 0) {
 		QColor v = variant->value<QColor>();
 		value_ptr = (void *) new QColor(v);
-	} else if (qstrcmp(classname, "Qt::Palette") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Palette") == 0) {
 		QPalette v = variant->value<QPalette>();
 		value_ptr = (void *) new QPalette(v);
-	} else if (qstrcmp(classname, "Qt::Icon") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Icon") == 0) {
 		QIcon v = variant->value<QIcon>();
 		value_ptr = (void *) new QIcon(v);
-	} else if (qstrcmp(classname, "Qt::Image") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Image") == 0) {
 		QImage v = variant->value<QImage>();
 		value_ptr = (void *) new QImage(v);
-	} else if (qstrcmp(classname, "Qt::Polygon") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Polygon") == 0) {
 		QPolygon v = variant->value<QPolygon>();
 		value_ptr = (void *) new QPolygon(v);
-	} else if (qstrcmp(classname, "Qt::Region") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Region") == 0) {
 		QRegion v = variant->value<QRegion>();
 		value_ptr = (void *) new QRegion(v);
-	} else if (qstrcmp(classname, "Qt::Bitmap") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Bitmap") == 0) {
 		QBitmap v = variant->value<QBitmap>();
 		value_ptr = (void *) new QBitmap(v);
-	} else if (qstrcmp(classname, "Qt::Cursor") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Cursor") == 0) {
 		QCursor v = variant->value<QCursor>();
 		value_ptr = (void *) new QCursor(v);
-	} else if (qstrcmp(classname, "Qt::SizePolicy") == 0) {
+	} else if (qstrcmp(classname, "Qt5::SizePolicy") == 0) {
 		QSizePolicy v = variant->value<QSizePolicy>();
 		value_ptr = (void *) new QSizePolicy(v);
-	} else if (qstrcmp(classname, "Qt::KeySequence") == 0) {
+	} else if (qstrcmp(classname, "Qt5::KeySequence") == 0) {
 		QKeySequence v = variant->value<QKeySequence>();
 		value_ptr = (void *) new QKeySequence(v);
-	} else if (qstrcmp(classname, "Qt::Pen") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Pen") == 0) {
 		QPen v = variant->value<QPen>();
 		value_ptr = (void *) new QPen(v);
-	} else if (qstrcmp(classname, "Qt::TextLength") == 0) {
+	} else if (qstrcmp(classname, "Qt5::TextLength") == 0) {
 		QTextLength v = variant->value<QTextLength>();
 		value_ptr = (void *) new QTextLength(v);
-	} else if (qstrcmp(classname, "Qt::TextFormat") == 0) {
+	} else if (qstrcmp(classname, "Qt5::TextFormat") == 0) {
 		QTextFormat v = variant->value<QTextFormat>();
 		value_ptr = (void *) new QTextFormat(v);
-	} else if (qstrcmp(classname, "Qt::Variant") == 0) {
+	} else if (qstrcmp(classname, "Qt5::Variant") == 0) {
 		value_ptr = (void *) new QVariant(*((QVariant *) variant->constData()));
 	} else {
-		// Assume the value of the Qt::Variant can be obtained
-		// with a call such as Qt::Variant.toPoint()
+		// Assume the value of the Qt5::Variant can be obtained
+		// with a call such as Qt5::Variant.toPoint()
 		QByteArray toValueMethodName(classname);
-		if (toValueMethodName.startsWith("Qt::")) {
-			toValueMethodName.remove(0, strlen("Qt::"));
+		if (toValueMethodName.startsWith("Qt5::")) {
+			toValueMethodName.remove(0, strlen("Qt5::"));
 		}
 		toValueMethodName.prepend("to");
 		return rb_funcall(variant_value, rb_intern(toValueMethodName), 1, variant_value);
@@ -1261,7 +1261,7 @@ qvariant_from_value(int argc, VALUE * argv, VALUE self)
 	smokeruby_object *o = value_obj_info(argv[0]);
 	int type = 0;
 
-	if (qstrcmp(classname, "Qt::Enum") == 0) {
+	if (qstrcmp(classname, "Qt5::Enum") == 0) {
 		return rb_funcall(qvariant_class, rb_intern("new"), 1, rb_funcall(argv[0], rb_intern("to_i"), 0));
 	} else if (o && o->ptr && (type = QVariant::nameToType(o->smoke->className(o->classId)))) {
 		v = new QVariant(type, o->ptr);
@@ -1284,7 +1284,7 @@ qvariant_from_value(int argc, VALUE * argv, VALUE self)
 	}
 
 	smokeruby_object * vo = alloc_smokeruby_object(true, qtcore_Smoke, qtcore_Smoke->idClass("QVariant").index, v);
-	VALUE result = set_obj_info("Qt::Variant", vo);
+	VALUE result = set_obj_info("Qt5::Variant", vo);
 
 	return result;
 }
@@ -1341,7 +1341,7 @@ static VALUE module_method_missing(int argc, VALUE * argv, VALUE klass)
 
 /*
 
-class LCDRange < Qt::Widget
+class LCDRange < Qt5::Widget
 
 	def initialize(s, parent, name)
 		super(parent, name)
@@ -1388,7 +1388,7 @@ initialize_qt(int argc, VALUE * argv, VALUE self)
 
 	VALUE * temp_stack = ALLOCA_N(VALUE, argc+4);
 
-	temp_stack[0] = rb_str_new2("Qt");
+	temp_stack[0] = rb_str_new2("Qt5");
 	temp_stack[1] = constructor_name;
 	temp_stack[2] = klass;
 	temp_stack[3] = self;
@@ -1640,7 +1640,7 @@ qtimer_single_shot(int argc, VALUE * argv, VALUE /*self*/)
 	}
 }
 
-// --------------- Ruby C functions for Qt::_internal.* helpers  ----------------
+// --------------- Ruby C functions for Qt5::_internal.* helpers  ----------------
 
 
 static VALUE
@@ -1686,7 +1686,7 @@ getIsa(VALUE /*self*/, VALUE classId)
 }
 
 // Return the class name of a QObject. Note that the name will be in the
-// form of Qt::Widget rather than QWidget. Is this a bug or a feature?
+// form of Qt5::Widget rather than QWidget. Is this a bug or a feature?
 static VALUE
 class_name(VALUE self)
 {
@@ -1694,8 +1694,8 @@ class_name(VALUE self)
 	return rb_funcall(klass, rb_intern("name"), 0);
 }
 
-// Allow classnames in both 'Qt::Widget' and 'QWidget' formats to be
-// used as an argument to Qt::Object.inherits()
+// Allow classnames in both 'Qt5::Widget' and 'QWidget' formats to be
+// used as an argument to Qt5::Object.inherits()
 static VALUE
 inherits_qobject(int argc, VALUE * argv, VALUE /*self*/)
 {
@@ -1745,8 +1745,8 @@ rb_qFindChildren_helper(VALUE parent, const QString &name, VALUE re,
 	return;
 }
 
-/* Should mimic Qt4's QObject::findChildren method with this syntax:
-	 obj.findChildren(Qt::Widget, "Optional Widget Name")
+/* Should mimic Qt5's QObject::findChildren method with this syntax:
+	 obj.findChildren(Qt5::Widget, "Optional Widget Name")
 */
 static VALUE
 find_qobject_children(int argc, VALUE *argv, VALUE self)
@@ -2485,11 +2485,11 @@ create_qobject_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 		klass = rb_define_class_under(klass, (const char*) s.toLocal8Bit(), qt_base_class);
 	}
 
-	if (packageName == "Qt::Application" || packageName == "Qt::CoreApplication" ) {
+	if (packageName == "Qt5::Application" || packageName == "Qt5::CoreApplication" ) {
 		rb_define_method(klass, "ARGV", (VALUE (*) (...)) qapplication_argv, 0);
-	} else if (packageName == "Qt::Object") {
+	} else if (packageName == "Qt5::Object") {
 		rb_define_singleton_method(klass, "staticMetaObject", (VALUE (*) (...)) qobject_staticmetaobject, 0);
-	} else if (packageName == "Qt::AbstractTableModel") {
+	} else if (packageName == "Qt5::AbstractTableModel") {
 		qtablemodel_class = rb_define_class_under(qt_module, "TableModel", klass);
 		rb_define_method(qtablemodel_class, "rowCount", (VALUE (*) (...)) qabstract_item_model_rowcount, -1);
 		rb_define_method(qtablemodel_class, "row_count", (VALUE (*) (...)) qabstract_item_model_rowcount, -1);
@@ -2529,10 +2529,10 @@ create_qobject_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 		rb_define_method(qlistmodel_class, "roleNames", (VALUE (*) (...)) qabstractitemmodel_rolenames, -1);
 		rb_define_method(qlistmodel_class, "role_names", (VALUE (*) (...)) qabstractitemmodel_rolenames, -1);
 	}
-	else if (packageName == "Qt::AbstractItemModel") {
+	else if (packageName == "Qt5::AbstractItemModel") {
 		rb_define_method(klass, "createIndex", (VALUE (*) (...)) qabstractitemmodel_createindex, -1);
 		rb_define_method(klass, "create_index", (VALUE (*) (...)) qabstractitemmodel_createindex, -1);
-	} else if (packageName == "Qt::Timer") {
+	} else if (packageName == "Qt5::Timer") {
 		rb_define_singleton_method(klass, "singleShot", (VALUE (*) (...)) qtimer_single_shot, -1);
 		rb_define_singleton_method(klass, "single_shot", (VALUE (*) (...)) qtimer_single_shot, -1);
 	}
@@ -2580,53 +2580,53 @@ create_qt_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 		klass = rb_define_class_under(klass, (const char*) s.toLocal8Bit(), qt_base_class);
 	}
 
-	if (packageName == "Qt::MetaObject") {
+	if (packageName == "Qt5::MetaObject") {
 		qmetaobject_class = klass;
-	} else if (packageName == "Qt::Variant") {
+	} else if (packageName == "Qt5::Variant") {
 		qvariant_class = klass;
 		rb_define_singleton_method(qvariant_class, "fromValue", (VALUE (*) (...)) qvariant_from_value, -1);
 		rb_define_singleton_method(qvariant_class, "from_value", (VALUE (*) (...)) qvariant_from_value, -1);
 		rb_define_singleton_method(qvariant_class, "new", (VALUE (*) (...)) new_qvariant, -1);
-	} else if (packageName == "Qt::ByteArray") {
+	} else if (packageName == "Qt5::ByteArray") {
 		rb_define_method(klass, "+", (VALUE (*) (...)) qbytearray_append, 1);
 		rb_define_method(klass, "data", (VALUE (*) (...)) qbytearray_data, 0);
 		rb_define_method(klass, "constData", (VALUE (*) (...)) qbytearray_cdata, 0);
 		rb_define_method(klass, "const_data", (VALUE (*) (...)) qbytearray_cdata, 0);
-	} else if (packageName == "Qt::Char") {
+	} else if (packageName == "Qt5::Char") {
 		rb_define_method(klass, "to_s", (VALUE (*) (...)) qchar_to_s, 0);
-	} else if (packageName == "Qt::Image") {
+	} else if (packageName == "Qt5::Image") {
 		rb_define_method(klass, "bits", (VALUE (*) (...)) qimage_bits, 0);
 		rb_define_method(klass, "scanLine", (VALUE (*) (...)) qimage_scan_line, 1);
-	} else if (packageName == "Qt::ItemSelection") {
+	} else if (packageName == "Qt5::ItemSelection") {
 		rb_define_method(klass, "[]", (VALUE (*) (...)) qitemselection_at, 1);
 		rb_define_method(klass, "at", (VALUE (*) (...)) qitemselection_at, 1);
 		rb_define_method(klass, "count", (VALUE (*) (...)) qitemselection_count, 0);
 		rb_define_method(klass, "length", (VALUE (*) (...)) qitemselection_count, 0);
-	} else if (packageName == "Qt::Polygon") {
+	} else if (packageName == "Qt5::Polygon") {
 		rb_define_method(klass, "[]", (VALUE (*) (...)) qpolygon_at, 1);
 		rb_define_method(klass, "at", (VALUE (*) (...)) qpolygon_at, 1);
 		rb_define_method(klass, "count", (VALUE (*) (...)) qpolygon_count, 0);
 		rb_define_method(klass, "length", (VALUE (*) (...)) qpolygon_count, 0);
-	} else if (packageName == "Qt::PolygonF") {
+	} else if (packageName == "Qt5::PolygonF") {
 		rb_define_method(klass, "[]", (VALUE (*) (...)) qpolygonf_at, 1);
 		rb_define_method(klass, "at", (VALUE (*) (...)) qpolygonf_at, 1);
 		rb_define_method(klass, "count", (VALUE (*) (...)) qpolygonf_count, 0);
 		rb_define_method(klass, "length", (VALUE (*) (...)) qpolygonf_count, 0);
 		rb_define_method(klass, "point", (VALUE (*) (...)) qpolygonf_at, 1);
-	} else if (packageName == "Qt::Painter") {
+	} else if (packageName == "Qt5::Painter") {
 		rb_define_method(klass, "drawLines", (VALUE (*) (...)) qpainter_drawlines, -1);
 		rb_define_method(klass, "draw_lines", (VALUE (*) (...)) qpainter_drawlines, -1);
 		rb_define_method(klass, "drawRects", (VALUE (*) (...)) qpainter_drawrects, -1);
 		rb_define_method(klass, "draw_rects", (VALUE (*) (...)) qpainter_drawrects, -1);
-	} else if (packageName == "Qt::ModelIndex") {
+	} else if (packageName == "Qt5::ModelIndex") {
 		rb_define_method(klass, "internalPointer", (VALUE (*) (...)) qmodelindex_internalpointer, 0);
 		rb_define_method(klass, "internal_pointer", (VALUE (*) (...)) qmodelindex_internalpointer, 0);
-	} else if (packageName == "Qt::SignalMapper") {
+	} else if (packageName == "Qt5::SignalMapper") {
 		rb_define_method(klass, "mapping", (VALUE (*) (...)) qsignalmapper_mapping, -1);
 		rb_define_method(klass, "setMapping", (VALUE (*) (...)) qsignalmapper_set_mapping, -1);
 		rb_define_method(klass, "set_mapping", (VALUE (*) (...)) qsignalmapper_set_mapping, -1);
 #ifdef QT_QTDBUS
-	} else if (packageName == "Qt::DBusArgument") {
+	} else if (packageName == "Qt5::DBusArgument") {
 		rb_define_method(klass, "endArrayWrite", (VALUE (*) (...)) qdbusargument_endarraywrite, 0);
 		rb_define_method(klass, "end_array_write", (VALUE (*) (...)) qdbusargument_endarraywrite, 0);
 		rb_define_method(klass, "endMapEntryWrite", (VALUE (*) (...)) qdbusargument_endmapentrywrite, 0);
@@ -2710,7 +2710,7 @@ Init_qtruby5()
 #endif
 
 	if (qt_module == Qnil) {
-		qt_module = rb_define_module("Qt");
+		qt_module = rb_define_module("Qt5");
 		qt_internal_module = rb_define_module_under(qt_module, "Internal");
 		qt_base_class = rb_define_class_under(qt_module, "Base", rb_cObject);
 		moduleindex_class = rb_define_class_under(qt_internal_module, "ModuleIndex", rb_cObject);

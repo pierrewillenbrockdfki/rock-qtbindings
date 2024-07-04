@@ -888,7 +888,7 @@ method_missing(int argc, VALUE * argv, VALUE self)
 	}
 
 	VALUE * temp_stack = ALLOCA_N(VALUE, argc+3);
-    temp_stack[0] = rb_str_new2("Qt");
+    temp_stack[0] = rb_str_new2("Qt5");
     temp_stack[1] = rb_str_new2(methodName);
     temp_stack[2] = klass;
     temp_stack[3] = self;
@@ -1016,7 +1016,7 @@ class_method_missing(int argc, VALUE * argv, VALUE klass)
   if (mainThread == Qnil) {
     mainThread = rb_thread_main();
   }
-    temp_stack[0] = rb_str_new2("Qt");
+    temp_stack[0] = rb_str_new2("Qt5");
     temp_stack[1] = rb_str_new2(methodName);
     temp_stack[2] = klass;
     temp_stack[3] = Qnil;
