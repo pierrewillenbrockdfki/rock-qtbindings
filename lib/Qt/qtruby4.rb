@@ -54,9 +54,11 @@ module Qt
     MethodMethod = 0x00
     MethodSignal = 0x04
     MethodSlot = 0x08
+    MethodConstructor = 0x0c
     MethodCompatibility = 0x10
     MethodCloned = 0x20
     MethodScriptable = 0x40
+    MethodRevisioned = 0x80
   end
 
   class Base
@@ -2907,74 +2909,145 @@ module Qt
     # Keeps a hash of strings against their corresponding offsets
     # within the qt_meta_stringdata sequence of null terminated
     # strings. Returns a proc to get an offset given a string.
-    # That proc also adds new strings to the 'data' array, and updates
-    # the corresponding 'pack_str' Array#pack template.
-    def Internal.string_table_handler(data, pack_str)
+    # That proc also adds new strings to the 'data' array
+    def Internal.string_table_handler(data)
       hsh = {}
-      offset = 0
       return lambda do |str|
         if !hsh.has_key? str
-          hsh[str] = offset
+          offset = hsh[str] = data.length
           data << str
-          pack_str << "a*x"
-          offset += str.length + 1
+          offset
         end
 
         return hsh[str]
       end
     end
 
-    def Internal.makeMetaData(classname, classinfos, dbus, signals, slots)
+    def Internal.makeMetaData(classname, classinfos, dbus, signals, slots, properties = [], enums = [], constructors = [])
       # Each entry in 'stringdata' corresponds to a string in the
-      # qt_meta_stringdata_<classname> structure.
-      # 'pack_string' is used to convert 'stringdata' into the
-      # binary sequence of null terminated strings for the metaObject
+      # QtByteArrayData array pointed to by QtMetaObject::string_data.
       stringdata = []
-      pack_string = ""
-      string_table = string_table_handler(stringdata, pack_string)
+      string_table = string_table_handler(stringdata)
 
       # This is used to create the array of uints that make up the
       # qt_meta_data_<classname> structure in the metaObject
-      data = [1,                 # revision
+      data = [8,                 # revision
           string_table.call(classname),   # classname
-          classinfos.length, classinfos.length > 0 ? 10 : 0,   # classinfo
+          classinfos.length, classinfos.length > 0 ? 14 : 0,   # classinfo
           signals.length + slots.length,
-          10 + (2*classinfos.length),   # methods
+          14 + (2*classinfos.length),   # methods
           0, 0,               # properties
-          0, 0]              # enums/sets
+          0, 0,               # enums/sets
+          constructors.length, 0,               # constructors
+          0,                  # flags
+          signals.length]     # signalCount
 
       classinfos.each do |entry|
         data.push string_table.call(entry[0])    # key
         data.push string_table.call(entry[1])    # value
       end
 
+      parametersBase = data.length + (5 * (signals.length + slots.length) )
+      # if there are any methods that are revisioned, add another signals.length + slots.length
+      haveRevisionedMethods = (signals.any? { |entry| (entry.access & MethodRevisioned) != 0 }) ||
+              (slots.any? { |entry| (entry.access & MethodRevisioned) != 0 })
+      if haveRevisionedMethods
+          parametersBase += signals.length + slots.length
+      end
+      parameterData = []
+
       signals.each do |entry|
-        data.push string_table.call(entry.full_name)        # signature
-        data.push string_table.call(entry.full_name.delete("^,"))  # parameters
-        data.push string_table.call(entry.reply_type)        # type, "" means void
+        data.push string_table.call(entry.name)        # name
+        data.push entry.args.length  # parameters
+        data.push parametersBase        # offset of parameters
         data.push string_table.call("")        # tag
         if dbus
           data.push MethodScriptable | MethodSignal | AccessPublic
         else
           data.push entry.access  # flags, always protected for now
         end
+        parametersBase += 1 + entry.args.length * 2   # return type, parameter types, then parameter names
+        parameterData.push 0x80000000 | string_table.call(entry.reply_type)
+        entry.args.each do |param|
+            parameterData.push 0x80000000 | string_table.call(param.type)
+        end
+        entry.args.each do |param|
+            parameterData.push string_table.call(param.name)
+        end
       end
 
       slots.each do |entry|
-        data.push string_table.call(entry.full_name)        # signature
-        data.push string_table.call(entry.full_name.delete("^,"))  # parameters
-        data.push string_table.call(entry.reply_type)        # type, "" means void
+        data.push string_table.call(entry.name)        # name
+        data.push entry.args.length  # parameters
+        data.push parametersBase        # offset of parameters
         data.push string_table.call("")        # tag
         if dbus
           data.push MethodScriptable | MethodSlot | AccessPublic  # flags, always public for now
         else
           data.push entry.access    # flags, always public for now
         end
+        parametersBase += 1 + entry.args.length * 2   # return type, parameter types, then parameter names
+        parameterData.push 0x80000000 | string_table.call(entry.reply_type)
+        entry.args.each do |param|
+            parameterData.push 0x80000000 | string_table.call(param.type)
+        end
+        entry.args.each do |param|
+            parameterData.push string_table.call(param.name)
+        end
       end
 
-      data.push 0    # eod
+      if haveRevisionedMethods
+        signals.each do |entry|
+          data.push entry.revision || 0   #revision
+        end
 
-      return [stringdata.pack(pack_string), data]
+        slots.each do |entry|
+          data.push entry.revision || 0   #revision
+        end
+      end
+
+      constructorsParametersBase = parametersBase
+
+      # The parameter descriptions are all in one place, but they don't have to be.
+      constructors.each do |entry|
+        parametersBase += 1 + entry.args.length * 2   # return type, parameter types, then parameter names
+        parameterData.push 0x80000000 | string_table.call(entry.reply_type)
+        entry.args.each do |param|
+            parameterData.push 0x80000000 | string_table.call(param.type)
+        end
+        entry.args.each do |param|
+            parameterData.push string_table.call(param.name)
+        end
+      end
+
+      data += parameterData
+
+      # properties
+
+      # enum
+
+      data.push constructors.length
+
+      if constructors.length != 0
+          data[13] = data.length
+      end
+
+      parametersBase = constructorsParametersBase
+
+      constructors.each do |entry|
+        data.push string_table.call(entry.name)        # signature
+        data.push entry.args.length  # parameters
+        data.push parametersBase        # offset of parameters
+        data.push string_table.call("")        # tag
+        if dbus
+          data.push MethodScriptable | MethodConstructor | AccessPublic  # flags, always public for now
+        else
+          data.push entry.access    # flags, always public for now
+        end
+        parametersBase += 1 + entry.args.length * 2   # return type, parameter types, then parameter names
+      end
+
+      return [stringdata, data]
     end
 
     def Internal.getMetaObject(klass, qobject)
@@ -3059,10 +3132,10 @@ module Qt
   # Example
   #  int foobar(QString,bool)
   #  :name is 'foobar'
-  #  :full_name is 'foobar(QString,bool)'
-  #  :arg_types is 'QString,bool'
+  #  :args is [{:name => 'foo', :type => 'QString'},{:name => 'bar', :type => 'bool'}]
   #  :reply_type is 'int'
-  QObjectMember = Struct.new :name, :full_name, :arg_types, :reply_type, :access
+  QObjectMember = Struct.new :name, :args, :reply_type, :access
+  QObjectMemberArg = Struct.new :name, :type
 
   class MetaInfo
     attr_accessor :classinfos, :dbus, :signals, :slots, :metaobject, :mocargs, :changed
@@ -3079,20 +3152,41 @@ module Qt
       Internal.addMetaObjectMethods(klass)
     end
 
+    def make_ObjectMember(method, access)
+        if method.kind_of? Symbol
+          method = method.to_s + "()"
+        end
+        method = Qt::MetaObject.normalizedSignature(method).to_s
+        if method =~ /^(([\w,<>:]*)\s+)?([^\s]*)\((.*)\)/
+          name = $3
+          args_str = $4
+          reply_type = ($2 == 'void' || $2.nil?) ? "" : $2
+          args = []
+          if not args_str.empty?
+            args = args_str.split(/,/).map do |arg|
+              if arg =~ /^([\w,<>:]+)(\s+([A-Za-z0-9_]*))?$/
+                QObjectMemberArg.new($3.nil? ? "" : $3, $1)
+              else
+                QObjectMemberArg.new("", arg)
+              end
+            end
+          end
+          return name, QObjectMember.new( name,
+                                          args,
+                                          reply_type,
+                                          access )
+        else
+          return nil
+        end
+    end
+
     def add_signals(signal_list, access)
       signal_names = []
       signal_list.each do |signal|
-        if signal.kind_of? Symbol
-          signal = signal.to_s + "()"
-        end
-        signal = Qt::MetaObject.normalizedSignature(signal).to_s
-        if signal =~ /^(([\w,<>:]*)\s+)?([^\s]*)\((.*)\)/
-          @signals.push QObjectMember.new(  $3,
-                                              $3 + "(" + $4 + ")",
-                                              $4,
-                                              ($2 == 'void' || $2.nil?) ? "" : $2,
-                                              access )
-          signal_names << $3
+        name, obj = make_ObjectMember(signal, access)
+        if name
+          @signals.push obj
+          signal_names << name
         else
           qWarning( "#{@klass.name}: Invalid signal format: '#{signal}'" )
         end
@@ -3116,16 +3210,9 @@ module Qt
 
     def add_slots(slot_list, access)
       slot_list.each do |slot|
-        if slot.kind_of? Symbol
-          slot = slot.to_s + "()"
-        end
-        slot = Qt::MetaObject.normalizedSignature(slot).to_s
-        if slot =~ /^(([\w,<>:]*)\s+)?([^\s]*)\((.*)\)/
-          @slots.push QObjectMember.new(  $3,
-                                          $3 + "(" + $4 + ")",
-                                          $4,
-                                          ($2 == 'void' || $2.nil?) ? "" : $2,
-                                          access )
+        name, obj = make_ObjectMember(slot, access)
+        if obj
+          @slots.push obj
         else
           qWarning( "#{@klass.name}: Invalid slot format: '#{slot}'" )
         end

@@ -1953,6 +1953,119 @@ parent_meta_object(VALUE obj)
 static VALUE
 make_metaObject(VALUE /*self*/, VALUE obj, VALUE parentMeta, VALUE stringdata_value, VALUE data_value)
 {
+    /*
+For QObject
+
+QArrayData::offset points to the data contents past the object pointer
+
+QMetaObject::d.stringdata[0]: (QArrayData) "QObject"
+QMetaObject::d.stringdata[1]: (QArrayData) "destroyed"
+QMetaObject::d.stringdata[2]: (QArrayData) ""
+QMetaObject::d.stringdata[3]: (QArrayData) "objectNameChanged"
+QMetaObject::d.stringdata[4]: (QArrayData) "objectName"
+QMetaObject::d.stringdata[5]: (QArrayData) "deleteLater"
+QMetaObject::d.stringdata[6]: (QArrayData) "_q_reregisterTimers"
+QMetaObject::d.stringdata[7]: (QArrayData) "parent"
+QMetaObject::d.relatedMetaObjects: (const QMetaObject * const *) NULL
+QMetaObject::d.superdata: (const QMetaObject *) NULL
+QMetaObject::d.extradata: (void*) NULL
+
+QMetaObject::d.data: (QMetaObjectPrivate*) = {
+    revision = (int)8,
+    className = (int)0,
+    classInfoCount = (int)0,
+    classInfoData = (int)0,
+    methodCount = (int)5,
+    methodData = (int)14,
+    propertyCount = (int)1,
+    propertyData = (int)54,
+    enumeratorCount = (int)0,
+    enumeratorData = (int)0,
+    constructorCount = (int)2,
+    constructorData = (int)58,
+    flags = (int)0,
+    signalCount = (int)3,
+}
+[14]:  methodData  (first are signals)
+1       1       39      2       6
+1       0       42      2       38
+3       1       43      2       6
+5       0       46      2       10
+6       1       47      2       8
+[39]: method(0).typesDataIndex
+43     39
+        2
+[42]: method(1).typesDataIndex
+43
+[43]: method(2).typesDataIndex
+43     10
+        4
+[46]: method(3).typesDataIndex
+43
+[47]: method(4).typesDataIndex
+43     31
+        2
+[50]: constructor[0].typesDataIndex
+0x80000000+2     39
+                 7
+[53]: constructor[1].typesDataIndex
+0x80000000+2
+[54]: propertyData
+4       10      4804867
+
+[57]: (???)  copy of constructorCount?
+2
+[58]: constructorData
+0       1       50      2       14
+0       0       53      2       46
+
+
+QMetaObject memory layout:
+d.superdata: const QMetaObject *
+d.stringdata: const QArrayData * (unbounded array)
+d.data: const uint * (cast to QMetaObjectPrivate*, which gives a header to more data)
+d.static_metacall: function pointer
+d.relatedMetaObjects: const QMetaObject *
+d.extradata: void *
+
+Class info descriptions as pointed to by QMetaObjectPrivate::classInfoData in QMetaObject::d.data is of size 2 ints. (QMetaClassInfo::handle)
+Method descriptions as pointed to by QMetaObjectPrivate::methodData in QMetaObject::d.data is of size 5 ints. (QMetaMethod::handle)
+Property descriptions as pointed to by QMetaObjectPrivate::propertyData in QMetaObject::d.data is of size 3 ints. (QMetaProperty::handle)
+Enumerator descriptions as pointed to by QMetaObjectPrivate::enumeratorData in QMetaObject::d.data is of size 5 ints. (QMetaEnum::handle) (in revision 8, which we will be targeting)
+Constructor descriptions as pointed to by QMetaObjectPrivate::constructorData in QMetaObject::d.data is of size 5 ints. (QMetaMethod::handle)
+
+QMetaClassInfo::handle ints layout:
+name: string number into QMetaObject::d.stringdata
+value: string number into QMetaObject::d.stringdata
+
+QMetaMethod::handle ints layout: (QMetaMethodPrivate)
+name: string number into QMetaObject::d.stringdata
+parameterCount: int
+typesDataIndex: int number into QMetaObject::d.data; points to
+    (parameterCount)ints
+       parameterType: highest bit is a flag: IsUnresolvedType
+          If IsUnresolvedType set: string number into QMetaObject::d.stringdata
+          If IsUnresolvedType clear: type id for MetaType(::typeName etc)
+    (parameterCount)ints
+        parameterName: string number into QMetaObject::d.stringdata
+tag: string number into QMetaObject::d.stringdata
+flags: int
+
+QMetaProperty::handle ints layout:
+name: string number into QMetaObject::d.stringdata
+typeName: string number into QMetaObject::d.stringdata
+flags: int
+
+QMetaEnum::handle ints layout:
+name: string number into QMetaObject::d.stringdata
+enumName: string number into QMetaObject::d.stringdata   (does not exist in revision 7)
+flags: int
+keyCount: int
+keyData: int number into QMetaObject::d.data; points to pairs of
+     key: string number into QMetaObject::d.stringdata
+     value: int
+
+*/
 	QMetaObject* superdata = 0;
 
 	if (parentMeta == Qnil) {
@@ -1966,12 +2079,32 @@ make_metaObject(VALUE /*self*/, VALUE obj, VALUE parentMeta, VALUE stringdata_va
 		superdata = (QMetaObject *) p->ptr;
 	}
 
-	char *stringdata = new char[RSTRING_LEN(stringdata_value)];
+	int strcount = RARRAY_LEN(stringdata_value);
+	int str_sum_len = 0;
+	for (long i = 0; i < strcount; i++) {
+		VALUE rv = rb_ary_entry(stringdata_value, i);
+		str_sum_len += RSTRING_LEN(rv)+1;
+	}
+
+	char *stringdata_mem = new char[sizeof(QByteArrayData) * strcount + str_sum_len];
+	memset(stringdata_mem, 0, sizeof(QByteArrayData) * strcount + str_sum_len);
+	char *stringdata_strings = stringdata_mem + sizeof(QByteArrayData) * strcount;
+	QByteArrayData *stringdata = (QByteArrayData *)stringdata_mem;
+
+	char *stringdata_pos = stringdata_strings;
+	for (long i = 0; i < strcount; i++) {
+		VALUE rv = rb_ary_entry(stringdata_value, i);
+		long str_len = RSTRING_LEN(rv);
+		memcpy(stringdata_pos, RSTRING_PTR(rv), str_len);
+		stringdata[i].ref.atomic = -1;
+		stringdata[i].size = str_len;
+		stringdata[i].offset = stringdata_pos - (char*)&stringdata[i];
+		stringdata_pos += str_len;
+		*stringdata_pos++ = '\0';
+	}
 
 	int count = RARRAY_LEN(data_value);
 	uint * data = new uint[count];
-
-	memcpy(	(void *) stringdata, RSTRING_PTR(stringdata_value), RSTRING_LEN(stringdata_value) );
 
 	for (long i = 0; i < count; i++) {
 		VALUE rv = rb_ary_entry(data_value, i);
@@ -1995,9 +2128,13 @@ make_metaObject(VALUE /*self*/, VALUE obj, VALUE parentMeta, VALUE stringdata_va
 	"	   %d,   %d, // classinfo\n"
 	"	   %d,   %d, // methods\n"
 	"	   %d,   %d, // properties\n"
-	"	   %d,   %d, // enums/sets\n",
+	"	   %d,   %d, // enums/sets\n"
+	"	   %d,   %d, // constructors\n"
+	"	   %d,	   // flags\n"
+	"	   %d,	   // signalCount\n",
 	data[0], data[1], data[2], data[3],
-	data[4], data[5], data[6], data[7], data[8], data[9]);
+	data[4], data[5], data[6], data[7], data[8], data[9],
+	data[10], data[11], data[12], data[13]);
 
 	int s = data[3];
 
@@ -2009,18 +2146,14 @@ make_metaObject(VALUE /*self*/, VALUE obj, VALUE parentMeta, VALUE stringdata_va
 	}
 
 	s = data[5];
-	bool signal_headings = true;
-	bool slot_headings = true;
 
 	for (uint j = 0; j < data[4]; j++) {
-		if (signal_headings && (data[s + (j * 5) + 4] & 0x04) != 0) {
-			printf("\n // signals: signature, parameters, type, tag, flags\n");
-			signal_headings = false;
+		if (j == 0) {
+			printf("\n // signals: name, parameterCount, types/names, tag, flags\n");
 		}
 
-		if (slot_headings && (data[s + (j * 5) + 4] & 0x08) != 0) {
-			printf("\n // slots: signature, parameters, type, tag, flags\n");
-			slot_headings = false;
+		if (j == data[13]) {
+			printf("\n // methods: name, parameterCount, types/names, tag, flags\n");
 		}
 
 		printf("	  %d,   %d,   %d,   %d, 0x%2.2x\n",
@@ -2028,34 +2161,105 @@ make_metaObject(VALUE /*self*/, VALUE obj, VALUE parentMeta, VALUE stringdata_va
 			data[s + (j * 5) + 3], data[s + (j * 5) + 4]);
 	}
 
-	s += (data[4] * 5);
-	for (uint j = 0; j < data[6]; j++) {
+	s = data[7];
+	if (data[6] > 0) {
 		printf("\n // properties: name, type, flags\n");
-		printf("	  %d,   %d,   0x%8.8x\n",
-			data[s + (j * 3)], data[s + (j * 3) + 1], data[s + (j * 3) + 2]);
-	}
-
-	s += (data[6] * 3);
-	for (int i = s; i < count; i++) {
-		printf("\n	   %d		// eod\n", data[i]);
-	}
-
-	printf("\nqt_meta_stringdata:\n	\"");
-
-	int strlength = 0;
-	for (int j = 0; j < RSTRING_LEN(stringdata_value); j++) {
-		strlength++;
-		if (meta->d.stringdata[j] == 0) {
-			printf("\\0");
-			if (strlength > 40) {
-				printf("\"\n	\"");
-				strlength = 0;
-			}
-		} else {
-			printf("%c", meta->d.stringdata[j]);
+		for (uint j = 0; j < data[6]; j++) {
+			printf("	  %d,   %d,   0x%8.8x\n",
+				data[s + (j * 3)], data[s + (j * 3) + 1], data[s + (j * 3) + 2]);
 		}
 	}
-	printf("\"\n\n");
+
+	s = data[9];
+
+	if (data[8] > 0) {
+		if(data[0] >= 8) {
+			printf("\n // enum/sets: name, enumName, flags, keyCount, keyData\n");
+			for (uint j = 0; j < data[8]; j++) {
+				printf("	  %d,   %d,   0x%8.8x,   %d,   %d\n",
+					data[s + (j * 5)], data[s + (j * 5) + 1], data[s + (j * 5) + 2], data[s + (j * 5) + 3], data[s + (j * 5) + 4]);
+			}
+		} else {
+			printf("\n // enum/sets: name, flags, keyCount, keyData\n");
+			for (uint j = 0; j < data[8]; j++) {
+				printf("	  %d,   0x%8.8x,   %d,   %d\n",
+					data[s + (j * 4)], data[s + (j * 4) + 1], data[s + (j * 4) + 2], data[s + (j * 4) + 3]);
+			}
+		}
+	}
+
+	s = data[11];
+
+	for (uint j = 0; j < data[10]; j++) {
+		if (j == 0) {
+			printf("\n // constructors: name, parameterCount, types/names, tag, flags\n");
+		}
+
+		printf("	  %d,   %d,   %d,   %d, 0x%2.2x\n",
+			data[s + (j * 5)], data[s + (j * 5) + 1], data[s + (j * 5) + 2],
+			data[s + (j * 5) + 3], data[s + (j * 5) + 4]);
+	}
+
+	s = data[5];
+
+	for (uint j = 0; j < data[4]; j++) {
+		if (j < data[13]) {
+			printf("\n // signal %d types: type, name\n", j);
+		} else {
+			printf("\n // method %d types: type, name\n", j - data[13]);
+		}
+
+		uint c = data[s + (j * 5) + 1];
+		uint t = data[s + (j * 5) + 2];
+
+		if (data[t] & 0x80000000U)
+			printf("	  %d/*unresolved*/\n", data[t] & ~0x80000000U);
+		else
+			printf("	  %d\n", data[t]);
+
+		for(uint k = 0; k < c; k++) {
+			if (data[t + k + 1] & 0x80000000U)
+				printf("	  %d/*unresolved*/,   %d\n", data[t + k + 1] & ~0x80000000U, data[t + k + c + 1]);
+			else
+				printf("	  %d,   %d\n", data[t + k + 1], data[t + k + c + 1]);
+		}
+	}
+
+	s = data[11];
+
+	for (uint j = 0; j < data[10]; j++) {
+		printf("\n // constructor %d types: type, name\n", j);
+
+		uint c = data[s + (j * 5) + 1];
+		uint t = data[s + (j * 5) + 2];
+
+		if (data[t] & 0x80000000U)
+			printf("	  %d/*unresolved*/\n", data[t] & ~0x80000000U);
+		else
+			printf("	  %d\n", data[t]);
+
+		for(uint k = 0; k < c; k++) {
+			if (data[t + k + 1] & 0x80000000U)
+				printf("	  %d/*unresolved*/,   %d\n", data[t + k + 1] & ~0x80000000U, data[t + k + c + 1]);
+			else
+				printf("	  %d,   %d\n", data[t + k + 1], data[t + k + c + 1]);
+		}
+	}
+
+	//There is more data inbetween the structures decoded here, for the
+	//parameter types and names, for the method revisions
+
+	printf("\nstring_data:\n");
+
+	for (int j = 0; j < strcount; j++) {
+		printf(" \"%s\"\n", (char*)meta->d.stringdata[j].data());
+	}
+	printf("\n");
+
+	printf("Class name: %s\n", meta->className());
+	for(uint j = 0; j < meta->methodCount(); j++) {
+		printf("Method %d: %s\n", j, (const char *)meta->method(j).methodSignature());
+	}
 
 #endif
 	smokeruby_object  * m = alloc_smokeruby_object(	true,
