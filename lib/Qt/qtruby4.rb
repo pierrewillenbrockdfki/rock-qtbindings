@@ -2582,9 +2582,11 @@ module Qt
           return 6 + const_point
         elsif typename =~ /^quint32&?$/
           return 4 + const_point
-        elsif typename =~ /^(?:short|ushort|unsigned short int|unsigned short|uchar|char|unsigned char|uint|long|ulong|unsigned long int|unsigned|float|double|WId|HBITMAP__\*|HDC__\*|HFONT__\*|HICON__\*|HINSTANCE__\*|HPALETTE__\*|HRGN__\*|HWND__\*|Q_PID|^quint16&?$|^qint16&?$)$/
+        elsif typename =~ /^(?:short|ushort|unsigned short int|unsigned short|uchar|char|unsigned char|uint|long|ulong|unsigned long int|unsigned|long long|float|double|WId|HBITMAP__\*|HDC__\*|HFONT__\*|HICON__\*|HINSTANCE__\*|HPALETTE__\*|HRGN__\*|HWND__\*|Q_PID|^quint16&?$|^qint16&?$)$/
           return 4 + const_point
         elsif typename =~ /^(quint|qint|qulong|qlong|qreal)/
+          return 4 + const_point
+        elsif typename == 'QIntegerForSizeof< void* >::Unsigned'.freeze
           return 4 + const_point
         else
           t = typename.sub(/^const\s+/, '')
