@@ -76,7 +76,7 @@ Init_qtuitools5()
 
     rb_define_singleton_method(qtuitools_internal_module, "getClassList", (VALUE (*) (...)) getClassList, 0);
 
-    rb_require("qtuitools/qtuitools5.rb");
+    rb_require("qtuitools5/qtuitools5.rb");
     rb_funcall(qtuitools_internal_module, rb_intern("init_all_classes"), 0);
 }
 
