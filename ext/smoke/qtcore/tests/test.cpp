@@ -281,7 +281,7 @@ int main(int argc, char ** argv)
 
 int main(int argc, char ** argv)
 {
-  QBitmap foo( QString::fromLatin1("foobar") );
+  QBitmap foo( QStringLiteral("foobar") );
 }
 
 #endif

@@ -105,7 +105,7 @@ namespace {
         // size type
         QString sizeType = properties.contains(QStringLiteral("sizeType"))  ?
                            properties.value(QStringLiteral("sizeType"))->elementEnum() :
-                           QString::fromLatin1("Expanding");
+                           QStringLiteral("Expanding");
 
         sizeType.replace("QSizePolicy", "Qt::SizePolicy");
         if (!sizeType.startsWith(QStringLiteral("Qt::SizePolicy::")))
@@ -920,13 +920,13 @@ void WriteInitialization::acceptLayoutItem(DomLayoutItem *node)
         if (node->hasAttributeColSpan())
             colSpan = node->attributeColSpan();
 
-        addArgs = QString::fromLatin1("%1, %2, %3, %4, %5").arg(itemName).arg(row).arg(col).arg(rowSpan).arg(colSpan);
+        addArgs = QStringLiteral("%1, %2, %3, %4, %5").arg(itemName).arg(row).arg(col).arg(rowSpan).arg(colSpan);
     } else {
         if (layout->attributeClass() == QStringLiteral("QFormLayout")) {
             methodPrefix = QStringLiteral("set");
             const int row = node->attributeRow();
             const QString role = node->attributeColumn() == 0 ? QStringLiteral("Qt::FormLayout::LabelRole") : QStringLiteral("Qt::FormLayout::FieldRole");
-            addArgs = QString::fromLatin1("%1, %2, %3").arg(row).arg(role).arg(itemName);
+            addArgs = QStringLiteral("%1, %2, %3").arg(row).arg(role).arg(itemName);
         } else {
             addArgs = itemName;
         }
@@ -1176,7 +1176,7 @@ void WriteInitialization::writeProperties(const QString &varName,
         }
         case DomProperty::Color: {
             DomColor *c = p->elementColor();
-            propertyValue = QString::fromLatin1("Qt::Color.new(%1, %2, %3)")
+            propertyValue = QStringLiteral("Qt::Color.new(%1, %2, %3)")
                   .arg(c->elementRed())
                   .arg(c->elementGreen())
                   .arg(c->elementBlue()); }
@@ -1192,13 +1192,13 @@ void WriteInitialization::writeProperties(const QString &varName,
             }
             break;
         case DomProperty::Cursor:
-            propertyValue = QString::fromLatin1("Qt::Cursor.new(%1)")
+            propertyValue = QStringLiteral("Qt::Cursor.new(%1)")
                             .arg(p->elementCursor());
             break;
         case DomProperty::CursorShape:
             if (p->hasAttributeStdset() && !p->attributeStdset())
                 varNewName += QStringLiteral(".viewport()");
-            propertyValue = QString::fromLatin1("Qt::Cursor.new(Qt::%1)")
+            propertyValue = QStringLiteral("Qt::Cursor.new(Qt::%1)")
                             .arg(p->elementCursorShape());
             break;
         case DomProperty::Enum:
@@ -1239,39 +1239,39 @@ void WriteInitialization::writeProperties(const QString &varName,
         }
         case DomProperty::Point: {
             DomPoint *po = p->elementPoint();
-            propertyValue = QString::fromLatin1("Qt::Point.new(%1, %2)")
+            propertyValue = QStringLiteral("Qt::Point.new(%1, %2)")
                             .arg(po->elementX()).arg(po->elementY());
             break;
         }
         case DomProperty::PointF: {
             DomPointF *pof = p->elementPointF();
-            propertyValue = QString::fromLatin1("Qt::PointF.new(%1, %2)")
+            propertyValue = QStringLiteral("Qt::PointF.new(%1, %2)")
                             .arg(pof->elementX()).arg(pof->elementY());
             break;
         }
         case DomProperty::Rect: {
             DomRect *r = p->elementRect();
-            propertyValue = QString::fromLatin1("Qt::Rect.new(%1, %2, %3, %4)")
+            propertyValue = QStringLiteral("Qt::Rect.new(%1, %2, %3, %4)")
                             .arg(r->elementX()).arg(r->elementY())
                             .arg(r->elementWidth()).arg(r->elementHeight());
             break;
         }
         case DomProperty::RectF: {
             DomRectF *rf = p->elementRectF();
-            propertyValue = QString::fromLatin1("Qt::RectF.new(%1, %2, %3, %4)")
+            propertyValue = QStringLiteral("Qt::RectF.new(%1, %2, %3, %4)")
                             .arg(rf->elementX()).arg(rf->elementY())
                             .arg(rf->elementWidth()).arg(rf->elementHeight());
             break;
         }
         case DomProperty::Locale: {
              const DomLocale *locale = p->elementLocale();
-             propertyValue = QString::fromLatin1("Qt::Locale.new(Qt::Locale::%1, Qt::Locale::%2)")
+             propertyValue = QStringLiteral("Qt::Locale.new(Qt::Locale::%1, Qt::Locale::%2)")
                              .arg(locale->attributeLanguage()).arg(locale->attributeCountry());
             break;
         }
         case DomProperty::SizePolicy: {
             const QString spName = writeSizePolicy( p->elementSizePolicy());
-            m_output << m_option.indent << spName << QString::fromLatin1(
+            m_output << m_option.indent << spName << QStringLiteral(
                 ".heightForWidth = %1.sizePolicy.hasHeightForWidth\n")
                 .arg(varName);
 
@@ -1280,13 +1280,13 @@ void WriteInitialization::writeProperties(const QString &varName,
         }
         case DomProperty::Size: {
              DomSize *s = p->elementSize();
-              propertyValue = QString::fromLatin1("Qt::Size.new(%1, %2)")
+              propertyValue = QStringLiteral("Qt::Size.new(%1, %2)")
                              .arg(s->elementWidth()).arg(s->elementHeight());
             break;
         }
         case DomProperty::SizeF: {
             DomSizeF *sf = p->elementSizeF();
-             propertyValue = QString::fromLatin1("Qt::SizeF.new(%1, %2)")
+             propertyValue = QStringLiteral("Qt::SizeF.new(%1, %2)")
                             .arg(sf->elementWidth()).arg(sf->elementHeight());
             break;
         }
@@ -1328,13 +1328,13 @@ void WriteInitialization::writeProperties(const QString &varName,
             break;
         case DomProperty::Char: {
             DomChar *c = p->elementChar();
-            propertyValue = QString::fromLatin1("Qt::Char.new(%1)")
+            propertyValue = QStringLiteral("Qt::Char.new(%1)")
                             .arg(c->elementUnicode());
             break;
         }
         case DomProperty::Date: {
             DomDate *d = p->elementDate();
-            propertyValue = QString::fromLatin1("Qt::Date.new(%1, %2, %3)")
+            propertyValue = QStringLiteral("Qt::Date.new(%1, %2, %3)")
                             .arg(d->elementYear())
                             .arg(d->elementMonth())
                             .arg(d->elementDay());
@@ -1342,7 +1342,7 @@ void WriteInitialization::writeProperties(const QString &varName,
         }
         case DomProperty::Time: {
             DomTime *t = p->elementTime();
-            propertyValue = QString::fromLatin1("Qt::Time.new(%1, %2, %3)")
+            propertyValue = QStringLiteral("Qt::Time.new(%1, %2, %3)")
                             .arg(t->elementHour())
                             .arg(t->elementMinute())
                             .arg(t->elementSecond());
@@ -1350,7 +1350,7 @@ void WriteInitialization::writeProperties(const QString &varName,
         }
         case DomProperty::DateTime: {
             DomDateTime *dt = p->elementDateTime();
-            propertyValue = QString::fromLatin1("Qt::DateTime.new(Qt::Date.new(%1, %2, %3), Qt::Time.new(%4, %5, %6))")
+            propertyValue = QStringLiteral("Qt::DateTime.new(Qt::Date.new(%1, %2, %3), Qt::Time.new(%4, %5, %6))")
                             .arg(dt->elementYear())
                             .arg(dt->elementMonth())
                             .arg(dt->elementDay())
@@ -1371,7 +1371,7 @@ void WriteInitialization::writeProperties(const QString &varName,
 
         case DomProperty::Url: {
             DomUrl* u = p->elementUrl();
-            propertyValue = QString::fromLatin1("Qt::Url.new(%1)")
+            propertyValue = QStringLiteral("Qt::Url.new(%1)")
                             .arg(fixString(u->elementString()->text(), m_option.indent));
             break;
         }
@@ -1549,12 +1549,12 @@ QString WriteInitialization::writeIconProperties(const DomResourceIcon *i)
 QString WriteInitialization::domColor2QString(const DomColor *c)
 {
     if (c->hasAttributeAlpha())
-        return QString::fromLatin1("Qt::Color.new(%1, %2, %3, %4)")
+        return QStringLiteral("Qt::Color.new(%1, %2, %3, %4)")
             .arg(c->elementRed())
             .arg(c->elementGreen())
             .arg(c->elementBlue())
             .arg(c->attributeAlpha());
-    return QString::fromLatin1("Qt::Color.new(%1, %2, %3)")
+    return QStringLiteral("Qt::Color.new(%1, %2, %3)")
         .arg(c->elementRed())
         .arg(c->elementGreen())
         .arg(c->elementBlue());

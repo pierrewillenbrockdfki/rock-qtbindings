@@ -1759,7 +1759,7 @@ find_qobject_children(int argc, VALUE *argv, VALUE self)
 	if (argc == 2) {
 		// If the second arg isn't a String, assume it's a regular expression
 		if (TYPE(argv[1]) == T_STRING) {
-			name = QString::fromLatin1(StringValuePtr(argv[1]));
+			name = QString::fromLocal8Bit(StringValuePtr(argv[1]));
 		} else {
 			re = argv[1];
 		}
@@ -1805,7 +1805,7 @@ find_qobject_child(int argc, VALUE *argv, VALUE self)
 
 	QString name;
 	if (argc == 2) {
-		name = QString::fromLatin1(StringValuePtr(argv[1]));
+		name = QString::fromLocal8Bit(StringValuePtr(argv[1]));
 	}
 
 	VALUE metaObject = rb_funcall(argv[0], rb_intern("staticMetaObject"), 0);

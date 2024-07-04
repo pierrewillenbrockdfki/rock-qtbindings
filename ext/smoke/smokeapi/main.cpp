@@ -145,7 +145,7 @@ static void
 showClass(const Smoke::ModuleIndex& classId, int indent)
 {
     if (showClassNamesOnly) {
-        QString className = QString::fromLatin1(classId.smoke->classes[classId.index].className);    
+        QString className = QString::fromLocal8Bit(classId.smoke->classes[classId.index].className);
         if (!matchPattern || targetPattern.indexIn(className) != -1) {
 			while (indent > 0) {
 				qOut << "  ";
