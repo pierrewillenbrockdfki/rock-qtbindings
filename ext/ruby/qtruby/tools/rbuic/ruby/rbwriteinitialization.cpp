@@ -2294,11 +2294,6 @@ QString WriteInitialization::trCall(const QString &str, const QString &commentHi
     result += QLatin1String(", ");
     result += comment;
 
-    if (m_option.translateFunction.isEmpty()) {
-        result += QLatin1String(", ");
-        result += QLatin1String("Qt::Application::UnicodeUTF8");
-    }
-
     result += QLatin1String(")");
     return result;
 }
