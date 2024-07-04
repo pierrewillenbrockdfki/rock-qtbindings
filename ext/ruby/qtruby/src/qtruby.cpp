@@ -1502,7 +1502,7 @@ qt_signal(int argc, VALUE * argv, VALUE self)
 	const QMetaObject * m = (QMetaObject*) ometa->ptr;
 	for (i = m->methodCount() - 1; i > -1; i--) {
 		if (m->method(i).methodType() == QMetaMethod::Signal) {
-			QString name(m->method(i).signature());
+			QString name(m->method(i).methodSignature());
 static QRegExp * rx = 0;
 			if (rx == 0) {
 				rx = new QRegExp("\\(.*");
@@ -1592,7 +1592,7 @@ qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 
 		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, method.typeName(), method.parameterTypes());
 
-		QString name(method.signature());
+		QString name(method.methodSignature());
 		static QRegExp * rx = 0;
 		if (rx == 0) {
 			rx = new QRegExp("\\(.*");
