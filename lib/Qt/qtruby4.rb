@@ -2715,7 +2715,7 @@ module Qt
         classname = @@cpp_names[klass.name]
         if classname.nil?
           # Make sure we haven't backed all the way up to Object
-          if klass != Object and klass != Qt
+          if klass != Object and klass != Qt and klass.superclass != nil
             # Don't recognize this class so try the superclass
             return do_method_missing(package, method, klass.superclass, this, *args)
           else
