@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-module QtWebKit
+module Qt5WebKit
     module Internal
         def self.init_all_classes
             getClassList.each do |c|

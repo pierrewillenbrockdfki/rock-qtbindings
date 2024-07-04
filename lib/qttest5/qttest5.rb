@@ -17,7 +17,7 @@
  ***************************************************************************/
 =end
 
-module QtTest
+module QtTest5
   module Internal
     def self.init_all_classes
       getClassList.each do |c|

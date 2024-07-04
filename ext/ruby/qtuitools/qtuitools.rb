@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-module QtUiTools
+module Qt5UiTools
     module Internal
         def self.init_all_classes
             getClassList.each do |c|

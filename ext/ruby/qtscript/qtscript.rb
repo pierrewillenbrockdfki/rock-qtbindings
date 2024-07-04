@@ -17,12 +17,12 @@
  ***************************************************************************/
 =end
 
-module QtScript
+module Qt5Script
   module Internal
     def self.init_all_classes
 #      Qt::Internal::add_normalize_proc(Proc.new do |classname|
-#        if classname =~ /^QtScript/
-#          now = classname.sub(/^QtScript?(?=[A-Z])/,'QtScript::')
+#        if classname =~ /^Qt5Script/
+#          now = classname.sub(/^Qt5Script?(?=[A-Z])/,'Qt5Script::')
 #        end
 #        now
 #      end)

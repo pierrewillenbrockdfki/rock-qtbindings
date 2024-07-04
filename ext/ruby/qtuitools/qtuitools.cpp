@@ -66,12 +66,12 @@ Init_qtuitools5()
 
     smokeList << qtuitools_Smoke;
 
-    QtRubyModule module = { "QtUiTools", resolve_classname_qtuitools, 0, &binding };
+    QtRubyModule module = { "QtUiTools5", resolve_classname_qtuitools, 0, &binding };
     qtruby_modules[qtuitools_Smoke] = module;
 
     install_handlers(QtUiTools_handlers);
 
-    qtuitools_module = rb_define_module("QtUiTools");
+    qtuitools_module = rb_define_module("QtUiTools5");
     qtuitools_internal_module = rb_define_module_under(qtuitools_module, "Internal");
 
     rb_define_singleton_method(qtuitools_internal_module, "getClassList", (VALUE (*) (...)) getClassList, 0);

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-module QtDeclarative
+module QtDeclarative5
     module Internal
         def self.init_all_classes
             getClassList.each do |c|
