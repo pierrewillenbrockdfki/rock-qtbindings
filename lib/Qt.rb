@@ -1,1 +1,1 @@
-require 'Qt4'
+require 'Qt5'

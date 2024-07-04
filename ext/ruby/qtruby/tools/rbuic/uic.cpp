@@ -326,9 +326,9 @@ bool Uic::rbwrite(DomUI *ui)
     Validator(this).acceptUI(ui);
     if (option().execCode) {
     	if (option().useKDE) {
-			out << "require 'korundum4'" << endl << endl;
+			out << "require 'korundum5'" << endl << endl;
 		} else {
-			out << "require 'Qt4'" << endl << endl;
+			out << "require 'Qt5'" << endl << endl;
 		}
 	}
 
