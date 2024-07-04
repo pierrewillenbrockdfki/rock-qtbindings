@@ -1667,7 +1667,11 @@ getIsa(VALUE /*self*/, VALUE classId)
 	VALUE parents_list = rb_ary_new();
 
 	int id = NUM2INT(rb_funcall(classId, rb_intern("index"), 0));
-	Smoke* smoke = smokeList[NUM2INT(rb_funcall(classId, rb_intern("smoke"), 0))];
+	int smoke_num = NUM2INT(rb_funcall(classId, rb_intern("smoke"), 0));
+	if(smoke_num < 0 || smoke_num > smokeList.size()) {
+		rb_raise(rb_eArgError, "smoke num out of range (class.smoke)");
+	}
+	Smoke* smoke = smokeList[smoke_num];
 
 	Smoke::Index *parents =
 		smoke->inheritanceList +
