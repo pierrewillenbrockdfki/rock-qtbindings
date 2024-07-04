@@ -24,8 +24,8 @@ end
 $: << File.join(File.dirname(__FILE__), "../lib/#{ruby_version}")
 require "#{ruby_version}/qtruby5"
 
-module Qt
-  class RubyThreadFix < Qt::Object
+module Qt5
+  class RubyThreadFix < Qt5::Object
     slots 'ruby_thread_timeout()'
     slots 'callback_timeout()'
     slots 'callback_timeout2()'
@@ -35,13 +35,13 @@ module Qt
       super()
       # Enable threading
       @ruby_thread_sleep_period = 0.01
-      @ruby_thread_timer = Qt::Timer.new(self)
+      @ruby_thread_timer = Qt5::Timer.new(self)
       connect(@ruby_thread_timer, SIGNAL('timeout()'), SLOT('ruby_thread_timeout()'))
       @ruby_thread_timer.start(0)
-      @callback_timer = Qt::Timer.new(self)
+      @callback_timer = Qt5::Timer.new(self)
       connect(@callback_timer, SIGNAL('timeout()'), SLOT('callback_timeout()'))
       @callback_timer.start(1)
-      @callback_timer2 = Qt::Timer.new(self)
+      @callback_timer2 = Qt5::Timer.new(self)
       connect(@callback_timer2, SIGNAL('timeout()'), SLOT('callback_timeout2()'))
       @running = true
     end
@@ -116,4 +116,4 @@ module Qt
     end
   end
 
-end # module Qt
+end # module Qt5

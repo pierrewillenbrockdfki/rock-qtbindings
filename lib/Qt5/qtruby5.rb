@@ -17,7 +17,7 @@
  ***************************************************************************/
 =end
 
-module Qt
+module Qt5
 
   module DebugLevel
     Off, Minimal, High, Extensive = 0, 1, 2, 3
@@ -35,12 +35,12 @@ module Qt
   end
 
   @@debug_level = DebugLevel::Off
-  def Qt.debug_level=(level)
+  def Qt5.debug_level=(level)
     @@debug_level = level
-    Internal::setDebug Qt::QtDebugChannel::QTDB_ALL if level >= DebugLevel::Extensive
+    Internal::setDebug Qt5::QtDebugChannel::QTDB_ALL if level >= DebugLevel::Extensive
   end
 
-  def Qt.debug_level
+  def Qt5.debug_level
     @@debug_level
   end
 
@@ -63,86 +63,86 @@ module Qt
 
   class Base
     def self.signals(*signal_list)
-      meta = Qt::Meta[self.name] || Qt::MetaInfo.new(self)
+      meta = Qt5::Meta[self.name] || Qt5::MetaInfo.new(self)
       meta.add_signals(signal_list, Internal::MethodSignal | Internal::AccessProtected)
       meta.changed = true
     end
 
     def self.slots(*slot_list)
-      meta = Qt::Meta[self.name] || Qt::MetaInfo.new(self)
+      meta = Qt5::Meta[self.name] || Qt5::MetaInfo.new(self)
       meta.add_slots(slot_list, Internal::MethodSlot | Internal::AccessPublic)
       meta.changed = true
     end
 
     def self.private_slots(*slot_list)
-      meta = Qt::Meta[self.name] || Qt::MetaInfo.new(self)
+      meta = Qt5::Meta[self.name] || Qt5::MetaInfo.new(self)
       meta.add_slots(slot_list, Internal::MethodSlot | Internal::AccessPrivate)
       meta.changed = true
     end
 
     def self.q_signal(signal)
-      meta = Qt::Meta[self.name] || Qt::MetaInfo.new(self)
+      meta = Qt5::Meta[self.name] || Qt5::MetaInfo.new(self)
       meta.add_signals([signal], Internal::MethodSignal | Internal::AccessProtected)
       meta.changed = true
     end
 
     def self.q_slot(slot)
-      meta = Qt::Meta[self.name] || Qt::MetaInfo.new(self)
+      meta = Qt5::Meta[self.name] || Qt5::MetaInfo.new(self)
       meta.add_slots([slot], Internal::MethodSlot | Internal::AccessPublic)
       meta.changed = true
     end
 
     def self.q_classinfo(key, value)
-      meta = Qt::Meta[self.name] || Qt::MetaInfo.new(self)
+      meta = Qt5::Meta[self.name] || Qt5::MetaInfo.new(self)
       meta.add_classinfo(key, value)
       meta.changed = true
     end
 
     def **(a)
-      return Qt::**(self, a)
+      return Qt5::**(self, a)
     end
     def +(a)
-      return Qt::+(self, a)
+      return Qt5::+(self, a)
     end
     def ~(a)
-      return Qt::~(self, a)
+      return Qt5::~(self, a)
     end
     def -@()
-      return Qt::-(self)
+      return Qt5::-(self)
     end
     def -(a)
-      return Qt::-(self, a)
+      return Qt5::-(self, a)
     end
     def *(a)
-      return Qt::*(self, a)
+      return Qt5::*(self, a)
     end
     def /(a)
-      return Qt::/(self, a) #/
+      return Qt5::/(self, a) #/
     end
     def %(a)
-      return Qt::%(self, a)
+      return Qt5::%(self, a)
     end
     def >>(a)
-      return Qt::>>(self, a)
+      return Qt5::>>(self, a)
     end
     def <<(a)
-      return Qt::<<(self, a)
+      return Qt5::<<(self, a)
     end
     def &(a)
-      return Qt::&(self, a)
+      return Qt5::&(self, a)
     end
     def ^(a)
-      return Qt::^(self, a)
+      return Qt5::^(self, a)
     end
     def |(a)
-      return Qt::|(self, a)
+      return Qt5::|(self, a)
     end
 
 #    Module has '<', '<=', '>' and '>=' operator instance methods, so pretend they
 #    don't exist by calling method_missing() explicitly
     def <(a)
       begin
-        Qt::method_missing(:<, self, a)
+        Qt5::method_missing(:<, self, a)
       rescue
         super(a)
       end
@@ -150,7 +150,7 @@ module Qt
 
     def <=(a)
       begin
-        Qt::method_missing(:<=, self, a)
+        Qt5::method_missing(:<=, self, a)
       rescue
         super(a)
       end
@@ -158,7 +158,7 @@ module Qt
 
     def >(a)
       begin
-        Qt::method_missing(:>, self, a)
+        Qt5::method_missing(:>, self, a)
       rescue
         super(a)
       end
@@ -166,7 +166,7 @@ module Qt
 
     def >=(a)
       begin
-        Qt::method_missing(:>=, self, a)
+        Qt5::method_missing(:>=, self, a)
       rescue
         super(a)
       end
@@ -177,7 +177,7 @@ module Qt
     def ==(a)
       return false if a.nil?
       begin
-        Qt::method_missing(:==, self, a)
+        Qt5::method_missing(:==, self, a)
       rescue
         super(a)
       end
@@ -187,7 +187,7 @@ module Qt
       klass = self
       classid = nil
       loop do
-        classid = Qt::Internal::find_pclassid(klass.name)
+        classid = Qt5::Internal::find_pclassid(klass.name)
         break if classid.index
 
         klass = klass.superclass
@@ -197,11 +197,11 @@ module Qt
       end
 
       klasses = super
-      klasses.delete(Qt::Base)
+      klasses.delete(Qt5::Base)
       klasses.delete(self)
       ids = []
-      Qt::Internal::getAllParents(classid, ids)
-      return [self] + ids.map {|id| Qt::Internal.find_class(Qt::Internal.classid2name(id))} + klasses
+      Qt5::Internal::getAllParents(classid, ids)
+      return [self] + ids.map {|id| Qt5::Internal.find_class(Qt5::Internal.classid2name(id))} + klasses
     end
 
     # Change the behaviors of is_a? and kind_of? (alias of is_a?) to use above self.ancestors method
@@ -236,16 +236,16 @@ module Qt
     private
     def qt_methods(meths, flags)
       ids = []
-      # These methods are all defined in Qt::Base, even if they aren't supported by a particular
+      # These methods are all defined in Qt5::Base, even if they aren't supported by a particular
       # subclass, so remove them to avoid confusion
       meths -= ["%", "&", "*", "**", "+", "-", "-@", "/", "<", "<<", "<=", ">", ">=", ">>", "|", "~", "^"]
-      classid = Qt::Internal::idInstance(self)
-      Qt::Internal::getAllParents(classid, ids)
+      classid = Qt5::Internal::idInstance(self)
+      Qt5::Internal::getAllParents(classid, ids)
       ids << classid
-      ids.each { |c| Qt::Internal::findAllMethodNames(meths, c, flags) }
+      ids.each { |c| Qt5::Internal::findAllMethodNames(meths, c, flags) }
       return meths.uniq.map! {|a| a.intern}
     end
-  end # Qt::Base
+  end # Qt5::Base
 
   # Provides a mutable numeric class for passing to methods with
   # C++ 'int*' or 'int&' arg types
@@ -408,7 +408,7 @@ module Qt
     end
   end
 
-  class AbstractSlider < Qt::Base
+  class AbstractSlider < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -418,34 +418,34 @@ module Qt
     end
   end
 
-  class AbstractSocket < Qt::Base
+  class AbstractSocket < Qt5::Base
     def abort(*args)
       method_missing(:abort, *args)
     end
   end
 
-  class AbstractTextDocumentLayout < Qt::Base
+  class AbstractTextDocumentLayout < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class AccessibleEvent < Qt::Base
+  class AccessibleEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class ActionEvent < Qt::Base
+  class ActionEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Action < Qt::Base
+  class Action < Qt5::Base
     def setShortcut(arg)
       if arg.kind_of?(String)
-        return super(Qt::KeySequence.new(arg))
+        return super(Qt5::KeySequence.new(arg))
       else
         return super(arg)
       end
@@ -456,7 +456,7 @@ module Qt
     end
   end
 
-  class Application < Qt::Base
+  class Application < Qt5::Base
     attr_reader :thread_fix
 
     def initialize(*args)
@@ -476,12 +476,12 @@ module Qt
 
     # Delete the underlying C++ instance after exec returns
     # Otherwise, rb_gc_call_finalizer_at_exit() can delete
-    # stuff that Qt::Application still needs for its cleanup.
+    # stuff that Qt5::Application still needs for its cleanup.
     def exec
       result = method_missing(:exec)
       disable_threading()
       self.dispose
-      Qt::Internal.application_terminated = true
+      Qt5::Internal.application_terminated = true
       result
     end
 
@@ -490,7 +490,7 @@ module Qt
     end
 
     def self.translate(*args)
-      if args[3] and args[3].value == Qt::Application::UnicodeUTF8.value
+      if args[3] and args[3].value == Qt5::Application::UnicodeUTF8.value
         return method_missing(:translate,*args).force_encoding('utf-8')
       else
         return method_missing(:translate,*args)
@@ -498,19 +498,19 @@ module Qt
     end
   end
 
-  class Buffer < Qt::Base
+  class Buffer < Qt5::Base
     def open(*args)
       method_missing(:open, *args)
     end
   end
 
-  class ButtonGroup < Qt::Base
+  class ButtonGroup < Qt5::Base
     def id(*args)
       method_missing(:id, *args)
     end
   end
 
-  class ByteArray < Qt::Base
+  class ByteArray < Qt5::Base
     def initialize(*args)
       if args.size == 1 && args[0].kind_of?(String)
         super(args[0], args[0].size)
@@ -540,10 +540,10 @@ module Qt
     end
   end
 
-  class CheckBox < Qt::Base
+  class CheckBox < Qt5::Base
     def setShortcut(arg)
       if arg.kind_of?(String)
-        return super(Qt::KeySequence.new(arg))
+        return super(Qt5::KeySequence.new(arg))
       else
         return super(arg)
       end
@@ -554,19 +554,19 @@ module Qt
     end
   end
 
-  class ChildEvent < Qt::Base
+  class ChildEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class CloseEvent < Qt::Base
+  class CloseEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Color < Qt::Base
+  class Color < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " %s>" % name)
@@ -582,7 +582,7 @@ module Qt
     end
   end
 
-  class Connection < Qt::Base
+  class Connection < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " memberName=%s, memberType=%s, object=%s>" %
@@ -596,13 +596,13 @@ module Qt
     end
   end
 
-  class ContextMenuEvent < Qt::Base
+  class ContextMenuEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class CoreApplication < Qt::Base
+  class CoreApplication < Qt5::Base
     attr_reader :thread_fix
 
     def initialize(*args)
@@ -622,12 +622,12 @@ module Qt
 
     # Delete the underlying C++ instance after exec returns
     # Otherwise, rb_gc_call_finalizer_at_exit() can delete
-    # stuff that Qt::Application still needs for its cleanup.
+    # stuff that Qt5::Application still needs for its cleanup.
     def exec
       method_missing(:exec)
       disable_threading()
       self.dispose
-      Qt::Internal.application_terminated = true
+      Qt5::Internal.application_terminated = true
     end
 
     def type(*args)
@@ -639,7 +639,7 @@ module Qt
     end
 
     def self.translate(*args)
-      if args[3] and args[3].value == Qt::Application::UnicodeUTF8.value
+      if args[3] and args[3].value == Qt5::Application::UnicodeUTF8.value
         return method_missing(:translate,*args).force_encoding('utf-8')
       else
         return method_missing(:translate,*args)
@@ -647,7 +647,7 @@ module Qt
     end
   end
 
-  class Cursor < Qt::Base
+  class Cursor < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " shape=%d>" % shape)
@@ -659,13 +659,13 @@ module Qt
     end
   end
 
-  class CustomEvent < Qt::Base
+  class CustomEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Date < Qt::Base
+  class Date < Qt5::Base
     def initialize(*args)
       if args.size == 1 && args[0].class.name == "Date"
         return super(args[0].year, args[0].month, args[0].day)
@@ -689,15 +689,15 @@ module Qt
     end
   end
 
-  class DateTime < Qt::Base
+  class DateTime < Qt5::Base
     def initialize(*args)
       if args.size == 1 && args[0].class.name == "DateTime"
-        return super(  Qt::Date.new(args[0].year, args[0].month, args[0].day),
-                Qt::Time.new(args[0].hour, args[0].min, args[0].sec) )
+        return super(  Qt5::Date.new(args[0].year, args[0].month, args[0].day),
+                Qt5::Time.new(args[0].hour, args[0].min, args[0].sec) )
       elsif args.size == 1 && args[0].class.name == "Time"
-        result = super(  Qt::Date.new(args[0].year, args[0].month, args[0].day),
-                Qt::Time.new(args[0].hour, args[0].min, args[0].sec, args[0].usec / 1000) )
-        result.timeSpec = (args[0].utc? ? Qt::UTC : Qt::LocalTime)
+        result = super(  Qt5::Date.new(args[0].year, args[0].month, args[0].day),
+                Qt5::Time.new(args[0].hour, args[0].min, args[0].sec, args[0].usec / 1000) )
+        result.timeSpec = (args[0].utc? ? Qt5::UTC : Qt5::LocalTime)
         return result
       else
         return super(*args)
@@ -705,7 +705,7 @@ module Qt
     end
 
     def to_time
-      if timeSpec == Qt::UTC
+      if timeSpec == Qt5::UTC
         return ::Time.utc(  date.year, date.month, date.day,
                   time.hour, time.minute, time.second, time.msec * 1000 )
       else
@@ -725,7 +725,7 @@ module Qt
     end
   end
 
-  class DBusArgument < Qt::Base
+  class DBusArgument < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " currentSignature='%s', atEnd=%s>" % [currentSignature, atEnd])
@@ -737,15 +737,15 @@ module Qt
     end
   end
 
-  class DBusConnection < Qt::Base
+  class DBusConnection < Qt5::Base
     def send(*args)
       method_missing(:send, *args)
     end
   end
 
-  class DBusConnectionInterface < Qt::Base
+  class DBusConnectionInterface < Qt5::Base
     def serviceOwner(name)
-        return Qt::DBusReply.new(internalConstCall(Qt::DBus::AutoDetect, "GetNameOwner", [Qt::Variant.new(name)]))
+        return Qt5::DBusReply.new(internalConstCall(Qt5::DBus::AutoDetect, "GetNameOwner", [Qt5::Variant.new(name)]))
     end
 
     def service_owner(name)
@@ -753,7 +753,7 @@ module Qt
     end
 
     def registeredServiceNames
-      return Qt::DBusReply.new(internalConstCall(Qt::DBus::AutoDetect, "ListNames"))
+      return Qt5::DBusReply.new(internalConstCall(Qt5::DBus::AutoDetect, "ListNames"))
     end
 
     def registered_service_names
@@ -761,7 +761,7 @@ module Qt
     end
 
     def isServiceRegistered(serviceName)
-        return Qt::DBusReply.new(internalConstCall(Qt::DBus::AutoDetect, "NameHasOwner", [Qt::Variant.new(serviceName)]))
+        return Qt5::DBusReply.new(internalConstCall(Qt5::DBus::AutoDetect, "NameHasOwner", [Qt5::Variant.new(serviceName)]))
     end
 
     def is_service_registered(serviceName)
@@ -777,7 +777,7 @@ module Qt
     end
 
     def servicePid(serviceName)
-        return Qt::DBusReply.new(internalConstCall(Qt::DBus::AutoDetect, "GetConnectionUnixProcessID", [Qt::Variant.new(serviceName)]))
+        return Qt5::DBusReply.new(internalConstCall(Qt5::DBus::AutoDetect, "GetConnectionUnixProcessID", [Qt5::Variant.new(serviceName)]))
     end
 
     def service_pid(serviceName)
@@ -785,7 +785,7 @@ module Qt
     end
 
     def serviceUid(serviceName)
-        return Qt::DBusReply.new(internalConstCall(Qt::DBus::AutoDetect, "GetConnectionUnixUser", [Qt::Variant.new(serviceName)]))
+        return Qt5::DBusReply.new(internalConstCall(Qt5::DBus::AutoDetect, "GetConnectionUnixUser", [Qt5::Variant.new(serviceName)]))
     end
 
     def service_uid(serviceName)
@@ -793,7 +793,7 @@ module Qt
     end
 
     def startService(name)
-        return call("StartServiceByName", Qt::Variant.new(name), Qt::Variant.new(0)).value
+        return call("StartServiceByName", Qt5::Variant.new(name), Qt5::Variant.new(0)).value
     end
 
     def start_service(name)
@@ -801,23 +801,23 @@ module Qt
     end
   end
 
-  class DBusError < Qt::Base
+  class DBusError < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class DBusInterface < Qt::Base
+  class DBusInterface < Qt5::Base
     def call(method_name, *args)
       if args.length == 0
         return super(method_name)
-      elsif method_name.is_a? Qt::Enum
+      elsif method_name.is_a? Qt5::Enum
         opt = args.shift
         qdbusArgs = args.collect {|arg| qVariantFromValue(arg)}
         return super(method_name, opt, *qdbusArgs)
       else
-        # If the method is Qt::DBusInterface.call(), create an Array
-        # 'dbusArgs' of Qt::Variants from '*args'
+        # If the method is Qt5::DBusInterface.call(), create an Array
+        # 'dbusArgs' of Qt5::Variants from '*args'
         qdbusArgs = args.collect {|arg| qVariantFromValue(arg)}
         return super(method_name, *qdbusArgs)
       end
@@ -838,13 +838,13 @@ module Qt
     end
   end
 
-  class DBusMessage < Qt::Base
+  class DBusMessage < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
 
     def value
-      if type() == Qt::DBusMessage::ReplyMessage
+      if type() == Qt5::DBusMessage::ReplyMessage
         reply = arguments()
         if reply.length == 0
           return nil
@@ -859,7 +859,7 @@ module Qt
     end
 
     def <<(a)
-      if a.kind_of?(Qt::Variant)
+      if a.kind_of?(Qt5::Variant)
         return super(a)
       else
         return super(qVariantFromValue(a))
@@ -869,10 +869,10 @@ module Qt
 
   class DBusReply
     def initialize(reply)
-      @error = Qt::DBusError.new(reply)
+      @error = Qt5::DBusError.new(reply)
 
       if @error.valid?
-        @data = Qt::Variant.new
+        @data = Qt5::Variant.new
         return
       end
 
@@ -882,9 +882,9 @@ module Qt
       end
 
       # error
-      @error = Qt::DBusError.new(  Qt::DBusError::InvalidSignature,
+      @error = Qt5::DBusError.new(  Qt5::DBusError::InvalidSignature,
                     "Unexpected reply signature" )
-      @data = Qt::Variant.new      # clear it
+      @data = Qt5::Variant.new      # clear it
     end
 
     def isValid
@@ -904,7 +904,7 @@ module Qt
     end
   end
 
-  class Dial < Qt::Base
+  class Dial < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -914,23 +914,23 @@ module Qt
     end
   end
 
-  class Dialog < Qt::Base
+  class Dialog < Qt5::Base
     def exec(*args)
       method_missing(:exec, *args)
     end
   end
 
-  class Dir < Qt::Base
-    Time = Qt::Enum.new(1, "QDir::SortFlag")
+  class Dir < Qt5::Base
+    Time = Qt5::Enum.new(1, "QDir::SortFlag")
   end
 
-  class DomAttr < Qt::Base
+  class DomAttr < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
   end
 
-  class DoubleSpinBox < Qt::Base
+  class DoubleSpinBox < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -940,7 +940,7 @@ module Qt
     end
   end
 
-  class DoubleValidator < Qt::Base
+  class DoubleValidator < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -950,7 +950,7 @@ module Qt
     end
   end
 
-  class DomDocumentType < Qt::Base
+  class DomDocumentType < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
@@ -960,19 +960,19 @@ module Qt
     end
   end
 
-  class DragEnterEvent < Qt::Base
+  class DragEnterEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class DragLeaveEvent < Qt::Base
+  class DragLeaveEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class DropEvent < Qt::Base
+  class DropEvent < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
@@ -981,13 +981,13 @@ module Qt
     end
   end
 
-  class Event < Qt::Base
+  class Event < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class EventLoop < Qt::Base
+  class EventLoop < Qt5::Base
     def exec(*args)
       method_missing(:exec, *args)
     end
@@ -997,33 +997,33 @@ module Qt
     end
   end
 
-  class File < Qt::Base
+  class File < Qt5::Base
     def open(*args)
       method_missing(:open, *args)
     end
   end
 
-  class FileOpenEvent < Qt::Base
+  class FileOpenEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class FileIconProvider < Qt::Base
-    File = Qt::Enum.new(6, "QFileIconProvider::IconType")
+  class FileIconProvider < Qt5::Base
+    File = Qt5::Enum.new(6, "QFileIconProvider::IconType")
 
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class FocusEvent < Qt::Base
+  class FocusEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Font < Qt::Base
+  class Font < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " family=%s, pointSize=%d, weight=%d, italic=%s, bold=%s, underline=%s, strikeOut=%s>" %
@@ -1037,59 +1037,59 @@ module Qt
     end
   end
 
-  class FontDatabase < Qt::Base
-    Symbol = Qt::Enum.new(30, "QFontDatabase::WritingSystem")
+  class FontDatabase < Qt5::Base
+    Symbol = Qt5::Enum.new(30, "QFontDatabase::WritingSystem")
   end
 
-  class Ftp < Qt::Base
+  class Ftp < Qt5::Base
     def abort(*args)
       method_missing(:abort, *args)
     end
   end
 
-  class GLContext < Qt::Base
+  class GLContext < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class GLPixelBuffer < Qt::Base
+  class GLPixelBuffer < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class GLWidget < Qt::Base
+  class GLWidget < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class GenericArgument < Qt::Base
+  class GenericArgument < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
   end
 
-  class Gradient < Qt::Base
+  class Gradient < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsEllipseItem < Qt::Base
+  class GraphicsEllipseItem < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsItem < Qt::Base
+  class GraphicsItem < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsItemGroup < Qt::Base
+  class GraphicsItemGroup < Qt5::Base
     Type = 10
 
     def type(*args)
@@ -1097,136 +1097,136 @@ module Qt
     end
   end
 
-  class GraphicsLineItem < Qt::Base
+  class GraphicsLineItem < Qt5::Base
     Type = 6
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsPathItem < Qt::Base
+  class GraphicsPathItem < Qt5::Base
     Type = 2
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsPixmapItem < Qt::Base
+  class GraphicsPixmapItem < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsPolygonItem < Qt::Base
+  class GraphicsPolygonItem < Qt5::Base
     Type = 5
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsProxyWidget < Qt::Base
+  class GraphicsProxyWidget < Qt5::Base
     Type = 12
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsRectItem < Qt::Base
+  class GraphicsRectItem < Qt5::Base
     Type = 3
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsSceneDragDropEvent < Qt::Base
+  class GraphicsSceneDragDropEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsSceneMouseEvent < Qt::Base
+  class GraphicsSceneMouseEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsSceneContextMenuEvent < Qt::Base
+  class GraphicsSceneContextMenuEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsSceneHoverEvent < Qt::Base
+  class GraphicsSceneHoverEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsSceneHelpEvent < Qt::Base
+  class GraphicsSceneHelpEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsSceneWheelEvent < Qt::Base
+  class GraphicsSceneWheelEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsSimpleTextItem < Qt::Base
+  class GraphicsSimpleTextItem < Qt5::Base
     Type = 9
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsSvgItem < Qt::Base
+  class GraphicsSvgItem < Qt5::Base
     Type = 13
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsTextItem < Qt::Base
+  class GraphicsTextItem < Qt5::Base
     Type = 8
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class GraphicsWidget < Qt::Base
+  class GraphicsWidget < Qt5::Base
     Type = 11
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class HelpEvent < Qt::Base
+  class HelpEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class HideEvent < Qt::Base
+  class HideEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class HoverEvent < Qt::Base
+  class HoverEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Http < Qt::Base
+  class Http < Qt5::Base
     def abort(*args)
       method_missing(:abort, *args)
     end
   end
 
-  class HttpRequestHeader < Qt::Base
+  class HttpRequestHeader < Qt5::Base
     def method(*args)
       if args.length == 1
         super(*args)
@@ -1236,31 +1236,31 @@ module Qt
     end
   end
 
-  class IconDragEvent < Qt::Base
+  class IconDragEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class InputEvent < Qt::Base
+  class InputEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class InputMethodEvent < Qt::Base
+  class InputMethodEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class IODevice < Qt::Base
+  class IODevice < Qt5::Base
     def open(*args)
       method_missing(:open, *args)
     end
   end
 
-  class Image < Qt::Base
+  class Image < Qt5::Base
     def fromImage(image)
       send("operator=".to_sym, image)
     end
@@ -1274,7 +1274,7 @@ module Qt
     end
   end
 
-  class ImageIOHandler < Qt::Base
+  class ImageIOHandler < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
@@ -1284,19 +1284,19 @@ module Qt
     end
   end
 
-  class ImageReader < Qt::Base
+  class ImageReader < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class ImageWriter < Qt::Base
+  class ImageWriter < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class IntValidator < Qt::Base
+  class IntValidator < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -1306,7 +1306,7 @@ module Qt
     end
   end
 
-  class ItemSelection < Qt::Base
+  class ItemSelection < Qt5::Base
     include Enumerable
 
     def each
@@ -1325,21 +1325,21 @@ module Qt
     end
   end
 
-  class ItemSelectionModel < Qt::Base
+  class ItemSelectionModel < Qt5::Base
     def select(*args)
       method_missing(:select, *args)
     end
   end
 
-  class KeyEvent < Qt::Base
+  class KeyEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class KeySequence < Qt::Base
+  class KeySequence < Qt5::Base
     def initialize(*args)
-      if args.length == 1 && args[0].kind_of?(Qt::Enum) && args[0].type == "Qt::Key"
+      if args.length == 1 && args[0].kind_of?(Qt5::Enum) && args[0].type == "Qt5::Key"
         return super(args[0].to_i)
       end
       return super(*args)
@@ -1356,21 +1356,21 @@ module Qt
     end
   end
 
-  class LCDNumber < Qt::Base
+  class LCDNumber < Qt5::Base
     def display(item)
       method_missing(:display, item)
     end
   end
 
-  class Library < Qt::Base
+  class Library < Qt5::Base
     def load(*args)
       method_missing(:load, *args)
     end
   end
 
-  class ListWidgetItem < Qt::Base
+  class ListWidgetItem < Qt5::Base
     def clone(*args)
-      Qt::ListWidgetItem.new(self)
+      Qt5::ListWidgetItem.new(self)
     end
 
     def type(*args)
@@ -1388,7 +1388,7 @@ module Qt
     end
   end
 
-  class Locale < Qt::Base
+  class Locale < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
@@ -1398,19 +1398,19 @@ module Qt
     end
   end
 
-  class Menu < Qt::Base
+  class Menu < Qt5::Base
     def exec(*args)
       method_missing(:exec, *args)
     end
   end
 
-  class MetaClassInfo < Qt::Base
+  class MetaClassInfo < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
   end
 
-  class MetaEnum < Qt::Base
+  class MetaEnum < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
@@ -1438,14 +1438,14 @@ module Qt
     end
   end
 
-  class MetaMethod < Qt::Base
+  class MetaMethod < Qt5::Base
     # Oops, name clash with the Signal module so hard code
     # this value rather than get it from the Smoke runtime
-    Method = Qt::Enum.new(0, "QMetaMethod::MethodType")
-    Signal = Qt::Enum.new(1, "QMetaMethod::MethodType")
+    Method = Qt5::Enum.new(0, "QMetaMethod::MethodType")
+    Signal = Qt5::Enum.new(1, "QMetaMethod::MethodType")
   end
 
-  class MetaObject < Qt::Base
+  class MetaObject < Qt5::Base
     def method(*args)
       if args.length == 1 && args[0].kind_of?(Symbol)
         super(*args)
@@ -1475,14 +1475,14 @@ module Qt
       res = []
       if inherits
         for m in 0...methodCount()
-          if method(m).methodType == Qt::MetaMethod::Slot
+          if method(m).methodType == Qt5::MetaMethod::Slot
             res.push "%s %s" % [method(m).typeName == "" ? "void" : method(m).typeName,
                       method(m).signature]
           end
         end
       else
         for m in methodOffset()...methodCount()
-          if method(m).methodType == Qt::MetaMethod::Slot
+          if method(m).methodType == Qt5::MetaMethod::Slot
             res.push "%s %s" % [method(m).typeName == "" ? "void" : method(m).typeName,
                       method(m).signature]
           end
@@ -1495,14 +1495,14 @@ module Qt
       res = []
       if inherits
         for m in 0...methodCount()
-          if method(m).methodType == Qt::MetaMethod::Signal
+          if method(m).methodType == Qt5::MetaMethod::Signal
             res.push "%s %s" % [method(m).typeName == "" ? "void" : method(m).typeName,
                       method(m).signature]
           end
         end
       else
         for m in methodOffset()...methodCount()
-          if method(m).methodType == Qt::MetaMethod::Signal
+          if method(m).methodType == Qt5::MetaMethod::Signal
             res.push "%s %s" % [method(m).typeName == "" ? "void" : method(m).typeName,
                       method(m).signature]
           end
@@ -1559,7 +1559,7 @@ module Qt
     end
   end
 
-  class MetaProperty < Qt::Base
+  class MetaProperty < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
@@ -1569,8 +1569,8 @@ module Qt
     end
   end
 
-  class MetaType < Qt::Base
-    Float = Qt::Enum.new(135, "QMetaType::Type")
+  class MetaType < Qt5::Base
+    Float = Qt5::Enum.new(135, "QMetaType::Type")
 
     def load(*args)
       method_missing(:load, *args)
@@ -1581,70 +1581,70 @@ module Qt
     end
   end
 
-  class MouseEvent < Qt::Base
+  class MouseEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class MoveEvent < Qt::Base
+  class MoveEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Movie < Qt::Base
+  class Movie < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class NetworkProxy < Qt::Base
+  class NetworkProxy < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Object < Qt::Base
+  class Object < Qt5::Base
   end
 
-  class PageSetupDialog < Qt::Base
+  class PageSetupDialog < Qt5::Base
     def exec(*args)
       method_missing(:exec, *args)
     end
   end
 
-  class PaintEvent < Qt::Base
+  class PaintEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Picture < Qt::Base
+  class Picture < Qt5::Base
     def load(*args)
       method_missing(:load, *args)
     end
   end
 
-  class PictureIO < Qt::Base
+  class PictureIO < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class Pixmap < Qt::Base
+  class Pixmap < Qt5::Base
     def load(*args)
       method_missing(:load, *args)
     end
   end
 
-  class PluginLoader < Qt::Base
+  class PluginLoader < Qt5::Base
     def load(*args)
       method_missing(:load, *args)
     end
   end
 
-  class Point < Qt::Base
+  class Point < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " x=%d, y=%d>" % [self.x, self.y])
@@ -1656,7 +1656,7 @@ module Qt
     end
   end
 
-  class PointF < Qt::Base
+  class PointF < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " x=%f, y=%f>" % [self.x, self.y])
@@ -1668,7 +1668,7 @@ module Qt
     end
   end
 
-  class Polygon < Qt::Base
+  class Polygon < Qt5::Base
     include Enumerable
 
     def each
@@ -1679,7 +1679,7 @@ module Qt
     end
   end
 
-  class PolygonF < Qt::Base
+  class PolygonF < Qt5::Base
     include Enumerable
 
     def each
@@ -1690,17 +1690,17 @@ module Qt
     end
   end
 
-  class PrintDialog < Qt::Base
+  class PrintDialog < Qt5::Base
     def exec(*args)
       method_missing(:exec, *args)
     end
   end
 
-  class Process < Qt::Base
-    StandardError = Qt::Enum.new(1, "QProcess::ProcessChannel")
+  class Process < Qt5::Base
+    StandardError = Qt5::Enum.new(1, "QProcess::ProcessChannel")
   end
 
-  class ProgressBar < Qt::Base
+  class ProgressBar < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -1710,7 +1710,7 @@ module Qt
     end
   end
 
-  class ProgressDialog < Qt::Base
+  class ProgressDialog < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -1720,16 +1720,16 @@ module Qt
     end
   end
 
-  class Printer < Qt::Base
+  class Printer < Qt5::Base
     def abort(*args)
       method_missing(:abort, *args)
     end
   end
 
-  class PushButton < Qt::Base
+  class PushButton < Qt5::Base
     def setShortcut(arg)
       if arg.kind_of?(String)
-        return super(Qt::KeySequence.new(arg))
+        return super(Qt5::KeySequence.new(arg))
       else
         return super(arg)
       end
@@ -1740,7 +1740,7 @@ module Qt
     end
   end
 
-  class Line < Qt::Base
+  class Line < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " x1=%d, y1=%d, x2=%d, y2=%d>" % [x1, y1, x2, y2])
@@ -1752,7 +1752,7 @@ module Qt
     end
   end
 
-  class LineF < Qt::Base
+  class LineF < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " x1=%f, y1=%f, x2=%f, y2=%f>" % [x1, y1, x2, y2])
@@ -1764,13 +1764,13 @@ module Qt
     end
   end
 
-  class MetaType < Qt::Base
+  class MetaType < Qt5::Base
     def self.type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class ModelIndex < Qt::Base
+  class ModelIndex < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " valid?=%s, row=%s, column=%s>" % [valid?, row, column])
@@ -1782,10 +1782,10 @@ module Qt
     end
   end
 
-  class RadioButton < Qt::Base
+  class RadioButton < Qt5::Base
     def setShortcut(arg)
       if arg.kind_of?(String)
-        return super(Qt::KeySequence.new(arg))
+        return super(Qt5::KeySequence.new(arg))
       else
         return super(arg)
       end
@@ -1796,7 +1796,7 @@ module Qt
     end
   end
 
-  class Rect < Qt::Base
+  class Rect < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " x=%d, y=%d, width=%d, height=%d>" % [self.x, self.y, width, height])
@@ -1808,7 +1808,7 @@ module Qt
     end
   end
 
-  class RectF < Qt::Base
+  class RectF < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " x=%f, y=%f, width=%f, height=%f>" % [self.x, self.y, width, height])
@@ -1820,13 +1820,13 @@ module Qt
     end
   end
 
-  class ResizeEvent < Qt::Base
+  class ResizeEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class ScrollBar < Qt::Base
+  class ScrollBar < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -1836,25 +1836,25 @@ module Qt
     end
   end
 
-  class Shortcut < Qt::Base
+  class Shortcut < Qt5::Base
     def id(*args)
       method_missing(:id, *args)
     end
   end
 
-  class ShortcutEvent < Qt::Base
+  class ShortcutEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class ShowEvent < Qt::Base
+  class ShowEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Size < Qt::Base
+  class Size < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " width=%d, height=%d>" % [width, height])
@@ -1866,7 +1866,7 @@ module Qt
     end
   end
 
-  class SizeF < Qt::Base
+  class SizeF < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " width=%f, height=%f>" % [width, height])
@@ -1878,7 +1878,7 @@ module Qt
     end
   end
 
-  class SizePolicy < Qt::Base
+  class SizePolicy < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " horizontalPolicy=%d, verticalPolicy=%d>" % [horizontalPolicy, verticalPolicy])
@@ -1890,7 +1890,7 @@ module Qt
     end
   end
 
-  class Slider < Qt::Base
+  class Slider < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -1900,15 +1900,15 @@ module Qt
     end
   end
 
-  class SocketNotifier < Qt::Base
-    Exception = Qt::Enum.new(2, "QSocketNotifier::Type")
+  class SocketNotifier < Qt5::Base
+    Exception = Qt5::Enum.new(2, "QSocketNotifier::Type")
 
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class SpinBox < Qt::Base
+  class SpinBox < Qt5::Base
     def range=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -1918,7 +1918,7 @@ module Qt
     end
   end
 
-  class SqlDatabase < Qt::Base
+  class SqlDatabase < Qt5::Base
     def exec(*args)
       method_missing(:exec, *args)
     end
@@ -1928,13 +1928,13 @@ module Qt
     end
   end
 
-  class SqlError < Qt::Base
+  class SqlError < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class SqlField < Qt::Base
+  class SqlField < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
@@ -1944,31 +1944,31 @@ module Qt
     end
   end
 
-  class SqlIndex < Qt::Base
+  class SqlIndex < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
   end
 
-  class SqlQuery < Qt::Base
+  class SqlQuery < Qt5::Base
     def exec(*args)
       method_missing(:exec, *args)
     end
   end
 
-  class SqlResult < Qt::Base
+  class SqlResult < Qt5::Base
     def exec(*args)
       method_missing(:exec, *args)
     end
   end
 
-  class SqlTableModel < Qt::Base
+  class SqlTableModel < Qt5::Base
     def select(*k)
       method_missing(:select, *k)
     end
   end
 
-  class StandardItem < Qt::Base
+  class StandardItem < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " text='%s'>" % [text])
@@ -1984,43 +1984,43 @@ module Qt
     end
 
     def clone
-      Qt::StandardItem.new(self)
+      Qt5::StandardItem.new(self)
     end
   end
 
-  class StandardItemModel < Qt::Base
+  class StandardItemModel < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class StatusTipEvent < Qt::Base
+  class StatusTipEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class StyleHintReturn < Qt::Base
+  class StyleHintReturn < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class StyleOption < Qt::Base
+  class StyleOption < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class SyntaxHighlighter < Qt::Base
+  class SyntaxHighlighter < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class TableWidgetItem < Qt::Base
+  class TableWidgetItem < Qt5::Base
     def clone(*args)
-      Qt::TableWidgetItem.new(self)
+      Qt5::TableWidgetItem.new(self)
     end
 
     def type(*args)
@@ -2038,19 +2038,19 @@ module Qt
     end
   end
 
-  class TemporaryFile < Qt::Base
+  class TemporaryFile < Qt5::Base
     def open(*args)
       method_missing(:open, *args)
     end
   end
 
-  class TextCursor < Qt::Base
+  class TextCursor < Qt5::Base
     def select(*k)
       method_missing(:select, *k)
     end
   end
 
-  class TextDocument < Qt::Base
+  class TextDocument < Qt5::Base
     def clone(*args)
       method_missing(:clone, *args)
     end
@@ -2060,55 +2060,55 @@ module Qt
     end
   end
 
-  class TextFormat < Qt::Base
+  class TextFormat < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class TextImageFormat < Qt::Base
+  class TextImageFormat < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
   end
 
-  class TextInlineObject < Qt::Base
+  class TextInlineObject < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class TextLength < Qt::Base
+  class TextLength < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class TextList < Qt::Base
+  class TextList < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class TextObject < Qt::Base
+  class TextObject < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class TextTable < Qt::Base
+  class TextTable < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class TextTableCell < Qt::Base
+  class TextTableCell < Qt5::Base
     def format(*args)
       method_missing(:format, *args)
     end
   end
 
-  class Time < Qt::Base
+  class Time < Qt5::Base
     def initialize(*args)
       if args.size == 1 && args[0].class.name == "Time"
         return super(args[0].hour, args[0].min, args[0].sec)
@@ -2128,19 +2128,19 @@ module Qt
     end
   end
 
-  class Timer < Qt::Base
+  class Timer < Qt5::Base
     def start(*args)
       method_missing(:start, *args)
     end
   end
 
-  class TimerEvent < Qt::Base
+  class TimerEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class TimeLine < Qt::Base
+  class TimeLine < Qt5::Base
     def frameRange=(arg)
       if arg.kind_of? Range
         return super(arg.begin, arg.exclude_end?  ? arg.end - 1 : arg.end)
@@ -2150,10 +2150,10 @@ module Qt
     end
   end
 
-  class ToolButton < Qt::Base
+  class ToolButton < Qt5::Base
     def setShortcut(arg)
       if arg.kind_of?(String)
-        return super(Qt::KeySequence.new(arg))
+        return super(Qt5::KeySequence.new(arg))
       else
         return super(arg)
       end
@@ -2164,17 +2164,17 @@ module Qt
     end
   end
 
-  class Translator < Qt::Base
+  class Translator < Qt5::Base
     def load(*args)
       method_missing(:load, *args)
     end
   end
 
-  class TreeWidget < Qt::Base
+  class TreeWidget < Qt5::Base
     include Enumerable
 
     def each
-      it = Qt::TreeWidgetItemIterator.new(self)
+      it = Qt5::TreeWidgetItemIterator.new(self)
       while it.current
         yield it.current
         it += 1
@@ -2182,7 +2182,7 @@ module Qt
     end
   end
 
-  class TreeWidgetItem < Qt::Base
+  class TreeWidgetItem < Qt5::Base
     include Enumerable
 
     def initialize(*args)
@@ -2191,8 +2191,8 @@ module Qt
       # and
       # QTreeWidgetItem (QTreeWidgetItem * parent, const QStringList & strings, int type = Type)
       # when the latter has a single argument. So force the second variant to be called
-      if args.length == 1 && args[0].kind_of?(Qt::TreeWidgetItem)
-        super(args[0], Qt::TreeWidgetItem::Type)
+      if args.length == 1 && args[0].kind_of?(Qt5::TreeWidgetItem)
+        super(args[0], Qt5::TreeWidgetItem::Type)
       else
         super(*args)
       end
@@ -2220,7 +2220,7 @@ module Qt
     end
 
     def clone(*args)
-      Qt::TreeWidgetItem.new(self)
+      Qt5::TreeWidgetItem.new(self)
     end
 
     def type(*args)
@@ -2228,7 +2228,7 @@ module Qt
     end
 
     def each
-      it = Qt::TreeWidgetItemIterator.new(self)
+      it = Qt5::TreeWidgetItemIterator.new(self)
       while it.current
         yield it.current
         it += 1
@@ -2236,13 +2236,13 @@ module Qt
     end
   end
 
-  class TreeWidgetItemIterator < Qt::Base
+  class TreeWidgetItemIterator < Qt5::Base
     def current
       return send("operator*".to_sym)
     end
   end
 
-  class Url < Qt::Base
+  class Url < Qt5::Base
     def inspect
       str = super
       str.sub(/>$/, " url=%s>" % toString)
@@ -2254,32 +2254,32 @@ module Qt
     end
   end
 
-  class UrlInfo < Qt::Base
+  class UrlInfo < Qt5::Base
     def name(*args)
       method_missing(:name, *args)
     end
   end
 
-  class Uuid < Qt::Base
-    Time = Qt::Enum.new(1, "QUuid::Version")
+  class Uuid < Qt5::Base
+    Time = Qt5::Enum.new(1, "QUuid::Version")
   end
 
-  class Variant < Qt::Base
-    String = Qt::Enum.new(10, "QVariant::Type")
-    Date = Qt::Enum.new(14, "QVariant::Type")
-    Time = Qt::Enum.new(15, "QVariant::Type")
-    DateTime = Qt::Enum.new(16, "QVariant::Type")
+  class Variant < Qt5::Base
+    String = Qt5::Enum.new(10, "QVariant::Type")
+    Date = Qt5::Enum.new(14, "QVariant::Type")
+    Time = Qt5::Enum.new(15, "QVariant::Type")
+    DateTime = Qt5::Enum.new(16, "QVariant::Type")
 
     def initialize(*args)
       if args.size == 1 && args[0].nil?
         return super()
       elsif args.size == 1 && args[0].class.name == "Date"
-        return super(Qt::Date.new(args[0]))
+        return super(Qt5::Date.new(args[0]))
       elsif args.size == 1 && args[0].class.name == "DateTime"
-        return super(Qt::DateTime.new(  Qt::Date.new(args[0].year, args[0].month, args[0].day),
-                        Qt::Time.new(args[0].hour, args[0].min, args[0].sec) ) )
+        return super(Qt5::DateTime.new(  Qt5::Date.new(args[0].year, args[0].month, args[0].day),
+                        Qt5::Time.new(args[0].hour, args[0].min, args[0].sec) ) )
       elsif args.size == 1 && args[0].class.name == "Time"
-        return super(Qt::Time.new(args[0]))
+        return super(Qt5::Time.new(args[0]))
       elsif args.size == 1 && args[0].class.name == "BigDecimal"
         return super(args[0].to_f) # we have to make do with a float
       else
@@ -2305,90 +2305,90 @@ module Qt
 
     def value
       case type()
-      when Qt::Variant::Invalid
+      when Qt5::Variant::Invalid
         return nil
-      when Qt::Variant::Bitmap
-      when Qt::Variant::Bool
+      when Qt5::Variant::Bitmap
+      when Qt5::Variant::Bool
         return toBool
-      when Qt::Variant::Brush
-        return qVariantValue(Qt::Brush, self)
-      when Qt::Variant::ByteArray
+      when Qt5::Variant::Brush
+        return qVariantValue(Qt5::Brush, self)
+      when Qt5::Variant::ByteArray
         return toByteArray
-      when Qt::Variant::Char
-        return qVariantValue(Qt::Char, self)
-      when Qt::Variant::Color
-        return qVariantValue(Qt::Color, self)
-      when Qt::Variant::Cursor
-        return qVariantValue(Qt::Cursor, self)
-      when Qt::Variant::Date
+      when Qt5::Variant::Char
+        return qVariantValue(Qt5::Char, self)
+      when Qt5::Variant::Color
+        return qVariantValue(Qt5::Color, self)
+      when Qt5::Variant::Cursor
+        return qVariantValue(Qt5::Cursor, self)
+      when Qt5::Variant::Date
         return toDate
-      when Qt::Variant::DateTime
+      when Qt5::Variant::DateTime
         return toDateTime
-      when Qt::Variant::Double
+      when Qt5::Variant::Double
         return toDouble
-      when Qt::Variant::Font
-        return qVariantValue(Qt::Font, self)
-      when Qt::Variant::Icon
-        return qVariantValue(Qt::Icon, self)
-      when Qt::Variant::Image
-        return qVariantValue(Qt::Image, self)
-      when Qt::Variant::Int
+      when Qt5::Variant::Font
+        return qVariantValue(Qt5::Font, self)
+      when Qt5::Variant::Icon
+        return qVariantValue(Qt5::Icon, self)
+      when Qt5::Variant::Image
+        return qVariantValue(Qt5::Image, self)
+      when Qt5::Variant::Int
         return toInt
-      when Qt::Variant::KeySequence
-        return qVariantValue(Qt::KeySequence, self)
-      when Qt::Variant::Line
+      when Qt5::Variant::KeySequence
+        return qVariantValue(Qt5::KeySequence, self)
+      when Qt5::Variant::Line
         return toLine
-      when Qt::Variant::LineF
+      when Qt5::Variant::LineF
         return toLineF
-      when Qt::Variant::List
+      when Qt5::Variant::List
         return toList
-      when Qt::Variant::Locale
-        return qVariantValue(Qt::Locale, self)
-      when Qt::Variant::LongLong
+      when Qt5::Variant::Locale
+        return qVariantValue(Qt5::Locale, self)
+      when Qt5::Variant::LongLong
         return toLongLong
-      when Qt::Variant::Map
+      when Qt5::Variant::Map
         return toMap
-      when Qt::Variant::Palette
-        return qVariantValue(Qt::Palette, self)
-      when Qt::Variant::Pen
-        return qVariantValue(Qt::Pen, self)
-      when Qt::Variant::Pixmap
-        return qVariantValue(Qt::Pixmap, self)
-      when Qt::Variant::Point
+      when Qt5::Variant::Palette
+        return qVariantValue(Qt5::Palette, self)
+      when Qt5::Variant::Pen
+        return qVariantValue(Qt5::Pen, self)
+      when Qt5::Variant::Pixmap
+        return qVariantValue(Qt5::Pixmap, self)
+      when Qt5::Variant::Point
         return toPoint
-      when Qt::Variant::PointF
+      when Qt5::Variant::PointF
         return toPointF
-      when Qt::Variant::Polygon
-        return qVariantValue(Qt::Polygon, self)
-      when Qt::Variant::Rect
+      when Qt5::Variant::Polygon
+        return qVariantValue(Qt5::Polygon, self)
+      when Qt5::Variant::Rect
         return toRect
-      when Qt::Variant::RectF
+      when Qt5::Variant::RectF
         return toRectF
-      when Qt::Variant::RegExp
+      when Qt5::Variant::RegExp
         return toRegExp
-      when Qt::Variant::Region
-        return qVariantValue(Qt::Region, self)
-      when Qt::Variant::Size
+      when Qt5::Variant::Region
+        return qVariantValue(Qt5::Region, self)
+      when Qt5::Variant::Size
         return toSize
-      when Qt::Variant::SizeF
+      when Qt5::Variant::SizeF
         return toSizeF
-      when Qt::Variant::SizePolicy
+      when Qt5::Variant::SizePolicy
         return toSizePolicy
-      when Qt::Variant::String
+      when Qt5::Variant::String
         return toString
-      when Qt::Variant::StringList
+      when Qt5::Variant::StringList
         return toStringList
-      when Qt::Variant::TextFormat
-        return qVariantValue(Qt::TextFormat, self)
-      when Qt::Variant::TextLength
-        return qVariantValue(Qt::TextLength, self)
-      when Qt::Variant::Time
+      when Qt5::Variant::TextFormat
+        return qVariantValue(Qt5::TextFormat, self)
+      when Qt5::Variant::TextLength
+        return qVariantValue(Qt5::TextLength, self)
+      when Qt5::Variant::Time
         return toTime
-      when Qt::Variant::UInt
+      when Qt5::Variant::UInt
         return toUInt
-      when Qt::Variant::ULongLong
+      when Qt5::Variant::ULongLong
         return toULongLong
-      when Qt::Variant::Url
+      when Qt5::Variant::Url
         return toUrl
       end
 
@@ -2416,10 +2416,10 @@ module Qt
 
   class DBusVariant < Variant
     def initialize(value)
-      if value.kind_of? Qt::Variant
+      if value.kind_of? Qt5::Variant
         super(value)
       else
-        super(Qt::Variant.new(value))
+        super(Qt5::Variant.new(value))
       end
     end
 
@@ -2435,31 +2435,31 @@ module Qt
     end
   end
 
-  class WhatsThisClickedEvent < Qt::Base
+  class WhatsThisClickedEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class Widget < Qt::Base
+  class Widget < Qt5::Base
     def raise(*args)
       method_missing(:raise, *args)
     end
   end
 
-  class WindowStateChangeEvent < Qt::Base
+  class WindowStateChangeEvent < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class XmlAttributes < Qt::Base
+  class XmlAttributes < Qt5::Base
     def type(*args)
       method_missing(:type, *args)
     end
   end
 
-  class SignalBlockInvocation < Qt::Object
+  class SignalBlockInvocation < Qt5::Object
     def initialize(parent, block, signature)
       super(parent)
       if metaObject.indexOfSlot(signature) == -1
@@ -2473,7 +2473,7 @@ module Qt
     end
   end
 
-  class BlockInvocation < Qt::Object
+  class BlockInvocation < Qt5::Object
     def initialize(target, block, signature)
       super(target)
       if metaObject.indexOfSlot(signature) == -1
@@ -2487,7 +2487,7 @@ module Qt
     end
   end
 
-  class MethodInvocation < Qt::Object
+  class MethodInvocation < Qt5::Object
     def initialize(target, method, signature)
       super(target)
       if metaObject.indexOfSlot(signature) == -1
@@ -2552,7 +2552,7 @@ module Qt
         end
       end
       if classname =~ /^Q/
-        ruby_classname = classname.sub(/^Q(?=[A-Z])/,'Qt::')
+        ruby_classname = classname.sub(/^Q(?=[A-Z])/,'Qt5::')
       else
         ruby_classname = classname
       end
@@ -2563,18 +2563,18 @@ module Qt
       if c == "WebCore" || c == "std" || c == "QGlobalSpace"
         return
       end
-      classname = Qt::Internal::normalize_classname(c)
-      classId = Qt::Internal.findClass(c)
+      classname = Qt5::Internal::normalize_classname(c)
+      classId = Qt5::Internal.findClass(c)
       insert_pclassid(classname, classId)
       @@idclass[classId.index] = classname
       @@cpp_names[classname] = c
-      klass = isQObject(c) ? create_qobject_class(classname, Qt) \
-                                                   : create_qt_class(classname, Qt)
+      klass = isQObject(c) ? create_qobject_class(classname, Qt5) \
+                                                   : create_qt_class(classname, Qt5)
       @@classes[classname] = klass unless klass.nil?
     end
 
     def Internal.debug_level
-      Qt.debug_level
+      Qt5.debug_level
     end
 
     def Internal.checkarg(argtype, typename)
@@ -2703,7 +2703,7 @@ module Qt
 
     # Looks up and executes a Qt method
     #
-    # package - Always the string 'Qt'
+    # package - Always the string 'Qt5'
     # method  - Methodname as a string
     # klass   - Ruby class object
     # this    - instance of class
@@ -2719,7 +2719,7 @@ module Qt
         classname = @@cpp_names[klass.name]
         if classname.nil?
           # Make sure we haven't backed all the way up to Object
-          if klass != Object and klass != Qt and klass.superclass != nil
+          if klass != Object and klass != Qt5 and klass.superclass != nil
             # Don't recognize this class so try the superclass
             return do_method_missing(package, method, klass.superclass, this, *args)
           else
@@ -2860,18 +2860,18 @@ module Qt
     end
 
     def Internal.init_all_classes()
-      Qt::Internal::getClassList().each do |c|
+      Qt5::Internal::getClassList().each do |c|
         if c == "Qt"
-          # Don't change Qt to Qt::t, just leave as is
-          @@cpp_names["Qt"] = c
+          # Don't change Qt to Q::t
+          @@cpp_names["Qt5"] = c
         elsif c != "QInternal" && !c.empty?
-          Qt::Internal::init_class(c)
+          Qt5::Internal::init_class(c)
         end
       end
 
-      @@classes['Qt::Integer'] = Qt::Integer
-      @@classes['Qt::Boolean'] = Qt::Boolean
-      @@classes['Qt::Enum'] = Qt::Enum
+      @@classes['Qt5::Integer'] = Qt5::Integer
+      @@classes['Qt5::Boolean'] = Qt5::Boolean
+      @@classes['Qt5::Enum'] = Qt5::Enum
     end
 
     def Internal.get_qinteger(num)
@@ -2883,7 +2883,7 @@ module Qt
     end
 
     def Internal.create_qenum(num, enum_type)
-      return Qt::Enum.new(num, enum_type)
+      return Qt5::Enum.new(num, enum_type)
     end
 
     def Internal.get_qenum_type(e)
@@ -3062,7 +3062,7 @@ module Qt
 
       meta = Meta[klass.name]
       if meta.nil?
-        meta = Qt::MetaInfo.new(klass)
+        meta = Qt5::MetaInfo.new(klass)
       end
 
       if meta.metaobject.nil? or meta.changed
@@ -3085,10 +3085,10 @@ module Qt
     #  connect(myobj, SIGNAL(:mysig)) { ...}
     def Internal.connect(src, signal, target, block)
       args = (signal =~ /\((.*)\)/) ? $1 : ""
-      signature = Qt::MetaObject.normalizedSignature("invoke(%s)" % args).to_s
-      return Qt::Object.connect(  src,
+      signature = Qt5::MetaObject.normalizedSignature("invoke(%s)" % args).to_s
+      return Qt5::Object.connect(  src,
                     signal,
-                    Qt::BlockInvocation.new(target, block.to_proc, signature),
+                    Qt5::BlockInvocation.new(target, block.to_proc, signature),
                     SLOT(signature) )
     end
 
@@ -3097,10 +3097,10 @@ module Qt
     #  connect(SIGNAL('mysig(int)')) {|arg(s)| ...}
     def Internal.signal_connect(src, signal, block)
       args = (signal =~ /\((.*)\)/) ? $1 : ""
-      signature = Qt::MetaObject.normalizedSignature("invoke(%s)" % args).to_s
-      return Qt::Object.connect(  src,
+      signature = Qt5::MetaObject.normalizedSignature("invoke(%s)" % args).to_s
+      return Qt5::Object.connect(  src,
                     signal,
-                    Qt::SignalBlockInvocation.new(src, block.to_proc, signature),
+                    Qt5::SignalBlockInvocation.new(src, block.to_proc, signature),
                     SLOT(signature) )
     end
 
@@ -3110,21 +3110,21 @@ module Qt
     def Internal.method_connect(src, signal, target, method)
       signal = SIGNAL(signal) if signal.is_a?Symbol
       args = (signal =~ /\((.*)\)/) ? $1 : ""
-      signature = Qt::MetaObject.normalizedSignature("invoke(%s)" % args).to_s
-      return Qt::Object.connect(  src,
+      signature = Qt5::MetaObject.normalizedSignature("invoke(%s)" % args).to_s
+      return Qt5::Object.connect(  src,
                     signal,
-                    Qt::MethodInvocation.new(target, method, signature),
+                    Qt5::MethodInvocation.new(target, method, signature),
                     SLOT(signature) )
     end
 
     # Handles calls of the form:
-    #  Qt::Timer.singleShot(500, myobj) { ...}
+    #  Qt5::Timer.singleShot(500, myobj) { ...}
     def Internal.single_shot_timer_connect(interval, target, block)
-      return Qt::Timer.singleShot(  interval,
-                      Qt::BlockInvocation.new(target, block, "invoke()"),
+      return Qt5::Timer.singleShot(  interval,
+                      Qt5::BlockInvocation.new(target, block, "invoke()"),
                       SLOT("invoke()") )
     end
-  end # Qt::Internal
+  end # Qt5::Internal
 
   Meta = {}
 
@@ -3156,7 +3156,7 @@ module Qt
         if method.kind_of? Symbol
           method = method.to_s + "()"
         end
-        method = Qt::MetaObject.normalizedSignature(method).to_s
+        method = Qt5::MetaObject.normalizedSignature(method).to_s
         if method =~ /^(([\w,<>:]*)\s+)?([^\s]*)\((.*)\)/
           name = $3
           args_str = $4
@@ -3198,7 +3198,7 @@ module Qt
     def get_signals
       all_signals = []
       current = @klass
-      while current != Qt::Base
+      while current != Qt5::Base
         meta = Meta[current.name]
         if !meta.nil?
           all_signals.concat meta.signals
@@ -3225,10 +3225,10 @@ module Qt
         @dbus = true
       end
     end
-  end # Qt::MetaInfo
+  end # Qt5::MetaInfo
 
   # These values are from the enum WindowType in qnamespace.h.
-  # Some of the names such as 'Qt::Dialog', clash with QtRuby
+  # Some of the names such as 'Qt5::Dialog', clash with QtRuby
   # class names. So add some constants here to use instead,
   # renamed with an ending of 'Type'.
   WidgetType = 0x00000000
@@ -3330,9 +3330,9 @@ class Module
     end
 
     klass = self
-    classid = Qt::Internal::ModuleIndex.new(0, 0)
+    classid = Qt5::Internal::ModuleIndex.new(0, 0)
     loop do
-      classid = Qt::Internal::find_pclassid(klass.name)
+      classid = Qt5::Internal::find_pclassid(klass.name)
       break if classid.index
 
       klass = klass.superclass
@@ -3341,15 +3341,15 @@ class Module
       end
     end
 
-    # These methods are all defined in Qt::Base, even if they aren't supported by a particular
+    # These methods are all defined in Qt5::Base, even if they aren't supported by a particular
     # subclass, so remove them to avoid confusion
     meths -= ["%", "&", "*", "**", "+", "-", "-@", "/", "<", "<<", "<=", ">", ">=", ">>", "|", "~", "^"]
     ids = []
     if inc_super
-      Qt::Internal::getAllParents(classid, ids)
+      Qt5::Internal::getAllParents(classid, ids)
     end
     ids << classid
-    ids.each { |c| Qt::Internal::findAllMethodNames(meths, c, flags) }
+    ids.each { |c| Qt5::Internal::findAllMethodNames(meths, c, flags) }
     return meths.uniq.map! {|a| a.intern}
   end
 end

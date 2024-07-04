@@ -20,20 +20,20 @@
 module QtScript5
   module Internal
     def self.init_all_classes
-#      Qt::Internal::add_normalize_proc(Proc.new do |classname|
+#      Qt5::Internal::add_normalize_proc(Proc.new do |classname|
 #        if classname =~ /^QtScript5/
 #          now = classname.sub(/^QtScript5?(?=[A-Z])/,'QtScript5::')
 #        end
 #        now
 #      end)
       getClassList.each do |c|
-        classname = Qt::Internal::normalize_classname(c)
-        id = Qt::Internal::findClass(c);
-        Qt::Internal::insert_pclassid(classname, id)
-        Qt::Internal::cpp_names[classname] = c
-        klass = Qt::Internal::isQObject(c) ? Qt::Internal::create_qobject_class(classname, Qt) \
-                                           : Qt::Internal::create_qt_class(classname, Qt)
-        Qt::Internal::classes[classname] = klass unless klass.nil?
+        classname = Qt5::Internal::normalize_classname(c)
+        id = Qt5::Internal::findClass(c);
+        Qt5::Internal::insert_pclassid(classname, id)
+        Qt5::Internal::cpp_names[classname] = c
+        klass = Qt5::Internal::isQObject(c) ? Qt5::Internal::create_qobject_class(classname, Qt5) \
+                                           : Qt5::Internal::create_qt_class(classname, Qt5)
+        Qt5::Internal::classes[classname] = klass unless klass.nil?
       end
     end
   end

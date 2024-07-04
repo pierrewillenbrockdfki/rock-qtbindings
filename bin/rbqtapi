@@ -53,7 +53,7 @@ opts.each do |opt, arg|
 end
 
 if versionOpt
-    print "QtRuby #{Qt::qtruby_version} using Qt-#{Qt::version}\n"
+    print "QtRuby #{Qt5::qtruby_version} using Qt-#{Qt5::version}\n"
     exit 0 
 elsif helpOpt
     print $usage
@@ -66,10 +66,10 @@ end
 
 classnames = []
 if ARGV.length == 0
-  classnames = Qt::Internal.classes.keys
+  classnames = Qt5::Internal.classes.keys
 else
   ARGV.each do |classname|
-    classid = Qt::Internal::find_pclassid(classname)
+    classid = Qt5::Internal::find_pclassid(classname)
     if !classid.index
       puts "ERROR: class '#{classname}' not found"
       exit 1
@@ -81,22 +81,22 @@ end
 candidates = ""
 
 classnames.each do |classname|
-  classid = Qt::Internal::find_pclassid(classname)
+  classid = Qt5::Internal::find_pclassid(classname)
   if !classid.index
     next
   end
 
-  a = Qt::Internal.findAllMethods(classid)
+  a = Qt5::Internal.findAllMethods(classid)
   ids = (a.keys.sort.map{|k|a[k]}).flatten
-  candidates << Qt::Internal::dumpCandidates(ids)
+  candidates << Qt5::Internal::dumpCandidates(ids)
 
   if parentsOpt
     superclasses = []
-    Qt::Internal::getAllParents(classid, superclasses)
+    Qt5::Internal::getAllParents(classid, superclasses)
     superclasses.each do |klass|
-        a = Qt::Internal::findAllMethods(klass)
+        a = Qt5::Internal::findAllMethods(klass)
         ids = (a.keys.sort.map{|k|a[k]}).flatten
-        candidates << Qt::Internal::dumpCandidates(ids)
+        candidates << Qt5::Internal::dumpCandidates(ids)
     end
   end
 end
@@ -135,7 +135,7 @@ class String
     method_name.gsub!(/::(is|has)([A-Z])([\w]+)\(/) { '::' + $2.downcase + $3 + "?" + "(" }
     method_name.gsub!(/::set([A-Z])([a-zA-Z]+)(\([^,]*\))/) { '::' + $1.downcase + $2 + '=' + $3 }
     method_name.sub!(/::([a-z])/) { '#' + $1 }
-    method_name.gsub!(/Q([A-Z])/) { 'Qt::' + $1 }
+    method_name.gsub!(/Q([A-Z])/) { 'Qt5::' + $1 }
     method_name.sub!('()', '')
     return method_name
   end
