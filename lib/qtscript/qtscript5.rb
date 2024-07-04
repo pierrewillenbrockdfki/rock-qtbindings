@@ -1,6 +1,6 @@
 =begin
 /***************************************************************************
-                          qtscript.rb  -  QtScript ruby client lib
+                          qtscript5.rb  -  QtScript5 ruby client lib
                              -------------------
     begin                : 11-07-2008
     copyright            : (C) 2008 by Richard Dale

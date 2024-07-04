@@ -1,6 +1,6 @@
 =begin
 /***************************************************************************
-                          qttest.rb  -  QtTest ruby client lib
+                          qttest5.rb  -  QtTest5 ruby client lib
                              -------------------
     begin                : 29-10-2008
     copyright            : (C) 2008 by Richard Dale
