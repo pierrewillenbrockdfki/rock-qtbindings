@@ -4,8 +4,8 @@ spec = Gem::Specification.new do |s|
   s.authors = ['Ryan Melton', 'Jason Thomas', 'Richard Dale', 'Arno Rehn']
   s.email = 'kde-bindings@kde.org'
   s.rubyforge_project = 'qt5bindings'
-  s.summary = "Qt bindings for ruby"
-  s.homepage = "http://github.com/ryanmelt/qtbindings"
+  s.summary = "Qt5 bindings for ruby"
+  s.homepage = "http://github.com/pierrewillenbrockdfki/qt5bindings"
   s.name = 'qt5bindings'
   s.version = QT5BINDINGS_VERSION
   s.requirements << 'none'
