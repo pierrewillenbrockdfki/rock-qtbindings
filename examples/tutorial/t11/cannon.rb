@@ -1,5 +1,5 @@
 include Math
-require 'Qt'
+require 'Qt5'
 
 class CannonField < Qt::Widget
   signals 'angleChanged(int)', 'forceChanged(int)'

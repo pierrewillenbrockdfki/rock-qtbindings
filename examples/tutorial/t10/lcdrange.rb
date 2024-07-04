@@ -1,4 +1,4 @@
-require 'Qt'
+require 'Qt5'
 
 class LCDRange < Qt::Widget
   signals 'valueChanged(int)'

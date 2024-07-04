@@ -25,7 +25,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-require 'Qt'
+require 'Qt5'
 
 # an analog clock widget using an internal Qt::Timer
 class AnalogClock < Qt::Widget

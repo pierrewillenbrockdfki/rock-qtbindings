@@ -5,7 +5,7 @@
 # http://www.ruby-lang.org/en/LICENSE.txt.
 #
 
-require 'Qt'
+require 'Qt5'
 require './Canvas'
 require './CameraDialog'
 

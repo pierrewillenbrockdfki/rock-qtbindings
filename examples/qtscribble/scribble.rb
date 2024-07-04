@@ -5,7 +5,7 @@
  # window knows how to redraw itself.
  #
 
-require 'Qt'
+require 'Qt5'
 	
 	class ScribbleArea < Qt::Widget
 	

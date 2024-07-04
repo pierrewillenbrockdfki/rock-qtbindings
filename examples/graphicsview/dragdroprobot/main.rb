@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
     
-require 'Qt'
+require 'Qt5'
 require './qrc_robot.rb'
 require './coloritem.rb'
 require './robot.rb'

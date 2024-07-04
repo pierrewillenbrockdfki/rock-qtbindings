@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'Qt'
+require 'Qt5'
 require './analogclock.rb'
 
 app = Qt::Application.new(ARGV)

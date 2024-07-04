@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-require 'Qt'
+require 'Qt5'
 require './tetrixwindow.rb'
 
 app = Qt::Application.new(ARGV)

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'Qt'
+require 'Qt5'
  
 class PassiveWindow < Qt::Frame
 	MARGIN = 20

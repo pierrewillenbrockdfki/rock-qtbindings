@@ -1,5 +1,5 @@
 #!/usr/bin/ruby -W
-require "Qt"
+require "Qt5"
 
 app = Qt::Application.new(ARGV)
 

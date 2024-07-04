@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-require 'Qt'
+require 'Qt5'
 require './mainwindow.rb'
 require './qrc_svgviewer.rb'
 

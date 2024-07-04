@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 $VERBOSE = true; $:.unshift File.dirname($0)
 
-require 'Qt'
+require 'Qt5'
 
 a = Qt::Application.new(ARGV)
 hello = Qt::PushButton.new('Hello World!', nil)

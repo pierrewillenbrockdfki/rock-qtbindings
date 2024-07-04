@@ -25,7 +25,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 
-require 'Qt'
+require 'Qt5'
 require './ping-common.rb'
 
 class Pong < Qt::DBusAbstractAdaptor

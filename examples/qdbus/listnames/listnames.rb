@@ -24,7 +24,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
     
-require 'Qt'
+require 'Qt5'
 
 def method1()
     qDebug("Method 1:")

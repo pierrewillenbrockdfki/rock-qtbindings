@@ -1,4 +1,4 @@
-require 'Qt'
+require 'Qt5'
 require 'pp'
 
 class LCDRange < Qt::Widget

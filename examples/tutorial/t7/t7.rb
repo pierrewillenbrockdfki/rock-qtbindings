@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 $VERBOSE = true; $:.unshift File.dirname($0)
 
-require 'Qt'
+require 'Qt5'
 require_relative 'lcdrange.rb'
 
 class MyWidget < Qt::Widget

@@ -1,4 +1,4 @@
-require 'Qt'
+require 'Qt5'
 
 class DigitalClock < Qt::LCDNumber
 

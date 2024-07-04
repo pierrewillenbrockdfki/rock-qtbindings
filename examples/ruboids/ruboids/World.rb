@@ -6,7 +6,7 @@
 #
 
 require 'singleton'
-require 'Qt'
+require 'Qt5'
 require './Params'
 require './Cloud'
 require './Flock'

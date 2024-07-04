@@ -1,4 +1,4 @@
-require 'Qt'
+require 'Qt5'
 require_relative 'lcdrange.rb'
 require_relative 'cannon.rb'
 

@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
 	
-require 'Qt'
+require 'Qt5'
 require 'qtuitools5'
 require './qrc_calculatorbuilder.rb'
 require './calculatorform.rb'

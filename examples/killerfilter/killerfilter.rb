@@ -2,7 +2,7 @@
 
 # This is the EventFilter example from Chapter 16 of 'Programming with Qt'
 
-require 'Qt'
+require 'Qt5'
 
 class KillerFilter < Qt::Object
 

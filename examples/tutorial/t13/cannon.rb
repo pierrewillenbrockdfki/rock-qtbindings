@@ -1,4 +1,4 @@
-require 'Qt'
+require 'Qt5'
 include Math
 
 class CannonField < Qt::Widget

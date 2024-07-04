@@ -23,7 +23,7 @@
 ** Translated to QtRuby by Richard Dale
 =end
     
-require 'Qt'
+require 'Qt5'
 require './chat_interface.rb'
 require './chat_adaptor.rb'
 
