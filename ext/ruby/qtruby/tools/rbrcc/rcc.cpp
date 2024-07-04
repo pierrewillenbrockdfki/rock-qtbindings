@@ -622,14 +622,14 @@ RCCResourceLibrary::writeInitializer(FILE *out)
 
         //init
         fprintf(out, "    def self.qInitResources%s()\n", initName.toLocal8Bit().constData());
-        fprintf(out, "        Qt.qRegisterResourceData(0x01, QCleanupResources__dest_class__.qt_resource_tree.pack(\"C*\"), "
+        fprintf(out, "        Qt5.qRegisterResourceData(0x01, QCleanupResources__dest_class__.qt_resource_tree.pack(\"C*\"), "
                      "QCleanupResources__dest_class__.qt_resource_name.pack(\"C*\"), QCleanupResources__dest_class__.qt_resource_data.pack(\"C*\"))\n");
         fprintf(out, "        return 1\n");
         fprintf(out, "    end\n");
 
         //cleanup
         fprintf(out, "    def self.qCleanupResources%s()\n", initName.toLocal8Bit().constData());
-        fprintf(out, "        Qt.qUnregisterResourceData(0x01, QCleanupResources__dest_class__.qt_resource_tree.pack(\"C*\"), "
+        fprintf(out, "        Qt5.qUnregisterResourceData(0x01, QCleanupResources__dest_class__.qt_resource_tree.pack(\"C*\"), "
                      "QCleanupResources__dest_class__.qt_resource_name.pack(\"C*\"), QCleanupResources__dest_class__.qt_resource_data.pack(\"C*\"))\n");
         fprintf(out, "        return 1\n");
         fprintf(out, "    end\n");
