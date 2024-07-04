@@ -107,16 +107,16 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 {
 	if (property.isEnumType()) {
 		QMetaEnum e = property.enumerator();
-		return QString(" %1=%2::%3").arg(name).arg(e.scope()).arg(e.valueToKey(value.toInt()));
+		return QStringLiteral(" %1=%2::%3").arg(name).arg(e.scope()).arg(e.valueToKey(value.toInt()));
 	}
 
 	switch (value.type()) {
 	case QVariant::String:
 	{
 		if (value.toString().isNull()) {
-			return QString(" %1=nil").arg(name);
+			return QStringLiteral(" %1=nil").arg(name);
 		} else {
-			return QString(" %1=%2").arg(name).arg(value.toString());
+			return QStringLiteral(" %1=%2").arg(name).arg(value.toString());
 		}
 	}
 
@@ -131,24 +131,24 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 			rubyName = name;
 		}
 
-		return QString(" %1=%2").arg(rubyName).arg(value.toString());
+		return QStringLiteral(" %1=%2").arg(rubyName).arg(value.toString());
 	}
 
 	case QVariant::Color:
 	{
 		QColor c = value.value<QColor>();
-		return QString(" %1=#<Qt::Color:0x0 %2>").arg(name).arg(c.name());
+		return QStringLiteral(" %1=#<Qt::Color:0x0 %2>").arg(name).arg(c.name());
 	}
 
 	case QVariant::Cursor:
 	{
 		QCursor c = value.value<QCursor>();
-		return QString(" %1=#<Qt::Cursor:0x0 shape=%2>").arg(name).arg(c.shape());
+		return QStringLiteral(" %1=#<Qt::Cursor:0x0 shape=%2>").arg(name).arg(c.shape());
 	}
 
 	case QVariant::Double:
 	{
-		return QString(" %1=%2").arg(name).arg(value.toDouble());
+		return QStringLiteral(" %1=%2").arg(name).arg(value.toDouble());
 	}
 
 	case QVariant::Font:
@@ -168,7 +168,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Line:
 	{
 		QLine l = value.toLine();
-		return QString(" %1=#<Qt::Line:0x0 x1=%2, y1=%3, x2=%4, y2=%5>")
+		return QStringLiteral(" %1=#<Qt::Line:0x0 x1=%2, y1=%3, x2=%4, y2=%5>")
 			.arg(name)
 			.arg(l.x1())
 			.arg(l.y1())
@@ -179,7 +179,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::LineF:
 	{
 		QLineF l = value.toLineF();
-		return QString(" %1=#<Qt::LineF:0x0 x1=%2, y1=%3, x2=%4, y2=%5>")
+		return QStringLiteral(" %1=#<Qt::LineF:0x0 x1=%2, y1=%3, x2=%4, y2=%5>")
 			.arg(name)
 			.arg(l.x1())
 			.arg(l.y1())
@@ -190,19 +190,19 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Point:
 	{
 		QPoint p = value.toPoint();
-		return QString(" %1=#<Qt::Point:0x0 x=%2, y=%3>").arg(name).arg(p.x()).arg(p.y());
+		return QStringLiteral(" %1=#<Qt::Point:0x0 x=%2, y=%3>").arg(name).arg(p.x()).arg(p.y());
 	}
 
 	case QVariant::PointF:
 	{
 		QPointF p = value.toPointF();
-		return QString(" %1=#<Qt::PointF:0x0 x=%2, y=%3>").arg(name).arg(p.x()).arg(p.y());
+		return QStringLiteral(" %1=#<Qt::PointF:0x0 x=%2, y=%3>").arg(name).arg(p.x()).arg(p.y());
 	}
 
 	case QVariant::Rect:
 	{
 		QRect r = value.toRect();
-		return QString(" %1=#<Qt::Rect:0x0 left=%2, right=%3, top=%4, bottom=%5>")
+		return QStringLiteral(" %1=#<Qt::Rect:0x0 left=%2, right=%3, top=%4, bottom=%5>")
 			.arg(name)
 			.arg(r.left()).arg(r.right()).arg(r.top()).arg(r.bottom());
 	}
@@ -210,7 +210,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::RectF:
 	{
 		QRectF r = value.toRectF();
-		return QString(" %1=#<Qt::RectF:0x0 left=%2, right=%3, top=%4, bottom=%5>")
+		return QStringLiteral(" %1=#<Qt::RectF:0x0 left=%2, right=%3, top=%4, bottom=%5>")
 			.arg(name)
 			.arg(r.left()).arg(r.right()).arg(r.top()).arg(r.bottom());
 	}
@@ -218,7 +218,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Size:
 	{
 		QSize s = value.toSize();
-		return QString(" %1=#<Qt::Size:0x0 width=%2, height=%3>")
+		return QStringLiteral(" %1=#<Qt::Size:0x0 width=%2, height=%3>")
 			.arg(name)
 			.arg(s.width()).arg(s.height());
 	}
@@ -226,7 +226,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::SizeF:
 	{
 		QSizeF s = value.toSizeF();
-		return QString(" %1=#<Qt::SizeF:0x0 width=%2, height=%3>")
+		return QStringLiteral(" %1=#<Qt::SizeF:0x0 width=%2, height=%3>")
 			.arg(name)
 			.arg(s.width()).arg(s.height());
 	}
@@ -234,7 +234,7 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::SizePolicy:
 	{
 		QSizePolicy s = value.value<QSizePolicy>();
-		return QString(" %1=#<Qt::SizePolicy:0x0 horizontalPolicy=%2, verticalPolicy=%3>")
+		return QStringLiteral(" %1=#<Qt::SizePolicy:0x0 horizontalPolicy=%2, verticalPolicy=%3>")
 			.arg(name)
 			.arg(s.horizontalPolicy())
 			.arg(s.verticalPolicy());
@@ -247,11 +247,11 @@ inspectProperty(QMetaProperty property, const char * name, QVariant & value)
 	case QVariant::Pixmap:
 	case QVariant::Region:
 	{
-		return QString(" %1=#<Qt::%2:0x0>").arg(name).arg(value.typeName() + 1);
+		return QStringLiteral(" %1=#<Qt::%2:0x0>").arg(name).arg(value.typeName() + 1);
 	}
 
 	default:
-		return QString(" %1=%2").arg(name)
+		return QStringLiteral(" %1=%2").arg(name)
 			.arg((value.isNull() || value.toString().isNull()) ? "nil" : value.toString() );
 	}
 }
@@ -278,11 +278,11 @@ inspect_qobject(VALUE self)
 	QObject * qobject = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
 
 	QString value_list;
-	value_list.append(QString(" objectName=\"%1\"").arg(qobject->objectName()));
+	value_list.append(QStringLiteral(" objectName=\"%1\"").arg(qobject->objectName()));
 
 	if (qobject->isWidgetType()) {
 		QWidget * w = (QWidget *) qobject;
-		value_list.append(QString(", x=%1, y=%2, width=%3, height=%4")
+		value_list.append(QStringLiteral(", x=%1, y=%2, width=%3, height=%4")
 			.arg(w->x())
 			.arg(w->y())
 			.arg(w->width())
@@ -337,7 +337,7 @@ pretty_print_qobject(VALUE self, VALUE pp)
 
 		if (qobject->parent()->isWidgetType()) {
 			QWidget * w = (QWidget *) qobject->parent();
-			value_list = QString("  parent=%1 objectName=\"%2\", x=%3, y=%4, width=%5, height=%6>,\n")
+			value_list = QStringLiteral("  parent=%1 objectName=\"%2\", x=%3, y=%4, width=%5, height=%6>,\n")
 				.arg(parentInspectString)
 				.arg(w->objectName())
 				.arg(w->x())
@@ -345,7 +345,7 @@ pretty_print_qobject(VALUE self, VALUE pp)
 				.arg(w->width())
 				.arg(w->height());
 		} else {
-			value_list = QString("  parent=%1 objectName=\"%2\">,\n")
+			value_list = QStringLiteral("  parent=%1 objectName=\"%2\">,\n")
 				.arg(parentInspectString)
 				.arg(qobject->parent()->objectName());
 		}
@@ -354,16 +354,16 @@ pretty_print_qobject(VALUE self, VALUE pp)
 	}
 
 	if (qobject->children().count() != 0) {
-		value_list = QString("  children=Array (%1 element(s)),\n")
+		value_list = QStringLiteral("  children=Array (%1 element(s)),\n")
 			.arg(qobject->children().count());
 		rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLocal8Bit()));
 	}
 
-	value_list = QString("  metaObject=#<Qt::MetaObject:0x0");
-	value_list.append(QString(" className=%1").arg(qobject->metaObject()->className()));
+	value_list = QStringLiteral("  metaObject=#<Qt::MetaObject:0x0");
+	value_list.append(QStringLiteral(" className=%1").arg(qobject->metaObject()->className()));
 
 	if (qobject->metaObject()->superClass() != 0) {
-		value_list.append(	QString(", superClass=#<Qt::MetaObject:0x0 className=%1>")
+		value_list.append(	QStringLiteral(", superClass=#<Qt::MetaObject:0x0 className=%1>")
 			.arg(qobject->metaObject()->superClass()->className()) );
 	}
 

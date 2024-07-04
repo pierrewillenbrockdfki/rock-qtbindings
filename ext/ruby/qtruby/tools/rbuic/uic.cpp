@@ -156,7 +156,7 @@ void Uic::writeCopyrightHeader(DomUI *ui)
     out << "** Form generated from reading ui file '" << QFileInfo(opt.inputFile).fileName() << "'\n";
     out << "**\n";
     out << "** Created: " << QDateTime::currentDateTime().toString() << "\n";
-    out << "**      " << QString("by: Qt User Interface Compiler version %1\n").arg(QT_VERSION_STR);
+    out << "**      " << QStringLiteral("by: Qt User Interface Compiler version %1\n").arg(QT_VERSION_STR);
     out << "**\n";
     out << "** WARNING! All changes made in this file will be lost when recompiling ui file!\n";
     out << "=end\n\n";

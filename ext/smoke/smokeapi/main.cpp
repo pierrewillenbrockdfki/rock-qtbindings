@@ -38,7 +38,7 @@ static QRegExp targetPattern;
 
 static Smoke* 
 loadSmokeModule(QString moduleName) {
-    QFileInfo file(QString("libsmoke") + moduleName);
+    QFileInfo file(QStringLiteral("libsmoke") + moduleName);
     QLibrary lib(file.filePath());
 
     QString init_name = "init_" + moduleName + "_Smoke";
@@ -75,7 +75,7 @@ methodToString(Smoke::ModuleIndex methodId)
     const char * typeName = smoke->types[methodRef.ret].name;
     
     if ((methodRef.flags & Smoke::mf_enum) != 0) {
-        result.append(QString("enum %1::%2")
+        result.append(QStringLiteral("enum %1::%2")
                             .arg(smoke->classes[methodRef.classId].className)
                             .arg(smoke->methodNames[methodRef.name]) );
         return result;
@@ -96,7 +96,7 @@ methodToString(Smoke::ModuleIndex methodId)
         result.append(" ");
     }
     
-    result.append(  QString("%1::%2(")
+    result.append(  QStringLiteral("%1::%2(")
                         .arg(smoke->classes[methodRef.classId].className)
                         .arg(smoke->methodNames[methodRef.name]) );
                         

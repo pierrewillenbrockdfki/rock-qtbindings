@@ -602,11 +602,11 @@ void WriteInitialization::acceptWidget(DomWidget *node)
             const QString groupName = toString(prop->elementString());
             if (!m_buttonGroups.contains(groupName)) {
                 m_buttonGroups.insert(groupName, m_driver->findOrInsertName(groupName));
-                const QString g = QString("@") + m_buttonGroups.value(groupName);
+                const QString g = QStringLiteral("@") + m_buttonGroups.value(groupName);
                 m_output << m_option.indent << g << " = Qt::ButtonGroup.new(" << m_generatedClass << ")\n";
             }
 
-            const QString g = QString("@") + m_buttonGroups.value(groupName);
+            const QString g = QStringLiteral("@") + m_buttonGroups.value(groupName);
             m_output << m_option.indent << g << ".addButton(" << varName << ")\n";
         }
     }
@@ -1227,7 +1227,7 @@ void WriteInitialization::writeProperties(const QString &varName,
 
         case DomProperty::Palette: {
             DomPalette *pal = p->elementPalette();
-            QString paletteName = QString("@") + m_driver->unique(QStringLiteral("palette"));
+            QString paletteName = QStringLiteral("@") + m_driver->unique(QStringLiteral("palette"));
             m_output << m_option.indent << paletteName << " = Qt::Palette.new\n";
 
             writeColorGroup(pal->elementActive(), QStringLiteral("Qt::Palette::Active"), paletteName);
@@ -1424,7 +1424,7 @@ QString  WriteInitialization::writeSizePolicy(const DomSizePolicy *sp)
 
 
     // insert with new name
-    const QString spName = QString("@") + m_driver->unique(QStringLiteral("sizePolicy"));
+    const QString spName = QStringLiteral("@") + m_driver->unique(QStringLiteral("sizePolicy"));
     m_sizePolicyNameMap.insert(sizePolicyHandle, spName);
 
     m_output << m_option.indent << spName << " = Qt::SizePolicy.new";
@@ -1461,7 +1461,7 @@ QString WriteInitialization::writeFontProperties(const DomFont *f)
     }
 
     // insert with new name
-    const QString fontName = QString("@") + m_driver->unique(QStringLiteral("font"));
+    const QString fontName = QStringLiteral("@") + m_driver->unique(QStringLiteral("font"));
     m_fontPropertiesNameMap.insert(FontHandle(f), fontName);
 
     m_output << m_option.indent << fontName << " = Qt::Font.new\n";

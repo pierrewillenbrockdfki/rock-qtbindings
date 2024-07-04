@@ -82,7 +82,7 @@ show_exception_message()
     VALUE message = RARRAY_PTR(bt)[0];
     VALUE message2 = rb_obj_as_string(info);
 
-    QString errormessage = QString("%1: %2 (%3)")
+    QString errormessage = QStringLiteral("%1: %2 (%3)")
                             .arg( StringValueCStr(message) )
                             .arg( StringValueCStr(message2) )
                             .arg( rb_class2name(CLASS_OF(info)) );
@@ -91,7 +91,7 @@ show_exception_message()
     QString tracemessage;
     for(int i = 1; i < RARRAY_LEN(bt); ++i) {
         if( TYPE(RARRAY_PTR(bt)[i]) == T_STRING ) {
-            QString s = QString("%1\n").arg( StringValueCStr(RARRAY_PTR(bt)[i]) );
+            QString s = QStringLiteral("%1\n").arg( StringValueCStr(RARRAY_PTR(bt)[i]) );
             Q_ASSERT( ! s.isNull() );
             tracemessage += s;
             fprintf(stderr, "\t%s", s.toLocal8Bit().constData());
