@@ -95,25 +95,6 @@ task :gem => [:install] do
   clear_version()
 end
 
-task :gemnative do
-  warn_version()
-  set_version()
-  system("#{COPY} gemspecs#{SLASH}qt5bindingsnative.gemspec .")
-  system("gem build qt5bindingsnative.gemspec")
-  system("#{DEL} qt5bindingsnative.gemspec")
-  clear_version()
-end
-
-task :gemqt do
-  warn_version()
-  set_version()
-  system("#{MAKE} installqt")
-  system("#{COPY} gemspecs#{SLASH}qt5bindings-qt.gemspec .")
-  system("gem build qt5bindings-qt.gemspec")
-  system("#{DEL} qt5bindings-qt.gemspec")
-  clear_version()
-end
-
 task :build do
   Rake::Task[:extconf].execute
   Rake::Task[:all].execute
