@@ -90,7 +90,7 @@ File.open('Makefile', 'w') do |file|
     file.puts ".."
     file.puts "\tcd ext\\build && mingw32-make"
     file.puts ""
-    file.puts "install: makedirs"
+    file.puts "install: build"
     file.puts "\t-copy ext\\build\\smoke\\deptool\\smokedeptool.exe bin\\#{ruby_version}"
     file.puts "\t-copy ext\\build\\smoke\\qtcore\\libsmokeqtcore.dll lib\\#{ruby_version}"
     file.puts "\t-copy ext\\build\\smoke\\qtdeclarative\\libsmokeqtdeclarative.dll lib\\#{ruby_version}"
@@ -210,7 +210,7 @@ File.open('Makefile', 'w') do |file|
     file.puts ".."
     file.puts "\tcd ext/build; make"
     file.puts ""
-    file.puts "install: makedirs"
+    file.puts "install: build"
     if macosx
       file.puts "\t-cp ext/build/smoke/smokeapi/smokeapi bin/#{ruby_version}"
       file.puts "\t-cp ext/build/smoke/deptool/smokedeptool bin/#{ruby_version}"
