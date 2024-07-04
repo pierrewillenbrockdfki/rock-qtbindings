@@ -10,5 +10,5 @@ windows = true if platform =~ /mswin32/ or platform =~ /mingw32/
 extension = ''
 extension = '.exe' if windows
 
-path = File.expand_path(File.join(File.dirname(__FILE__), RUBY_VERSION.split('.')[0..1].join('.'), "rbrcc#{extension}"))
+path = File.expand_path(File.join(File.dirname(__FILE__), RUBY_VERSION.split('.')[0..1].join('.'), "rbrcc5#{extension}"))
 exec(path, *ARGV)

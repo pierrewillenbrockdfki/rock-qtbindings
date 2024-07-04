@@ -116,7 +116,7 @@ File.open('Makefile', 'w') do |file|
     file.puts "\t-copy ext\\build\\ruby\\qttest\\qttest.dll lib\\#{ruby_version}\\qttest.so"
     file.puts "\t-copy ext\\build\\ruby\\qtuitools\\qtuitools.dll lib\\#{ruby_version}\\qtuitools.so"
     file.puts "\t-copy ext\\build\\ruby\\qtwebkit\\qtwebkit.dll lib\\#{ruby_version}\\qtwebkit.so"
-    file.puts "\t-copy ext\\build\\ruby\\qtruby\\tools\\rbrcc\\rbrcc.exe bin\\#{ruby_version}"
+    file.puts "\t-copy ext\\build\\ruby\\qtruby\\tools\\rbrcc\\rbrcc5.exe bin\\#{ruby_version}"
     file.puts "\t-copy ext\\build\\ruby\\qtruby\\tools\\rbuic\\rbuic5.exe bin\\#{ruby_version}"
   else
     file.puts "all: clean build"
@@ -186,7 +186,7 @@ File.open('Makefile', 'w') do |file|
       file.puts "\t-cp ext/build/ruby/qttest/qttest.* lib/#{ruby_version}/qttest.bundle"
       file.puts "\t-cp ext/build/ruby/qtuitools/qtuitools.* lib/#{ruby_version}/qtuitools.bundle"
       file.puts "\t-cp ext/build/ruby/qtwebkit/qtwebkit.* lib/#{ruby_version}/qtwebkit.bundle"
-      file.puts "\t-cp ext/build/ruby/qtruby/tools/rbrcc/rbrcc bin/#{ruby_version}"
+      file.puts "\t-cp ext/build/ruby/qtruby/tools/rbrcc/rbrcc5 bin/#{ruby_version}"
       file.puts "\t-cp ext/build/ruby/qtruby/tools/rbuic/rbuic5 bin/#{ruby_version}"
     else
       file.puts "\t-cp ext/build/smoke/deptool/smokedeptool bin/#{ruby_version}"
@@ -215,7 +215,7 @@ File.open('Makefile', 'w') do |file|
       file.puts "\t-cp ext/build/ruby/qttest/qttest.* lib/#{ruby_version}"
       file.puts "\t-cp ext/build/ruby/qtuitools/qtuitools.* lib/#{ruby_version}"
       file.puts "\t-cp ext/build/ruby/qtwebkit/qtwebkit.* lib/#{ruby_version}"
-      file.puts "\t-cp ext/build/ruby/qtruby/tools/rbrcc/rbrcc bin/#{ruby_version}"
+      file.puts "\t-cp ext/build/ruby/qtruby/tools/rbrcc/rbrcc5 bin/#{ruby_version}"
       file.puts "\t-cp ext/build/ruby/qtruby/tools/rbuic/rbuic5 bin/#{ruby_version}"
     end
   end
