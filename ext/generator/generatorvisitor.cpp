@@ -458,7 +458,7 @@ void GeneratorVisitor::visitDeclarator(DeclaratorAST* node)
             static QRegExp regexp("^([\\w:<>\\*]+)\\s+(\\w+)\\s+READ\\s+(\\w+)(\\s+WRITE\\s+\\w+)?");
             static QRegExp typePtr(".*\\*$");
             if (regexp.indexIn(literals) != -1) {
-                QProperty prop = { QMetaObject::normalizedType(regexp.cap(1).toLatin1()), (typePtr.indexIn(regexp.cap(1)) !=  -1), regexp.cap(2),
+                QProperty prop = { QMetaObject::normalizedType(regexp.cap(1).toLocal8Bit()), (typePtr.indexIn(regexp.cap(1)) !=  -1), regexp.cap(2),
                                    regexp.cap(3), regexp.cap(4).replace(QRegExp("\\s+WRITE\\s+"), QString()) };
                 q_properties.top().append(prop);
             }
