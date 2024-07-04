@@ -469,8 +469,8 @@ RCCResourceLibrary::writeHeader(FILE *out)
         fprintf(out,  "\tdef self.qt_resource_name\n");
         fprintf(out,  "\t\treturn @@qt_resource_name\n");
         fprintf(out,  "\tend\n\n");
-        fprintf(out,  "\tdef self.qt_resource_struct\n");
-        fprintf(out,  "\t\treturn @@qt_resource_struct\n");
+        fprintf(out,  "\tdef self.qt_resource_tree\n");
+        fprintf(out,  "\t\treturn @@qt_resource_tree\n");
         fprintf(out,  "\tend\n\n");
 //        fprintf(out, "#include <QtCore/qglobal.h>\n\n");
     } else if(mFormat == Binary) {
@@ -558,7 +558,7 @@ bool
 RCCResourceLibrary::writeDataStructure(FILE *out)
 {
     if(mFormat == C_Code)
-        fprintf(out, "@@qt_resource_struct = [\n");
+        fprintf(out, "@@qt_resource_tree = [\n");
     else if(mFormat == Binary)
         mTreeOffset = ftell(out);
     QStack<RCCFileInfo*> pending;
@@ -622,14 +622,14 @@ RCCResourceLibrary::writeInitializer(FILE *out)
 
         //init
         fprintf(out, "    def self.qInitResources%s()\n", initName.toLocal8Bit().constData());
-        fprintf(out, "        Qt.qRegisterResourceData(0x01, QCleanupResources__dest_class__.qt_resource_struct.pack(\"C*\"), "
+        fprintf(out, "        Qt.qRegisterResourceData(0x01, QCleanupResources__dest_class__.qt_resource_tree.pack(\"C*\"), "
                      "QCleanupResources__dest_class__.qt_resource_name.pack(\"C*\"), QCleanupResources__dest_class__.qt_resource_data.pack(\"C*\"))\n");
         fprintf(out, "        return 1\n");
         fprintf(out, "    end\n");
 
         //cleanup
         fprintf(out, "    def self.qCleanupResources%s()\n", initName.toLocal8Bit().constData());
-        fprintf(out, "        Qt.qUnregisterResourceData(0x01, QCleanupResources__dest_class__.qt_resource_struct.pack(\"C*\"), "
+        fprintf(out, "        Qt.qUnregisterResourceData(0x01, QCleanupResources__dest_class__.qt_resource_tree.pack(\"C*\"), "
                      "QCleanupResources__dest_class__.qt_resource_name.pack(\"C*\"), QCleanupResources__dest_class__.qt_resource_data.pack(\"C*\"))\n");
         fprintf(out, "        return 1\n");
         fprintf(out, "    end\n");
