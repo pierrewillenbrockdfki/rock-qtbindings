@@ -86,7 +86,7 @@ show_exception_message()
                             .arg( StringValueCStr(message) )
                             .arg( StringValueCStr(message2) )
                             .arg( rb_class2name(CLASS_OF(info)) );
-    fprintf(stderr, "%s\n", errormessage.toLatin1().data());
+    fprintf(stderr, "%s\n", errormessage.toLocal8Bit().constData());
 
     QString tracemessage;
     for(int i = 1; i < RARRAY_LEN(bt); ++i) {
@@ -94,7 +94,7 @@ show_exception_message()
             QString s = QString("%1\n").arg( StringValueCStr(RARRAY_PTR(bt)[i]) );
             Q_ASSERT( ! s.isNull() );
             tracemessage += s;
-            fprintf(stderr, "\t%s", s.toLatin1().data());
+            fprintf(stderr, "\t%s", s.toLocal8Bit().constData());
         }
     }
 }

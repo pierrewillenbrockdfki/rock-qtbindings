@@ -547,7 +547,7 @@ void marshall_Hash(Marshall *m) {
 				o->allocated = false;
 				value_obj = set_obj_info(val_className, o);
 			}
-			rb_hash_aset(hv, rb_str_new2(((QString*)&(it.key()))->toLatin1()), value_obj);
+			rb_hash_aset(hv, rb_str_new2(((QString*)&(it.key()))->toLocal8Bit()), value_obj);
         }
 		
 		*(m->var()) = hv;
@@ -627,7 +627,7 @@ void marshall_Map(Marshall *m) {
 				o->allocated = false;
 				value_obj = set_obj_info(val_className, o);
 			}
-			rb_hash_aset(hv, rb_str_new2(((QString*)&(it.key()))->toLatin1()), value_obj);
+			rb_hash_aset(hv, rb_str_new2(((QString*)&(it.key()))->toLocal8Bit()), value_obj);
         }
 		
 		*(m->var()) = hv;

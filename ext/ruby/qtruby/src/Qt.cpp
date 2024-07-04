@@ -730,14 +730,14 @@ findAllMethods(int argc, VALUE * argv, VALUE /*self*/)
 								&& (methodRef.flags & Smoke::mf_protected) == Smoke::mf_protected ) ) ) { \
 			if (strncmp(s->methodNames[methodRef.name], "operator", strlen("operator")) == 0) { \
 				if (op_re.indexIn(s->methodNames[methodRef.name]) != -1) { \
-					rb_ary_push(result, rb_str_new2((op_re.cap(1) + op_re.cap(2)).toLatin1())); \
+					rb_ary_push(result, rb_str_new2((op_re.cap(1) + op_re.cap(2)).toLocal8Bit())); \
 				} else { \
 					rb_ary_push(result, rb_str_new2(s->methodNames[methodRef.name] + strlen("operator"))); \
 				} \
 			} else if (predicate_re.indexIn(s->methodNames[methodRef.name]) != -1 && methodRef.numArgs == 0) { \
-				rb_ary_push(result, rb_str_new2((predicate_re.cap(2).toLower() + predicate_re.cap(3) + "?").toLatin1())); \
+				rb_ary_push(result, rb_str_new2((predicate_re.cap(2).toLower() + predicate_re.cap(3) + "?").toLocal8Bit())); \
 			} else if (set_re.indexIn(s->methodNames[methodRef.name]) != -1 && methodRef.numArgs == 1) { \
-				rb_ary_push(result, rb_str_new2((set_re.cap(2).toLower() + set_re.cap(3) + "=").toLatin1())); \
+				rb_ary_push(result, rb_str_new2((set_re.cap(2).toLower() + set_re.cap(3) + "=").toLocal8Bit())); \
 			} else { \
 				rb_ary_push(result, rb_str_new2(s->methodNames[methodRef.name])); \
 			} \

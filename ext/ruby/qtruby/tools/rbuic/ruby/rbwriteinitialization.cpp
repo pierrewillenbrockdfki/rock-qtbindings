@@ -494,10 +494,10 @@ void WriteInitialization::acceptUI(DomUI *node)
         buddyName.replace("@", "");
 
         if (!m_registeredWidgets.contains(name) && !m_registeredWidgets.contains(name)) {
-            fprintf(stderr, "'@%s' isn't a valid widget\n", name.toLatin1().data());
+            fprintf(stderr, "'@%s' isn't a valid widget\n", name.toLocal8Bit().constData());
             continue;
         } else if (!m_registeredWidgets.contains(b.buddy) && !m_registeredWidgets.contains(buddyName)) {
-            fprintf(stderr, "'@%s' isn't a valid widget\n", buddyName.toLatin1().data());
+            fprintf(stderr, "'@%s' isn't a valid widget\n", buddyName.toLocal8Bit().constData());
             continue;
         }
 
@@ -753,7 +753,7 @@ void WriteInitialization::acceptWidget(DomWidget *node)
         const QString name = zOrder.at(i);
 
         if (!m_registeredWidgets.contains(name)) {
-            fprintf(stderr, "'%s' isn't a valid widget\n", name.toLatin1().data());
+            fprintf(stderr, "'%s' isn't a valid widget\n", name.toLocal8Bit().constData());
             continue;
         }
 
@@ -1019,7 +1019,7 @@ void WriteInitialization::acceptActionRef(DomActionRef *node)
             return;
         }
     } else if (!(m_driver->actionByName(actionName) || isSeparator)) {
-        fprintf(stderr, "Warning: action `%s' not declared\n", actionName.toLatin1().data());
+        fprintf(stderr, "Warning: action `%s' not declared\n", actionName.toLocal8Bit().constData());
         return;
     }
 
@@ -1700,7 +1700,7 @@ void WriteInitialization::acceptTabStops(DomTabStops *tabStops)
         QString name = l.at(i);
 
         if (!m_registeredWidgets.contains(name)) {
-            fprintf(stderr, "'%s' isn't a valid widget\n", name.toLatin1().data());
+            fprintf(stderr, "'%s' isn't a valid widget\n", name.toLocal8Bit().constData());
             continue;
         }
 

@@ -59,7 +59,7 @@ bool processResourceFile(const QStringList &filenamesIn, const QString &filename
         out_fd = fopen(filenameOut.toLocal8Bit().constData(), "w");
         if(!out_fd) {
 #endif
-            fprintf(stderr, "Unable to open %s for writing\n", filenameOut.toLatin1().constData());
+            fprintf(stderr, "Unable to open %s for writing\n", filenameOut.toLocal8Bit().constData());
             return false;
         }
     }
@@ -69,7 +69,7 @@ bool processResourceFile(const QStringList &filenamesIn, const QString &filename
     if(list) {
         const QStringList data = library.dataFiles();
         for(int i = 0; i < data.size(); ++i)
-            fprintf(out_fd, "%s\n", QDir::cleanPath(data.at(i)).toLatin1().constData());
+            fprintf(out_fd, "%s\n", QDir::cleanPath(data.at(i)).toLocal8Bit().constData());
     } else {
         ret = library.output(out_fd);
     }
@@ -84,7 +84,7 @@ int showHelp(const char *argv0, const QString &error)
 {
     fprintf(stderr, "Qt ruby resource compiler\n");
     if (!error.isEmpty())
-        fprintf(stderr, "%s: %s\n", argv0, error.toLatin1().constData());
+        fprintf(stderr, "%s: %s\n", argv0, error.toLocal8Bit().constData());
     fprintf(stderr, "Usage: %s  [options] <inputs>\n\n"
             "Options:\n"
             "\t-o file           Write output to file rather than stdout\n"
