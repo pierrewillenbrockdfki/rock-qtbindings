@@ -1,2 +1,2 @@
 qrc_simpletreemodel.rb: simpletreemodel.qrc
-	rbrcc -name simpletreemodel simpletreemodel.qrc -o qrc_simpletreemodel.rb
+	rbrcc5 -name simpletreemodel simpletreemodel.qrc -o qrc_simpletreemodel.rb
