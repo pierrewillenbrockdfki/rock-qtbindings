@@ -1125,19 +1125,19 @@ qvariant_value(VALUE /*self*/, VALUE variant_value_klass, VALUE variant_value)
 		return *(VALUE*) variant->data();
 #ifdef QT_QTDBUS
 	} else if (variant->userType() == qMetaTypeId<QDBusObjectPath>()) {
-		QString s = qVariantValue<QDBusObjectPath>(*variant).path();
+		QString s = variant->value<QDBusObjectPath>().path();
 		return rb_str_new2(s.toLatin1());
 	} else if (variant->userType() == qMetaTypeId<QDBusSignature>()) {
-		QString s = qVariantValue<QDBusSignature>(*variant).signature();
+		QString s = variant->value<QDBusSignature>().signature();
 		return rb_str_new2(s.toLatin1());
 	} else if (variant->userType() == qMetaTypeId<QDBusVariant>()) {
-		QVariant *ptr = new QVariant(qVariantValue<QDBusVariant>(*variant).variant());
+		QVariant *ptr = new QVariant(variant->value<QDBusVariant>().variant());
 		vo = alloc_smokeruby_object(true, qtcore_Smoke, qtcore_Smoke->idClass("QVariant").index, ptr);
 		return set_obj_info("Qt::Variant", vo);
 #endif
 	} else if (variant->type() >= QVariant::UserType) {
 		// If the QVariant contains a user type, don't bother to look at the Ruby class argument
-		value_ptr = QMetaType::construct(QMetaType::type(variant->typeName()), (void *) variant->constData());
+		value_ptr = QMetaType(QMetaType::type(variant->typeName())).construct((void *) variant->constData());
 		Smoke::ModuleIndex mi = o->smoke->findClass(variant->typeName());
 		vo = alloc_smokeruby_object(true, mi.smoke, mi.index, value_ptr);
 		return set_obj_info(qtruby_modules[mi.smoke].binding->className(mi.index), vo);
@@ -1150,52 +1150,52 @@ qvariant_value(VALUE /*self*/, VALUE variant_value_klass, VALUE variant_value)
 	}
 
 	if (qstrcmp(classname, "Qt::Pixmap") == 0) {
-		QPixmap v = qVariantValue<QPixmap>(*variant);
+		QPixmap v = variant->value<QPixmap>();
 		value_ptr = (void *) new QPixmap(v);
 	} else if (qstrcmp(classname, "Qt::Font") == 0) {
-		QFont v = qVariantValue<QFont>(*variant);
+		QFont v = variant->value<QFont>();
 		value_ptr = (void *) new QFont(v);
 	} else if (qstrcmp(classname, "Qt::Brush") == 0) {
-		QBrush v = qVariantValue<QBrush>(*variant);
+		QBrush v = variant->value<QBrush>();
 		value_ptr = (void *) new QBrush(v);
 	} else if (qstrcmp(classname, "Qt::Color") == 0) {
-		QColor v = qVariantValue<QColor>(*variant);
+		QColor v = variant->value<QColor>();
 		value_ptr = (void *) new QColor(v);
 	} else if (qstrcmp(classname, "Qt::Palette") == 0) {
-		QPalette v = qVariantValue<QPalette>(*variant);
+		QPalette v = variant->value<QPalette>();
 		value_ptr = (void *) new QPalette(v);
 	} else if (qstrcmp(classname, "Qt::Icon") == 0) {
-		QIcon v = qVariantValue<QIcon>(*variant);
+		QIcon v = variant->value<QIcon>();
 		value_ptr = (void *) new QIcon(v);
 	} else if (qstrcmp(classname, "Qt::Image") == 0) {
-		QImage v = qVariantValue<QImage>(*variant);
+		QImage v = variant->value<QImage>();
 		value_ptr = (void *) new QImage(v);
 	} else if (qstrcmp(classname, "Qt::Polygon") == 0) {
-		QPolygon v = qVariantValue<QPolygon>(*variant);
+		QPolygon v = variant->value<QPolygon>();
 		value_ptr = (void *) new QPolygon(v);
 	} else if (qstrcmp(classname, "Qt::Region") == 0) {
-		QRegion v = qVariantValue<QRegion>(*variant);
+		QRegion v = variant->value<QRegion>();
 		value_ptr = (void *) new QRegion(v);
 	} else if (qstrcmp(classname, "Qt::Bitmap") == 0) {
-		QBitmap v = qVariantValue<QBitmap>(*variant);
+		QBitmap v = variant->value<QBitmap>();
 		value_ptr = (void *) new QBitmap(v);
 	} else if (qstrcmp(classname, "Qt::Cursor") == 0) {
-		QCursor v = qVariantValue<QCursor>(*variant);
+		QCursor v = variant->value<QCursor>();
 		value_ptr = (void *) new QCursor(v);
 	} else if (qstrcmp(classname, "Qt::SizePolicy") == 0) {
-		QSizePolicy v = qVariantValue<QSizePolicy>(*variant);
+		QSizePolicy v = variant->value<QSizePolicy>();
 		value_ptr = (void *) new QSizePolicy(v);
 	} else if (qstrcmp(classname, "Qt::KeySequence") == 0) {
-		QKeySequence v = qVariantValue<QKeySequence>(*variant);
+		QKeySequence v = variant->value<QKeySequence>();
 		value_ptr = (void *) new QKeySequence(v);
 	} else if (qstrcmp(classname, "Qt::Pen") == 0) {
-		QPen v = qVariantValue<QPen>(*variant);
+		QPen v = variant->value<QPen>();
 		value_ptr = (void *) new QPen(v);
 	} else if (qstrcmp(classname, "Qt::TextLength") == 0) {
-		QTextLength v = qVariantValue<QTextLength>(*variant);
+		QTextLength v = variant->value<QTextLength>();
 		value_ptr = (void *) new QTextLength(v);
 	} else if (qstrcmp(classname, "Qt::TextFormat") == 0) {
-		QTextFormat v = qVariantValue<QTextFormat>(*variant);
+		QTextFormat v = variant->value<QTextFormat>();
 		value_ptr = (void *) new QTextFormat(v);
 	} else if (qstrcmp(classname, "Qt::Variant") == 0) {
 		value_ptr = (void *) new QVariant(*((QVariant *) variant->constData()));
