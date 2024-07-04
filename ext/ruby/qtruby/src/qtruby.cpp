@@ -1366,12 +1366,11 @@ so initialize() can be allowed to proceed to the end.
 static VALUE
 initialize_qt(int argc, VALUE * argv, VALUE self)
 {
-	VALUE retval = Qnil;
 	VALUE temp_obj;
-  static VALUE mainThread = Qnil;
-  if (mainThread == Qnil) {
-    mainThread = rb_thread_main();
-  }
+	static VALUE mainThread = Qnil;
+	if (mainThread == Qnil) {
+		mainThread = rb_thread_main();
+	}
 	if (TYPE(self) == T_DATA) {
 		// If a ruby block was passed then run that now
 		if (rb_block_given_p()) {
@@ -1379,10 +1378,10 @@ initialize_qt(int argc, VALUE * argv, VALUE self)
 		}
 		return self;
 	} else {
-    if (rb_thread_current() != mainThread) {
-      rb_raise(rb_eRuntimeError, "Qt methods cannot be called from outside of the main thread");
-    }
-  }
+		if (rb_thread_current() != mainThread) {
+			rb_raise(rb_eRuntimeError, "Qt methods cannot be called from outside of the main thread");
+		}
+	}
 
 	VALUE klass = rb_funcall(self, rb_intern("class"), 0);
 	VALUE constructor_name = rb_str_new2("new");
@@ -1402,7 +1401,7 @@ initialize_qt(int argc, VALUE * argv, VALUE self)
 		QByteArray * mcid = find_cached_selector(argc+4, temp_stack, klass, rb_class2name(klass));
 
 		if (_current_method.index == -1) {
-			retval = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+4, temp_stack);
+			(void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+4, temp_stack);
 			if (_current_method.index != -1) {
 				// Success. Cache result.
 				methcache.insert(*mcid, new Smoke::ModuleIndex(_current_method));
@@ -1671,12 +1670,13 @@ getIsa(VALUE /*self*/, VALUE classId)
 	Smoke* smoke = smokeList[NUM2INT(rb_funcall(classId, rb_intern("smoke"), 0))];
 
 	Smoke::Index *parents =
-	smoke->inheritanceList +
-	smoke->classes[id].parents;
+		smoke->inheritanceList +
+		smoke->classes[id].parents;
 
 	while(*parents) {
-	//logger("\tparent: %s", qtcore_Smoke->classes[*parents].className);
-	rb_ary_push(parents_list, rb_str_new2(smoke->classes[*parents++].className));
+		//logger("\tparent: %s", qtcore_Smoke->classes[*parents].className);
+		rb_ary_push(parents_list, rb_str_new2(smoke->classes[*parents].className));
+		parents++;
 	}
 	return parents_list;
 }
