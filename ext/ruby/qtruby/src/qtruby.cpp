@@ -601,10 +601,21 @@ qbytearray_append(VALUE self, VALUE str)
 }
 
 static VALUE
+qbytearray_cdata(VALUE self)
+{
+	smokeruby_object *o = value_obj_info(self);
+	QByteArray * bytes = (QByteArray *) o->ptr;
+	return rb_str_new(bytes->data(), bytes->size());
+}
+
+static VALUE
 qbytearray_data(VALUE self)
 {
 	smokeruby_object *o = value_obj_info(self);
 	QByteArray * bytes = (QByteArray *) o->ptr;
+	//using rb_str_new_static here would allow for the bytes to get written back if needed.
+	//This means the ruby object must be GCd before the qbytearray...
+	//return rb_str_new_static(bytes->data(), bytes->size());
 	return rb_str_new(bytes->data(), bytes->size());
 }
 
@@ -614,7 +625,10 @@ qimage_bits(VALUE self)
 	smokeruby_object *o = value_obj_info(self);
 	QImage * image = static_cast<QImage *>(o->ptr);
 	const uchar * bytes = image->bits();
-	return rb_str_new((const char *) bytes, image->numBytes());
+	//using rb_str_new_static here would allow for the bytes to get written back if needed.
+	//This means the ruby object must be GCd before the qimage...
+	//return rb_str_new_static((const char *) bytes, image->sizeInBytes());
+	return rb_str_new((const char *) bytes, image->sizeInBytes());
 }
 
 static VALUE
@@ -623,7 +637,10 @@ qimage_scan_line(VALUE self, VALUE ix)
 	smokeruby_object *o = value_obj_info(self);
 	QImage * image = static_cast<QImage *>(o->ptr);
 	const uchar * bytes = image->scanLine(NUM2INT(ix));
-	return rb_str_new((const char *) bytes, image->bytesPerLine());
+	//using rb_str_new_static here would allow for the bytes to get written back if needed.
+	//This means the ruby object must be GCd before the qimage...
+	//return rb_str_new_static((const char *) bytes, image->bytesPerLine());
+ 	return rb_str_new((const char *) bytes, image->bytesPerLine());
 }
 
 #ifdef QT_QTDBUS
@@ -2559,8 +2576,8 @@ create_qt_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 	} else if (packageName == "Qt::ByteArray") {
 		rb_define_method(klass, "+", (VALUE (*) (...)) qbytearray_append, 1);
 		rb_define_method(klass, "data", (VALUE (*) (...)) qbytearray_data, 0);
-		rb_define_method(klass, "constData", (VALUE (*) (...)) qbytearray_data, 0);
-		rb_define_method(klass, "const_data", (VALUE (*) (...)) qbytearray_data, 0);
+		rb_define_method(klass, "constData", (VALUE (*) (...)) qbytearray_cdata, 0);
+		rb_define_method(klass, "const_data", (VALUE (*) (...)) qbytearray_cdata, 0);
 	} else if (packageName == "Qt::Char") {
 		rb_define_method(klass, "to_s", (VALUE (*) (...)) qchar_to_s, 0);
 	} else if (packageName == "Qt::Image") {
