@@ -1464,8 +1464,8 @@ qapplication_argv(VALUE /*self*/)
 {
 	VALUE result = rb_ary_new();
 	// Drop argv[0], as it isn't included in the ruby global ARGV
-	for (int index = 1; index < qApp->argc(); index++) {
-		rb_ary_push(result, rb_str_new2(qApp->argv()[index]));
+	for (int index = 1; index < qApp->arguments().size(); index++) {
+		rb_ary_push(result, rb_str_new2(qApp->arguments()[index].toLocal8Bit()	));
 	}
 
 	return result;
