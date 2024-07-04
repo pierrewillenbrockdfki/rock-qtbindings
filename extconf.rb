@@ -18,11 +18,11 @@ end
 if windows
   # README! - Modify this path if you have QT installed somewhere else
   # or if you have a different version of QT you want to link to.
-  qt_sdk_path = ENV['QTBINDINGS_QT_PATH']
+  qt_sdk_path = ENV['QT5BINDINGS_QT_PATH']
   begin
     File::Stat.new(qt_sdk_path)
   rescue
-    puts "ERROR! QT SDK doesn't exist at #{qt_sdk_path}. Please set environment QTBINDINGS_QT_PATH"
+    puts "ERROR! QT SDK doesn't exist at #{qt_sdk_path}. Please set environment QT5BINDINGS_QT_PATH"
     exit # Not much we can do if the QT SDK doesn't exist
   end
 end
@@ -73,7 +73,7 @@ File.open('Makefile', 'w') do |file|
     file.puts "\t-cd bin\\#{ruby_version} && del /F /Q *"
     file.puts "\t-cd lib\\#{ruby_version} && del /F /Q *"
     file.puts "\t-del /F /Q Makefile"
-    file.puts "\t-del /F /Q qtbindings-*.gem"
+    file.puts "\t-del /F /Q qt5bindings-*.gem"
     file.puts ""
     file.puts "build: makedirs"
     file.puts "\tset CC=mingw32-gcc.exe"
@@ -196,7 +196,7 @@ File.open('Makefile', 'w') do |file|
     file.puts "\t-cd bin/#{ruby_version} && rm *"
     file.puts "\t-cd lib/#{ruby_version} && rm *"
     file.puts "\t-rm Makefile"
-    file.puts "\t-rm qtbindings-*.gem"
+    file.puts "\t-rm qt5bindings-*.gem"
     file.puts ""
     file.puts "build: makedirs"
     file.puts "\t-cd ext/build; \\"

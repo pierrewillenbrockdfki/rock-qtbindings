@@ -4,7 +4,7 @@ windows = true if platform =~ /mswin32/ or platform =~ /mingw32/
 
 begin
   require 'thread'
-  require 'qtbindings-qt'
+  require 'qt5bindings-qt'
 rescue LoadError
   # Oh well - Hopefully not using the Windows binary gem
 end
