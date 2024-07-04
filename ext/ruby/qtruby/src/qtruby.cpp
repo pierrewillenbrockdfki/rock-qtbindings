@@ -290,7 +290,7 @@ inspect_qobject(VALUE self)
 	}
 
 	value_list.append(">");
-	rb_str_cat2(inspect_str, value_list.toLatin1());
+	rb_str_cat2(inspect_str, value_list.toLocal8Bit());
 
 	return inspect_str;
 }
@@ -350,13 +350,13 @@ pretty_print_qobject(VALUE self, VALUE pp)
 				.arg(qobject->parent()->objectName());
 		}
 
-		rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLatin1()));
+		rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLocal8Bit()));
 	}
 
 	if (qobject->children().count() != 0) {
 		value_list = QString("  children=Array (%1 element(s)),\n")
 			.arg(qobject->children().count());
-		rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLatin1()));
+		rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLocal8Bit()));
 	}
 
 	value_list = QString("  metaObject=#<Qt::MetaObject:0x0");
@@ -368,12 +368,12 @@ pretty_print_qobject(VALUE self, VALUE pp)
 	}
 
 	value_list.append(">,\n");
-	rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLatin1()));
+	rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLocal8Bit()));
 
 	QMetaProperty property = qobject->metaObject()->property(0);
 	QVariant value = property.read(qobject);
 	value_list = " " + inspectProperty(property, property.name(), value);
-	rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLatin1()));
+	rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLocal8Bit()));
 
 	for (int index = 1; index < qobject->metaObject()->propertyCount(); index++) {
 		rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(",\n"));
@@ -381,7 +381,7 @@ pretty_print_qobject(VALUE self, VALUE pp)
 		property = qobject->metaObject()->property(index);
 		value = property.read(qobject);
 		value_list = " " + inspectProperty(property, property.name(), value);
-		rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLatin1()));
+		rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(value_list.toLocal8Bit()));
 	}
 
 	rb_funcall(pp, rb_intern("text"), 1, rb_str_new2(">"));
@@ -1126,10 +1126,10 @@ qvariant_value(VALUE /*self*/, VALUE variant_value_klass, VALUE variant_value)
 #ifdef QT_QTDBUS
 	} else if (variant->userType() == qMetaTypeId<QDBusObjectPath>()) {
 		QString s = variant->value<QDBusObjectPath>().path();
-		return rb_str_new2(s.toLatin1());
+		return rb_str_new2(s.toLocal8Bit());
 	} else if (variant->userType() == qMetaTypeId<QDBusSignature>()) {
 		QString s = variant->value<QDBusSignature>().signature();
-		return rb_str_new2(s.toLatin1());
+		return rb_str_new2(s.toLocal8Bit());
 	} else if (variant->userType() == qMetaTypeId<QDBusVariant>()) {
 		QVariant *ptr = new QVariant(variant->value<QDBusVariant>().variant());
 		vo = alloc_smokeruby_object(true, qtcore_Smoke, qtcore_Smoke->idClass("QVariant").index, ptr);
@@ -1598,7 +1598,7 @@ qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 			rx = new QRegExp("\\(.*");
 		}
 		name.replace(*rx, "");
-		QtRuby::InvokeSlot slot(self, rb_intern(name.toLatin1()), mocArgs, _o);
+		QtRuby::InvokeSlot slot(self, rb_intern(name.toLocal8Bit()), mocArgs, _o);
 		slot.next();
 	}
 
@@ -2478,7 +2478,7 @@ create_qobject_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 	QString packageName(package);
 
 	foreach(QString s, packageName.mid(strlen(moduleName) + 2).split("::")) {
-		klass = rb_define_class_under(klass, (const char*) s.toLatin1(), qt_base_class);
+		klass = rb_define_class_under(klass, (const char*) s.toLocal8Bit(), qt_base_class);
 	}
 
 	if (packageName == "Qt::Application" || packageName == "Qt::CoreApplication" ) {
@@ -2573,7 +2573,7 @@ create_qt_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 	rb_define_singleton_method(module_value, "const_missing", (VALUE (*) (...)) module_method_missing, -1);
 */
 	foreach(QString s, packageName.mid(strlen(moduleName) + 2).split("::")) {
-		klass = rb_define_class_under(klass, (const char*) s.toLatin1(), qt_base_class);
+		klass = rb_define_class_under(klass, (const char*) s.toLocal8Bit(), qt_base_class);
 	}
 
 	if (packageName == "Qt::MetaObject") {
