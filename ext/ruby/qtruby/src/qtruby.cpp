@@ -2811,7 +2811,7 @@ Init_qtruby5()
 	rb_intern("itemAt");
 	rb_intern("internalPointer");
 
-	rb_require("Qt/qtruby5.rb");
+	rb_require("Qt5/qtruby5.rb");
 
 	rObject_typeId = QMetaType::registerType("rObject", &delete_ruby_object, &create_ruby_object);
 
