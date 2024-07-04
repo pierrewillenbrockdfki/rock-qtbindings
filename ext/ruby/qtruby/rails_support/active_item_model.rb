@@ -16,7 +16,7 @@ Written by Richard Dale and Silvio Fonseca
 
 =end
 
-require 'Qt'
+require 'Qt5'
 
 #require "active_record"
 #require "active_support"

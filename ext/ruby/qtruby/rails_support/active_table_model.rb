@@ -15,7 +15,7 @@ Written by Richard Dale and Silvio Fonseca
 
 =end
 
-require 'Qt'
+require 'Qt5'
 require 'date'
 
 class ActiveTableModel < Qt::AbstractTableModel
