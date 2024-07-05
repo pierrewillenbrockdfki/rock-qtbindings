@@ -50,48 +50,48 @@ task :build_examples do
   # Go into the examples directory and look for all the makefiles and build them
   Dir['examples/**/makefile'].each do |file|
     if windows
-      system("cd #{File.dirname(file).gsub('/', '\\')} && #{MAKE}")
+      sh("cd #{File.dirname(file).gsub('/', '\\')} && #{MAKE}")
     else
-      system("cd #{File.dirname(file)} && #{MAKE}")
+      sh("cd #{File.dirname(file)} && #{MAKE}")
     end
   end
 end
 
 task :examples => [:build_examples] do
-  system('cd examples && ruby run_all.rb')
+  sh('cd examples && ruby run_all.rb')
 end
 
 task :default => [:all]
 
 task :extconf do
-  system('ruby extconf.rb')
+  sh('ruby extconf.rb')
 end
 
 # All calls 'make clean' and 'make build'
 task :all => [:extconf] do
-  system("#{MAKE} all")
+  sh("#{MAKE} all")
 end
 
 task :clean => [:extconf] do
-  system("#{MAKE} clean")
+  sh("#{MAKE} clean")
 end
 
 task :distclean => [:extconf] do
-  system("#{MAKE} distclean")
+  sh("#{MAKE} distclean")
 end
 
 task :make_build => [:extconf] do
-  system("#{MAKE} build")
+  sh("#{MAKE} build")
 end
 
 task :install => [:extconf] do
-  system("#{MAKE} install")
+  sh("#{MAKE} install")
 end
 
 task :gem => [:distclean] do
   warn_version()
   set_version()
-  system("gem build qt5bindings.gemspec")
+  sh("gem build qt5bindings.gemspec")
   clear_version()
 end
 
