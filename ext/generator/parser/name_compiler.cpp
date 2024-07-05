@@ -141,7 +141,7 @@ void NameCompiler::visitUnqualifiedName(UnqualifiedNameAST *node)
       if (op_id->op && op_id->op->op)
         tmp +=  decode(m_session, op_id->op, true);
       else
-        tmp += QLatin1String("{...cast...}");
+        tmp += QStringLiteral("{...cast...}");
 
       tmp_name = IndexedString(tmp);
       m_typeSpecifier = op_id->type_specifier;

@@ -252,9 +252,9 @@ QStringList TypeCompiler::cvString() const
   foreach (int q, cv())
     {
       if (q == Token_const)
-        lst.append(QLatin1String("const"));
+        lst.append(QStringLiteral("const"));
       else if (q == Token_volatile)
-        lst.append(QLatin1String("volatile"));
+        lst.append(QStringLiteral("volatile"));
     }
 
   return lst;
