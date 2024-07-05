@@ -95,23 +95,26 @@ mark_qobject_children(QObject * qobject)
 {
 	VALUE obj;
 
-	const QList<QObject*> l = qobject->children();
+	try {
+		const QList<QObject *> l = qobject->children();
 
-	if (l.count() == 0) {
-		return;
-	}
-
-	QObject *child;
-
-	for (int i=0; i < l.size(); ++i) {
-		child = l.at(i);
-		obj = getPointerObject(child);
-		if (obj != Qnil) {
-			if(do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", child->metaObject()->className(), child, (void*)obj);
-			rb_gc_mark(obj);
+		if (l.count() == 0) {
+			return;
 		}
 
-		mark_qobject_children(child);
+		QObject *child;
+
+		for (int i = 0; i < l.size(); ++i) {
+			child = l.at(i);
+			obj = getPointerObject(child);
+			if (obj != Qnil) {
+				if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", child->metaObject()->className(), child, (void *)obj);
+				rb_gc_mark(obj);
+			}
+
+			mark_qobject_children(child);
+		}
+	} catch (SmokeAbstractMethodException &e) {
 	}
 }
 
@@ -120,23 +123,26 @@ mark_qgraphicsitem_children(QGraphicsItem * item)
 {
 	VALUE obj;
 
-	const QList<QGraphicsItem*> l = item->childItems();
+	try {
+		const QList<QGraphicsItem *> l = item->childItems();
 
-	if (l.count() == 0) {
-		return;
-	}
-
-	QGraphicsItem *child;
-
-	for (int i=0; i < l.size(); ++i) {
-		child = l.at(i);
-		obj = getPointerObject(child);
-		if (obj != Qnil) {
-			if(do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QGraphicsItem", child, (void*)obj);
-			rb_gc_mark(obj);
+		if (l.count() == 0) {
+			return;
 		}
 
-		mark_qgraphicsitem_children(child);
+		QGraphicsItem *child;
+
+		for (int i = 0; i < l.size(); ++i) {
+			child = l.at(i);
+			obj = getPointerObject(child);
+			if (obj != Qnil) {
+				if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QGraphicsItem", child, (void *)obj);
+				rb_gc_mark(obj);
+			}
+
+			mark_qgraphicsitem_children(child);
+		}
+	} catch (SmokeAbstractMethodException &e) {
 	}
 }
 
@@ -146,15 +152,18 @@ mark_qtreewidgetitem_children(QTreeWidgetItem * item)
 	VALUE obj;
 	QTreeWidgetItem *child;
 
-	for (int i = 0; i < item->childCount(); i++) {
-		child = item->child(i);
-		obj = getPointerObject(child);
-		if (obj != Qnil) {
-			if(do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QTreeWidgetItem", child, (void*)obj);
-			rb_gc_mark(obj);
-		}
+	try {
+		for (int i = 0; i < item->childCount(); i++) {
+			child = item->child(i);
+			obj = getPointerObject(child);
+			if (obj != Qnil) {
+				if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QTreeWidgetItem", child, (void *)obj);
+				rb_gc_mark(obj);
+			}
 
-		mark_qtreewidgetitem_children(child);
+			mark_qtreewidgetitem_children(child);
+		}
+	} catch (SmokeAbstractMethodException &e) {
 	}
 }
 
@@ -163,20 +172,26 @@ mark_qstandarditem_children(QStandardItem * item)
 {
 	VALUE obj;
 
-	for (int row = 0; row < item->rowCount(); row++) {
-		for (int column = 0; column < item->columnCount(); column++) {
-			QStandardItem * child = item->child(row, column);
-			if (child != 0) {
-				if (child->hasChildren()) {
-					mark_qstandarditem_children(child);
-				}
-				obj = getPointerObject(child);
-				if (obj != Qnil) {
-					if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QStandardItem", item, (void*)obj);
-					rb_gc_mark(obj);
+	try {
+		for (int row = 0; row < item->rowCount(); row++) {
+			for (int column = 0; column < item->columnCount(); column++) {
+				QStandardItem *child = item->child(row, column);
+				if (child != 0) {
+					try {
+						if (child->hasChildren()) {
+							mark_qstandarditem_children(child);
+						}
+					} catch (SmokeAbstractMethodException &e) {
+					}
+					obj = getPointerObject(child);
+					if (obj != Qnil) {
+						if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QStandardItem", item, (void *)obj);
+						rb_gc_mark(obj);
+					}
 				}
 			}
 		}
+	} catch (SmokeAbstractMethodException &e) {
 	}
 }
 
@@ -184,8 +199,8 @@ void
 smokeruby_mark(void * p)
 {
 	VALUE obj;
-    smokeruby_object * o = (smokeruby_object *) p;
-    const char *className = o->smoke->classes[o->classId].className;
+	smokeruby_object *o = (smokeruby_object *) p;
+	const char *className = o->smoke->classes[o->classId].className;
 
 	if (do_debug & qtdb_gc) qWarning("Checking for mark (%s*)%p", className, o->ptr);
 
@@ -194,33 +209,42 @@ smokeruby_mark(void * p)
 			QObject *qobject = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject", true).index);
 			// Only mark the QObject tree if the current item doesn't have a parent or the parent isn't wrapped by the bindings.
 			// This avoids marking parts of a tree more than once.
-			if (qobject->parent() == 0 || getPointerObject(qobject->parent()) == Qnil) {
-				mark_qobject_children(qobject);
+			try {
+				if (qobject->parent() == 0 || getPointerObject(qobject->parent()) == Qnil) {
+					mark_qobject_children(qobject);
+				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 		}
 
 		if (o->smoke->isDerivedFrom(className, "QWidget")) {
 			QWidget * widget = (QWidget *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QWidget", true).index);
-			QLayout * layout = widget->layout();
-			if (layout != 0) {
-				obj = getPointerObject(layout);
-				if (obj != Qnil) {
-					if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QLayout", layout, (void*)obj);
-					rb_gc_mark(obj);
+			try {
+				QLayout *layout = widget->layout();
+				if (layout != 0) {
+					obj = getPointerObject(layout);
+					if (obj != Qnil) {
+						if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QLayout", layout, (void *)obj);
+						rb_gc_mark(obj);
+					}
 				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 		}
 
 		if (o->smoke->isDerivedFrom(className, "QListWidget")) {
 			QListWidget * listwidget = (QListWidget *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QListWidget", true).index);
 
-			for (int i = 0; i < listwidget->count(); i++) {
-				QListWidgetItem * item = listwidget->item(i);
-				obj = getPointerObject(item);
-				if (obj != Qnil) {
-					if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QListWidgetItem", item, (void*)obj);
-					rb_gc_mark(obj);
+			try {
+				for (int i = 0; i < listwidget->count(); i++) {
+					QListWidgetItem *item = listwidget->item(i);
+					obj = getPointerObject(item);
+					if (obj != Qnil) {
+						if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QListWidgetItem", item, (void *)obj);
+						rb_gc_mark(obj);
+					}
 				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 			return;
 		}
@@ -229,15 +253,18 @@ smokeruby_mark(void * p)
 			QTableWidget * table = (QTableWidget *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QTableWidget", true).index);
 			QTableWidgetItem *item;
 
-			for ( int row = 0; row < table->rowCount(); row++ ) {
-				for ( int col = 0; col < table->columnCount(); col++ ) {
-					item = table->item(row, col);
-					obj = getPointerObject(item);
-					if (obj != Qnil) {
-						if(do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", className, item, (void*)obj);
-						rb_gc_mark(obj);
+			try {
+				for (int row = 0; row < table->rowCount(); row++) {
+					for (int col = 0; col < table->columnCount(); col++) {
+						item = table->item(row, col);
+						obj = getPointerObject(item);
+						if (obj != Qnil) {
+							if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", className, item, (void *)obj);
+							rb_gc_mark(obj);
+						}
 					}
 				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 			return;
 		}
@@ -245,86 +272,107 @@ smokeruby_mark(void * p)
 		if (o->smoke->isDerivedFrom(className, "QTreeWidget")) {
 			QTreeWidget * qtreewidget = (QTreeWidget *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QTreeWidget", true).index);
 
-			for (int i = 0; i < qtreewidget->topLevelItemCount(); i++) {
-				QTreeWidgetItem * item = qtreewidget->topLevelItem(i);
-				obj = getPointerObject(item);
-				if (obj != Qnil) {
-					if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QTreeWidgetItem", item, (void*)obj);
-					rb_gc_mark(obj);
+			try {
+				for (int i = 0; i < qtreewidget->topLevelItemCount(); i++) {
+					QTreeWidgetItem *item = qtreewidget->topLevelItem(i);
+					obj = getPointerObject(item);
+					if (obj != Qnil) {
+						if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QTreeWidgetItem", item, (void *)obj);
+						rb_gc_mark(obj);
+					}
+					mark_qtreewidgetitem_children(item);
 				}
-				mark_qtreewidgetitem_children(item);
+			} catch (SmokeAbstractMethodException &e) {
 			}
 			return;
 		}
 
 		if (o->smoke->isDerivedFrom(className, "QLayout")) {
 			QLayout * qlayout = (QLayout *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QLayout", true).index);
-      obj = getPointerObject(qlayout);
-			for (int i = 0; i < qlayout->count(); ++i) {
-				QLayoutItem * item = qlayout->itemAt(i);
-        if (do_debug & qtdb_gc) qWarning("Checking QLayoutItem %p", item);
-				if (item != 0) {
-					obj = getPointerObject(item);
-					if (obj != Qnil) {
-						if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QLayoutItem", item, (void*)obj);
-						rb_gc_mark(obj);
+			obj = getPointerObject(qlayout);
+			try {
+				for (int i = 0; i < qlayout->count(); ++i) {
+					QLayoutItem *item = qlayout->itemAt(i);
+					if (do_debug & qtdb_gc) qWarning("Checking QLayoutItem %p", item);
+					if (item != 0) {
+						obj = getPointerObject(item);
+						if (obj != Qnil) {
+							if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QLayoutItem", item, (void *)obj);
+							rb_gc_mark(obj);
+						}
+						try {
+							QWidget *widget = item->widget();
+							if (widget != 0) {
+								obj = getPointerObject(widget);
+								if (obj != Qnil) {
+									if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QLayoutItem->widget", widget, (void *)obj);
+									rb_gc_mark(obj);
+								}
+							}
+						} catch (SmokeAbstractMethodException &e) {
+						}
 					}
-          QWidget * widget = item->widget();
-          if (widget != 0) {
-            obj = getPointerObject(widget);
-            if (obj != Qnil) {
-              if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QLayoutItem->widget", widget, (void*)obj);
-              rb_gc_mark(obj);
-            }
-          }
 				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 			return;
 		}
 
 		if (o->smoke->isDerivedFrom(className, "QStandardItemModel")) {
 			QStandardItemModel * model = (QStandardItemModel *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QStandardItemModel", true).index);
-			for (int row = 0; row < model->rowCount(); row++) {
-				for (int column = 0; column < model->columnCount(); column++) {
-					QStandardItem * item = model->item(row, column);
-					if (item != 0) {
-						if (item->hasChildren()) {
-							mark_qstandarditem_children(item);
-						}
-						obj = getPointerObject(item);
-						if (obj != Qnil) {
-							if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QStandardItem", item, (void*)obj);
-							rb_gc_mark(obj);
+			try {
+				for (int row = 0; row < model->rowCount(); row++) {
+					for (int column = 0; column < model->columnCount(); column++) {
+						QStandardItem *item = model->item(row, column);
+						if (item != 0) {
+							try {
+								if (item->hasChildren()) {
+									mark_qstandarditem_children(item);
+								}
+							} catch (SmokeAbstractMethodException &e) {
+							}
+							obj = getPointerObject(item);
+							if (obj != Qnil) {
+								if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QStandardItem", item, (void *)obj);
+								rb_gc_mark(obj);
+							}
 						}
 					}
 				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 			return;
 		}
 
 		if (o->smoke->isDerivedFrom(className, "QGraphicsWidget")) {
 			QGraphicsWidget * widget = (QGraphicsWidget *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QGraphicsWidget", true).index);
-			QGraphicsLayout * layout = widget->layout();
-			if (layout != 0) {
-				obj = getPointerObject(layout);
-				if (obj != Qnil) {
-					if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QGraphicsLayout", layout, (void*)obj);
-					rb_gc_mark(obj);
+			try {
+				QGraphicsLayout *layout = widget->layout();
+				if (layout != 0) {
+					obj = getPointerObject(layout);
+					if (obj != Qnil) {
+						if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QGraphicsLayout", layout, (void *)obj);
+						rb_gc_mark(obj);
+					}
 				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 		}
 
 		if (o->smoke->isDerivedFrom(className, "QGraphicsLayout")) {
 			QGraphicsLayout * qlayout = (QGraphicsLayout *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QGraphicsLayout", true).index);
-			for (int i = 0; i < qlayout->count(); ++i) {
-				QGraphicsLayoutItem * item = qlayout->itemAt(i);
-				if (item != 0) {
-					obj = getPointerObject(item);
-					if (obj != Qnil) {
-						if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QGraphicsLayoutItem", item, (void*)obj);
-						rb_gc_mark(obj);
+			try {
+				for (int i = 0; i < qlayout->count(); ++i) {
+					QGraphicsLayoutItem *item = qlayout->itemAt(i);
+					if (item != 0) {
+						obj = getPointerObject(item);
+						if (obj != Qnil) {
+							if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QGraphicsLayoutItem", item, (void *)obj);
+							rb_gc_mark(obj);
+						}
 					}
 				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 			return;
 		}
@@ -333,43 +381,55 @@ smokeruby_mark(void * p)
 			QGraphicsItem * item = (QGraphicsItem *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QGraphicsItem", true).index);
 			// Only mark the QGraphicsItem tree if the current item doesn't have a parent.
 			// This avoids marking parts of a tree more than once.
-			if (item->parentItem() == 0) {
-				mark_qgraphicsitem_children(item);
-			}
-			if (QGraphicsEffect* effect = item->graphicsEffect()) {
-				obj = getPointerObject(effect);
-				if (obj != Qnil) {
-				  if (do_debug & qtdb_gc)
-					qWarning("Marking (%s*)%p -> %p", "QGraphicsEffect", effect, (void*)obj);
-					rb_gc_mark(obj);
+			try {
+				if (item->parentItem() == 0) {
+					mark_qgraphicsitem_children(item);
 				}
+			} catch (SmokeAbstractMethodException &e) {
+			}
+			try {
+				if (QGraphicsEffect *effect = item->graphicsEffect()) {
+					obj = getPointerObject(effect);
+					if (obj != Qnil) {
+						if (do_debug & qtdb_gc)
+							qWarning("Marking (%s*)%p -> %p", "QGraphicsEffect", effect, (void *)obj);
+						rb_gc_mark(obj);
+					}
+				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 		}
 
 		if (o->smoke->isDerivedFrom(className, "QGraphicsScene")) {
 			QGraphicsScene * scene = (QGraphicsScene *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QGraphicsScene", true).index);
-			QList<QGraphicsItem *> list = scene->items();
-			for (int i = 0; i < list.size(); i++) {
-				QGraphicsItem * item = list.at(i);
-				if (item != 0) {
-					obj = getPointerObject(item);
-					if (obj != Qnil) {
-						if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QGraphicsItem", item, (void*)obj);
-						rb_gc_mark(obj);
+			try {
+				QList<QGraphicsItem *> list = scene->items();
+				for (int i = 0; i < list.size(); i++) {
+					QGraphicsItem *item = list.at(i);
+					if (item != 0) {
+						obj = getPointerObject(item);
+						if (obj != Qnil) {
+							if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QGraphicsItem", item, (void *)obj);
+							rb_gc_mark(obj);
+						}
 					}
 				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 			return;
 		}
 
 		if (qstrcmp(className, "QModelIndex") == 0) {
 			QModelIndex * qmodelindex = (QModelIndex *) o->ptr;
-			void * ptr = qmodelindex->internalPointer();
-		        obj = getPointerObject(ptr);
-			if (obj != Qnil) {
-				if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QModelIndex", ptr, (void*)obj);
+			try {
+				void *ptr = qmodelindex->internalPointer();
+				obj = getPointerObject(ptr);
+				if (obj != Qnil) {
+					if (do_debug & qtdb_gc) qWarning("Marking (%s*)%p -> %p", "QModelIndex", ptr, (void *)obj);
 
-				rb_gc_mark(obj);
+					rb_gc_mark(obj);
+				}
+			} catch (SmokeAbstractMethodException &e) {
 			}
 
 			return;

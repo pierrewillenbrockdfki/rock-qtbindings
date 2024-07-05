@@ -5,6 +5,7 @@
 #include <cstring>
 #include <string>
 #include <map>
+#include <stdexcept>
 
 /*
    Copyright (C) 2002, Ashley Winters <qaqortog@nwlink.com>
@@ -539,9 +540,9 @@ public:
     }
 
     static inline bool isDerivedFrom(const char *className, const char *baseClassName) {
-    ModuleIndex classId = findClass(className);
-    ModuleIndex baseId = findClass(baseClassName);
-    return isDerivedFrom(classId.smoke, classId.index, baseId.smoke, baseId.index);
+        ModuleIndex classId = findClass(className);
+        ModuleIndex baseId = findClass(baseClassName);
+        return isDerivedFrom(classId.smoke, classId.index, baseId.smoke, baseId.index);
     }
 };
 
@@ -554,6 +555,13 @@ public:
     virtual bool callMethod(Smoke::Index method, void *obj, Smoke::Stack args, bool isAbstract = false) = 0;
     virtual char* className(Smoke::Index classId) = 0;
     virtual ~SmokeBinding() {}
+};
+
+class SmokeAbstractMethodException : public std::runtime_error {
+public:
+SmokeAbstractMethodException( const std::string& what_arg ) : runtime_error(what_arg) {}
+SmokeAbstractMethodException( const char* what_arg ) : runtime_error(what_arg) {}
+SmokeAbstractMethodException( const runtime_error& other ) noexcept  : runtime_error(other) {}
 };
 
 #endif

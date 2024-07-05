@@ -318,21 +318,29 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
     out << x_params;
     
     if (meth.flags() & Method::PureVirtual) {
-        out << QStringLiteral("        this->_binding->callMethod(%1, (void*)this, x, true /*pure virtual*/);\n").arg(m_smokeData->methodIdx[&meth]);
-        if (meth.type() != Type::Void) {
+        out << QStringLiteral("        if (this->_binding->callMethod(%1, (void*)this, x, true /*pure virtual*/)) ").arg(m_smokeData->methodIdx[&meth]);
+        if (meth.type() == Type::Void) {
+            out << "return;\n";
+        } else {
             QString field = Util::stackItemField(meth.type());
             if (meth.type()->pointerDepth() == 0 && field == "s_class") {
                 QString tmpType = type;
                 if (meth.type()->isRef()) tmpType.replace('&', "");
                 tmpType.append('*');
-                out << "        " << tmpType << " xptr = (" << tmpType << ")x[0].s_class;\n";
-                out << "        " << type << " xret(*xptr);\n";
-                out << "        delete xptr;\n";
-                out << "        return xret;\n";
+                out << "{\n";
+                out << "            " << tmpType << " xptr = (" << tmpType << ")x[0].s_class;\n";
+                out << "            " << type << " xret(*xptr);\n";
+                out << "            delete xptr;\n";
+                out << "            return xret;\n";
+                out << "        }\n";
             } else {
-                out << QStringLiteral("        return (%1)x[0].%2;\n").arg(type, Util::stackItemField(meth.type()));
+                out << QStringLiteral("return (%1)x[0].%2;\n").arg(type, Util::stackItemField(meth.type()));
             }
         }
+        out << "        // This is the original virtual abstract name\n"
+            << "        throw SmokeAbstractMethodException(\"Pure virtual c++ method called: "
+            << QStringLiteral("%1::%2").arg(meth.getClass()->toString()).arg(meth.name())
+            << "\");\n";
     } else {
         out << QStringLiteral("        if (this->_binding->callMethod(%1, (void*)this, x)) ").arg(m_smokeData->methodIdx[&meth]);
         if (meth.type() == Type::Void) {
