@@ -183,7 +183,7 @@ void SmokeClassFiles::generateMethod(QTextStream& out, const QString& className,
     out << "    ";
     if ((meth.flags() & Method::Static) || meth.isConstructor())
         out << "static ";
-    out << QString("void x_%1(Smoke::Stack x) {\n").arg(index);
+    out << QStringLiteral("void x_%1(Smoke::Stack x) {\n").arg(index);
     out << "        // Method: \"" << meth.toString(false, true) << "\"\n";
 
     bool dynamicDispatch = ((meth.flags() & Method::PureVirtual) || (meth.flags() & Method::DynamicDispatch));
@@ -296,7 +296,7 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
             includes.insert(param.type()->getClass()->fileName());
         
         out << param.type()->toString() << " x" << i + 1;
-        x_params += QString("        x[%1].%2 = %3;\n")
+        x_params += QStringLiteral("        x[%1].%2 = %3;\n")
             .arg(QString::number(i + 1)).arg(Util::stackItemField(param.type()))
             .arg(Util::assignmentString(param.type(), "x" + QString::number(i + 1)));
         x_list += "x" + QString::number(i + 1);
@@ -313,11 +313,11 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
         out << ") ";
     }
     out << "override {\n";
-    out << QString("        Smoke::StackItem x[%1];\n").arg(meth.parameters().count() + 1);
+    out << QStringLiteral("        Smoke::StackItem x[%1];\n").arg(meth.parameters().count() + 1);
     out << x_params;
     
     if (meth.flags() & Method::PureVirtual) {
-        out << QString("        this->_binding->callMethod(%1, (void*)this, x, true /*pure virtual*/);\n").arg(m_smokeData->methodIdx[&meth]);
+        out << QStringLiteral("        this->_binding->callMethod(%1, (void*)this, x, true /*pure virtual*/);\n").arg(m_smokeData->methodIdx[&meth]);
         if (meth.type() != Type::Void) {
             QString field = Util::stackItemField(meth.type());
             if (meth.type()->pointerDepth() == 0 && field == "s_class") {
@@ -329,11 +329,11 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
                 out << "        delete xptr;\n";
                 out << "        return xret;\n";
             } else {
-                out << QString("        return (%1)x[0].%2;\n").arg(type, Util::stackItemField(meth.type()));
+                out << QStringLiteral("        return (%1)x[0].%2;\n").arg(type, Util::stackItemField(meth.type()));
             }
         }
     } else {
-        out << QString("        if (this->_binding->callMethod(%1, (void*)this, x)) ").arg(m_smokeData->methodIdx[&meth]);
+        out << QStringLiteral("        if (this->_binding->callMethod(%1, (void*)this, x)) ").arg(m_smokeData->methodIdx[&meth]);
         if (meth.type() == Type::Void) {
             out << "return;\n";
         } else {
@@ -349,13 +349,13 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
                 out << "            return xret;\n";
                 out << "        }\n";
             } else {
-                out << QString("return (%1)x[0].%2;\n").arg(type, Util::stackItemField(meth.type()));
+                out << QStringLiteral("return (%1)x[0].%2;\n").arg(type, Util::stackItemField(meth.type()));
             }
         }
         out << "        ";
         if (meth.type() != Type::Void)
             out << "return ";
-        out << QString("this->%1::%2(%3);\n").arg(meth.getClass()->toString()).arg(meth.name()).arg(x_list);
+        out << QStringLiteral("this->%1::%2(%3);\n").arg(meth.getClass()->toString()).arg(meth.name()).arg(x_list);
     }
     out << "    }\n";
 }
@@ -368,9 +368,9 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
     QString switchCode;
     QTextStream switchOut(&switchCode);
 
-    out << QString("class %1").arg(smokeClassName);
+    out << QStringLiteral("class %1").arg(smokeClassName);
     if (!klass->isNameSpace()) {
-        out << QString(" : public %1").arg(className);
+        out << QStringLiteral(" : public %1").arg(className);
         if (Util::hasClassVirtualDestructor(klass) && Util::hasClassPublicDestructor(klass)) {
             out << ", public __internal_SmokeClass";
         }
@@ -484,7 +484,7 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
             }
             out << ") ";
         }
-        out << QString("{ this->_binding->deleted(%1, (void*)this); }\n").arg(m_smokeData->classIndex[className]);
+        out << QStringLiteral("{ this->_binding->deleted(%1, (void*)this); }\n").arg(m_smokeData->classIndex[className]);
     } else {
         out << "#if __cplusplus >= 201103L\n";
         out << "private:\n";

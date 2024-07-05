@@ -29,7 +29,7 @@ namespace QTest {
   template<>
   char* toString(const Token& t)
   {
-    return qstrdup(QString("%1 [ %2 ]").arg(token_name(t.kind)).arg(t.symbolString()).toUtf8());
+    return qstrdup(QStringLiteral("%1 [ %2 ]").arg(token_name(t.kind)).arg(t.symbolString()).toUtf8());
   }
 }
 

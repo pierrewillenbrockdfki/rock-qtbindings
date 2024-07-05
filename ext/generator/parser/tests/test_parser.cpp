@@ -52,7 +52,7 @@ private slots:
     table.findOrInsert("KXmlGuiWindow", sizeof("KXmlGuiWindow"));
     QCOMPARE(table.count(), size_t(3));
     const NameSymbol *s = table.findOrInsert("QMainWindow", sizeof("QMainWindow"));
-    QCOMPARE(QString(s->data), QString("QMainWindow"));
+    QCOMPARE(QString(s->data), QStringLiteral("QMainWindow"));
     QCOMPARE(table.count(), size_t(3));
   }
 
@@ -95,7 +95,7 @@ private slots:
 //
 //     Lexer lexer(token_stream, location_table, line_table, &control);
 //     lexer.tokenize(code, code.size()+1);
-//     QCOMPARE(control.problem(0).message(), QString("expected end of line"));
+//     QCOMPARE(control.problem(0).message(), QStringLiteral("expected end of line"));
 //
 //     QByteArray code2("class Foo { int foo() {} }; ");
 //     lexer.tokenize(code2, code2.size()+1);
@@ -206,7 +206,7 @@ private slots:
 //     UnqualifiedNameAST* argName  = static_cast<UnqualifiedNameAST*>
 //       (getAST(param, AST::Kind_UnqualifiedName));
 //     QCOMPARE(parser.token_stream.symbol(argName->id)->as_string(),
-// 	    QString("primitive"));
+// 	    QStringLiteral("primitive"));
 //
 //     // second param
 //     param = static_cast<ParameterDeclarationAST*>
@@ -214,7 +214,7 @@ private slots:
 //     UnqualifiedNameAST* argType = static_cast<UnqualifiedNameAST*>
 //       (getAST(param, AST::Kind_UnqualifiedName));
 //     QCOMPARE(parser.token_stream.symbol(argType->id)->as_string(),
-// 	    QString("B"));
+// 	    QStringLiteral("B"));
 //
 //     // pointer operator
 //     QVERIFY(hasKind(param, AST::Kind_PtrOperator));
@@ -222,7 +222,7 @@ private slots:
 //     argName = static_cast<UnqualifiedNameAST*>
 //       (getAST(param, AST::Kind_UnqualifiedName, 1));
 //     QCOMPARE(parser.token_stream.symbol(argName->id)->as_string(),
-// 	    QString("pointer"));
+// 	    QStringLiteral("pointer"));
 //
 //   }
 
@@ -345,7 +345,7 @@ private slots:
     QVERIFY(templDecl);
     QVERIFY(templDecl->declaration);
 
-    //QCOMPARE(CommentFormatter::formatComment(templDecl->declaration->comments, lastSession), QString("Comment"));
+    //QCOMPARE(CommentFormatter::formatComment(templDecl->declaration->comments, lastSession), QStringLiteral("Comment"));
   }
 
   QString preprocess(const QString& contents) {
@@ -356,17 +356,17 @@ private slots:
 
   void testPreprocessor() {
     rpp::Preprocessor preprocessor;
-    //QCOMPARE(preprocess("#define TEST (1L<<10)\nTEST").trimmed(), QString("(1L<<10)"));
-    QCOMPARE(preprocess("#define TEST //Comment\nTEST 1").trimmed(), QString("1")); //Comments are not included in macros
-    QCOMPARE(preprocess("#define TEST /*Comment\n*/\nTEST 1").trimmed(), QString("1")); //Comments are not included in macros
+    //QCOMPARE(preprocess("#define TEST (1L<<10)\nTEST").trimmed(), QStringLiteral("(1L<<10)"));
+    QCOMPARE(preprocess("#define TEST //Comment\nTEST 1").trimmed(), QStringLiteral("1")); //Comments are not included in macros
+    QCOMPARE(preprocess("#define TEST /*Comment\n*/\nTEST 1").trimmed(), QStringLiteral("1")); //Comments are not included in macros
 
   }
 
   void testStringConcatenation()
   {
     rpp::Preprocessor preprocessor;
-    QCOMPARE(preprocess("Hello##You"), QString("HelloYou"));
-    QCOMPARE(preprocess("#define CONCAT(Var1, Var2) Var1##Var2 Var2##Var1\nCONCAT(      Hello      ,      You     )").simplified(), QString("\nHelloYou YouHello").simplified());
+    QCOMPARE(preprocess("Hello##You"), QStringLiteral("HelloYou"));
+    QCOMPARE(preprocess("#define CONCAT(Var1, Var2) Var1##Var2 Var2##Var1\nCONCAT(      Hello      ,      You     )").simplified(), QStringLiteral("\nHelloYou YouHello").simplified());
   }
 
   void testCondition()

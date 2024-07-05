@@ -133,7 +133,7 @@ private:
   }
 
   template <class _Tp>
-  void commaPrintNodes(Visitor *v, const ListNode<_Tp> *nodes, const QString& separator = QString(","))
+  void commaPrintNodes(Visitor *v, const ListNode<_Tp> *nodes, const QString& separator = QStringLiteral(","))
   {
     if (!nodes)
       return;

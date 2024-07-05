@@ -176,7 +176,7 @@ void SmokeDataFile::write()
     QFile smokedata(Options::outputDir.filePath("smokedata.cpp"));
     smokedata.open(QFile::ReadWrite | QFile::Truncate);
     QTextStream out(&smokedata);
-    QFile argNames(Options::outputDir.filePath(QString("%1.argnames.txt").arg(Options::module)));
+    QFile argNames(Options::outputDir.filePath(QStringLiteral("%1.argnames.txt").arg(Options::module)));
     argNames.open(QFile::ReadWrite | QFile::Truncate);
     QTextStream outArgNames(&argNames);
     foreach (const QFileInfo& file, Options::headerList)
@@ -209,11 +209,11 @@ void SmokeDataFile::write()
                     continue;
                 indices << index;
                 
-                out << QString("        case %1: return (void*)(%2*)(%3*)xptr;\n")
+                out << QStringLiteral("        case %1: return (void*)(%2*)(%3*)xptr;\n")
                     .arg(index).arg(className).arg(klass.toString());
             }
         }
-        out << QString("        case %1: return (void*)(%2*)xptr;\n").arg(iter.value()).arg(klass.toString());
+        out << QStringLiteral("        case %1: return (void*)(%2*)xptr;\n").arg(iter.value()).arg(klass.toString());
         foreach (const Class* desc, Util::descendantsList(&klass)) {
             QString className = desc->toString();
             
@@ -224,10 +224,10 @@ void SmokeDataFile::write()
                 indices << index;
                 
                 if (Util::isVirtualInheritancePath(desc, &klass)) {
-                    out << QString("        case %1: return (void*)dynamic_cast<%2*>((%3*)xptr);\n")
+                    out << QStringLiteral("        case %1: return (void*)dynamic_cast<%2*>((%3*)xptr);\n")
                         .arg(index).arg(className).arg(klass.toString());
                 } else {
-                    out << QString("        case %1: return (void*)(%2*)(%3*)xptr;\n")
+                    out << QStringLiteral("        case %1: return (void*)(%2*)(%3*)xptr;\n")
                         .arg(index).arg(className).arg(klass.toString());
                 }
             }
@@ -341,7 +341,7 @@ void SmokeDataFile::write()
             QString smokeClassName = QString(iter.key()).replace("::", "__");
             out << "    { \"" << iter.key() << "\", false" << ", "
                 << inheritanceIndex.value(klass, 0) << ", xcall_" << smokeClassName << ", "
-                << (enumClassesHandled.contains(iter.key()) ? QString("xenum_").append(smokeClassName) : "0") << ", ";
+                << (enumClassesHandled.contains(iter.key()) ? QStringLiteral("xenum_").append(smokeClassName) : "0") << ", ";
             QString flags = "0";
             if (!klass->isNameSpace()) {
                 if (Util::canClassBeInstanciated(klass)) flags += "|Smoke::cf_constructor";

@@ -110,8 +110,8 @@ pp_actual pp_macro_expander::resolve_formal(IndexedString name, Stream& input)
         Problem *problem = new Problem;
         problem->file = m_engine->currentFileNameString();
         problem->position = input.originalInputPosition();
-        problem->description = QString("Call to macro %1 missing argument number %2").arg(name.str()).arg(index);
-        problem->explanation = QString("Formals: %1").arg(joinIndexVector(formals, ", "));
+        problem->description = QStringLiteral("Call to macro %1 missing argument number %2").arg(name.str()).arg(index);
+        problem->explanation = QStringLiteral("Formals: %1").arg(joinIndexVector(formals, ", "));
         m_engine->problemEncountered(problem);
       }
     }
@@ -360,7 +360,7 @@ void pp_macro_expander::operator()(Stream& input, Stream& output)
           if (name == lineIndex)
             output.appendString(inputPosition, convertFromByteArray(QString::number(input.inputPosition().line).toUtf8()));
           else if (name == fileIndex)
-            output.appendString(inputPosition, convertFromByteArray(QString("\"%1\"").arg(m_engine->currentFileNameString()).toUtf8()));
+            output.appendString(inputPosition, convertFromByteArray(QStringLiteral("\"%1\"").arg(m_engine->currentFileNameString()).toUtf8()));
           else if (name == dateIndex)
             output.appendString(inputPosition, convertFromByteArray(QDate::currentDate().toString("MMM dd yyyy").toUtf8()));
           else if (name == timeIndex)

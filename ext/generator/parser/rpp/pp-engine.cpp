@@ -445,8 +445,8 @@ Value pp::eval_primary(Stream& input)
         problem->file = currentFileNameString();
         problem->position = input.originalInputPosition();
         QChar tk(token);
-        problem->description = QString("Expected \"identifier\", found: %1").arg((tk < TOKENS_END && tk > TOKENS_START) ? QString(tk) : QString("character %1").arg(token));
-        problem->explanation = QString("<h5>Token text</h5><pre>%1</pre><h5>Input</h5><pre>%2</pre>").arg(token_text.str())
+        problem->description = QStringLiteral("Expected \"identifier\", found: %1").arg((tk < TOKENS_END && tk > TOKENS_START) ? QString(tk) : QStringLiteral("character %1").arg(token));
+        problem->explanation = QStringLiteral("<h5>Token text</h5><pre>%1</pre><h5>Input</h5><pre>%2</pre>").arg(token_text.str())
                                        .arg(QString::fromUtf8(input.stringFrom(start)));
         problemEncountered(problem);
         break;
@@ -465,8 +465,8 @@ Value pp::eval_primary(Stream& input)
           problem->file = currentFileNameString();
           problem->position = input.originalInputPosition();
           QChar tk(token);
-          problem->description = QString("Expected \")\", found %1").arg(tk.isLetterOrNumber() ? QString(tk) : QString("character %1").arg(token));
-          problem->explanation = QString("<h5>Token text</h5><pre>%1</pre><h5>Input</h5><pre>%2</pre>").arg(token_text.str())
+          problem->description = QStringLiteral("Expected \")\", found %1").arg(tk.isLetterOrNumber() ? QString(tk) : QStringLiteral("character %1").arg(token));
+          problem->explanation = QStringLiteral("<h5>Token text</h5><pre>%1</pre><h5>Input</h5><pre>%2</pre>").arg(token_text.str())
                                          .arg(QString::fromUtf8(input.stringFrom(start)));
           problemEncountered(problem);
         } else {
@@ -499,8 +499,8 @@ Value pp::eval_primary(Stream& input)
         problem->file = currentFileNameString();
         problem->position = input.originalInputPosition();
         QChar tk(token);
-        problem->description = QString("Expected \")\", found %1").arg(tk.isLetterOrNumber() ? QString(tk) : QString("character %1").arg(token));
-        problem->explanation = QString("<h5>Token text</h5><pre>%1</pre><h5>Input</h5><pre>%2</pre>").arg(token_text.str())
+        problem->description = QStringLiteral("Expected \")\", found %1").arg(tk.isLetterOrNumber() ? QString(tk) : QStringLiteral("character %1").arg(token));
+        problem->explanation = QStringLiteral("<h5>Token text</h5><pre>%1</pre><h5>Input</h5><pre>%2</pre>").arg(token_text.str())
                                        .arg(QString::fromUtf8(input.stringFrom(start)));
         problemEncountered(problem);
       } else {
@@ -538,7 +538,7 @@ Value pp::eval_multiplicative(Stream& input)
         problem->file = currentFileNameString();
         problem->position = input.originalInputPosition();
         problem->description = "Division by zero";
-        problem->explanation = QString("Input text: %1").arg(QString::fromUtf8(input.stringFrom(start)));
+        problem->explanation = QStringLiteral("Input text: %1").arg(QString::fromUtf8(input.stringFrom(start)));
         problemEncountered(problem);
         result.set_long(0);
 
@@ -552,7 +552,7 @@ Value pp::eval_multiplicative(Stream& input)
         problem->file = currentFileNameString();
         problem->position = input.originalInputPosition();
         problem->description = "Division by zero";
-        problem->description = QString("Input text: %1").arg(QString::fromUtf8(input.stringFrom(start)));
+        problem->description = QStringLiteral("Input text: %1").arg(QString::fromUtf8(input.stringFrom(start)));
         problemEncountered(problem);
         result.set_long(0);
 
@@ -790,7 +790,7 @@ Value pp::eval_constant_expression(Stream& input)
       Problem* problem = new Problem;
       problem->file = currentFileNameString();
       problem->position = input.originalInputPosition();
-      problem->description = QString("expected ``:'' = %1").arg(int(token));
+      problem->description = QStringLiteral("expected ``:'' = %1").arg(int(token));
       problemEncountered(problem);
       result = left_value;
     }
@@ -928,7 +928,7 @@ void pp::handle_endif(Stream& input, Stream& output)
     Problem* problem = new Problem;
     problem->file = currentFileNameString();
     problem->position = input.originalInputPosition();
-    problem->description = QString("#endif without #if at output line %1")
+    problem->description = QStringLiteral("#endif without #if at output line %1")
                                    .arg(m_environment->locationTable()->anchorForOffset(output.offset()).anchor.line);
     problemEncountered(problem);
   }
@@ -972,7 +972,7 @@ void pp::handle_ifdef (bool check_undefined, Stream& input)
 
   hadGuardCandidate = true;
   
-  environment()->enterBlock(input.inputPosition().line);//, QString("%1defined(%2)").arg(check_undefined ? "!" : "").arg(macro_name).toUtf8());
+  environment()->enterBlock(input.inputPosition().line);//, QStringLiteral("%1defined(%2)").arg(check_undefined ? "!" : "").arg(macro_name).toUtf8());
 
   if (test_if_level())
   {

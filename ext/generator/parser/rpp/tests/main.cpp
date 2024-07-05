@@ -47,7 +47,7 @@ int main (int /*argc*/, char *argv[])
 
   pp preprocess(&p);
 
-  preprocess.processFile(QString("pp-configuration")); // ### put your macros here!
+  preprocess.processFile(QStringLiteral("pp-configuration")); // ### put your macros here!
 
   preprocess.environment()->enterBlock(0, PreprocessedContents());
 
