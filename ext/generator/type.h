@@ -464,7 +464,7 @@ public:
     const ParameterList& parameters() const { return m_params; }
     void appendParameter(const Parameter& param) { m_params.append(param); }
 
-    QString toString(const QString& fnPtrName = QString()) const;
+    QString toString(const QString& fnPtrName = QString(), bool fqn = false) const;
 
     // on windows, we can't reference 'types' here, because it's marked __declspec(dllexport) above.
     static Type* registerType(const Type& type)

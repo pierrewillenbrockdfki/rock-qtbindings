@@ -159,11 +159,12 @@ QString Function::toString() const
     return ret;
 }
 
-QString Type::toString(const QString& fnPtrName) const
+QString Type::toString(const QString& fnPtrName, bool fqn) const
 {
     QString ret;
     if (m_isVolatile) ret += "volatile ";
     if (m_isConst) ret += "const ";
+    if (fqn && (m_class || m_typedef)) ret += "::";
     ret += name();
     if (!m_templateArgs.isEmpty()) {
         ret += "<";

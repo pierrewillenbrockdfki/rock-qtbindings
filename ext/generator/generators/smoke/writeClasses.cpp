@@ -112,9 +112,9 @@ QString SmokeClassFiles::generateMethodBody(const QString& indent, const QString
             includes.insert(meth.type()->getClass()->fileName());
 
         if (meth.type()->isFunctionPointer() || meth.type()->isArray())
-            out << meth.type()->toString("xret") << " = ";
+            out << meth.type()->toString("xret", true) << " = ";
         else if (meth.type() != Type::Void)
-            out << meth.type()->toString() << " xret = ";
+            out << meth.type()->toString(QString(), true) << " xret = ";
 
         if (!(meth.flags() & Method::Static)) {
             if (meth.isConst()) {
@@ -142,12 +142,12 @@ QString SmokeClassFiles::generateMethodBody(const QString& indent, const QString
         if (j > 0) out << ",";
 
         QString field = Util::stackItemField(param.type());
-        QString typeName = param.type()->toString();
+        QString typeName = param.type()->toString(QString(), true);
         if (param.type()->isArray()) {
             Type t = *param.type();
             t.setPointerDepth(t.pointerDepth() + 1);
             t.setIsRef(false);
-            typeName = t.toString();
+            typeName = t.toString(QString(), true);
             out << '*';
         } else if (field == "s_class" && (param.type()->pointerDepth() == 0 || param.type()->isRef()) && !param.type()->isFunctionPointer()) {
             // references and classes are passed in s_class
@@ -214,7 +214,7 @@ void SmokeClassFiles::generateMethod(QTextStream& out, const QString& className,
         QStringList x_list;
         for (int i = 0; i < meth.parameters().count(); i++) {
             if (i > 0) out << ", ";
-            out << meth.parameters()[i].type()->toString() << " x" << QString::number(i + 1);
+            out << meth.parameters()[i].type()->toString(QString(), true) << " x" << QString::number(i + 1);
             x_list << "x" + QString::number(i + 1);
         }
         out << ") : " << meth.getClass()->name() << '(' << x_list.join(", ") << ") {}\n";
@@ -251,10 +251,10 @@ void SmokeClassFiles::generateSetAccessor(QTextStream& out, const QString& class
     }
     fieldName += className + "::" + field.name();
     out << "void x_" << index << "(Smoke::Stack x) {\n"
-        << "        // Field \"" << field.toString() << "\" setter\n"
+        << "        // Field \"" << field.toString(false, true) << "\" setter\n"
         << "        " << fieldName << " = ";
     QString unionField = Util::stackItemField(type);
-    QString cast = type->toString();
+    QString cast = type->toString(QString(), true);
     cast.replace("&", "");
     if (unionField == "s_class" && type->pointerDepth() == 0) {
         out << '*';
@@ -283,7 +283,7 @@ void SmokeClassFiles::generateEnumMemberCall(QTextStream& out, const QString& cl
 void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth, QSet<QString>& includes)
 {
     QString x_params, x_list;
-    QString type = meth.type()->toString();
+    QString type = meth.type()->toString(QString(), true);
     if (meth.type()->getClass())
         includes.insert(meth.type()->getClass()->fileName());
     
@@ -295,7 +295,7 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
         if (param.type()->getClass())
             includes.insert(param.type()->getClass()->fileName());
         
-        out << param.type()->toString() << " x" << i + 1;
+        out << param.type()->toString(QString(), true) << " x" << i + 1;
         x_params += QStringLiteral("        x[%1].%2 = %3;\n")
             .arg(QString::number(i + 1)).arg(Util::stackItemField(param.type()))
             .arg(Util::assignmentString(param.type(), "x" + QString::number(i + 1)));
@@ -308,11 +308,12 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
         out << "throw(";
         for (int i = 0; i < meth.exceptionTypes().count(); i++) {
             if (i > 0) out << ", ";
-            out << meth.exceptionTypes()[i].toString();
+            out << meth.exceptionTypes()[i].toString(QString(), true);
         }
         out << ") ";
     }
     out << "override {\n";
+    out << "        // Method: \"" << meth.toString(false, true) << "\"\n";
     out << QStringLiteral("        Smoke::StackItem x[%1];\n").arg(meth.parameters().count() + 1);
     out << x_params;
     
@@ -480,7 +481,7 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
             out << "throw(";
             for (int i = 0; i < destructor->exceptionTypes().count(); i++) {
                 if (i > 0) out << ", ";
-                out << destructor->exceptionTypes()[i].toString();
+                out << destructor->exceptionTypes()[i].toString(QString(), true);
             }
             out << ") ";
         }
