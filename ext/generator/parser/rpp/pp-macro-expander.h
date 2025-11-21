@@ -65,7 +65,7 @@ public:
     
     PreprocessedContents ret;
     
-    foreach(const PreprocessedContents& t, text)
+    Q_FOREACH(const PreprocessedContents& t, text)
       ret += t;
     return ret;
   }

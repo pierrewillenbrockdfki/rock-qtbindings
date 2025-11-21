@@ -412,8 +412,10 @@ struct ExceptionSpecificationAST: public AST
 {
   DECLARE_AST_NODE(ExceptionSpecification)
 
+  std::size_t key;//Token_throw or Token_noexcept
   std::size_t ellipsis;
   const ListNode<TypeIdAST*> *type_ids;
+  ExpressionAST *expression;
 };
 
 struct ExpressionOrDeclarationStatementAST: public StatementAST

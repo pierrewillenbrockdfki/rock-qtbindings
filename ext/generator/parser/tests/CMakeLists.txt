@@ -19,8 +19,10 @@ if (WIN32)
 	set_target_properties (parsertest PROPERTIES COMPILE_FLAGS -mstackrealign)
 endif (WIN32)
 
-target_link_libraries(parsertest Qt5::Core Qt5::Test cppparser)
+target_link_libraries(parsertest Qt5::Core Qt5::Test clang-cpp LLVM cppparser)
 target_compile_options(parsertest PRIVATE -Wall)
+target_compile_definitions(parsertest PRIVATE QT_NO_KEYWORDS)
+target_include_directories(parsertest PRIVATE ${CLANG_INCLUDE_DIRS})
 
 ########### next target ###############
 

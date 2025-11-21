@@ -410,6 +410,9 @@ bool Parser::skipUntilDeclaration()
         case Token_identifier:
         case Token_operator:
         case Token_char:
+        case Token_char8_t:
+        case Token_char16_t:
+        case Token_char32_t:
         case Token_size_t:
         case Token_wchar_t:
         case Token_bool:
@@ -476,6 +479,9 @@ bool Parser::skipUntilStatement()
         case Token_catch:
         case Token_throw:
         case Token_char:
+        case Token_char8_t:
+        case Token_char16_t:
+        case Token_char32_t:
         case Token_size_t:
         case Token_wchar_t:
         case Token_bool:
@@ -1231,6 +1237,9 @@ bool Parser::parseSimpleTypeSpecifier(TypeSpecifierAST *&node,
       switch(session->token_stream->lookAhead())
         {
         case Token_char:
+        case Token_char8_t:
+        case Token_char16_t:
+        case Token_char32_t:
         case Token_size_t:
         case Token_wchar_t:
         case Token_bool:
@@ -1872,13 +1881,24 @@ bool Parser::parseStorageClassSpecifier(const ListNode<std::size_t> *&node)
   std::size_t start = session->token_stream->cursor();
 
   int tk;
+  // Per the standard, friend, auto, constexpr, alignas are not storage class specified; they just go at the same position.
   while (0 != (tk = session->token_stream->lookAhead())
          && (tk == Token_friend || tk == Token_auto
              || tk == Token_register || tk == Token_static
-             || tk == Token_extern || tk == Token_mutable))
+             || tk == Token_extern || tk == Token_mutable
+             || tk == Token_thread_local || tk == Token_constexpr
+             || tk == Token_alignas))
     {
-      node = snoc(node, session->token_stream->cursor(), session->mempool);
-      advance();
+      if(tk == Token_alignas)
+        {
+          //TODO: 'alignas' '('<type_id> | <expression> | <a comma separated list thereof> ')'
+          return false;
+        }
+      else
+        {
+          node = snoc(node, session->token_stream->cursor(), session->mempool);
+          advance();
+        }
     }
 
   return start != session->token_stream->cursor();
@@ -2338,28 +2358,62 @@ bool Parser::parseExceptionSpecification(ExceptionSpecificationAST *&node)
 {
   std::size_t start = session->token_stream->cursor();
 
-  CHECK(Token_throw);
-  ADVANCE('(', "(");
-
-  ExceptionSpecificationAST *ast
-    = CreateNode<ExceptionSpecificationAST>(session->mempool);
-
-  if (session->token_stream->lookAhead() == Token_ellipsis)
+  int tk = session->token_stream->lookAhead();
+  switch(tk)
     {
-      ast->ellipsis = session->token_stream->cursor();
-      advance();
+      case Token_throw:
+        {
+          advance();
+
+          ADVANCE('(', "(");
+
+          ExceptionSpecificationAST *ast
+            = CreateNode<ExceptionSpecificationAST>(session->mempool);
+          ast->key = Token_throw;
+
+          if (session->token_stream->lookAhead() == Token_ellipsis)
+            {
+              ast->ellipsis = session->token_stream->cursor();
+              advance();
+            }
+          else
+            {
+              parseTypeIdList(ast->type_ids);
+            }
+
+          ADVANCE(')', ")");
+
+          UPDATE_POS(ast, start, _M_last_valid_token+1);
+          node = ast;
+
+          return true;
+        }
+      case Token_noexcept:
+        {
+          advance();
+
+          ExceptionSpecificationAST *ast
+            = CreateNode<ExceptionSpecificationAST>(session->mempool);
+          ast->key = Token_noexcept;
+
+          if (session->token_stream->lookAhead() == '(')
+            {
+              advance();
+
+              if(!parseConditionalExpression(ast->expression) )
+                return false;
+
+              ADVANCE(')', ")");
+            }
+
+          UPDATE_POS(ast, start, _M_last_valid_token+1);
+          node = ast;
+
+          return true;
+        }
+      default:
+        return false;
     }
-  else
-    {
-      parseTypeIdList(ast->type_ids);
-    }
-
-  ADVANCE(')', ")");
-
-  UPDATE_POS(ast, start, _M_last_valid_token+1);
-  node = ast;
-
-  return true;
 }
 
 bool Parser::parseEnumerator(EnumeratorAST *&node)
@@ -3931,6 +3985,26 @@ bool Parser::parsePostfixExpression(ExpressionAST *&node)
       }
       return true;
 
+    case Token_noexcept:
+    case Token_static_assert:
+      {
+        std::size_t func_like_op = session->token_stream->cursor();
+        advance();
+
+        CHECK('(');
+        StatementAST *expr = 0;
+        parseExpressionStatement(expr);
+        CHECK(')');
+
+        PrimaryExpressionAST *ast = CreateNode<PrimaryExpressionAST>(session->mempool);
+        ast->token = func_like_op;
+        ast->expression_statement = expr;
+
+        UPDATE_POS(ast, start, _M_last_valid_token+1);
+        node = ast;
+      }
+      return true;
+
     case Token_typename:
       {
         std::size_t token = session->token_stream->cursor();
@@ -4080,6 +4154,7 @@ bool Parser::parseUnaryExpression(ExpressionAST *&node)
       return true;
 
     case Token_sizeof:
+    case Token_alignof:
       {
         std::size_t sizeof_token = session->token_stream->cursor();
         advance();

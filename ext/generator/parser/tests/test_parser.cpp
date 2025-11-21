@@ -19,12 +19,89 @@
 #include <QFile>
 
 #include <iostream>
+#include <optional>
 #include <rpp/chartools.h>
 #include <rpp/pp-engine.h>
 
 
+#include <clang/AST/ASTDumper.h>
+#include <clang/AST/ASTConsumer.h>
+#include <clang/AST/ASTContext.h>
+#include <clang/AST/CommentCommandTraits.h>
+#include <clang/AST/Decl.h>
+#include <clang/AST/DeclBase.h>
+#include <clang/AST/DeclCXX.h>
+#include <clang/AST/DeclGroup.h>
+#include <clang/AST/DeclObjC.h>
+#include <clang/AST/DeclTemplate.h>
+#include <clang/AST/DeclarationName.h>
+#include <clang/AST/ExternalASTSource.h>
+#include <clang/AST/PrettyPrinter.h>
+#include <clang/AST/RecursiveASTVisitor.h>
+#include <clang/AST/Type.h>
+#include <clang/AST/TypeOrdering.h>
+#include <clang/Basic/Diagnostic.h>
+#include <clang/Basic/FileManager.h>
+#include <clang/Basic/IdentifierTable.h>
+#include <clang/Basic/LLVM.h>
+#include <clang/Basic/LangOptions.h>
+#include <clang/Basic/LangStandard.h>
+#include <clang/Basic/Module.h>
+#include <clang/Basic/SourceLocation.h>
+#include <clang/Basic/SourceManager.h>
+#include <clang/Basic/TargetInfo.h>
+#include <clang/Basic/TargetOptions.h>
+#include <clang/Frontend/ASTUnit.h>
+#include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/CompilerInvocation.h>
+#include <clang/Frontend/FrontendAction.h>
+#include <clang/Frontend/FrontendActions.h>
+#include <clang/Frontend/FrontendDiagnostic.h>
+#include <clang/Frontend/FrontendOptions.h>
+#include <clang/Frontend/MultiplexConsumer.h>
+#include <clang/Frontend/PrecompiledPreamble.h>
+#include <clang/Frontend/Utils.h>
+#include <clang/Lex/HeaderSearch.h>
+#include <clang/Lex/HeaderSearchOptions.h>
+#include <clang/Lex/Lexer.h>
+#include <clang/Lex/PPCallbacks.h>
+#include <clang/Lex/PreprocessingRecord.h>
+#include <clang/Lex/Preprocessor.h>
+#include <clang/Lex/PreprocessorOptions.h>
+#include <clang/Lex/Token.h>
+#include <clang/Sema/CodeCompleteConsumer.h>
+#include <clang/Sema/CodeCompleteOptions.h>
+#include <clang/Serialization/ASTBitCodes.h>
+#include <clang/Serialization/ASTReader.h>
+#include <clang/Serialization/ASTWriter.h>
+#include <clang/Serialization/ContinuousRangeMap.h>
+#include <clang/Serialization/InMemoryModuleCache.h>
+#include <clang/Serialization/ModuleFile.h>
+#include <clang/Serialization/PCHContainerOperations.h>
+#include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/DenseMap.h>
+#include <llvm/ADT/IntrusiveRefCntPtr.h>
+#include <llvm/ADT/STLExtras.h>
+#include <llvm/ADT/ScopeExit.h>
+#include <llvm/ADT/SmallVector.h>
+#include <llvm/ADT/StringMap.h>
+#include <llvm/ADT/StringRef.h>
+#include <llvm/ADT/StringSet.h>
+#include <llvm/ADT/Twine.h>
+#include <llvm/ADT/iterator_range.h>
+#include <llvm/Support/ErrorHandling.h>
+
 bool hasKind(AST*, AST::NODE_KIND);
+bool hasCXXRecordDecl(clang::Decl* DC);
+bool hasFunctionDecl(clang::Decl* DC);
+bool hasForStmt(clang::Decl* DC);
+bool hasIfStmt(clang::Decl* DC);
+bool hasDeclStmt(clang::Decl* DC);
+bool hasBinaryOperator(clang::Decl* DC, std::string const &opcode);
+bool hasUnaryOperator(clang::Decl* DC, std::string const &opcode);
 AST* getAST(AST*, AST::NODE_KIND, int num = 0);
+
+std::string getClangResourcesPath();
 
 class TestParser : public QObject
 {
@@ -38,7 +115,7 @@ public:
   {
   }
 
-private slots:
+private Q_SLOTS:
 
   void initTestCase()
   {
@@ -107,8 +184,11 @@ private slots:
     QByteArray clazz("struct A { int i; A() : i(5) { } virtual void test() = 0; };");
     pool mem_pool;
     TranslationUnitAST* ast = parse(clazz, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(clazz);
     QVERIFY(ast != 0);
     QVERIFY(ast->declarations != 0);
+    QVERIFY(clangast);
+    QVERIFY(!clangast->top_level_empty());
   }
   
   void testManyComparisons()
@@ -118,16 +198,27 @@ private slots:
       QByteArray clazz("void test() { if(val < f && val < val1 && val < val2 && val < val3 ){ } }");
       pool mem_pool;
       TranslationUnitAST* ast = parse(clazz, &mem_pool);
+      std::unique_ptr<clang::ASTUnit> clangast = parseClang(clazz);
       QVERIFY(ast != 0);
       QVERIFY(ast->declarations != 0);
+      QVERIFY(clangast);
+      QVERIFY(!clangast->top_level_empty());
       dumper.dump(ast, lastSession->token_stream);
+      std::string dumped;
+      llvm::raw_string_ostream dumpStream(dumped);
+      clang::ASTDumper clangdumper(dumpStream, clangast->getASTContext(), true);
+      clangdumper.dumpDeclContext(clangast->getASTContext().getTranslationUnitDecl());
+      qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
     }
     {
       QByteArray clazz("void test() { if(val < f && val < val1 && val < val2 && val < val3 && val < val4 && val < val5 && val < val6 && val < val7 && val < val8 && val < val9 && val < val10 && val < val11 && val < val12 && val < val13 && val < val14 && val < val15 && val < val16 && val < val17 && val < val18 && val < val19 && val < val20 && val < val21 && val < val22 && val < val23 && val < val24 && val < val25 && val < val26){ } }");
       pool mem_pool;
       TranslationUnitAST* ast = parse(clazz, &mem_pool);
+      std::unique_ptr<clang::ASTUnit> clangast = parseClang(clazz);
       QVERIFY(ast != 0);
       QVERIFY(ast->declarations != 0);
+      QVERIFY(clangast);
+      QVERIFY(!clangast->top_level_empty());
     }
   }
   
@@ -136,8 +227,17 @@ private slots:
     QByteArray stuff("foo bar !!! nothing that really looks like valid c++ code");
     pool mem_pool;
     TranslationUnitAST *ast = parse(stuff, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(stuff);
     QVERIFY(ast->declarations == 0);
     QVERIFY(control.problems().count() > 3);
+    std::string dumped;
+    llvm::raw_string_ostream dumpStream(dumped);
+    clang::ASTDumper clangdumper(dumpStream, clangast->getASTContext(), true);
+    clangdumper.dumpDeclContext(clangast->getASTContext().getTranslationUnitDecl());
+    qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
+    //clang sees a VarDecl here.
+    //QVERIFY(clangast->top_level_empty());
+    //TODO check for errors; we are currently dropping them, i think, not sure.
   }
 
   void testPartialParseFail() {
@@ -145,41 +245,59 @@ private slots:
     QByteArray method("struct C { Something invalid is here };");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
     QVERIFY(ast != 0);
     QVERIFY(hasKind(ast, AST::Kind_ClassSpecifier));
+    QVERIFY(clangast);
+    QVERIFY(hasCXXRecordDecl(clangast->getASTContext().getTranslationUnitDecl()));
     }
     {
     QByteArray method("void test() { Something invalid is here };");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
     QVERIFY(ast != 0);
     QVERIFY(hasKind(ast, AST::Kind_FunctionDefinition));
+    QVERIFY(clangast);
+    QVERIFY(hasFunctionDecl(clangast->getASTContext().getTranslationUnitDecl()));
     }
     {
     QByteArray method("void test() { {Something invalid is here };");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
     QVERIFY(ast != 0);
     QVERIFY(hasKind(ast, AST::Kind_FunctionDefinition));
     QVERIFY(ast->hadMissingCompoundTokens);
+    QVERIFY(clangast);
+    QVERIFY(hasFunctionDecl(clangast->getASTContext().getTranslationUnitDecl()));
+    //TODO ast->hadMissingCompoundTokens
     }
     {
     QByteArray method("void test() { case:{};");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
     QVERIFY(ast != 0);
     QVERIFY(hasKind(ast, AST::Kind_FunctionDefinition));
     QVERIFY(ast->hadMissingCompoundTokens);
+    QVERIFY(clangast);
+    QVERIFY(hasFunctionDecl(clangast->getASTContext().getTranslationUnitDecl()));
+    //TODO ast->hadMissingCompoundTokens
     }
   }
 
   void testParseMethod()
   {
-    QByteArray method("void A::test() {  }");
+    /* clang requires the class definition to accept the function */
+    QByteArray method("class A { void test(); }; void A::test() {  }");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
     QVERIFY(ast != 0);
     QVERIFY(hasKind(ast, AST::Kind_FunctionDefinition));
+    QVERIFY(clangast);
+    QVERIFY(hasFunctionDecl(clangast->getASTContext().getTranslationUnitDecl()));
   }
 
 ///@todo reenable
@@ -228,31 +346,45 @@ private slots:
 
   void testForStatements()
   {
-    QByteArray method("void A::t() { for (int i = 0; i < 10; i++) { ; }}");
+    QByteArray method("void t() { for (int i = 0; i < 10; i++) { ; }}");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
 
     QVERIFY(ast != 0);
     QVERIFY(hasKind(ast, AST::Kind_ForStatement));
     QVERIFY(hasKind(ast, AST::Kind_Condition));
     QVERIFY(hasKind(ast, AST::Kind_IncrDecrExpression));
     QVERIFY(hasKind(ast, AST::Kind_SimpleDeclaration));
+    QVERIFY(clangast);
+    QVERIFY(hasForStmt(clangast->getASTContext().getTranslationUnitDecl()));
+    QVERIFY(hasBinaryOperator(clangast->getASTContext().getTranslationUnitDecl(), "<"));
+    QVERIFY(hasUnaryOperator(clangast->getASTContext().getTranslationUnitDecl(), "++"));
+    QVERIFY(hasDeclStmt(clangast->getASTContext().getTranslationUnitDecl()));
 
-    QByteArray emptyFor("void A::t() { for (;;) { } }");
+    QByteArray emptyFor("void t() { for (;;) { } }");
     ast = parse(emptyFor, &mem_pool);
+    clangast = parseClang(emptyFor);
     QVERIFY(ast != 0);
     QVERIFY(hasKind(ast, AST::Kind_ForStatement));
     QVERIFY(!hasKind(ast, AST::Kind_Condition));
     QVERIFY(!hasKind(ast, AST::Kind_SimpleDeclaration));
+    QVERIFY(clangast);
+    QVERIFY(hasForStmt(clangast->getASTContext().getTranslationUnitDecl()));
+    QVERIFY(!hasBinaryOperator(clangast->getASTContext().getTranslationUnitDecl(), "<"));
+    QVERIFY(!hasDeclStmt(clangast->getASTContext().getTranslationUnitDecl()));
   }
 
   void testIfStatements()
   {
-    QByteArray method("void A::t() { if (1 < 2) { } }");
+    QByteArray method("void t() { if (1 < 2) { } }");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
     QVERIFY(hasKind(ast, AST::Kind_Condition));
     QVERIFY(hasKind(ast, AST::Kind_BinaryExpression));
+    QVERIFY(hasIfStmt(clangast->getASTContext().getTranslationUnitDecl()));
+    QVERIFY(hasBinaryOperator(clangast->getASTContext().getTranslationUnitDecl(), "<"));
   }
 
   void testComments()
@@ -260,6 +392,9 @@ private slots:
     QByteArray method("//TranslationUnitComment\n//Hello\nint A; //behind\n /*between*/\n /*Hello2*/\n class B{}; //behind\n//Hello3\n //beforeTest\nvoid test(); //testBehind");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
+
+    //TODO
 
     QCOMPARE(CommentFormatter::formatComment(ast->comments, lastSession), QByteArray("TranslationUnitComment")); //The comments were merged
 
@@ -283,6 +418,9 @@ private slots:
     QByteArray method("enum Enum\n {//enumerator1Comment\nenumerator1, //enumerator1BehindComment\n /*enumerator2Comment*/ enumerator2 /*enumerator2BehindComment*/};");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
+
+    //TODO
 
     const ListNode<DeclarationAST*>* it = ast->declarations;
     QVERIFY(it);
@@ -312,6 +450,9 @@ private slots:
     QByteArray method("class Class{\n//Comment\n int val;};");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
+
+    //TODO
 
     const ListNode<DeclarationAST*>* it = ast->declarations;
     QVERIFY(it);
@@ -336,6 +477,9 @@ private slots:
     QByteArray method("//TranslationUnitComment\n//Comment\ntemplate<class C> class Class{};");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
+
+    //TODO
 
     const ListNode<DeclarationAST*>* it = ast->declarations;
     QVERIFY(it);
@@ -374,7 +518,13 @@ private slots:
     QByteArray method("bool i = (small < big || big > small);");
     pool mem_pool;
     TranslationUnitAST* ast = parse(method, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(method);
     dumper.dump(ast, lastSession->token_stream);
+    std::string dumped;
+    llvm::raw_string_ostream dumpStream(dumped);
+    clang::ASTDumper clangdumper(dumpStream, clangast->getASTContext(), true);
+    clangdumper.dumpDeclContext(clangast->getASTContext().getTranslationUnitDecl());
+    qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
     ///@todo make this work, it should yield something like TranslationUnit -> SimpleDeclaration -> InitDeclarator -> BinaryExpression
   }
 
@@ -384,14 +534,26 @@ private slots:
       QByteArray templateMethod("template <int> class a {}; int main() { const int b = 1; const int c = 2; a<b|c> d; }");
       pool mem_pool;
       TranslationUnitAST* ast = parse(templateMethod, &mem_pool);
+      parseClange(templateMethod);
       dumper.dump(ast, lastSession->token_stream);
+      std::string dumped;
+      llvm::raw_string_ostream dumpStream(dumped);
+      clang::ASTDumper clangdumper(dumpStream, clangast->getASTContext(), true);
+      clangdumper.dumpDeclContext(clangast->getASTContext().getTranslationUnitDecl());
+      qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
     }*/
 
     //int a, b, c, d; bool e;
     QByteArray declaration("void expression() { if (a < b || c > d) {} }");
     pool mem_pool;
     TranslationUnitAST* ast = parse(declaration, &mem_pool);
+    std::unique_ptr<clang::ASTUnit> clangast = parseClang(declaration);
     dumper.dump(ast, lastSession->token_stream);
+    std::string dumped;
+    llvm::raw_string_ostream dumpStream(dumped);
+    clang::ASTDumper clangdumper(dumpStream, clangast->getASTContext(), true);
+    clangdumper.dumpDeclContext(clangast->getASTContext().getTranslationUnitDecl());
+    qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
   }
 
   /*void testParseFile()
@@ -420,9 +582,91 @@ private:
     return  parser.parse(lastSession);
   }
 
+    std::unique_ptr<clang::ASTUnit> parseClang(const QByteArray &source)
+    {
+        // Configure the diagnostics.
+        clang::IntrusiveRefCntPtr<clang::DiagnosticsEngine>
+        Diags(clang::CompilerInstance::createDiagnostics(new clang::DiagnosticOptions));
+
+        std::unique_ptr<std::vector<const char *> >
+        Args(new std::vector<const char *>());
+
+        Args->push_back("-fno-spell-checking");
+        Args->push_back("-fparse-all-comments");
+        Args->push_back("source.cpp");
+
+        clang::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = llvm::vfs::createPhysicalFileSystem();
+
+        clang::SmallVector<clang::StoredDiagnostic, 4> StoredDiagnostics;
+
+        std::shared_ptr<clang::CompilerInvocation> CI;
+
+        CI = std::make_shared<clang::CompilerInvocation>();
+        clang::CompilerInvocation::CreateFromArgs(*CI, *Args,
+                *Diags);
+
+        clang::StringRef Data(source.data(), source.size());
+        llvm::MemoryBuffer *Buffer
+            = llvm::MemoryBuffer::getMemBufferCopy(Data, "source.cpp").release();
+        CI->getPreprocessorOpts().addRemappedFile("source.cpp", Buffer);
+
+
+        clang::PreprocessorOptions &PPOpts = CI->getPreprocessorOpts();
+        PPOpts.RemappedFilesKeepOriginalName = true;
+        PPOpts.AllowPCHWithCompilerErrors = true;
+        PPOpts.SingleFileParseMode = false;
+        PPOpts.RetainExcludedConditionalBlocks = false;
+
+        // Override the resources path.
+        CI->getHeaderSearchOpts().ResourceDir = getClangResourcesPath();
+
+        CI->getFrontendOpts().SkipFunctionBodies = false;
+
+        // Create the AST unit.
+        std::unique_ptr<clang::ASTUnit> AST = clang::ASTUnit::LoadFromCompilerInvocation(
+                CI,
+                std::make_shared< clang::PCHContainerOperations >(),
+                Diags,
+                new clang::FileManager(CI->getFileSystemOpts(), VFS),
+                /*OnlyLocalDecls=*/false,
+                clang::CaptureDiagsKind::All,
+                /*PrecompilePreambleAfterNParses=*/0,
+                clang::TU_Complete,
+                /*CacheCodeCompletionResults=*/false,
+                /*IncludeBriefCommentsInCodeCompletion=*/false,
+                /*UserFilesAreVolatile=*/true);
+        // Zero out now to ease cleanup during crash recovery.
+        CI = nullptr;
+        Diags = nullptr;
+
+        return AST;
+
+    }
 
 
 };
+
+std::string getClangResourcesPath()
+{
+    static std::string foundPath;
+    if(foundPath.empty()) {
+        FILE *f = popen("clang -print-resource-dir", "r");
+        char buffer[256];
+        int res = fread(buffer, 1, 255, f);
+        pclose(f);
+        if (res <= 0) {
+            return std::string();
+        }
+        buffer[res] = 0;
+        if (buffer[res - 1] == '\n') {
+            buffer[res - 1] = 0;
+            res--;
+        }
+        foundPath = buffer;
+    }
+    return foundPath;
+}
+
 
 struct HasKindVisitor : protected DefaultVisitor
 {
@@ -454,11 +698,177 @@ struct HasKindVisitor : protected DefaultVisitor
   }
 };
 
+class ClangHasCXXRecordDeclVisitor
+  : public clang::RecursiveASTVisitor<ClangHasCXXRecordDeclVisitor> {
+public:
+  clang::CXXRecordDecl *decl;
+  int num;
+  ClangHasCXXRecordDeclVisitor(int num = 0) : decl(nullptr), num(num) {}
+  bool VisitCXXRecordDecl(clang::CXXRecordDecl *Declaration) {
+    if (--num < 0) {
+        decl = Declaration;
+        return false;
+    }
+
+    // The return value indicates whether we want the visitation to proceed.
+    // Return false to stop the traversal of the AST.
+    return true;
+  }
+};
+
+class ClangHasFunctionDeclVisitor
+  : public clang::RecursiveASTVisitor<ClangHasFunctionDeclVisitor> {
+public:
+  clang::FunctionDecl *decl;
+  int num;
+  ClangHasFunctionDeclVisitor(int num = 0) : decl(nullptr), num(num) {}
+  bool VisitFunctionDecl(clang::FunctionDecl *Declaration)  {
+    if (--num < 0) {
+        decl = Declaration;
+        return false;
+    }
+
+    // The return value indicates whether we want the visitation to proceed.
+    // Return false to stop the traversal of the AST.
+    return true;
+  }
+};
+
+class ClangHasForStmtVisitor
+  : public clang::RecursiveASTVisitor<ClangHasForStmtVisitor> {
+public:
+  clang::ForStmt *decl;
+  int num;
+  ClangHasForStmtVisitor(int num = 0) : decl(nullptr), num(num) {}
+  bool VisitForStmt(clang::ForStmt *Declaration)  {
+    if (--num < 0) {
+        decl = Declaration;
+        return false;
+    }
+    return true;
+  }
+};
+
+class ClangHasIfStmtVisitor
+  : public clang::RecursiveASTVisitor<ClangHasIfStmtVisitor> {
+public:
+  clang::IfStmt *decl;
+  int num;
+  ClangHasIfStmtVisitor(int num = 0) : decl(nullptr), num(num) {}
+  bool VisitIfStmt(clang::IfStmt *Declaration)  {
+    if (--num < 0) {
+        decl = Declaration;
+        return false;
+    }
+    return true;
+  }
+};
+
+class ClangHasDeclStmtVisitor
+  : public clang::RecursiveASTVisitor<ClangHasDeclStmtVisitor> {
+public:
+  clang::DeclStmt *decl;
+  int num;
+  ClangHasDeclStmtVisitor(int num = 0) : decl(nullptr), num(num) {}
+  bool VisitDeclStmt(clang::DeclStmt *Declaration)  {
+    if (--num < 0) {
+        decl = Declaration;
+        return false;
+    }
+
+    // The return value indicates whether we want the visitation to proceed.
+    // Return false to stop the traversal of the AST.
+    return true;
+  }
+};
+
+class ClangHasBinaryOperatorVisitor
+  : public clang::RecursiveASTVisitor<ClangHasBinaryOperatorVisitor> {
+public:
+  clang::BinaryOperator *decl;
+  int num;
+  std::string opcode;
+  ClangHasBinaryOperatorVisitor(std::string const &opcode, int num = 0) : decl(nullptr), num(num), opcode(opcode) {}
+  bool VisitBinaryOperator(clang::BinaryOperator *Declaration)  {
+    if (Declaration->getOpcodeStr() == opcode && --num < 0) {
+        decl = Declaration;
+        return false;
+    }
+
+    // The return value indicates whether we want the visitation to proceed.
+    // Return false to stop the traversal of the AST.
+    return true;
+  }
+};
+
+class ClangHasUnaryOperatorVisitor
+  : public clang::RecursiveASTVisitor<ClangHasUnaryOperatorVisitor> {
+public:
+  clang::UnaryOperator *decl;
+  int num;
+  std::string opcode;
+  ClangHasUnaryOperatorVisitor(std::string const &opcode, int num = 0) : decl(nullptr), num(num), opcode(opcode) {}
+  bool VisitUnaryOperator(clang::UnaryOperator *Declaration)  {
+    if (clang::UnaryOperator::getOpcodeStr(Declaration->getOpcode()) == opcode && --num < 0) {
+        decl = Declaration;
+        return false;
+    }
+
+    // The return value indicates whether we want the visitation to proceed.
+    // Return false to stop the traversal of the AST.
+    return true;
+  }
+};
+
+
 bool hasKind(AST* ast, AST::NODE_KIND kind)
 {
   HasKindVisitor visitor(kind);
   visitor.visit(ast);
   return visitor.hasKind();
+}
+
+bool hasCXXRecordDecl(clang::Decl* DC)
+{
+    ClangHasCXXRecordDeclVisitor visitor;
+    visitor.TraverseDecl(DC);
+    return visitor.decl != nullptr;
+}
+
+bool hasFunctionDecl(clang::Decl* DC) {
+    ClangHasFunctionDeclVisitor visitor;
+    visitor.TraverseDecl(DC);
+    return visitor.decl != nullptr;
+}
+
+bool hasForStmt(clang::Decl* DC) {
+    ClangHasForStmtVisitor visitor;
+    visitor.TraverseDecl(DC);
+    return visitor.decl != nullptr;
+}
+
+bool hasIfStmt(clang::Decl* DC) {
+    ClangHasIfStmtVisitor visitor;
+    visitor.TraverseDecl(DC);
+    return visitor.decl != nullptr;
+}
+
+bool hasDeclStmt(clang::Decl* DC) {
+    ClangHasDeclStmtVisitor visitor;
+    visitor.TraverseDecl(DC);
+    return visitor.decl != nullptr;
+}
+
+bool hasBinaryOperator(clang::Decl* DC, std::string const &opcode) {
+    ClangHasBinaryOperatorVisitor visitor(opcode);
+    visitor.TraverseDecl(DC);
+    return visitor.decl != nullptr;
+}
+
+bool hasUnaryOperator(clang::Decl* DC, std::string const &opcode) {
+    ClangHasUnaryOperatorVisitor visitor(opcode);
+    visitor.TraverseDecl(DC);
+    return visitor.decl != nullptr;
 }
 
 AST* getAST(AST* ast, AST::NODE_KIND kind, int num)

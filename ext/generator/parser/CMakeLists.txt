@@ -1,6 +1,9 @@
 project(parser)
 
-# add_subdirectory(tests)
+find_package(Clang REQUIRED)
+find_package(LLVM REQUIRED)
+
+add_subdirectory(tests)
 
 ########### next target ###############
 
@@ -36,8 +39,9 @@ set(cppparser_LIB_SRCS
 
 add_definitions(-D__CPPPARSER_BUILDING)
 add_library(cppparser SHARED ${cppparser_LIB_SRCS})
-target_link_libraries(cppparser Qt5::Core)
+target_link_libraries(cppparser Qt5::Core clang-cpp LLVM)
 target_compile_options(cppparser PRIVATE -Wall)
+target_include_directories(cppparser PRIVATE ${CLANG_INCLUDE_DIRS})
 
 install(TARGETS cppparser LIBRARY DESTINATION ${LIB_INSTALL_DIR}
     ARCHIVE DESTINATION ${LIB_INSTALL_DIR}

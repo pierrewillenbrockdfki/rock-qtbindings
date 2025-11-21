@@ -27,7 +27,7 @@
 #include <QtCore/QList>
 
 struct Declarator;
-struct Type;
+class Type;
 
 /**Parser control information.
 Provides problem tracking, context(visibility)-aware symbol name tables,
