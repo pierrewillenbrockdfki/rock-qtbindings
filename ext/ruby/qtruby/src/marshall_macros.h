@@ -104,6 +104,12 @@ void marshall_ItemList(Marshall *m) {
 			VALUE av = rb_ary_new();
 
             Smoke::ModuleIndex mi = Smoke::findClass(ItemSTR);
+			if(mi == Smoke::NullModuleIndex) {
+				qFatal("Could not find class index for %s", ItemSTR);
+			}
+			if(!mi.smoke) {
+				qFatal("Could not find class smoke for %s", ItemSTR);
+			}
 
 			for (int i=0; i < cpplist->size(); ++i) {
 				void *p = (void *) cpplist->at(i);

@@ -82,5 +82,7 @@
     </functions>
     <classList>
         <class>QX11Info</class>
+
+        <class>QFlags&lt;QX11Info::PeekOption&gt;</class>
      </classList>
 </config>

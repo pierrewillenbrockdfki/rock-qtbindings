@@ -83,6 +83,13 @@
         <class>QAudioOutput</class>
         <class>QVideoFrame</class>
         <class>QVideoSurfaceFormat</class>
+
+        <class>QFlags&lt;QCameraExposure::FlashMode&gt;</class>
+        <class>QFlags&lt;QCameraFocus::FocusMode&gt;</class>
+        <class>QFlags&lt;QCameraImageCapture::CaptureDestination&gt;</class>
+        <class>QFlags&lt;QCamera::LockType&gt;</class>
+        <class>QFlags&lt;QMediaServiceProviderHint::Feature&gt;</class>
+        <class>QFlags&lt;QVideoFilterRunnable::RunFlag&gt;</class>
         
         <!-- namespaces -->
         <class>QAudio</class>

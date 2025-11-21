@@ -71,7 +71,18 @@ public:
 	Binding(Smoke *s);
 	void deleted(Smoke::Index classId, void *ptr);
 	bool callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool /*isAbstract*/);
-	char *className(Smoke::Index classId);
+	const char *className(Smoke::Index classId);
+};
+
+struct MethodCacheElement {
+    Smoke::ModuleIndex method;
+    QHash<unsigned int, Smoke::ModuleIndex> conversionConstructors;
+
+    MethodCacheElement() =default;
+    MethodCacheElement(MethodCacheElement const &) =default;
+    MethodCacheElement(Smoke::ModuleIndex const &method,
+                       QHash<unsigned int, Smoke::ModuleIndex> const &conversionConstructors)
+    : method(method), conversionConstructors(conversionConstructors) {}
 };
 
 }
@@ -116,7 +127,7 @@ struct QtRubyModule {
     QtRuby::Binding *binding;
 };
 
-// keep this enum in sync with lib/Qt/qtruby4.rb
+// keep this enum in sync with lib/Qt/qtruby5.rb
 
 enum QtDebugChannel {
     qtdb_none = 0x00,
@@ -146,14 +157,15 @@ extern Q_DECL_EXPORT void set_qtruby_embedded(bool yn);
 
 
 extern Q_DECL_EXPORT Smoke::ModuleIndex _current_method;
+extern Q_DECL_EXPORT QHash<unsigned int, Smoke::ModuleIndex> _current_method_conversion_constructors;
 
 extern Q_DECL_EXPORT QHash<Smoke*, QtRubyModule> qtruby_modules;
 extern Q_DECL_EXPORT QList<Smoke*> smokeList;
 
-extern Q_DECL_EXPORT QHash<QByteArray, Smoke::ModuleIndex *> methcache;
-extern Q_DECL_EXPORT QHash<QByteArray, Smoke::ModuleIndex *> classcache;
+extern Q_DECL_EXPORT QHash<QByteArray, QtRuby::MethodCacheElement> methcache;
+extern Q_DECL_EXPORT QHash<QByteArray, Smoke::ModuleIndex> classcache;
 // Maps from an int id to classname in the form Qt::Widget
-extern Q_DECL_EXPORT QHash<Smoke::ModuleIndex, QByteArray*> IdToClassNameMap;
+extern Q_DECL_EXPORT QHash<Smoke::ModuleIndex, QByteArray> IdToClassNameMap;
 
 extern Q_DECL_EXPORT void install_handlers(TypeHandler *);
 
@@ -178,7 +190,7 @@ extern Q_DECL_EXPORT VALUE findMethod(VALUE self, VALUE c_value, VALUE name_valu
 extern Q_DECL_EXPORT VALUE findAllMethods(int argc, VALUE * argv, VALUE self);
 extern Q_DECL_EXPORT VALUE findAllMethodNames(VALUE self, VALUE result, VALUE classid, VALUE flags_value);
 
-extern Q_DECL_EXPORT QByteArray* find_cached_selector(int argc, VALUE * argv, VALUE klass, const char * methodName);
+extern Q_DECL_EXPORT QByteArray find_cached_selector(int argc, VALUE * argv, VALUE klass, const char * methodName);
 extern Q_DECL_EXPORT VALUE method_missing(int argc, VALUE * argv, VALUE self);
 extern Q_DECL_EXPORT VALUE class_method_missing(int argc, VALUE * argv, VALUE klass);
 extern Q_DECL_EXPORT QList<MocArgument*> get_moc_arguments(Smoke* smoke, const char * typeName, QList<QByteArray> methodTypes);

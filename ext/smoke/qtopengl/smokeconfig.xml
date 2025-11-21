@@ -83,6 +83,12 @@
         <class>QGLShaderProgram</class>
         <class>QGLWidget</class>
 
+        <class>QFlags&lt;QGLContext::BindOption&gt;</class>
+        <class>QFlags&lt;QGLFormat::OpenGLVersionFlag&gt;</class>
+        <class>QFlags&lt;QGL::FormatOption&gt;</class>
+        <class>QFlags&lt;QGLFunctions::OpenGLFeature&gt;</class>
+        <class>QFlags&lt;QGLShader::ShaderTypeBit&gt;</class>
+
         <!-- namespaces -->
         <class>QGL</class>
      </classList>

@@ -28,89 +28,68 @@
         <typeName>HPALETTE__</typeName>
         <typeName>HRGN__</typeName>
         <typeName>HWND__</typeName>
+
+        <typeName>QList&lt;QKeySequence&gt;</typeName>
+        <typeName>QList&lt;QByteArray&gt;</typeName>
+        <typeName>QList&lt;QPolygonF&gt;</typeName>
+        <typeName>QList&lt;double&gt;</typeName>
+        <typeName>QList&lt;QStandardItem*&gt;</typeName>
+        <typeName>QList&lt;QTextBlock&gt;</typeName>
+        <typeName>QList&lt;QTextFrame*&gt;</typeName>
+        <typeName>QList&lt;QTextLayout::FormatRange&gt;</typeName>
+        <typeName>QPair&lt;int,int&gt;</typeName>
+        <typeName>QVector&lt;QLineF&gt;</typeName>
+        <typeName>QVector&lt;QLine&gt;</typeName>
+        <typeName>QVector&lt;QPoint&gt;</typeName>
+        <typeName>QVector&lt;QPointF&gt;</typeName>
+        <typeName>QVector&lt;double&gt;</typeName>
+        <typeName>QVector&lt;QRectF&gt;</typeName>
+        <typeName>QVector&lt;QRect&gt;</typeName>
+        <typeName>QVector&lt;QTextFormat&gt;</typeName>
+        <typeName>QVector&lt;QTextLength&gt;</typeName>
     </voidpTypes>
     <exclude>
         <!-- we don't want private stuff in smoke.. -->
+        <signature>.*::d_ptr.*</signature>
+        <signature>.*::q_ptr.*</signature>
         <signature>.*\(.*Private.*\).*</signature>
-        <signature>.*::d_ptr</signature>
-        <signature>.*::q_ptr</signature>
+        <signature>.*QUuid::data.*</signature>
+        <signature>.*QBitArray::data_ptr.*</signature>
+        <signature>.*QByteArray::data_ptr.*</signature>
+        <signature>.*QLocale::p</signature>
+        <signature>.*QLocale::v</signature>
+        <signature>.*QByteArrayMatcher::dummy</signature>
+        <signature>.*QByteArrayMatcher::p</signature>
+        <signature>.*QStringMatcher::q_data</signature>
+        <signature>.*QStringMatcher::p</signature>
+        <signature>.*QDateTime::d</signature>
         <!-- Function pointers in parameters in general; they need local
              typdefs to be definable. -->
         <signature>.*\(.*\(\*\).*\).*</signature>
+        <!-- unsigned int[] cast needs local typedef to work -->
+        <signature>unsigned int\[3\] QTextCodec::ConverterState::state_data</signature>
+        <!-- Private classes -->
+        <signature>.*QCollatorSortKeyPrivate.*</signature>
+        <signature>.*QMimeTypePrivate.*</signature>
+        <!-- Ambigous type signature; smoke does not match
+             exactly one of the defined numeric types-->
+        <signature>QFlag\* QFlag::QFlag\(long\)</signature>
+        <signature>QFlag\* QFlag::QFlag\(unsigned long\)</signature>
         <!-- Deleted methods -->
-        <signature>QBackingStore\* QBackingStore::QBackingStore\(const QBackingStore&amp;\)</signature>
-        <signature>QOpenGLPaintDevice\* QOpenGLPaintDevice::QOpenGLPaintDevice\(const QOpenGLPaintDevice&amp;\)</signature>
-        <signature>QOpenGLPaintDevice&amp; QOpenGLPaintDevice::operator=\(const QOpenGLPaintDevice&amp;\)</signature>
+        <signature>.*QResource::QResource\(const QResource&amp;\).*</signature>
+        <signature>QBasicMutex\* QBasicMutex::QBasicMutex\(const QBasicMutex&amp;\)</signature>
+        <signature>QCborStreamWriter\* QCborStreamWriter::QCborStreamWriter\(const QCborStreamWriter&amp;\)</signature>
+        <signature>QCborStreamWriter&amp; QCborStreamWriter::operator=\(const QCborStreamWriter&amp;\)</signature>
         <!-- For Q*Application::compressEvent, which is internal, can be
              called from any thread and cannot meaningfully be overridden
              because that needs access to qt internals -->
         <signature>.*compressEvent.*</signature>
-        <!-- Looks like the generator/parser has trouble with the local type ConstIterator.
-             Maybe an error in our using implementation? -->
-        <signature>.*ConstIterator.* QRegion::.*\(\) const</signature>
-        <signature>QTextBlock::iterator\* QTextBlock::iterator::iterator\(const Iterator&amp;\)</signature>
-        <signature>bool QTextBlock::iterator::operator==\(const Iterator&amp;\) const</signature>
-        <signature>bool QTextBlock::iterator::operator!=\(const Iterator&amp;\) const</signature>
-        <signature>Iterator&amp; QTextBlock::iterator::operator\+\+\(\)</signature>
-        <signature>Iterator QTextBlock::iterator::operator\+\+\(int\)</signature>
-        <signature>Iterator&amp; QTextBlock::iterator::operator--\(\)</signature>
-        <signature>Iterator QTextBlock::iterator::operator--\(int\)</signature>
-        <signature>QTextFrame::iterator\* QTextFrame::iterator::iterator\(const Iterator&amp;\)</signature>
-        <signature>QTextFrame::iterator\* QTextFrame::iterator::iterator\(Iterator&amp;\)</signature>
-        <signature>bool QTextFrame::iterator::operator==\(const Iterator&amp;\) const</signature>
-        <signature>bool QTextFrame::iterator::operator!=\(const Iterator&amp;\) const</signature>
-        <signature>Iterator&amp; QTextFrame::iterator::operator\+\+\(\)</signature>
-        <signature>Iterator QTextFrame::iterator::operator\+\+\(int\)</signature>
-        <signature>Iterator&amp; QTextFrame::iterator::operator--\(\)</signature>
-        <signature>Iterator QTextFrame::iterator::operator--\(int\)</signature>
-        <signature>Iterator&amp; QTextFrame::iterator::operator=\(const Iterator&amp;\)</signature>
-        <signature>Iterator&amp; QTextFrame::iterator::operator=\(Iterator&amp;\)</signature>
-        <signature>const Iterator&amp; QTextFrame::iterator::iterator</signature>
-        <signature>Iterator&amp; QTextFrame::iterator::operator=</signature>
         <!-- Thread related stuff belongs to the bindings language -->
         <signature>.*QtConcurrent.*</signature>
         <!-- this doesn't link, internal stuff.. -->
         <signature>.*qFindString.*</signature>
         <!-- windows internal helper functions -->
         <signature>.*qFrom.*Endian_helper.*</signature>
-        <signature>.*QPixmapData.*</signature>
-        <signature>.*qt_x11_getX11InfoForWindow.*</signature>
-        <!-- OS X internal stuff -->
-        <signature>.*qt_mac_set_cursor.*</signature>
-        <signature>.*QMenu::macMenu\(.*</signature>
-        <!-- QGlobalSpace: "static" and "QGlobalSpace::" strings are not present when filtering -->
-        <!-- Some of these are the result of parse errors. -->
-        <!-- There seems to be a parsing problem with the QCbor* classes -->
-        <!-- operator[] does not make sense in global space? -->
-        <signature>const QCborValue operator\[\]\(.*</signature>
-        <signature>QCborValueRef operator\[\]\(.*</signature>
-        <signature>QCborArray operator\+\(const QCborValue&amp;\)</signature>
-        <signature>QCborArray&amp; operator&lt;&lt;\(const QCborValue&amp;\)</signature>
-        <signature>QCborArray&amp; operator\+=\(const QCborValue&amp;\)</signature>
-        <signature>QCborValue&amp; operator=\(const QCborValue&amp;\)</signature>
-        <signature>bool operator&lt;\(const QCborArray&amp;\)</signature>
-        <signature>bool operator!=\(const QCborValue&amp;\)</signature>
-        <signature>bool operator==\(const QCborValue&amp;\)</signature>
-        <signature>bool operator&lt;\(const QCborValue&amp;\)</signature>
-        <signature>bool operator&lt;\(const QCborMap&amp;\)</signature>
-        <signature>bool operator!\(\)</signature>
-        <signature>void\* operator-&gt;\(\)</signature>
-        <!-- This function is templated -->
-        <signature>QDebug operator&lt;&lt;\(QDebug,.*</signature>
-        <!-- QUrlTwoFlags is templated -->
-        <signature>QUrlTwoFlags operator.*</signature>
-        <signature>QUrlTwoFlags&amp; operator.*</signature>
-        <!-- More template functions -->
-        <signature>Code operator Code\(\)</signature>
-        <signature>E2 operator int\(\)</signature>
-        <signature>E2 operator QFlags&lt;E2&gt;\(\)</signature>
-        <signature>E2 operator QFlags&lt;E1&gt;\(\)</signature>
-        <signature>QTimer&amp; operator=\(const QTimer&amp;\)</signature>
-        <signature>float operator\[\]\(int\)</signature>
-        <signature>float&amp; operator\[\]\(int\)</signature>
-        <signature>QVector3D&amp; operator.*=\(const QVector3D&amp;\)</signature>
-        <signature>QVector3D&amp; operator.*=\(float\)</signature>
-        <signature>QPointF operator QVariant\(\)</signature>
     </exclude>
     <functions>
         <!-- include functions starting with 'q' -->
@@ -360,5 +339,59 @@
         <class>QWheelEvent</class>
         <class>QWindow</class>
         <class>QWindowStateChangeEvent</class>
-     </classList>
+
+        <class>QFlags&lt;QGlyphRun::GlyphRunFlag&gt;</class>
+        <class>QFlags&lt;QImageIOHandler::Transformation&gt;</class>
+        <class>QFlags&lt;QImageIOPlugin::Capability&gt;</class>
+        <class>QFlags&lt;QOpenGLBuffer::RangeAccessFlag&gt;</class>
+        <class>QFlags&lt;QOpenGLDebugMessage::Severity&gt;</class>
+        <class>QFlags&lt;QOpenGLDebugMessage::Source&gt;</class>
+        <class>QFlags&lt;QOpenGLDebugMessage::Type&gt;</class>
+        <class>QFlags&lt;QOpenGLFunctions::OpenGLFeature&gt;</class>
+        <class>QFlags&lt;QOpenGLShader::ShaderTypeBit&gt;</class>
+        <class>QFlags&lt;QOpenGLTexture::Feature&gt;</class>
+        <class>QFlags&lt;QPaintEngine::DirtyFlag&gt;</class>
+        <class>QFlags&lt;QPaintEngine::PaintEngineFeature&gt;</class>
+        <class>QFlags&lt;QPainter::PixmapFragmentHint&gt;</class>
+        <class>QFlags&lt;QPainter::RenderHint&gt;</class>
+        <class>QFlags&lt;QRawFont::LayoutFlag&gt;</class>
+        <class>QFlags&lt;QSurfaceFormat::FormatOption&gt;</class>
+        <class>QFlags&lt;QTextDocument::FindFlag&gt;</class>
+        <class>QFlags&lt;QTextDocument::MarkdownFeature&gt;</class>
+        <class>QFlags&lt;QTextFormat::PageBreakFlag&gt;</class>
+        <class>QFlags&lt;QTextItem::RenderFlag&gt;</class>
+        <class>QFlags&lt;QTextOption::Flag&gt;</class>
+        <class>QFlags&lt;QTouchDevice::CapabilityFlag&gt;</class>
+        <class>QFlags&lt;QTouchEvent::TouchPoint::InfoFlag&gt;</class>
+        <class>QFlags&lt;Qt::AlignmentFlag&gt;</class>
+        <class>QFlags&lt;Qt::Edge&gt;</class>
+        <class>QFlags&lt;Qt::ImageConversionFlag&gt;</class>
+        <class>QFlags&lt;Qt::InputMethodQuery&gt;</class>
+        <class>QFlags&lt;Qt::KeyboardModifier&gt;</class>
+        <class>QFlags&lt;Qt::MatchFlag&gt;</class>
+        <class>QFlags&lt;Qt::MouseButton&gt;</class>
+        <class>QFlags&lt;Qt::MouseEventFlag&gt;</class>
+        <class>QFlags&lt;Qt::ScreenOrientation&gt;</class>
+        <class>QFlags&lt;Qt::TouchPointState&gt;</class>
+        <class>QFlags&lt;Qt::WindowState&gt;</class>
+        <class>QFlags&lt;Qt::WindowType&gt;</class>
+
+        <class>QList&lt;QKeySequence&gt;</class>
+        <class>QList&lt;QPolygonF&gt;</class>
+        <class>QList&lt;double&gt;</class>
+        <class>QList&lt;QStandardItem*&gt;</class>
+        <class>QList&lt;QTextBlock&gt;</class>
+        <class>QList&lt;QTextFrame*&gt;</class>
+        <class>QList&lt;QTextLayout::FormatRange&gt;</class>
+        <class>QPair&lt;int,int&gt;</class>
+        <class>QVector&lt;QLineF&gt;</class>
+        <class>QVector&lt;QLine&gt;</class>
+        <class>QVector&lt;QPoint&gt;</class>
+        <class>QVector&lt;QPointF&gt;</class>
+        <class>QVector&lt;double&gt;</class>
+        <class>QVector&lt;QRectF&gt;</class>
+        <class>QVector&lt;QRect&gt;</class>
+        <class>QVector&lt;QTextFormat&gt;</class>
+        <class>QVector&lt;QTextLength&gt;</class>
+        </classList>
 </config>

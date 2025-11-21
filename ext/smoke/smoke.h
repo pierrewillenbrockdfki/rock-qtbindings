@@ -182,16 +182,16 @@ public:
     };
 
     enum TypeFlags {
-        // The first 4 bits indicate the TypeId value, i.e. which field
+        // The first 5 bits indicate the TypeId value, i.e. which field
         // of the StackItem union is used.
-        tf_elem = 0x0F,
+        tf_elem = 0x1F,
 
 	// Always only one of the next three flags should be set
-	tf_stack = 0x10, 	// Stored on the stack, 'type'
-	tf_ptr = 0x20,   	// Pointer, 'type*'
-	tf_ref = 0x30,   	// Reference, 'type&'
+	tf_stack = 0x20, 	// Stored on the stack, 'type'
+	tf_ptr = 0x40,   	// Pointer, 'type*'
+	tf_ref = 0x60,   	// Reference, 'type&'
 	// Can | whatever ones of these apply
-	tf_const = 0x40		// const argument
+	tf_const = 0x80		// const argument
     };
     /**
      * One Type entry is one argument type needed by a method.
@@ -205,6 +205,7 @@ public:
 
     // We could just pass everything around using void* (pass-by-reference)
     // I don't want to, though. -aw
+    // TODO This should at some point learn to carry member field/function pointers
     union StackItem {
 	void* s_voidp;
 	bool s_bool;
@@ -218,9 +219,11 @@ public:
 	unsigned long s_ulong;
 	float s_float;
 	double s_double;
-        long s_enum;
-        void* s_class;
-        size_t s_size_t;
+	long s_enum;
+	void* s_class;
+	size_t s_size_t;
+	char16_t s_char16_t;
+	char32_t s_char32_t;
     };
     enum TypeId {
 	t_voidp,
@@ -235,9 +238,11 @@ public:
 	t_ulong,
 	t_float,
 	t_double,
-        t_enum,
-        t_class,
-        t_size_t,
+	t_enum,
+	t_class,
+	t_size_t,
+	t_char16_t,
+	t_char32_t,
 	t_last		// number of pre-defined types
     };
 
@@ -553,7 +558,7 @@ public:
     SmokeBinding(Smoke *s) : smoke(s) {}
     virtual void deleted(Smoke::Index classId, void *obj) = 0;
     virtual bool callMethod(Smoke::Index method, void *obj, Smoke::Stack args, bool isAbstract = false) = 0;
-    virtual char* className(Smoke::Index classId) = 0;
+    virtual const char* className(Smoke::Index classId) = 0;
     virtual ~SmokeBinding() {}
 };
 

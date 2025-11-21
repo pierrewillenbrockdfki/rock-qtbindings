@@ -722,22 +722,26 @@ static Smoke::Index drawlines_line_vector = 0;
 		smokeruby_object * o = value_obj_info(rb_ary_entry(argv[0], 0));
 
 		if (qstrcmp(o->smoke->classes[o->classId].className, "QPointF") == 0) {
+			    _current_method_conversion_constructors.clear();
 			_current_method.smoke = qtcore_Smoke;
 			_current_method.index = drawlines_pointf_vector;
 		} else if (qstrcmp(o->smoke->classes[o->classId].className, "QPoint") == 0) {
+			    _current_method_conversion_constructors.clear();
 			_current_method.smoke = qtcore_Smoke;
 			_current_method.index = drawlines_point_vector;
 		} else if (qstrcmp(o->smoke->classes[o->classId].className, "QLineF") == 0) {
+			    _current_method_conversion_constructors.clear();
 			_current_method.smoke = qtcore_Smoke;
 			_current_method.index = drawlines_linef_vector;
 		} else if (qstrcmp(o->smoke->classes[o->classId].className, "QLine") == 0) {
+			    _current_method_conversion_constructors.clear();
 			_current_method.smoke = qtcore_Smoke;
 			_current_method.index = drawlines_line_vector;
 		} else {
 			return rb_call_super(argc, argv);
 		}
 
-		QtRuby::MethodCall c(qtcore_Smoke, _current_method.index, self, argv, argc-1);
+		QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, argc-1);
 		c.next();
 		return self;
 	}
@@ -773,16 +777,18 @@ static Smoke::Index drawlines_rect_vector = 0;
 		smokeruby_object * o = value_obj_info(rb_ary_entry(argv[0], 0));
 
 		if (qstrcmp(o->smoke->classes[o->classId].className, "QRectF") == 0) {
+			    _current_method_conversion_constructors.clear();
 			_current_method.smoke = qtcore_Smoke;
 			_current_method.index = drawlines_rectf_vector;
 		} else if (qstrcmp(o->smoke->classes[o->classId].className, "QRect") == 0) {
+			    _current_method_conversion_constructors.clear();
 			_current_method.smoke = qtcore_Smoke;
 			_current_method.index = drawlines_rect_vector;
 		} else {
 			return rb_call_super(argc, argv);
 		}
 
-		QtRuby::MethodCall c(qtcore_Smoke, _current_method.index, self, argv, argc-1);
+		QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, argc-1);
 		c.next();
 		return self;
 	}
@@ -798,12 +804,38 @@ qabstractitemmodel_createindex(int argc, VALUE * argv, VALUE self)
 		Smoke::ModuleIndex nameId = o->smoke->idMethodName("createIndex$$$");
 		Smoke::ModuleIndex meth = o->smoke->findMethod(qtcore_Smoke->findClass("QAbstractItemModel"), nameId);
 		Smoke::Index i = meth.smoke->methodMaps[meth.index].method;
-		i = -i;		// turn into ambiguousMethodList index
-		while (o->smoke->ambiguousMethodList[i] != 0) {
-			if (	qstrcmp(	o->smoke->types[o->smoke->argumentList[o->smoke->methods[o->smoke->ambiguousMethodList[i]].args + 2]].name,
+		if(i < 0) {
+			i = -i;		// turn into ambiguousMethodList index
+			while (o->smoke->ambiguousMethodList[i] != 0) {
+				if (	qstrcmp(	o->smoke->types[o->smoke->argumentList[o->smoke->methods[o->smoke->ambiguousMethodList[i]].args + 2]].name,
+								"void*" ) == 0 )
+				{
+					const Smoke::Method &m = o->smoke->methods[o->smoke->ambiguousMethodList[i]];
+					Smoke::ClassFn fn = o->smoke->classes[m.classId].classFn;
+					Smoke::StackItem stack[4];
+					stack[1].s_int = NUM2INT(argv[0]);
+					stack[2].s_int = NUM2INT(argv[1]);
+					if (argc == 2) {
+						stack[3].s_voidp = (void*) Qnil;
+					} else {
+						stack[3].s_voidp = (void*) argv[2];
+					}
+					(*fn)(m.method, o->ptr, stack);
+					smokeruby_object  * result = alloc_smokeruby_object(	true,
+																			o->smoke,
+																			o->smoke->idClass("QModelIndex").index,
+																			stack[0].s_voidp );
+
+					return set_obj_info("Qt5::ModelIndex", result);
+				}
+
+				i++;
+			}
+		} else {
+			if (	qstrcmp(	o->smoke->types[o->smoke->argumentList[o->smoke->methods[i].args + 2]].name,
 							"void*" ) == 0 )
 			{
-				const Smoke::Method &m = o->smoke->methods[o->smoke->ambiguousMethodList[i]];
+				const Smoke::Method &m = o->smoke->methods[i];
 				Smoke::ClassFn fn = o->smoke->classes[m.classId].classFn;
 				Smoke::StackItem stack[4];
 				stack[1].s_int = NUM2INT(argv[0]);
@@ -821,8 +853,6 @@ qabstractitemmodel_createindex(int argc, VALUE * argv, VALUE self)
 
 				return set_obj_info("Qt5::ModelIndex", result);
 			}
-
-			i++;
 		}
 	}
 
@@ -966,15 +996,15 @@ cast_object_to(VALUE /*self*/, VALUE object, VALUE new_klass)
 
 	VALUE new_klassname = rb_funcall(new_klass, rb_intern("name"), 0);
 
-	Smoke::ModuleIndex * cast_to_id = classcache.value(StringValuePtr(new_klassname));
-	if (cast_to_id == 0) {
+	Smoke::ModuleIndex cast_to_id = classcache.value(StringValuePtr(new_klassname));
+	if (cast_to_id == Smoke::NullModuleIndex) {
 		rb_raise(rb_eArgError, "unable to find class \"%s\" to cast to\n", StringValuePtr(new_klassname));
 	}
 
 	smokeruby_object * o_cast = alloc_smokeruby_object(o->allocated,
-							   cast_to_id->smoke,
-							   (int) cast_to_id->index,
-							   o->smoke->cast(o->ptr, o->classId, (int) cast_to_id->index) );
+							   cast_to_id.smoke,
+							   (int) cast_to_id.index,
+							   o->smoke->cast(o->ptr, o->classId, (int) cast_to_id.index) );
 
 	VALUE obj = Data_Wrap_Struct(new_klass, smokeruby_mark, smokeruby_free, (void *) o_cast);
 	mapPointer(obj, o_cast, o_cast->classId, 0);
@@ -990,8 +1020,8 @@ qobject_qt_metacast(VALUE self, VALUE klass)
 	}
 
 	const char * classname = rb_class2name(klass);
-	Smoke::ModuleIndex * mi = classcache.value(classname);
-	if (mi == 0) {
+	Smoke::ModuleIndex mi = classcache.value(classname);
+	if (mi == Smoke::NullModuleIndex) {
 		return Qnil;
 	}
 
@@ -1000,15 +1030,15 @@ qobject_qt_metacast(VALUE self, VALUE klass)
 		return Qnil;
 	}
 
-	void* ret = qobj->qt_metacast(mi->smoke->classes[mi->index].className);
+	void* ret = qobj->qt_metacast(mi.smoke->classes[mi.index].className);
 
 	if (ret == 0) {
 		return Qnil;
 	}
 
 	smokeruby_object * o_cast = alloc_smokeruby_object(	o->allocated,
-								mi->smoke,
-								(int) mi->index,
+								mi.smoke,
+								(int) mi.index,
 								ret );
 
 	VALUE obj = Data_Wrap_Struct(klass, smokeruby_mark, smokeruby_free, (void *) o_cast);
@@ -1036,9 +1066,10 @@ qsignalmapper_mapping(int argc, VALUE * argv, VALUE self)
 				|| (qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name, "QWidget*" ) == 0
 				&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") ) )
 			{
+				    _current_method_conversion_constructors.clear();
 				_current_method.smoke = meth.smoke;
 				_current_method.index = meth.smoke->ambiguousMethodList[i];
-				QtRuby::MethodCall c(meth.smoke, _current_method.index, self, argv, 1);
+				QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, 1);
 				c.next();
 				return *(c.var());
 			}
@@ -1070,9 +1101,10 @@ qsignalmapper_set_mapping(int argc, VALUE * argv, VALUE self)
 				|| (qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args + 1]].name, "QWidget*" ) == 0
 				&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") ) )
 			{
+				    _current_method_conversion_constructors.clear();
 				_current_method.smoke = meth.smoke;
 				_current_method.index = meth.smoke->ambiguousMethodList[i];
-				QtRuby::MethodCall c(meth.smoke, _current_method.index, self, argv, 2);
+				QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, 2);
 				c.next();
 				return *(c.var());
 			}
@@ -1144,8 +1176,8 @@ qvariant_value(VALUE /*self*/, VALUE variant_value_klass, VALUE variant_value)
 	}
 
 	const char * classname = rb_class2name(variant_value_klass);
-	Smoke::ModuleIndex * value_class_id = classcache.value(classname);
-	if (value_class_id == 0) {
+	Smoke::ModuleIndex value_class_id = classcache.value(classname);
+	if (value_class_id == Smoke::NullModuleIndex) {
 		return Qnil;
 	}
 
@@ -1210,7 +1242,7 @@ qvariant_value(VALUE /*self*/, VALUE variant_value_klass, VALUE variant_value)
 		return rb_funcall(variant_value, rb_intern(toValueMethodName), 1, variant_value);
 	}
 
-	vo = alloc_smokeruby_object(true, value_class_id->smoke, value_class_id->index, value_ptr);
+	vo = alloc_smokeruby_object(true, value_class_id.smoke, value_class_id.index, value_ptr);
 	result = set_obj_info(classname, vo);
 
 	return result;
@@ -1242,9 +1274,10 @@ qvariant_from_value(int argc, VALUE * argv, VALUE self)
 		while (meth.smoke->ambiguousMethodList[i] != 0) {
 			if (qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name, typeName ) == 0 )
 			{
+				    _current_method_conversion_constructors.clear();
 				_current_method.smoke = meth.smoke;
 				_current_method.index = meth.smoke->ambiguousMethodList[i];
-				QtRuby::MethodCall c(meth.smoke, _current_method.index, self, argv, 0);
+				QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, 0);
 				c.next();
 				return *(c.var());
 			}
@@ -1296,27 +1329,45 @@ static Smoke::Index new_qvariant_qlist = 0;
 static Smoke::Index new_qvariant_qmap = 0;
 
 	if (new_qvariant_qlist == 0) {
-		Smoke::ModuleIndex nameId = qtcore_Smoke->findMethodName("Qvariant", "QVariant?");
-		Smoke::ModuleIndex meth = qtcore_Smoke->findMethod(qtcore_Smoke->findClass("QVariant"), nameId);
-		Smoke::Index i = meth.smoke->methodMaps[meth.index].method;
-		i = -i;		// turn into ambiguousMethodList index
-		while (qtcore_Smoke->ambiguousMethodList[i] != 0) {
-			const char * argType = meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name;
-
-			if (qstrcmp(argType, "const QList<QVariant>&" ) == 0) {
-				new_qvariant_qlist = meth.smoke->ambiguousMethodList[i];
-			} else if (qstrcmp(argType, "const QMap<QString,QVariant>&" ) == 0) {
-				new_qvariant_qmap = meth.smoke->ambiguousMethodList[i];
+		for(int j = 0; j < 2; j++) {
+			Smoke::ModuleIndex nameId;
+			if(j == 0) {
+				nameId = qtcore_Smoke->findMethodName("Qvariant", "QVariant?");
+			} else {
+				nameId = qtcore_Smoke->findMethodName("Qvariant", "QVariant#");
 			}
+			Smoke::ModuleIndex meth = qtcore_Smoke->findMethod(qtcore_Smoke->findClass("QVariant"), nameId);
+			Smoke::Index i = meth.smoke->methodMaps[meth.index].method;
+			if(i >= 0) {
+				const char *argType = meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[i].args]].name;
 
-			i++;
+				if (qstrcmp(argType, "const QList<QVariant>&") == 0) {
+					new_qvariant_qlist = i;
+				} else if (qstrcmp(argType, "const QMap<QString,QVariant>&") == 0) {
+					new_qvariant_qmap = i;
+				}
+			} else {
+				i = -i;     // turn into ambiguousMethodList index
+				while (qtcore_Smoke->ambiguousMethodList[i] != 0) {
+					const char *argType = meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name;
+
+					if (qstrcmp(argType, "const QList<QVariant>&") == 0) {
+						new_qvariant_qlist = meth.smoke->ambiguousMethodList[i];
+					} else if (qstrcmp(argType, "const QMap<QString,QVariant>&") == 0) {
+						new_qvariant_qmap = meth.smoke->ambiguousMethodList[i];
+					}
+
+					i++;
+				}
+			}
 		}
 	}
 
 	if (argc == 1 && TYPE(argv[0]) == T_HASH) {
+		    _current_method_conversion_constructors.clear();
 		_current_method.smoke = qtcore_Smoke;
 		_current_method.index = new_qvariant_qmap;
-		QtRuby::MethodCall c(qtcore_Smoke, _current_method.index, self, argv, argc-1);
+		QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, argc-1);
 		c.next();
 		return *(c.var());
 	} else if (	argc == 1
@@ -1324,9 +1375,10 @@ static Smoke::Index new_qvariant_qmap = 0;
 				&& RARRAY_LEN(argv[0]) > 0
 				&& TYPE(rb_ary_entry(argv[0], 0)) != T_STRING )
 	{
+		    _current_method_conversion_constructors.clear();
 		_current_method.smoke = qtcore_Smoke;
 		_current_method.index = new_qvariant_qlist;
-		QtRuby::MethodCall c(qtcore_Smoke, _current_method.index, self, argv, argc-1);
+		QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, argc-1);
 		c.next();
 		return *(c.var());
 	}
@@ -1398,13 +1450,13 @@ initialize_qt(int argc, VALUE * argv, VALUE self)
 	}
 
 	{
-		QByteArray * mcid = find_cached_selector(argc+4, temp_stack, klass, rb_class2name(klass));
+		QByteArray mcid = find_cached_selector(argc+4, temp_stack, klass, rb_class2name(klass));
 
 		if (_current_method.index == -1) {
 			(void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+4, temp_stack);
 			if (_current_method.index != -1) {
 				// Success. Cache result.
-				methcache.insert(*mcid, new Smoke::ModuleIndex(_current_method));
+				methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
 			}
 		}
 	}
@@ -1417,7 +1469,7 @@ initialize_qt(int argc, VALUE * argv, VALUE self)
 	{
 		// Allocate the MethodCall within a C block. Otherwise, because the continue_new_instance()
 		// call below will longjmp out, it wouldn't give C++ an opportunity to clean up
-		QtRuby::MethodCall c(_current_method.smoke, _current_method.index, self, temp_stack+4, argc);
+		QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, temp_stack+4, argc);
 		c.next();
 		temp_obj = *(c.var());
 	}
@@ -1528,6 +1580,18 @@ static QRegExp * rx = 0;
 	return result;
 }
 
+/*
+ about qt_static_metacall
+
+ This function only gets the object pointer, but it also needs to know which
+ metaobject it is associated with to make sense of the supplied relative index.
+ we can only do that by generating a function
+ that adds a pointer to the relevant meta object and then calls into a helper.
+
+ we currently are not setup to generate such functions. Qt usually falls back to
+ using the qt_metacall, so this is fine for now.
+ */
+
 static VALUE
 qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 {
@@ -1539,10 +1603,15 @@ qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 	int id = NUM2INT(argv[1]);
 	void ** _o = 0;
 
+	// run the superclasses qt_metacall. its result is id minus the number of methods/properties the superclass(es) handled.
+	// we index into a complete method/property array using id, so we keep the original value.
+
 	// Note that for a slot with no args and no return type,
 	// it isn't an error to get a NULL value of _o here.
 	Data_Get_Struct(argv[2], void*, _o);
-	// Assume the target slot is a C++ one
+
+	// Call into the closest c++ QObject qt_metacall
+	// all ruby classes calls are handled later.
 	smokeruby_object *o = value_obj_info(self);
 	Smoke::ModuleIndex nameId = o->smoke->idMethodName("qt_metacall$$?");
 	Smoke::ModuleIndex classIdx(o->smoke, o->classId);
@@ -1557,6 +1626,7 @@ qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 		(*fn)(m.method, o->ptr, i);
 		int ret = i[0].s_int;
 		if (ret < 0) {
+			//some superclass was responsible for this method/property
 			return INT2NUM(ret);
 		}
 	} else {
@@ -1565,23 +1635,15 @@ qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 			o->smoke->classes[o->classId].className );
 	}
 
-	if (_c != QMetaObject::InvokeMetaMethod) {
-		return argv[1];
-	}
-
-	QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
-	// get obj metaobject with a virtual call
-	const QMetaObject *metaobject = qobj->metaObject();
-
-	// get method/property count
-	int count = 0;
 	if (_c == QMetaObject::InvokeMetaMethod) {
-		count = metaobject->methodCount();
-	} else {
-		count = metaobject->propertyCount();
-	}
 
-	if (_c == QMetaObject::InvokeMetaMethod) {
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		// get method/property count
+		int count = metaobject->methodCount();
+
 		QMetaMethod method = metaobject->method(id);
 
 		if (method.methodType() == QMetaMethod::Signal) {
@@ -1591,17 +1653,259 @@ qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 
 		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, method.typeName(), method.parameterTypes());
 
-		QString name(method.methodSignature());
-		static QRegExp * rx = 0;
-		if (rx == 0) {
-			rx = new QRegExp("\\(.*");
-		}
-		name.replace(*rx, "");
-		QtRuby::InvokeSlot slot(self, rb_intern(name.toLocal8Bit()), mocArgs, _o);
+		QtRuby::InvokeSlot slot(self, rb_intern(method.name().constData()), mocArgs, _o);
 		slot.next();
-	}
 
-	return INT2NUM(id - count);
+		return INT2NUM(id - count);
+/*	} else if (_c == QMetaObject::IndexOfMethod) {
+		//checks if a signal method pointer in _o[1] matches some declared method of
+		//the class, returns the class local index in *(int*)_o[0],
+		//this is not generally handled in qt_metacall, only in qt_static_metacall.
+		//this has no use in scripted languages unless one generates call shim code.
+		return argv[1];
+		*/
+	} else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+		//returns the type of parameter *(int*)_o[1] of method id in *(int*)_o[0], or -1 if not applicable
+		//This is only called when the type is not registered already.
+		//This is also called on the qt_static_metacall method.
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->methodCount();
+
+		return INT2NUM(id - count);
+	} else if (_c == QMetaObject::ReadProperty) {
+		// stores the result of the read function of property id in *(TYPE*)_o[0]
+		// uses qt_static_metacall
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->propertyCount();
+
+		QMetaProperty property = metaobject->property(id);
+
+		VALUE *temp_stack = ALLOCA_N(VALUE, 3);
+		temp_stack[0] = ID2SYM(rb_intern("read"));
+		temp_stack[1] = self;
+		temp_stack[2] = INT2NUM(id - metaobject->propertyOffset());
+
+		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
+
+		if(helper_result == Qnil) {
+			qDebug("Property reader is nil");
+			return argv[1];
+		}
+		qDebug("Property reader is \"%s\"", rb_id2name(SYM2ID(helper_result)));
+
+		ID ruby_method_id = SYM2ID(helper_result);
+
+		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, property.typeName(), QList<QByteArray>());
+
+		QtRuby::InvokeSlot slot(self, ruby_method_id, mocArgs, _o);
+		slot.next();
+
+		return INT2NUM(id - count);
+	} else if (_c == QMetaObject::WriteProperty) {
+		// runs the write function of property id with *(TYPE*)_o[0]
+		// uses qt_static_metacall
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->propertyCount();
+
+		QMetaProperty property = metaobject->property(id);
+
+		VALUE *temp_stack = ALLOCA_N(VALUE, 3);
+		temp_stack[0] = ID2SYM(rb_intern("write"));
+		temp_stack[1] = self;
+		temp_stack[2] = INT2NUM(id - metaobject->propertyOffset());
+
+		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
+
+		if(helper_result == Qnil) {
+			qDebug("Property writer is nil");
+			return argv[1];
+		}
+		qDebug("Property writer is \"%s\"", rb_id2name(SYM2ID(helper_result)));
+
+		ID ruby_method_id = SYM2ID(helper_result);
+
+		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, "void", QList<QByteArray>({property.typeName()}));
+
+		QtRuby::InvokeSlot slot(self, ruby_method_id, mocArgs, _o);
+		slot.next();
+
+		return INT2NUM(id - count);
+	} else if (_c == QMetaObject::ResetProperty) {
+		// runs the reset function of property id
+		// uses qt_static_metacall
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->propertyCount();
+
+		VALUE *temp_stack = ALLOCA_N(VALUE, 3);
+		temp_stack[0] = ID2SYM(rb_intern("reset"));
+		temp_stack[1] = self;
+		temp_stack[2] = INT2NUM(id - metaobject->propertyOffset());
+
+		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
+
+		if(helper_result == Qnil) {
+			return argv[1];
+		}
+
+		ID ruby_method_id = SYM2ID(helper_result);
+
+		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, "void", QList<QByteArray>());
+
+		QtRuby::InvokeSlot slot(self, ruby_method_id, mocArgs, _o);
+		slot.next();
+
+		return INT2NUM(id - count);
+	} else if (_c == QMetaObject::RegisterPropertyMetaType) {
+		//returns the type of property id in *(int*)_o[0], or -1 if not applicable
+		//This is only called when the type is not registered already.
+		// uses qt_static_metacall
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->propertyCount();
+
+		return INT2NUM(id - count);
+	} else if (_c == QMetaObject::QueryPropertyDesignable) {
+		//returns the designable attribute of property id in *(int*)_o[0] (true or false)
+		//this only needs to do something if the flag in the metadata does not match,
+		//i.E. when it is a function or similar evaluatable
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->propertyCount();
+
+		VALUE *temp_stack = ALLOCA_N(VALUE, 3);
+		temp_stack[0] = ID2SYM(rb_intern("querydesignable"));
+		temp_stack[1] = self;
+		temp_stack[2] = INT2NUM(id - metaobject->propertyOffset());
+
+		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
+
+		if(helper_result == Qnil) {
+			return argv[1];
+		}
+
+		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, "int", QList<QByteArray>());
+		QtRuby::SlotReturnValue r(_o, &helper_result, mocArgs);
+
+		return INT2NUM(id - count);
+	} else if (_c == QMetaObject::QueryPropertyScriptable) {
+		//returns the scriptable attribute of property id in *(int*)_o[0] (true or false)
+		//this only needs to do something if the flag in the metadata does not match,
+		//i.E. when it is a function or similar evaluatable
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->propertyCount();
+
+		VALUE *temp_stack = ALLOCA_N(VALUE, 3);
+		temp_stack[0] = ID2SYM(rb_intern("queryscriptable"));
+		temp_stack[1] = self;
+		temp_stack[2] = INT2NUM(id - metaobject->propertyOffset());
+
+		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
+
+		if(helper_result == Qnil) {
+			return argv[1];
+		}
+
+		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, "int", QList<QByteArray>());
+		QtRuby::SlotReturnValue r(_o, &helper_result, mocArgs);
+
+		return INT2NUM(id - count);
+	} else if (_c == QMetaObject::QueryPropertyStored) {
+		//returns the stored attribute of property id in *(int*)_o[0] (true or false)
+		//this only needs to do something if the flag in the metadata does not match,
+		//i.E. when it is a function or similar evaluatable
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->propertyCount();
+
+		VALUE *temp_stack = ALLOCA_N(VALUE, 3);
+		temp_stack[0] = ID2SYM(rb_intern("querystored"));
+		temp_stack[1] = self;
+		temp_stack[2] = INT2NUM(id - metaobject->propertyOffset());
+
+		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
+
+		if(helper_result == Qnil) {
+			return argv[1];
+		}
+
+		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, "int", QList<QByteArray>());
+		QtRuby::SlotReturnValue r(_o, &helper_result, mocArgs);
+
+		return INT2NUM(id - count);
+	} else if (_c == QMetaObject::QueryPropertyEditable) {
+		//returns the editable attribute of property id in *(int*)_o[0] (true or false)
+		//this only needs to do something if the flag in the metadata does not match,
+		//i.E. when it is a function or similar evaluatable
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->propertyCount();
+
+		VALUE *temp_stack = ALLOCA_N(VALUE, 3);
+		temp_stack[0] = ID2SYM(rb_intern("queryeditable"));
+		temp_stack[1] = self;
+		temp_stack[2] = INT2NUM(id - metaobject->propertyOffset());
+
+		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
+
+		if(helper_result == Qnil) {
+			return argv[1];
+		}
+
+		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, "int", QList<QByteArray>());
+		QtRuby::SlotReturnValue r(_o, &helper_result, mocArgs);
+
+		return INT2NUM(id - count);
+	} else if (_c == QMetaObject::QueryPropertyUser) {
+		//returns the user attribute of property id in *(int*)_o[0] (true or false)
+		//this only needs to do something if the flag in the metadata does not match,
+		//i.E. when it is a function or similar evaluatable
+		QObject * qobj = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+		// get obj metaobject with a virtual call
+		const QMetaObject *metaobject = qobj->metaObject();
+
+		int count = metaobject->propertyCount();
+
+		VALUE *temp_stack = ALLOCA_N(VALUE, 3);
+		temp_stack[0] = ID2SYM(rb_intern("queryuser"));
+		temp_stack[1] = self;
+		temp_stack[2] = INT2NUM(id - metaobject->propertyOffset());
+
+		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
+
+		if(helper_result == Qnil) {
+			return argv[1];
+		}
+
+		QList<MocArgument*> mocArgs = get_moc_arguments(o->smoke, "int", QList<QByteArray>());
+		QtRuby::SlotReturnValue r(_o, &helper_result, mocArgs);
+
+		return INT2NUM(id - count);
+	} else {
+		return argv[1];
+	}
 }
 
 static VALUE
@@ -1703,12 +2007,12 @@ inherits_qobject(int argc, VALUE * argv, VALUE /*self*/)
 		return rb_call_super(argc, argv);
 	}
 
-	Smoke::ModuleIndex * classId = classcache.value(StringValuePtr(argv[0]));
+	Smoke::ModuleIndex classId = classcache.value(StringValuePtr(argv[0]));
 
-	if (classId == 0) {
+	if (classId == Smoke::NullModuleIndex) {
 		return rb_call_super(argc, argv);
 	} else {
-		VALUE super_class = rb_str_new2(classId->smoke->classes[classId->index].className);
+		VALUE super_class = rb_str_new2(classId.smoke->classes[classId.index].className);
 		return rb_call_super(argc, &super_class);
 	}
 }
@@ -1876,8 +2180,8 @@ insert_pclassid(VALUE self, VALUE p_value, VALUE mi_value)
 	int ix = NUM2INT(rb_funcall(mi_value, rb_intern("index"), 0));
 	int smokeidx = NUM2INT(rb_funcall(mi_value, rb_intern("smoke"), 0));
 	Smoke::ModuleIndex mi(smokeList[smokeidx], ix);
-	classcache.insert(QByteArray(p), new Smoke::ModuleIndex(mi));
-	IdToClassNameMap.insert(mi, new QByteArray(p));
+	classcache.insert(QByteArray(p), mi);
+	IdToClassNameMap.insert(mi, QByteArray(p));
 	return self;
 }
 
@@ -1887,22 +2191,22 @@ classid2name(VALUE /*self*/, VALUE mi_value)
 	int ix = NUM2INT(rb_funcall(mi_value, rb_intern("index"), 0));
 	int smokeidx = NUM2INT(rb_funcall(mi_value, rb_intern("smoke"), 0));
 	Smoke::ModuleIndex mi(smokeList[smokeidx], ix);
-	return rb_str_new2(IdToClassNameMap[mi]->constData());
+	return rb_str_new2(IdToClassNameMap[mi].constData());
 }
 
 static VALUE
 find_pclassid(VALUE /*self*/, VALUE p_value)
 {
 	if (NIL_P(p_value)) {
-	   return rb_funcall(moduleindex_class, rb_intern("new"), 2, 0, 0);
+	   return rb_funcall(moduleindex_class, rb_intern("new"), 2, INT2NUM(0), INT2NUM(0));
 	}
 
 	char *p = StringValuePtr(p_value);
-	Smoke::ModuleIndex *r = classcache.value(QByteArray(p));
-	if (r != 0) {
-		return rb_funcall(moduleindex_class, rb_intern("new"), 2, INT2NUM(smokeList.indexOf(r->smoke)), INT2NUM(r->index));
+	Smoke::ModuleIndex r = classcache.value(QByteArray(p));
+	if (r != Smoke::NullModuleIndex) {
+		return rb_funcall(moduleindex_class, rb_intern("new"), 2, INT2NUM(smokeList.indexOf(r.smoke)), INT2NUM(r.index));
 	} else {
-		return rb_funcall(moduleindex_class, rb_intern("new"), 2, Qnil, Qnil);
+		return rb_funcall(moduleindex_class, rb_intern("new"), 2, INT2NUM(0), INT2NUM(0));
 	}
 }
 
@@ -2014,6 +2318,22 @@ Property descriptions as pointed to by QMetaObjectPrivate::propertyData in QMeta
 Enumerator descriptions as pointed to by QMetaObjectPrivate::enumeratorData in QMetaObject::d.data is of size 5 ints. (QMetaEnum::handle) (in revision 8, which we will be targeting)
 Constructor descriptions as pointed to by QMetaObjectPrivate::constructorData in QMetaObject::d.data is of size 5 ints. (QMetaMethod::handle)
 
+QMetaObjectPrivate ints layout:
+revision: int 8
+className: string number into QMetaObject::d.stringdata
+classInfoCount: int
+classInfoData: int number into QMetaObject::d.data; points to QMetaClassInfo::handle
+methodCount: int number of methods(signals, slots, others)
+methodData: int number into QMetaObject::d.data; points to QMetaMethod::handle
+propertyCount: int
+propertyData: int number into QMetaObject::d.data; points to QMetaProperty::handle
+enumeratorCount: int
+enumeratorData: int number into QMetaObject::d.data; points to QMetaEnum::handle
+constructorCount: int
+constructorData: int number into QMetaObject::d.data; points to QMetaMethod::handle
+flags: int
+signalCount: int
+
 QMetaClassInfo::handle ints layout:
 name: string number into QMetaObject::d.stringdata
 value: string number into QMetaObject::d.stringdata
@@ -2078,6 +2398,8 @@ keyData: int number into QMetaObject::d.data; points to pairs of
 		memcpy(stringdata_pos, RSTRING_PTR(rv), str_len);
 		stringdata[i].ref.atomic = -1;
 		stringdata[i].size = str_len;
+		stringdata[i].alloc = 0;
+		stringdata[i].capacityReserved = 0;
 		stringdata[i].offset = stringdata_pos - (char*)&stringdata[i];
 		stringdata_pos += str_len;
 		*stringdata_pos++ = '\0';
@@ -2093,13 +2415,14 @@ keyData: int number into QMetaObject::d.data; points to pairs of
 
 	QMetaObject ob = {
 		{ superdata, stringdata, data, 0 }
-	} ;
+	};
 
 	QMetaObject * meta = new QMetaObject;
 	*meta = ob;
 
-#ifdef DEBUG
-	printf("make_metaObject() superdata: %p %s\n", meta->d.superdata, superdata->className());
+//#ifdef DEBUG
+#if 1
+	printf("make_metaObject() superdata: %p %s\n", &meta->d.superdata, superdata->className());
 
 	printf(
 	" // content:\n"
@@ -2239,6 +2562,14 @@ keyData: int number into QMetaObject::d.data; points to pairs of
 	printf("Class name: %s\n", meta->className());
 	for(uint j = 0; j < meta->methodCount(); j++) {
 		printf("Method %d: %s\n", j, (const char *)meta->method(j).methodSignature());
+		printf("    %s %s(", meta->method(j).typeName(), meta->method(j).name().constData());
+		for(uint k = 0; k < meta->method(j).parameterCount(); k++) {
+			if(k != 0) {
+				printf(", ");
+			}
+			printf("%s %s", meta->method(j).parameterTypes()[k].constData(), meta->method(j).parameterNames()[k].constData());
+		}
+		printf(")\n");
 	}
 
 #endif
@@ -2351,30 +2682,42 @@ dumpCandidates(VALUE /*self*/, VALUE rmeths)
 {
 	VALUE errmsg = rb_str_new2("");
 	if(rmeths != Qnil) {
-	int count = RARRAY_LEN(rmeths);
+		int count = RARRAY_LEN(rmeths);
 		for(int i = 0; i < count; i++) {
-		qt_rb_str_catf(errmsg, "\t");
-		int id = NUM2INT(rb_funcall(rb_ary_entry(rmeths, i), rb_intern("index"), 0));
-		Smoke* smoke = smokeList[NUM2INT(rb_funcall(rb_ary_entry(rmeths, i), rb_intern("smoke"), 0))];
-		const Smoke::Method &meth = smoke->methods[id];
-		const char *tname = smoke->types[meth.ret].name;
-		if(meth.flags & Smoke::mf_enum) {
-			qt_rb_str_catf(errmsg, "enum ");
-			qt_rb_str_catf(errmsg, "%s::%s", smoke->classes[meth.classId].className, smoke->methodNames[meth.name]);
-			qt_rb_str_catf(errmsg, "\n");
-		} else {
-			if(meth.flags & Smoke::mf_static) qt_rb_str_catf(errmsg, "static ");
-			qt_rb_str_catf(errmsg, "%s ", (tname ? tname:"void"));
-			qt_rb_str_catf(errmsg, "%s::%s(", smoke->classes[meth.classId].className, smoke->methodNames[meth.name]);
-			for(int i = 0; i < meth.numArgs; i++) {
-			if(i) qt_rb_str_catf(errmsg, ", ");
-			tname = smoke->types[smoke->argumentList[meth.args+i]].name;
-			qt_rb_str_catf(errmsg, "%s", (tname ? tname:"void"));
+			qt_rb_str_catf(errmsg, "\t");
+			int id = NUM2INT(rb_funcall(rb_ary_entry(rmeths, i), rb_intern("index"), 0));
+			Smoke* smoke = smokeList[NUM2INT(rb_funcall(rb_ary_entry(rmeths, i), rb_intern("smoke"), 0))];
+			const Smoke::Method &meth = smoke->methods[id];
+			const char *tname = smoke->types[meth.ret].name;
+			if(meth.flags & Smoke::mf_enum) {
+				qt_rb_str_catf(errmsg, "enum ");
+				qt_rb_str_catf(errmsg, "%s::%s", smoke->classes[meth.classId].className, smoke->methodNames[meth.name]);
+			} else {
+				if(meth.flags & Smoke::mf_static) qt_rb_str_catf(errmsg, "static ");
+				qt_rb_str_catf(errmsg, "%s ", (tname ? tname:"void"));
+				qt_rb_str_catf(errmsg, "%s::%s(", smoke->classes[meth.classId].className, smoke->methodNames[meth.name]);
+				for(int i = 0; i < meth.numArgs; i++) {
+					if(i) qt_rb_str_catf(errmsg, ", ");
+					tname = smoke->types[smoke->argumentList[meth.args+i]].name;
+					qt_rb_str_catf(errmsg, "%s", (tname ? tname:"void"));
+				}
+				qt_rb_str_catf(errmsg, ")");
+				if(meth.flags & Smoke::mf_const) qt_rb_str_catf(errmsg, " const");
 			}
-			qt_rb_str_catf(errmsg, ")");
-			if(meth.flags & Smoke::mf_const) qt_rb_str_catf(errmsg, " const");
-			qt_rb_str_catf(errmsg, "\n");
+			for(int j = 0; j < smoke->numMethodMaps; j++) {
+				if (smoke->methodMaps[j].method < 0) {
+					for(int k = -smoke->methodMaps[j].method; smoke->ambiguousMethodList[k] != 0; k++) {
+						if (smoke->ambiguousMethodList[k] == id) {
+							qt_rb_str_catf(errmsg, " %s", smoke->methodNames[smoke->methodMaps[j].name]);
+						}
+					}
+				} else {
+					if (smoke->methodMaps[j].method == id) {
+						qt_rb_str_catf(errmsg, " %s", smoke->methodNames[smoke->methodMaps[j].name]);
+					}
+				}
 			}
+			qt_rb_str_catf(errmsg, "\n");
 		}
 	}
 	return errmsg;
@@ -2387,6 +2730,15 @@ isConstMethod(VALUE /*self*/, VALUE idx)
 	Smoke* smoke = smokeList[NUM2INT(rb_funcall(idx, rb_intern("smoke"), 0))];
 	const Smoke::Method &meth = smoke->methods[id];
 	return (meth.flags & Smoke::mf_const) ? Qtrue : Qfalse;
+}
+
+static VALUE
+isExplicitMethod(VALUE /*self*/, VALUE idx)
+{
+	int id = NUM2INT(rb_funcall(idx, rb_intern("index"), 0));
+	Smoke* smoke = smokeList[NUM2INT(rb_funcall(idx, rb_intern("smoke"), 0))];
+	const Smoke::Method &meth = smoke->methods[id];
+	return (meth.flags & Smoke::mf_explicit) ? Qtrue : Qfalse;
 }
 
 static VALUE
@@ -2405,6 +2757,18 @@ setCurrentMethod(VALUE self, VALUE meth_value)
 	// FIXME: damn, this is lame, and it doesn't handle ambiguous methods
 	_current_method.smoke = smokeList[smokeidx];  //qtcore_Smoke->methodMaps[meth].method;
 	_current_method.index = meth;
+	return self;
+}
+
+static VALUE
+setCurrentMethodConversion(VALUE self, VALUE arg_num_value, VALUE meth_value)
+{
+	int smokeidx = NUM2INT(rb_funcall(meth_value, rb_intern("smoke"), 0));
+	int meth = NUM2INT(rb_funcall(meth_value, rb_intern("index"), 0));
+	int arg_num = NUM2INT(arg_num_value);
+
+	    _current_method_conversion_constructors[arg_num].smoke = smokeList[smokeidx];
+	    _current_method_conversion_constructors[arg_num].index = meth;
 	return self;
 }
 
@@ -2481,7 +2845,7 @@ create_qobject_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 
 	QString packageName(package);
 
-	foreach(QString s, packageName.mid(strlen(moduleName) + 2).split("::")) {
+	Q_FOREACH(QString s, packageName.mid(strlen(moduleName) + 2).split("::")) {
 		klass = rb_define_class_under(klass, (const char*) s.toLocal8Bit(), qt_base_class);
 	}
 
@@ -2576,7 +2940,8 @@ create_qt_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 	rb_define_singleton_method(module_value, "method_missing", (VALUE (*) (...)) module_method_missing, -1);
 	rb_define_singleton_method(module_value, "const_missing", (VALUE (*) (...)) module_method_missing, -1);
 */
-	foreach(QString s, packageName.mid(strlen(moduleName) + 2).split("::")) {
+	Q_FOREACH(QString s, packageName.mid(strlen(moduleName) + 2).split("::")) {
+		qDebug("Defining class named %s", qPrintable(s));
 		klass = rb_define_class_under(klass, (const char*) s.toLocal8Bit(), qt_base_class);
 	}
 
@@ -2638,7 +3003,7 @@ create_qt_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 #endif
 	}
 
-	foreach(QtRubyModule m, qtruby_modules.values()) {
+	Q_FOREACH(QtRubyModule m, qtruby_modules.values()) {
 		if (m.class_created)
 			m.class_created(package, module_value, klass);
 	}
@@ -2765,8 +3130,10 @@ Init_qtruby5()
 	rb_define_module_function(qt_internal_module, "findAllMethodNames", (VALUE (*) (...)) findAllMethodNames, 3);
 	rb_define_module_function(qt_internal_module, "dumpCandidates", (VALUE (*) (...)) dumpCandidates, 1);
 	rb_define_module_function(qt_internal_module, "isConstMethod", (VALUE (*) (...)) isConstMethod, 1);
+	rb_define_module_function(qt_internal_module, "isExplicitMethod", (VALUE (*) (...)) isExplicitMethod, 1);
 	rb_define_module_function(qt_internal_module, "isObject", (VALUE (*) (...)) isObject, 1);
 	rb_define_module_function(qt_internal_module, "setCurrentMethod", (VALUE (*) (...)) setCurrentMethod, 1);
+	rb_define_module_function(qt_internal_module, "setCurrentMethodConversion", (VALUE (*) (...)) setCurrentMethodConversion, 2);
 	rb_define_module_function(qt_internal_module, "getClassList", (VALUE (*) (...)) getClassList, 0);
 	rb_define_module_function(qt_internal_module, "create_qt_class", (VALUE (*) (...)) create_qt_class, 2);
 	rb_define_module_function(qt_internal_module, "create_qobject_class", (VALUE (*) (...)) create_qobject_class, 2);

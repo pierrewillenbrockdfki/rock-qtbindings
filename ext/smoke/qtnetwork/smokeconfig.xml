@@ -12,6 +12,12 @@
         <!-- both are classes, but they are represented as Smoke::t_voidp -->
         <typeName>QStringList</typeName>
         <typeName>QString</typeName>
+        <typeName>QList&lt;QHostAddress&gt;</typeName>
+        <typeName>QList&lt;QNetworkAddressEntry&gt;</typeName>
+        <typeName>QList&lt;QNetworkInterface&gt;</typeName>
+        <typeName>QList&lt;QSslCertificate&gt;</typeName>
+        <typeName>QList&lt;QSslCipher&gt;</typeName>
+        <typeName>QList&lt;QSslError&gt;</typeName>
     </voidpTypes>
     <exclude>
         <!-- we don't want private stuff in smoke.. -->
@@ -116,6 +122,25 @@
         <class>QTcpServer</class>
         <class>QTcpSocket</class>
         <class>QUdpSocket</class>
+
+        <class>QFlags&lt;QAbstractSocket::BindFlag&gt;</class>
+        <class>QFlags&lt;QAbstractSocket::PauseMode&gt;</class>
+        <class>QFlags&lt;QHostAddress::ConversionModeFlag&gt;</class>
+        <class>QFlags&lt;QHstsPolicy::PolicyFlag&gt;</class>
+        <class>QFlags&lt;QLocalServer::SocketOption&gt;</class>
+        <class>QFlags&lt;QNetworkConfigurationManager::Capability&gt;</class>
+        <class>QFlags&lt;QNetworkConfiguration::StateFlag&gt;</class>
+        <class>QFlags&lt;QNetworkInterface::InterfaceFlag&gt;</class>
+        <class>QFlags&lt;QNetworkProxy::Capability&gt;</class>
+        <class>QFlags&lt;QNetworkSession::UsagePolicy&gt;</class>
+        <class>QFlags&lt;QSsl::SslOption&gt;</class>
+
+        <class>QList&lt;QHostAddress&gt;</class>
+        <class>QList&lt;QNetworkAddressEntry&gt;</class>
+        <class>QList&lt;QNetworkInterface&gt;</class>
+        <class>QList&lt;QSslCertificate&gt;</class>
+        <class>QList&lt;QSslCipher&gt;</class>
+        <class>QList&lt;QSslError&gt;</class>
 
         <!-- namespaces -->
         <class>QSsl</class>

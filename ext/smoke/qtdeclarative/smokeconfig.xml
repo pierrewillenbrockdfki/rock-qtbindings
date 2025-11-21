@@ -92,7 +92,25 @@
         <class>QDeclarativePropertyMap</class>
         <class>QDeclarativeScriptString</class>
         <class>QDeclarativeView</class>
-        
+
+        <class>QFlags&lt;QJSEngine::Extension&gt;</class>
+        <class>QFlags&lt;QQmlImageProviderBase::Flag&gt;</class>
+        <class>QFlags&lt;QQuickItem::Flag&gt;</class>
+        <class>QFlags&lt;QQuickPaintedItem::PerformanceHint&gt;</class>
+        <class>QFlags&lt;QSGAbstractRenderer::ClearModeBit&gt;</class>
+        <class>QFlags&lt;QSGImageNode::TextureCoordinatesTransformFlag&gt;</class>
+        <class>QFlags&lt;QSGMaterial::Flag&gt;</class>
+        <class>QFlags&lt;QSGMaterialRhiShader::Flag&gt;</class>
+        <class>QFlags&lt;QSGMaterialRhiShader::GraphicsPipelineState::ColorMaskComponent&gt;</class>
+        <class>QFlags&lt;QSGMaterialShader::RenderState::DirtyState&gt;</class>
+        <class>QFlags&lt;QSGNode::DirtyStateBit&gt;</class>
+        <class>QFlags&lt;QSGNode::Flag&gt;</class>
+        <class>QFlags&lt;QSGRendererInterface::ShaderCompilationType&gt;</class>
+        <class>QFlags&lt;QSGRendererInterface::ShaderSourceType&gt;</class>
+        <class>QFlags&lt;QSGRenderNode::RenderingFlag&gt;</class>
+        <class>QFlags&lt;QSGRenderNode::StateFlag&gt;</class>
+        <class>QFlags&lt;QSGSimpleTextureNode::TextureCoordinatesTransformFlag&gt;</class>
+
         <!-- namespaces -->
      </classList>
 </config>

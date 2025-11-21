@@ -2,7 +2,7 @@
 include_directories( ${QT_INCLUDES} ${CMAKE_SOURCE_DIR}/smoke )
 
 set(QT_INCLUDE_DIRS_XML_LIST
-    ${Qt5Core_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS})
+    ${Qt5Core_INCLUDE_DIRS} ${Qt5Gui_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS})
 list(TRANSFORM QT_INCLUDE_DIRS_XML_LIST REPLACE ".+" "<dir>\\0</dir>")
 list(REMOVE_DUPLICATES QT_INCLUDE_DIRS_XML_LIST)
 list(JOIN QT_INCLUDE_DIRS_XML_LIST "\n        " QT_INCLUDE_DIRS_XML)
@@ -41,7 +41,6 @@ target_link_libraries(smokeqtsql
                         smokeqtgui 
                         Qt5::Sql
                         Qt5::Gui
-                        Qt5::Widgets
                         Qt5::Core )
 target_compile_options(smokeqtsql PRIVATE -Wall)
 

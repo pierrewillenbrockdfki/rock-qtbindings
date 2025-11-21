@@ -94,5 +94,7 @@
         <class>QPrinterInfo</class>
         <class>QPrintPreviewDialog</class>
         <class>QPrintPreviewWidget</class>
+
+        <class>QFlags&lt;QAbstractPrintDialog::PrintDialogOption&gt;</class>
      </classList>
 </config>

@@ -104,16 +104,16 @@ static QMutex pointer_map_mutex;
 static QHash<void *, SmokeValue> pointer_map;
 int object_count = 0;
 
-// FIXME:
-// Don't the two following hashs create memory leaks by using pointers to Smoke::(Module)Index ?
-QHash<QByteArray, Smoke::ModuleIndex *> methcache;
-QHash<QByteArray, Smoke::ModuleIndex *> classcache;
+QHash<QByteArray, QtRuby::MethodCacheElement> methcache;
+QHash<QByteArray, Smoke::ModuleIndex> classcache;
 
-QHash<Smoke::ModuleIndex, QByteArray*> IdToClassNameMap;
+QHash<Smoke::ModuleIndex, QByteArray> IdToClassNameMap;
 
 #define logger logger_backend
 
 Smoke::ModuleIndex _current_method;
+QHash<unsigned int, Smoke::ModuleIndex> _current_method_conversion_constructors;
+
 
 smokeruby_object *
 alloc_smokeruby_object(bool allocated, Smoke * smoke, int classId, void * ptr)
@@ -319,9 +319,9 @@ Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool isAb
 	// It it is abstract, raise an error.
 #ifdef HAVE_RUBY_RUBY_H
 	int ruby_thread = ruby_native_thread_p();
-	if (ruby_thread == 0)
+	if (ruby_thread == 0 && false) //ruby since v2 may be threadsafe enough already.
 #else
-	if (ruby_stack_check())
+	if (ruby_stack_check() && false) //ruby since v2 may be threadsafe enough already.
 #endif
 	{
 		//throw std::runtime_error("Qt tries to call object while not running on a ruby thread");
@@ -337,7 +337,7 @@ Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool isAb
 				return;
 			}
 
-			QtRuby::VirtualMethodCall c(smoke, method, args, obj, ALLOCA_N(VALUE, smoke->methods[method].numArgs));
+			QtRuby::VirtualMethodCall c(Smoke::ModuleIndex(smoke, method), QHash<unsigned int, Smoke::ModuleIndex>(), args, obj, ALLOCA_N(VALUE, smoke->methods[method].numArgs));
 			c.next();
 			result = true;
 			return;
@@ -351,15 +351,15 @@ Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool isAb
 		return false;
 	}
 
-	QtRuby::VirtualMethodCall c(smoke, method, args, obj, ALLOCA_N(VALUE, smoke->methods[method].numArgs));
+	QtRuby::VirtualMethodCall c(Smoke::ModuleIndex(smoke, method), QHash<unsigned int, Smoke::ModuleIndex>(), args, obj, ALLOCA_N(VALUE, smoke->methods[method].numArgs));
 	c.next();
 	return true;
 }
 
-char*
+const char*
 Binding::className(Smoke::Index classId) {
 	Smoke::ModuleIndex mi(smoke, classId);
-	return (char *) (const char *) *(IdToClassNameMap.value(mi));
+	return IdToClassNameMap.value(mi).data();
 }
 
 /*
@@ -381,26 +381,26 @@ public:
 		(*fn)(this);
     }
 
-    SmokeType type() {
+    SmokeType type() override {
 		return _replyType[0]->st;
 	}
-    Marshall::Action action() { return Marshall::ToVALUE; }
-    Smoke::StackItem &item() { return _stack[0]; }
-    VALUE * var() {
+    Marshall::Action action() override { return Marshall::ToVALUE; }
+    Smoke::StackItem &item() override { return _stack[0]; }
+    VALUE * var() override {
     	return _result;
     }
 
-	void unsupported()
+	void unsupported() override
 	{
 		rb_raise(rb_eArgError, "Cannot handle '%s' as signal reply-type", type().name());
     }
-	Smoke *smoke() { return type().smoke(); }
+	Smoke *smoke() override { return type().smoke(); }
 
-	void next() {}
+	void next() override {}
 
-	bool cleanup() { return false; }
+	bool cleanup() override { return false; }
 
-	~SignalReturnValue() {
+	~SignalReturnValue() override {
 		delete[] _stack;
 	}
 };
@@ -539,16 +539,19 @@ static char p[CAT_BUFFER_SIZE];
 const char *
 resolve_classname(smokeruby_object * o)
 {
+    if (!o->smoke) {
+        qFatal("smokeruby_object does not provide smoke");
+    }
 	if (Smoke::isDerivedFrom(o->smoke->classes[o->classId].className, "QObject")) {
 		QObject * qobject = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
 		const QMetaObject * meta = qobject->metaObject();
 
 		while (meta != 0) {
 			Smoke::ModuleIndex mi = o->smoke->findClass(meta->className());
-			o->smoke = mi.smoke;
-			o->classId = mi.index;
-			if (o->smoke != 0) {
-				if (o->classId != 0) {
+            if (mi.smoke != 0) {
+                o->smoke = mi.smoke;
+                if (mi.index != 0) {
+					o->classId = mi.index;
 					return qtruby_modules[o->smoke].binding->className(o->classId);
 				}
 			}
@@ -558,10 +561,20 @@ resolve_classname(smokeruby_object * o)
 	}
 
     if (o->smoke->classes[o->classId].external) {
-        Smoke::ModuleIndex mi = o->smoke->findClass(o->smoke->className(o->classId));
+        const char *className = o->smoke->className(o->classId);
+        Smoke::ModuleIndex mi = o->smoke->findClass(className);
+        if (mi == Smoke::NullModuleIndex) {
+            qFatal("cannot find module index for for class %s",qPrintable(className));
+        }
         o->smoke = mi.smoke;
         o->classId = mi.index;
+        if (!qtruby_modules.value(mi.smoke).resolve_classname) {
+            qFatal("resolve_classname is not set");
+        }
         return qtruby_modules.value(mi.smoke).resolve_classname(o);
+    }
+    if (!qtruby_modules.value(o->smoke).resolve_classname) {
+        qFatal("resolve_classname is not set");
     }
     return qtruby_modules.value(o->smoke).resolve_classname(o);
 }
@@ -585,7 +598,7 @@ findMethod(VALUE /*self*/, VALUE c_value, VALUE name_value)
     if(!meth.index) {
         // since every smoke module defines a class 'QGlobalSpace' we can't rely on the classMap,
         // so we search for methods by hand
-        foreach (Smoke* s, smokeList) {
+        Q_FOREACH (Smoke* s, smokeList) {
             Smoke::ModuleIndex cid = s->idClass("QGlobalSpace");
             Smoke::ModuleIndex mnid = s->idMethodName(name);
             if (!cid.index || !mnid.index) continue;
@@ -806,262 +819,313 @@ findAllMethodNames(VALUE /*self*/, VALUE result, VALUE classid, VALUE flags_valu
     return result;
 }
 
-QByteArray *
+QByteArray
 find_cached_selector(int argc, VALUE * argv, VALUE klass, const char * methodName)
 {
     // Look in the cache
-static QByteArray * mcid = 0;
-	if (mcid == 0) {
-		mcid = new QByteArray();
-	}
+    QByteArray mcid;
 
-	*mcid = rb_class2name(klass);
-	*mcid += ';';
-	*mcid += methodName;
+	mcid = rb_class2name(klass);
+	mcid += ';';
+	mcid += methodName;
 	for(int i=4; i<argc ; i++)
 	{
-		*mcid += ';';
-		*mcid += value_to_type_flag(argv[i]);
+		mcid += ';';
+		mcid += value_to_type_flag(argv[i]);
 	}
-	Smoke::ModuleIndex *rcid = methcache.value(*mcid);
+	QtRuby::MethodCacheElement rcid = methcache.value(mcid);
 #ifdef DEBUG
 	if (do_debug & qtdb_calls) qWarning("method_missing mcid: %s", (const char *) *mcid);
 #endif
 
-	if (rcid) {
+	if (rcid.method != Smoke::NullModuleIndex) {
 		// Got a hit
 #ifdef DEBUG
 		if (do_debug & qtdb_calls) qWarning("method_missing cache hit, mcid: %s", (const char *) *mcid);
 #endif
-		_current_method.smoke = rcid->smoke;
-		_current_method.index = rcid->index;
+		_current_method = rcid.method;
+        _current_method_conversion_constructors = rcid.conversionConstructors;
 	} else {
 		_current_method.smoke = 0;
 		_current_method.index = -1;
+        _current_method_conversion_constructors.clear();
 	}
 
 	return mcid;
 }
 
+void find_object_method(int argc, VALUE * argv, VALUE self) {
+    const char *methodName = rb_id2name(SYM2ID(argv[0]));
+    VALUE klass = rb_funcall(self, rb_intern("class"), 0);
+
+    QByteArray pred;
+
+    pred = methodName;
+    if (pred.endsWith("?")) {
+        smokeruby_object *o = value_obj_info(self);
+        if (!o || !o->ptr) {
+            _current_method.index = -1;
+            return;
+        }
+
+        // Drop the trailing '?'
+        pred.replace(pred.length() - 1, 1, "");
+
+        pred.replace(0, 1, pred.mid(0, 1).toUpper());
+        pred.replace(0, 0, "is");
+        Smoke::ModuleIndex meth = o->smoke->findMethod(o->smoke->classes[o->classId].className, (const char *) pred);
+
+        if (meth.index == 0) {
+            pred.replace(0, 2, "has");
+            meth = o->smoke->findMethod(o->smoke->classes[o->classId].className, pred);
+        }
+
+        if (meth.index > 0) {
+            methodName = (const char *) pred;
+        }
+    }
+
+    {
+        VALUE *temp_stack = ALLOCA_N(VALUE, argc + 3);
+        temp_stack[0] = rb_str_new2("Qt5");
+        temp_stack[1] = rb_str_new2(methodName);
+        temp_stack[2] = klass;
+        temp_stack[3] = self;
+        for (int count = 1; count < argc; count++) {
+            temp_stack[count + 3] = argv[count];
+        }
+
+        QByteArray mcid = find_cached_selector(argc + 3, temp_stack, klass, methodName);
+
+        if (_current_method.index == -1) {
+            // Find the C++ method to call. Do that from Ruby for now
+
+            (void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
+            if (_current_method.index != -1) {
+                // Success. Cache result.
+                methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+            }
+        }
+        if (_current_method.index == -1) {
+            const char *op = rb_id2name(SYM2ID(argv[0]));
+            if (qstrcmp(op, "-") == 0
+                    || qstrcmp(op, "+") == 0
+                    || qstrcmp(op, "/") == 0
+                    || qstrcmp(op, "%") == 0
+                    || qstrcmp(op, "|") == 0) {
+                // Look for operator methods of the form 'operator+=', 'operator-=' and so on..
+                char op1[3];
+                op1[0] = op[0];
+                op1[1] = '=';
+                op1[2] = '\0';
+                temp_stack[1] = rb_str_new2(op1);
+                (void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
+            }
+
+            if (_current_method.index != -1) {
+                // Success. Cache result.
+                methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+            }
+        }
+    }
+}
+
+/** Finds and runs a method on an object
+ */
 VALUE
 method_missing(int argc, VALUE * argv, VALUE self)
 {
-	const char * methodName = rb_id2name(SYM2ID(argv[0]));
-    VALUE klass = rb_funcall(self, rb_intern("class"), 0);
+    const char *methodName = rb_id2name(SYM2ID(argv[0]));
 
-	// Look for 'thing?' methods, and try to match isThing() or hasThing() in the Smoke runtime
-  static QByteArray * pred = 0;
-  static VALUE mainThread = Qnil;
-	if (pred == 0) {
-		pred = new QByteArray();
-	}
-  if (mainThread == Qnil) {
-    mainThread = rb_thread_main();
-  }
+    // Look for 'thing?' methods, and try to match isThing() or hasThing() in the Smoke runtime
+    static VALUE mainThread = Qnil;
+    if (mainThread == Qnil) {
+        mainThread = rb_thread_main();
+    }
 
-  if (rb_thread_current() != mainThread) {
-    rb_raise(rb_eRuntimeError, "Qt methods cannot be called from outside of the main thread");
-  }
+    if (rb_thread_current() != mainThread) {
+        rb_raise(rb_eRuntimeError, "Qt methods cannot be called from outside of the main thread");
+    }
 
-	*pred = methodName;
-	if (pred->endsWith("?")) {
+    QByteArray pred;
+
+	pred = methodName;
+	if (pred.endsWith("?")) {
 		smokeruby_object *o = value_obj_info(self);
 		if(!o || !o->ptr) {
 			return rb_call_super(argc, argv);
 		}
-
-		// Drop the trailing '?'
-		pred->replace(pred->length() - 1, 1, "");
-
-		pred->replace(0, 1, pred->mid(0, 1).toUpper());
-		pred->replace(0, 0, "is");
-		Smoke::ModuleIndex meth = o->smoke->findMethod(o->smoke->classes[o->classId].className, (const char *) *pred);
-
-		if (meth.index == 0) {
-			pred->replace(0, 2, "has");
-			meth = o->smoke->findMethod(o->smoke->classes[o->classId].className, *pred);
-		}
-
-		if (meth.index > 0) {
-			methodName = (char *) (const char *) *pred;
-		}
 	}
 
-	VALUE * temp_stack = ALLOCA_N(VALUE, argc+3);
-    temp_stack[0] = rb_str_new2("Qt5");
-    temp_stack[1] = rb_str_new2(methodName);
-    temp_stack[2] = klass;
-    temp_stack[3] = self;
-    for (int count = 1; count < argc; count++) {
-		temp_stack[count+3] = argv[count];
+	find_object_method(argc, argv, self);
+
+    if (_current_method.index != -1) {
+        QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv + 1, argc - 1);
+        c.next();
+        VALUE result = *(c.var());
+        return result;
     }
 
-	{
-		QByteArray * mcid = find_cached_selector(argc+3, temp_stack, klass, methodName);
+    // Check for property getter/setter calls, and for slots in QObject classes
+    // not in the smoke library
+    smokeruby_object *o = value_obj_info(self);
+    if (!o || !o->ptr) {
+        return rb_call_super(argc, argv);
+    }
+    if (!Smoke::isDerivedFrom(Smoke::ModuleIndex(o->smoke, o->classId), Smoke::findClass("QObject"))) {
+        return rb_call_super(argc, argv);
+    }
 
-		if (_current_method.index == -1) {
-			// Find the C++ method to call. Do that from Ruby for now
+    QObject *qobject = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
+    QByteArray name;
 
-			(void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+3, temp_stack);
-			if (_current_method.index == -1) {
-				const char * op = rb_id2name(SYM2ID(argv[0]));
-				if (	qstrcmp(op, "-") == 0
-						|| qstrcmp(op, "+") == 0
-						|| qstrcmp(op, "/") == 0
-						|| qstrcmp(op, "%") == 0
-						|| qstrcmp(op, "|") == 0 )
-				{
-					// Look for operator methods of the form 'operator+=', 'operator-=' and so on..
-					char op1[3];
-					op1[0] = op[0];
-					op1[1] = '=';
-					op1[2] = '\0';
-					temp_stack[1] = rb_str_new2(op1);
-					(void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+3, temp_stack);
-				}
+    name = rb_id2name(SYM2ID(argv[0]));
+    const QMetaObject *meta = qobject->metaObject();
 
-				if (_current_method.index == -1) {
-					// Check for property getter/setter calls, and for slots in QObject classes
-					// not in the smoke library
-					smokeruby_object *o = value_obj_info(self);
-					if (	o != 0
-							&& o->ptr != 0
-							&& Smoke::isDerivedFrom(Smoke::ModuleIndex(o->smoke, o->classId), Smoke::findClass("QObject")) )
-					{
-						QObject * qobject = (QObject *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QObject").index);
-static QByteArray * name = 0;
-						if (name == 0) {
-							name = new QByteArray();
-						}
+    if (argc == 1) {
+        if (name.endsWith("?")) {
+            name.replace(0, 1, name.mid(0, 1).toUpper());
+            name.replace(0, 0, "is");
+            if (meta->indexOfProperty(name) == -1) {
+                name.replace(0, 2, "has");
+            }
+        }
 
-						*name = rb_id2name(SYM2ID(argv[0]));
-						const QMetaObject * meta = qobject->metaObject();
+        if (meta->indexOfProperty(name) != -1) {
+            VALUE qvariant = rb_funcall(self, rb_intern("property"), 1, rb_str_new2(name));
+            return rb_funcall(qvariant, rb_intern("value"), 0);
+        }
+    }
 
-						if (argc == 1) {
-							if (name->endsWith("?")) {
-								name->replace(0, 1, pred->mid(0, 1).toUpper());
-								name->replace(0, 0, "is");
-								if (meta->indexOfProperty(*name) == -1) {
-									name->replace(0, 2, "has");
-								}
-							}
+    if (argc == 2 && name.endsWith("=")) {
+        name.replace("=", "");
+        if (meta->indexOfProperty(name) != -1) {
+            VALUE qvariant = rb_funcall(self, rb_intern("qVariantFromValue"), 1, argv[1]);
+            return rb_funcall(self, rb_intern("setProperty"), 2, rb_str_new2(name), qvariant);
+        }
+    }
 
-							if (meta->indexOfProperty(*name) != -1) {
-								VALUE qvariant = rb_funcall(self, rb_intern("property"), 1, rb_str_new2(*name));
-								return rb_funcall(qvariant, rb_intern("value"), 0);
-							}
-						}
+    int classId = o->smoke->idClass(meta->className()).index;
 
-						if (argc == 2 && name->endsWith("=")) {
-							name->replace("=", "");
-							if (meta->indexOfProperty(*name) != -1) {
-								VALUE qvariant = rb_funcall(self, rb_intern("qVariantFromValue"), 1, argv[1]);
-								return rb_funcall(self, rb_intern("setProperty"), 2, rb_str_new2(*name), qvariant);
-							}
-						}
+    // The class isn't in the Smoke lib. But if it is called 'local::Merged'
+    // it is from a QDBusInterface and the slots are remote, so don't try to
+    // those.
+    while (classId == 0
+            && qstrcmp(meta->className(), "local::Merged") != 0
+            && qstrcmp(meta->superClass()->className(), "QDBusAbstractInterface") != 0) {
+        // Assume the QObject has slots which aren't in the Smoke library, so try
+        // and call the slot directly
+        for (int id = meta->methodOffset(); id < meta->methodCount(); id++) {
+            if (meta->method(id).methodType() == QMetaMethod::Slot) {
+                QByteArray signature(meta->method(id).methodSignature());
+                QByteArray methodName = signature.mid(0, signature.indexOf('('));
 
-						int classId = o->smoke->idClass(meta->className()).index;
+                // Don't check that the types of the ruby args match the c++ ones for now,
+                // only that the name and arg count is the same.
+                if (name == methodName && meta->method(id).parameterTypes().count() == (argc - 1)) {
+                    QList<MocArgument *> args = get_moc_arguments(o->smoke, meta->method(id).typeName(),
+                                                meta->method(id).parameterTypes());
+                    VALUE result = Qnil;
+                    QtRuby::InvokeNativeSlot slot(qobject, id, argc - 1, args, argv + 1, &result);
+                    slot.next();
+                    return result;
+                }
+            }
+        }
+        meta = meta->superClass();
+        classId = o->smoke->idClass(meta->className()).index;
+    }
 
-						// The class isn't in the Smoke lib. But if it is called 'local::Merged'
-						// it is from a QDBusInterface and the slots are remote, so don't try to
-						// those.
-						while (	classId == 0
-								&& qstrcmp(meta->className(), "local::Merged") != 0
-								&& qstrcmp(meta->superClass()->className(), "QDBusAbstractInterface") != 0 )
-						{
-							// Assume the QObject has slots which aren't in the Smoke library, so try
-							// and call the slot directly
-							for (int id = meta->methodOffset(); id < meta->methodCount(); id++) {
-								if (meta->method(id).methodType() == QMetaMethod::Slot) {
-									QByteArray signature(meta->method(id).methodSignature());
-									QByteArray methodName = signature.mid(0, signature.indexOf('('));
-
-									// Don't check that the types of the ruby args match the c++ ones for now,
-									// only that the name and arg count is the same.
-									if (*name == methodName && meta->method(id).parameterTypes().count() == (argc - 1)) {
-										QList<MocArgument*> args = get_moc_arguments(	o->smoke, meta->method(id).typeName(),
-																						meta->method(id).parameterTypes() );
-										VALUE result = Qnil;
-										QtRuby::InvokeNativeSlot slot(qobject, id, argc - 1, args, argv + 1, &result);
-										slot.next();
-										return result;
-									}
-								}
-							}
-							meta = meta->superClass();
-							classId = o->smoke->idClass(meta->className()).index;
-						}
-					}
-
-					return rb_call_super(argc, argv);
-				}
-			}
-			// Success. Cache result.
-			methcache.insert(*mcid, new Smoke::ModuleIndex(_current_method));
-		}
-	}
-    QtRuby::MethodCall c(_current_method.smoke, _current_method.index, self, temp_stack+4, argc-1);
-    c.next();
-    VALUE result = *(c.var());
-    return result;
+    return rb_call_super(argc, argv);
 }
 
-VALUE
-class_method_missing(int argc, VALUE * argv, VALUE klass)
-{
-	VALUE result = Qnil;
+void find_class_method(int argc, VALUE * argv, VALUE klass) {
 	const char * methodName = rb_id2name(SYM2ID(argv[0]));
 	VALUE * temp_stack = ALLOCA_N(VALUE, argc+3);
-  static VALUE mainThread = Qnil;
-  if (mainThread == Qnil) {
-    mainThread = rb_thread_main();
-  }
+
     temp_stack[0] = rb_str_new2("Qt5");
     temp_stack[1] = rb_str_new2(methodName);
     temp_stack[2] = klass;
     temp_stack[3] = Qnil;
 
-    if (rb_thread_current() != mainThread) {
-      rb_raise(rb_eRuntimeError, "Qt methods cannot be called from outside of the main thread");
-    }
-
     for (int count = 1; count < argc; count++) {
-		temp_stack[count+3] = argv[count];
+        temp_stack[count + 3] = argv[count];
     }
 
     {
-		QByteArray * mcid = find_cached_selector(argc+3, temp_stack, klass, methodName);
+        QByteArray mcid = find_cached_selector(argc + 3, temp_stack, klass, methodName);
 
-		if (_current_method.index == -1) {
-			(void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+3, temp_stack);
-			if (_current_method.index != -1) {
-				// Success. Cache result.
-				methcache.insert(*mcid, new Smoke::ModuleIndex(_current_method));
-			}
-		}
+        if (_current_method.index == -1) {
+            (void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
+            if (_current_method.index != -1) {
+                // Success. Cache result.
+                methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+            }
+        }
+    }
+}
+
+/** Finds and runs a method on a class or module
+ */
+VALUE
+class_method_missing(int argc, VALUE * argv, VALUE klass)
+{
+	VALUE result = Qnil;
+	const char * methodName = rb_id2name(SYM2ID(argv[0]));
+	static VALUE mainThread = Qnil;
+	if (mainThread == Qnil) {
+		mainThread = rb_thread_main();
+	}
+	static QRegExp * rx = 0;
+	if (rx == 0) {
+		rx = new QRegExp("[a-zA-Z]+");
+	}
+    if (rb_thread_current() != mainThread) {
+        rb_raise(rb_eRuntimeError, "Qt methods cannot be called from outside of the main thread");
+    }
+
+	if(klass == qt_module && rx->indexIn(methodName) == -1) {
+		// operator under the module(i think this happens for all operators)
+		// need to first check in the first arguments class(and super classes)
+		// to find a match, then in the module
+        // we are called with: argv: method name, methods arguments
+        // we need to create an argv stack with: method name, argv[1...] and send self=argv[0]
+        VALUE *temp_stack = ALLOCA_N(VALUE, argc -1);
+
+        temp_stack[0] = argv[0];
+        for (int count = 2; count < argc; count++) {
+            temp_stack[count - 1] = argv[count];
+        }
+        find_object_method(argc - 1, temp_stack, argv[1]);
+
+        if (_current_method.index != -1) {
+            QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, argv[1], argv + 2, argc - 2);
+            c.next();
+            VALUE result = *(c.var());
+            return result;
+        }
 	}
 
-	if (_current_method.index == -1) {
-		static QRegExp * rx = 0;
-		if (rx == 0) {
-			rx = new QRegExp("[a-zA-Z]+");
-		}
+    find_class_method(argc, argv, klass);
 
-		if (rx->indexIn(methodName) == -1) {
-			// If an operator method hasn't been found as an instance method,
-			// then look for a class method - after 'op(self,a)' try 'self.op(a)'
-	    	VALUE * method_stack = ALLOCA_N(VALUE, argc - 1);
-	    	method_stack[0] = argv[0];
-	    	for (int count = 1; count < argc - 1; count++) {
-				method_stack[count] = argv[count+1];
-    		}
-			result = method_missing(argc-1, method_stack, argv[1]);
-			return result;
-		} else {
-			return rb_call_super(argc, argv);
-		}
+    if (_current_method.index == -1) {
+        if (rx->indexIn(methodName) == -1) {
+            // operator has not been found in class/module, try on first argument object
+
+            // create a new argument array
+            VALUE *method_stack = ALLOCA_N(VALUE, argc - 1);
+            method_stack[0] = argv[0];
+            for (int count = 1; count < argc - 1; count++) {
+                method_stack[count] = argv[count + 1];
+            }
+            result = method_missing(argc - 1, method_stack, argv[1]);
+            return result;
+        } else {
+            return rb_call_super(argc, argv);
+        }
     }
-    QtRuby::MethodCall c(_current_method.smoke, _current_method.index, Qnil, temp_stack+4, argc-1);
+
+    QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, Qnil, argv + 1, argc - 1);
     c.next();
     result = *(c.var());
     return result;
@@ -1070,18 +1134,18 @@ class_method_missing(int argc, VALUE * argv, VALUE klass)
 QList<MocArgument*>
 get_moc_arguments(Smoke* smoke, const char * typeName, QList<QByteArray> methodTypes)
 {
-static QRegExp * rx = 0;
+	static QRegExp * rx = 0;
 	if (rx == 0) {
 		rx = new QRegExp("^(bool|int|uint|long|ulong|double|char\\*|QString)&?$");
 	}
 	methodTypes.prepend(QByteArray(typeName));
 	QList<MocArgument*> result;
 
-	foreach (QByteArray name, methodTypes) {
+	Q_FOREACH (QByteArray name, methodTypes) {
 		MocArgument *arg = new MocArgument;
 		Smoke::Index typeId = 0;
 
-		if (name.isEmpty()) {
+		if (name.isEmpty() || name == "void") {
 			arg->argType = xmoc_void;
 			result.append(arg);
 		} else {
@@ -1221,9 +1285,9 @@ set_obj_info(const char * className, smokeruby_object * o)
 		rb_raise(rb_eRuntimeError, "Class '%s' not found", className);
 	}
 
-	Smoke::ModuleIndex *r = classcache.value(className);
-	if (r != 0) {
-		o->classId = (int) r->index;
+	Smoke::ModuleIndex r = classcache.value(className);
+	if (r != Smoke::NullModuleIndex) {
+		o->classId = (int) r.index;
 	}
 	// If the instance is a subclass of QObject, then check to see if the
 	// className from its QMetaObject is in the Smoke library. If not then
@@ -1284,15 +1348,15 @@ kross2smoke(VALUE /*self*/, VALUE krobject, VALUE new_klass)
 {
   VALUE new_klassname = rb_funcall(new_klass, rb_intern("name"), 0);
 
-  Smoke::ModuleIndex * cast_to_id = classcache.value(StringValuePtr(new_klassname));
-  if (cast_to_id == 0) {
+  Smoke::ModuleIndex cast_to_id = classcache.value(StringValuePtr(new_klassname));
+  if (cast_to_id == Smoke::NullModuleIndex) {
     rb_raise(rb_eArgError, "unable to find class \"%s\" to cast to\n", StringValuePtr(new_klassname));
   }
 
   void* o;
   Data_Get_Struct(krobject, void, o);
 
-  smokeruby_object * o_cast = alloc_smokeruby_object(false, cast_to_id->smoke, (int) cast_to_id->index, o);
+  smokeruby_object * o_cast = alloc_smokeruby_object(false, cast_to_id.smoke, (int) cast_to_id.index, o);
 
   VALUE obj = Data_Wrap_Struct(new_klass, smokeruby_mark, smokeruby_free, (void *) o_cast);
   mapPointer(obj, o_cast, o_cast->classId, 0);
@@ -1306,15 +1370,15 @@ value_to_type_flag(VALUE ruby_value)
 	const char *r = "";
 	if (ruby_value == Qnil)
 		r = "u";
-	else if (TYPE(ruby_value) == T_FIXNUM || TYPE(ruby_value) == T_BIGNUM || qstrcmp(classname, "Qt::Integer") == 0)
+	else if (TYPE(ruby_value) == T_FIXNUM || TYPE(ruby_value) == T_BIGNUM || qstrcmp(classname, "Qt5::Integer") == 0)
 		r = "i";
 	else if (TYPE(ruby_value) == T_FLOAT)
 		r = "n";
 	else if (TYPE(ruby_value) == T_STRING)
 		r = "s";
-	else if(ruby_value == Qtrue || ruby_value == Qfalse || qstrcmp(classname, "Qt::Boolean") == 0)
+	else if(ruby_value == Qtrue || ruby_value == Qfalse || qstrcmp(classname, "Qt5::Boolean") == 0)
 		r = "B";
-	else if (qstrcmp(classname, "Qt::Enum") == 0) {
+	else if (qstrcmp(classname, "Qt5::Enum") == 0) {
 		VALUE temp = rb_funcall(qt_internal_module, rb_intern("get_qenum_type"), 1, ruby_value);
 		r = StringValuePtr(temp);
 	} else if (TYPE(ruby_value) == T_DATA) {
@@ -1327,6 +1391,7 @@ value_to_type_flag(VALUE ruby_value)
 	} else {
 		r = "U";
 	}
+	qDebug("type flag of ruby classname %s is %s", classname, r);
 
     return r;
 }

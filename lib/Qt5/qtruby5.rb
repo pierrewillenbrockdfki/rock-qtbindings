@@ -34,7 +34,8 @@ module Qt5
     QTDB_ALL = QTDB_VERBOSE | QTDB_VIRTUAL | QTDB_GC | QTDB_CALLS | QTDB_METHOD_MISSING | QTDB_AMBIGUOUS
   end
 
-  @@debug_level = DebugLevel::Off
+  #@@debug_level = DebugLevel::Off
+  @@debug_level = DebugLevel::High
   def Qt5.debug_level=(level)
     @@debug_level = level
     Internal::setDebug Qt5::QtDebugChannel::QTDB_ALL if level >= DebugLevel::Extensive
@@ -51,6 +52,7 @@ module Qt5
     AccessPrivate = 0x00
     AccessProtected = 0x01
     AccessPublic = 0x02
+
     MethodMethod = 0x00
     MethodSignal = 0x04
     MethodSlot = 0x08
@@ -59,6 +61,41 @@ module Qt5
     MethodCloned = 0x20
     MethodScriptable = 0x40
     MethodRevisioned = 0x80
+
+    PropertyInvalid = 0x00000000
+    PropertyReadable = 0x00000001
+    PropertyWritable = 0x00000002
+    PropertyResettable = 0x00000004
+    PropertyEnumOrFlag = 0x00000008
+    PropertyStdCppSet = 0x00000100
+#     PropertyOverride = 0x00000200
+    PropertyConstant = 0x00000400
+    PropertyFinal = 0x00000800
+    PropertyDesignable = 0x00001000
+    PropertyResolveDesignable = 0x00002000
+    PropertyScriptable = 0x00004000
+    PropertyResolveScriptable = 0x00008000
+    PropertyStored = 0x00010000
+    PropertyResolveStored = 0x00020000
+    PropertyEditable = 0x00040000
+    PropertyResolveEditable = 0x00080000
+    PropertyUser = 0x00100000
+    PropertyResolveUser = 0x00200000
+    PropertyNotify = 0x00400000
+    PropertyRevisioned = 0x00800000
+    PropertyRequired = 0x01000000
+
+    MetaObjectDynamicMetaObject = 0x01
+    MetaObjectRequiresVariantMetaObject = 0x02
+    MetaObjectPropertyAccessInStaticMetaCall = 0x04 # since Qt 5.5, property code is in the static metacall
+
+    EnumIsFlag = 0x1
+    EnumIsScoped = 0x2
+
+    #
+    # From enum QMetaType::Type
+    #
+    TypeVoid = 43
   end
 
   class Base
@@ -95,6 +132,12 @@ module Qt5
     def self.q_classinfo(key, value)
       meta = Qt5::Meta[self.name] || Qt5::MetaInfo.new(self)
       meta.add_classinfo(key, value)
+      meta.changed = true
+    end
+
+    def self.q_property(type, name, member: nil, read: nil, write: nil, reset: nil, notify: nil, revision: nil, designable: nil, scriptable: nil, stored: nil, user: nil, constant: nil, final: nil, required: nil, editable: nil)
+      meta = Qt5::Meta[self.name] || Qt5::MetaInfo.new(self)
+      meta.add_property(type, name, member: member, read: read, write: write, reset: reset, notify: notify, revision: revision, designable: designable, scriptable:scriptable, stored: stored, user: user, constant: constant, final: final, required: required, editable: editable)
       meta.changed = true
     end
 
@@ -809,18 +852,17 @@ module Qt5
 
   class DBusInterface < Qt5::Base
     def call(method_name, *args)
-      if args.length == 0
-        return super(method_name)
-      elsif method_name.is_a? Qt5::Enum
-        opt = args.shift
-        qdbusArgs = args.collect {|arg| qVariantFromValue(arg)}
-        return super(method_name, opt, *qdbusArgs)
-      else
-        # If the method is Qt5::DBusInterface.call(), create an Array
-        # 'dbusArgs' of Qt5::Variants from '*args'
-        qdbusArgs = args.collect {|arg| qVariantFromValue(arg)}
-        return super(method_name, *qdbusArgs)
+      # we construct a callWithArgumentList from our parameters;
+      # call is template overloaded starting with Qt 5.14, and
+      # qtruby cannot do that(short of including llvm to generate
+      # accessors with each call)
+      mode = Qt5::DBus::AutoDetect
+      if method_name.is_a? Qt5::Enum
+        mode = method_name
+        method_name = args.shift
       end
+      qdbusArgs = args.collect {|arg| qVariantFromValue(arg)}
+      Qt5::Base.instance_method(:method_missing).bind(self).call(:callWithArgumentList, mode, method_name, qdbusArgs)
     end
 
     def method_missing(id, *args)
@@ -2556,7 +2598,35 @@ module Qt5
       else
         ruby_classname = classname
       end
-      ruby_classname
+      ## the class name is split along ::, then the < and > in each part are counted to
+      ## determine if the part changes into an more inner template, a more outer
+      ## template or stays the same. if the part starts at outer-most template depth,
+      ## it gets added to ruby_classname with "::" prepended, otherwise, we use "Part"
+      ## finally, all the "<", ">" and "," are replaced with "Of", "" and "And"
+      namespaces_candidates = ruby_classname.split(/::/)
+      ruby_classname2 = ""
+      template_depth = 0
+      namespaces_candidates.each do |part|
+        unless ruby_classname2 == ""
+          if template_depth == 0
+            ruby_classname2 += "::" + part
+          else
+            ruby_classname2 += "Part" + part
+          end
+        else
+          ruby_classname2 += part
+        end
+        opencount = part.count("<")
+        closecount = part.count(">")
+        template_depth += opencount
+        template_depth -= closecount
+      end
+      ruby_classname2.sub!(/</,"Of")
+      ruby_classname2.sub!(/>/,"")
+      ruby_classname2.sub!(/,/,"And")
+      ruby_classname2.sub!(/ \*/,"Ptr")
+      puts "Normalized #{classname} to #{ruby_classname} then #{ruby_classname2}"
+      ruby_classname2
     end
 
     def Internal.init_class(c)
@@ -2577,55 +2647,68 @@ module Qt5
       Qt5.debug_level
     end
 
-    def Internal.checkarg(argtype, typename)
+    def Internal.checkarg(argtype, arg, typename)
       const_point = typename =~ /^const\s+/ ? -1 : 0
       if argtype == 'i'.freeze
+        # integer numbers
         if typename =~ /^int&?$|^signed int&?$|^signed$|^qint32&?$/
-          return 6 + const_point
+          return 6 + const_point, nil
         elsif typename =~ /^quint32&?$/
-          return 4 + const_point
-        elsif typename =~ /^(?:short|ushort|unsigned short int|unsigned short|uchar|char|unsigned char|uint|long|ulong|unsigned long int|unsigned|long long|float|double|WId|HBITMAP__\*|HDC__\*|HFONT__\*|HICON__\*|HINSTANCE__\*|HPALETTE__\*|HRGN__\*|HWND__\*|Q_PID|^quint16&?$|^qint16&?$)$/
-          return 4 + const_point
+          return 4 + const_point, nil
+        elsif typename =~ /^(?:short|ushort|unsigned short int|unsigned short|uchar|char|unsigned char|uint|long|ulong|unsigned long int|unsigned|long long|unsigned long long|float|double|WId|HBITMAP__\*|HDC__\*|HFONT__\*|HICON__\*|HINSTANCE__\*|HPALETTE__\*|HRGN__\*|HWND__\*|Q_PID|^quint16&?$|^qint16&?$)$/
+          return 4 + const_point, nil
         elsif typename =~ /^(quint|qint|qulong|qlong|qreal)/
-          return 4 + const_point
-        elsif typename == 'QIntegerForSizeof< void* >::Unsigned'.freeze
-          return 4 + const_point
+          return 4 + const_point, nil
+        elsif typename == 'QIntegerForSizeof<void*>::Unsigned'.freeze
+          return 4 + const_point, nil
         else
           t = typename.sub(/^const\s+/, '')
           t.sub!(/[&*]$/, '')
           if isEnum(t)
-            return 2
+            return 2, nil
+          end
+        end
+        classId = Qt5::Internal.findClass(typename)
+        if classId.index != 0
+          puts "check if we can construct typename #{typename}(#{classId.index}) from argtype #{argtype}"
+
+          method = find_implicit_constructor_method(typename, typename, argtype, arg)
+          if method
+            return 1 + const_point, method
           end
         end
       elsif argtype == 'n'.freeze
+        # floating point numbers
         if typename =~ /^double$|^qreal$/
-          return 6 + const_point
+          return 6 + const_point, nil
         elsif typename =~ /^float$/
-          return 4 + const_point
+          return 4 + const_point, nil
         elsif typename =~ /^int&?$/
-          return 2 + const_point
+          return 2 + const_point, nil
         elsif typename =~ /^(?:short|ushort|uint|long|ulong|signed|unsigned|float|double)$/
-          return 2 + const_point
+          return 2 + const_point, nil
         else
           t = typename.sub(/^const\s+/, '')
           t.sub!(/[&*]$/, '')
           if isEnum(t)
-            return 2 + const_point
+            return 2 + const_point, nil
           end
         end
       elsif argtype == 'B'.freeze
+        # boolean
         if typename =~ /^(?:bool)[*&]?$/
-          return 2 + const_point
+          return 2 + const_point, nil
         end
       elsif argtype == 's'.freeze
+        # strings
         if typename =~ /^(const )?((QChar)[*&]?)$/
-          return 6 + const_point
+          return 6 + const_point, nil
         elsif typename =~ /^(?:(u(nsigned )?)?char\*)$/
-          return 4 + const_point
+          return 4 + const_point, nil
         elsif typename =~ /^(?:const (u(nsigned )?)?char\*)$/
-          return 2 + const_point
+          return 2 + const_point, nil
         elsif typename =~ /^(?:(?:const )?(QString)[*&]?)$/
-          return 8 + const_point
+          return 8 + const_point, nil
         end
       elsif argtype == 'a'.freeze
         # FIXME: shouldn't be hardcoded. Installed handlers should tell what ruby type they expect.
@@ -2639,38 +2722,152 @@ module Qt5
                 char\*\*
             )
                   )$/x
-          return 2 + const_point
+          return 2 + const_point, nil
         end
       elsif argtype == 'u'.freeze
         # Give nil matched against string types a higher score than anything else
         if typename =~ /^(?:u?char\*|const u?char\*|(?:const )?((Q(C?)String))[*&]?)$/
-          return 4 + const_point
+          return 4 + const_point, nil
         # Numerics will give a runtime conversion error, so they fail the match
         elsif typename =~ /^(?:short|ushort|uint|long|ulong|signed|unsigned|int)$/
-          return -99
+          return -99, nil
         else
-          return 2 + const_point
+          return 2 + const_point, nil
         end
       elsif argtype == 'U'.freeze
-        if typename =~ /QStringList/
-          return 4 + const_point
+        # Note: this is the catchall when c++ value_to_type_flag does not match anything
+        if typename =~ /QStringList|QVector<QPointF>|QVector<QPoint>/
+          return 4 + const_point, nil
         else
-          return 2 + const_point
+          return 2 + const_point, nil
         end
       else
         t = typename.sub(/^const\s+/, '')
         t.sub!(/(::)?Ptr$/, '')
         t.sub!(/[&*]$/, '')
         if argtype == t
-          return 4 + const_point
+          return 4 + const_point, nil
         elsif classIsa(argtype, t)
-          return 2 + const_point
+          return 2 + const_point, nil
         elsif isEnum(argtype) and
             (t =~ /int|qint32|uint|quint32|long|ulong/ or isEnum(t))
-          return 2 + const_point
+          return 2 + const_point, nil
+        end
+        classId = Qt5::Internal.findClass(typename)
+        if classId.index != 0
+          puts "check if we can construct typename #{typename}(#{classId.index}) from argtype #{argtype}"
+
+          method = find_implicit_constructor_method(typename, typename, argtype, arg)
+          if method
+            return 1 + const_point, method
+          end
+        end
+
+      end
+      return -99, nil
+    end
+
+    def Internal.checkarg_constructible_from(argtype, typename)
+      const_point = typename =~ /^const\s+/ ? -1 : 0
+      if argtype == 'i'.freeze
+        # integer numbers
+        if typename =~ /^int&?$|^signed int&?$|^signed$|^qint32&?$/
+          return 6 + const_point, nil
+        elsif typename =~ /^quint32&?$/
+          return 4 + const_point, nil
+        elsif typename =~ /^(?:short|ushort|unsigned short int|unsigned short|uchar|char|unsigned char|uint|long|ulong|unsigned long int|unsigned|long long|unsigned long long|float|double|WId|HBITMAP__\*|HDC__\*|HFONT__\*|HICON__\*|HINSTANCE__\*|HPALETTE__\*|HRGN__\*|HWND__\*|Q_PID|^quint16&?$|^qint16&?$)$/
+          return 4 + const_point, nil
+        elsif typename =~ /^(quint|qint|qulong|qlong|qreal)/
+          return 4 + const_point, nil
+        elsif typename == 'QIntegerForSizeof<void*>::Unsigned'.freeze
+          return 4 + const_point, nil
+        else
+          t = typename.sub(/^const\s+/, '')
+          t.sub!(/[&*]$/, '')
+          puts "checking if #{t} #{typename} is an enum and convertible from #{argtype}"
+          if isEnum(t)
+            return 2, nil
+          end
+        end
+      elsif argtype == 'n'.freeze
+        # floating point numbers
+        if typename =~ /^double$|^qreal$/
+          return 6 + const_point, nil
+        elsif typename =~ /^float$/
+          return 4 + const_point, nil
+        elsif typename =~ /^int&?$/
+          return 2 + const_point, nil
+        elsif typename =~ /^(?:short|ushort|uint|long|ulong|signed|unsigned|float|double)$/
+          return 2 + const_point, nil
+        else
+          t = typename.sub(/^const\s+/, '')
+          t.sub!(/[&*]$/, '')
+          puts "checking if #{t} #{typename} is an enum and convertible from #{argtype}"
+          if isEnum(t)
+            return 2 + const_point, nil
+          end
+        end
+      elsif argtype == 'B'.freeze
+        # boolean
+        if typename =~ /^(?:bool)[*&]?$/
+          return 2 + const_point, nil
+        end
+      elsif argtype == 's'.freeze
+        # strings
+        if typename =~ /^(const )?((QChar)[*&]?)$/
+          return 6 + const_point, nil
+        elsif typename =~ /^(?:(u(nsigned )?)?char\*)$/
+          return 4 + const_point, nil
+        elsif typename =~ /^(?:const (u(nsigned )?)?char\*)$/
+          return 2 + const_point, nil
+        elsif typename =~ /^(?:(?:const )?(QString)[*&]?)$/
+          return 8 + const_point, nil
+        end
+      elsif argtype == 'a'.freeze
+        # FIXME: shouldn't be hardcoded. Installed handlers should tell what ruby type they expect.
+        if typename =~ /^(?:
+            const\ QCOORD\*|
+            (?:const\ )?
+            (?:
+                QStringList[\*&]?|
+                QValueList<int>[\*&]?|
+                QRgb\*|
+                char\*\*
+            )
+                  )$/x
+          return 2 + const_point, nil
+        end
+      elsif argtype == 'u'.freeze
+        # Give nil matched against string types a higher score than anything else
+        if typename =~ /^(?:u?char\*|const u?char\*|(?:const )?((Q(C?)String))[*&]?)$/
+          return 4 + const_point, nil
+        # Numerics will give a runtime conversion error, so they fail the match
+        elsif typename =~ /^(?:short|ushort|uint|long|ulong|signed|unsigned|int)$/
+          return -99, nil
+        else
+          return 2 + const_point, nil
+        end
+      elsif argtype == 'U'.freeze
+        # Note: this is the catchall when c++ value_to_type_flag does not match anything
+        if typename =~ /QStringList|QVector<QPointF>/
+          return 4 + const_point, nil
+        else
+          return 2 + const_point, nil
+        end
+      else
+        t = typename.sub(/^const\s+/, '')
+        t.sub!(/(::)?Ptr$/, '')
+        t.sub!(/[&*]$/, '')
+        if argtype == t
+          return 4 + const_point, nil
+        elsif classIsa(argtype, t)
+          return 2 + const_point, nil
+        elsif isEnum(argtype) and
+            (t =~ /int|qint32|uint|quint32|long|ulong/ or isEnum(t))
+          return 2 + const_point, nil
         end
       end
-      return -99
+      return -99, nil
     end
 
     def Internal.find_class(classname)
@@ -2701,46 +2898,224 @@ module Qt5
       end
     end
 
-    # Looks up and executes a Qt method
+    # Finds the functions on a given object to manipulate properties
     #
-    # package - Always the string 'Qt5'
-    # method  - Methodname as a string
-    # klass   - Ruby class object
-    # this    - instance of class
-    # args    - arguments to method call
+    # action   - :read :write :reset :querydesignable :queryscriptable :querystored :queryeditable :queryuser
+    #            :read :write :reset   are supposed to return a symbol representing the function, or nil if none
+    #            :querydesignable :queryscriptable :querystored :queryeditable :queryuser
+    #              return 0 or 1 depending on the state of the attribute, or nil if no explicit state given.
+    #              these are only queried when the corresponding flag is not set.
+    # this     - instance of class
+    # property - number of the property in this classes scope
     #
-    def Internal.do_method_missing(package, method, klass, this, *args)
-      # Determine class name
-      if klass.class == Module
-        # If a module use the module's name - typically Qt
-        classname = klass.name
-      else
-        # Lookup Qt class name from Ruby class name
-        classname = @@cpp_names[klass.name]
-        if classname.nil?
-          # Make sure we haven't backed all the way up to Object
-          if klass != Object and klass != Qt5 and klass.superclass != nil
-            # Don't recognize this class so try the superclass
-            return do_method_missing(package, method, klass.superclass, this, *args)
-          else
-            # Give up if we back all the way up to Object
-            return nil
+    def Internal.do_property_metacall(action, this, property)
+      puts "do_property_metacall #{action.to_s} for #{property} in #{this.class.name}"
+      meta = Qt5::Meta[this.class.name] || Qt5::MetaInfo.new(this.class)
+      return nil if property >= meta.properties.length
+      propobj = meta.properties[property]
+      if action == :read
+        # returns id of the reader
+        return propobj.read unless propobj.read.nil?
+        return propobj.member unless propobj.member.nil?
+        return nil
+      elsif action == :write
+        # returns id of the writer
+        return propobj.write unless propobj.write.nil?
+        unless propobj.member.nil?
+          if this.methods.include? ("set"+propobj.member.to_s.capitalize).to_sym
+            return ("set"+propobj.member.to_s.capitalize).to_sym
+          end
+          if this.methods.include? (propobj.member.to_s+"=").to_sym
+            return (propobj.member.to_s+"=").to_sym
           end
         end
+        return nil
+      elsif action == :reset
+        # returns id of the reseter
+        return propobj.reset
+      elsif [:querydesignable, :queryscriptable, :querystored, :queryeditable, :queryuser].include? action
+        v = nil;
+        case action
+        when :querydesignable
+          v = propobj.designable
+        when :queryscriptable
+          v = propobj.scriptable
+        when :querystored
+          v = propobj.stored
+        when :queryeditable
+          v = propobj.editable
+        when :queryuser
+          v = propobj.user
+        end
+        return nil if v.nil?
+        if v.respond_to? :call
+          return v.call(this)
+        elsif v.is_a? Symbol
+          return this.send(v)
+        end
       end
-      lookup_str = "#{classname}::#{method}::#{args.collect {|arg| arg.class.to_s} }"
-      lookup = @@method_lookup_cache[lookup_str]
+      return nil
+    end
+
+    # Converts a classname to its constructor (method) name
+    #
+    # This removes all template arguments and then removes all scoping
+    def Internal.constructor_name_from_classname(classname)
+        method = classname.dup
+        # looking for the constructor name, which does not copy any template parameters,
+        # so just strip them out to prevent confusion when removing the class name bits.
+        # this must rerun the gsub as long as it finds the match to cover a<b<c>>
+        while method.match(/<[^<>]*>/)
+          method.gsub!(/<[^<>]*>/,"")
+        end
+        method.gsub!(/^.*::/,"")
+        method
+    end
+
+    # Finds a constructor to create classname from arg
+    #
+    # classname      - Name of the class, c++ or module name
+    # ruby_classname - Name of the ruby class
+    # argtype        - type name of arg
+    # arg            - argument to constructor
+    #
+    def Internal.find_implicit_constructor_method(classname, ruby_classname, argtype, arg)
+      puts "find_implicit_constructor_method for #{classname} #{ruby_classname} #{argtype} #{arg.class.to_s}"
+      lookup_str = "#{classname}::new::[\"#{arg.class.to_s}\"]"
+      lookup, conversions = @@method_lookup_cache[lookup_str]
       # @@method_lookup_cache is initialized to return false values on a cache miss
       if lookup != false
-        setCurrentMethod(lookup) if lookup
-        return nil
+        return lookup
+      end
+
+      # Modify constructor method name from new to the name of the Qt class
+      # and remove any namespacing
+      method = constructor_name_from_classname(classname)
+
+      # Build list of munged method names which is the methodname followed
+      # by symbols that indicate the basic type of the method's arguments
+      #
+      # Plain scalar = $
+      # Object = #
+      # Non-scalar (reference to array or hash, undef) = ?
+      #
+      methods = []
+      methods << method.dup
+      if arg.nil?
+        # For each nil arg encountered, triple the number of munged method
+        # templates, in order to cover all possible types that can match nil
+        temp = []
+        methods.collect! do |meth|
+          temp << meth + '?'
+          temp << meth + '#'
+          meth << '$'
+        end
+        methods.concat(temp)
+      elsif isObject(arg)
+        methods.collect! { |meth| meth << '#' }
+      elsif arg.kind_of? Array or arg.kind_of? Hash
+        temp = []
+        methods.collect! do |meth|
+          temp << meth + '#'
+          meth << '?'
+        end
+        methods.concat(temp)
+      elsif arg.kind_of? Numeric or arg.kind_of? String or arg.kind_of? TrueClass or arg.kind_of? FalseClass or arg.is_a? Qt5::Enum or arg.is_a? Qt5::Integer or arg.is_a? Qt5::Boolean
+        #methods.collect! { |meth| meth << '$' }
+        # some c++ objects can convert from scalars
+        temp = []
+        methods.collect! do |meth|
+          temp << meth + '#'
+          meth << '$'
+        end
+        methods.concat(temp)
+      else
+        methods.collect! { |meth| meth << '?' }
+      end
+
+      # Create list of methodIds that match classname and munged method name
+      methodIds = []
+      methods.collect { |meth| methodIds.concat( findMethod(classname, meth) ) }
+
+      # Debugging output for method lookup
+      if debug_level >= DebugLevel::High
+        puts "Searching for #{classname}##{method}"
+        puts "Munged method names:"
+        methods.each {|meth| puts "        #{meth}"}
+        puts "candidate list:"
+        prototypes = dumpCandidates(methodIds).split("\n")
+        line_len = (prototypes.collect { |p| p.length }).max
+        prototypes.zip(methodIds) {
+          |prototype,id| puts "#{prototype.ljust line_len}  (smoke: #{id.smoke} index: #{id.index})"
+        }
+      end
+
+      # Find the best match
+      chosen = nil
+      conversions = Hash.new
+      if methodIds.length > 0
+        best_match = -1
+        methodIds.each do |id|
+          puts "matching => smoke: #{id.smoke} index: #{id.index}" if debug_level >= DebugLevel::High
+          current_match = (isConstMethod(id) ? 1 : 0)
+          current_match = -99 if isExplicitMethod(id)
+          typename = get_arg_type_name(id, 0)
+          current_match = -99 if classname == typename
+          score, _ = checkarg_constructible_from(argtype, typename)
+          current_match += score
+          puts "        #{typename} (#{argtype}) score: #{score}" if debug_level >= DebugLevel::High
+
+          # Note that if current_match > best_match, then chosen must be nil
+          if current_match > best_match
+            best_match = current_match
+            chosen = id
+          # Ties are bad - but it is better to chose something than to fail
+          elsif current_match == best_match && id.smoke == chosen.smoke
+            puts " ****** warning: multiple methods with the same score of #{current_match}: #{chosen.index} and #{id.index}" if debug_level >= DebugLevel::Minimal
+            chosen = id
+          end
+          puts "        match => smoke: #{id.smoke} index: #{id.index} score: #{current_match} chosen: #{chosen ? chosen.index : nil}" if debug_level >= DebugLevel::High
+        end
+      end
+
+      # Additional debugging output
+      if debug_level >= DebugLevel::Minimal && chosen.nil?
+        id = find_pclassid(normalize_classname(ruby_classname))
+        puts "Looking for all methods of #{id} (#{id.smoke} #{id.index})"
+        hash = findAllMethods(id)
+        candidate_names = nil
+
+        puts "No matching constructor found, possibles:\n"
+        candidate_names = hash.keys.grep(/^#{method}/)
+
+        method_ids = hash.values_at(*candidate_names).flatten
+        puts dumpCandidates(method_ids)
+      end
+
+      @@method_lookup_cache[lookup_str] = [ chosen, conversions ]
+      return chosen
+    end
+
+    # Looks up a Qt method
+    #
+    # method         - Methodname as a string
+    # classname      - Name of the class, c++ or module name
+    # ruby_classname - Name of the ruby class
+    # args           - arguments to method call
+    #
+    def Internal.find_method_for_call(method, classname, ruby_classname, *args)
+      puts "find_method_for_call for #{method} #{classname} #{ruby_classname} #{args.collect {|arg| arg.class.to_s} }"
+      lookup_str = "#{classname}::#{method}::#{args.collect {|arg| arg.class.to_s} }"
+      lookup, conversionConstructors = @@method_lookup_cache[lookup_str]
+      # @@method_lookup_cache is initialized to return false values on a cache miss
+      if lookup != false
+        return lookup, conversionConstructors
       end
 
       # Modify constructor method name from new to the name of the Qt class
       # and remove any namespacing
       if method == "new".freeze
-        method = classname.dup
-        method.gsub!(/^.*::/,"")
+        method = constructor_name_from_classname(classname)
       end
 
       # If the method contains no letters it must be an operator, append "operator" to the
@@ -2773,9 +3148,23 @@ module Qt5
         elsif isObject(arg)
           methods.collect! { |meth| meth << '#' }
         elsif arg.kind_of? Array or arg.kind_of? Hash
-          methods.collect! { |meth| meth << '?' }
+          temp = []
+          methods.collect! do |meth|
+            temp << meth + '#'
+            meth << '?'
+          end
+          methods.concat(temp)
+        elsif arg.kind_of? Numeric or arg.kind_of? String or arg.kind_of? TrueClass or arg.kind_of? FalseClass or arg.is_a? Qt5::Enum or arg.is_a? Qt5::Integer or arg.is_a? Qt5::Boolean
+          #methods.collect! { |meth| meth << '$' }
+          # some c++ objects can convert from scalars
+          temp = []
+          methods.collect! do |meth|
+            temp << meth + '#'
+            meth << '$'
+          end
+          methods.concat(temp)
         else
-          methods.collect! { |meth| meth << '$' }
+          methods.collect! { |meth| meth << '?' }
         end
       end
 
@@ -2783,13 +3172,27 @@ module Qt5
       methodIds = []
       methods.collect { |meth| methodIds.concat( findMethod(classname, meth) ) }
 
+      # When to_i cannot be found, try to find a conversion operator to an integer type
+      if method == "to_i" && methodIds.length == 0
+        [ "long long int", "unsigned long long int", "long long", "unsigned long long",
+          "long int", "unsigned long int", "long", "unsigned long",
+          "int", "unsigned int", "unsigned",
+          "short", "unsigned short",
+          "char", "unsigned char" ].each do |typename|
+          chosen, conversions = find_method_for_call("operator "+typename, classname, ruby_classname, *args)
+          if chosen
+            return chosen, conversions
+          end
+        end
+      end
+
       # If we didn't find any methods and the method name contains an underscore
       # then convert to camelcase and try again
       if method =~ /._./ && methodIds.length == 0
         # If the method name contains underscores, convert to camel case
         # form and try again
         method.gsub!(/(.)_(.)/) {$1 + $2.upcase}
-        return do_method_missing(package, method, klass, this, *args)
+        return find_method_for_call(method, classname, ruby_classname, *args)
       end
 
       # Debugging output for method lookup
@@ -2807,18 +3210,19 @@ module Qt5
 
       # Find the best match
       chosen = nil
+      conversionConstructors = Hash.new
       if methodIds.length > 0
         best_match = -1
-        methodIds.each do
-          |id|
+        methodIds.each do |id|
           puts "matching => smoke: #{id.smoke} index: #{id.index}" if debug_level >= DebugLevel::High
           current_match = (isConstMethod(id) ? 1 : 0)
-          (0...args.length).each do
-            |i|
+          current_conversionConstructors = Hash.new
+          (0...args.length).each do |i|
             typename = get_arg_type_name(id, i)
             argtype = get_value_type(args[i])
-            score = checkarg(argtype, typename)
+            score, conversion = checkarg(argtype, args[i], typename)
             current_match += score
+            current_conversionConstructors[i] = conversion if conversion
             puts "        #{typename} (#{argtype}) score: #{score}" if debug_level >= DebugLevel::High
           end
 
@@ -2826,10 +3230,12 @@ module Qt5
           if current_match > best_match
             best_match = current_match
             chosen = id
+            conversionConstructors = current_conversionConstructors
           # Ties are bad - but it is better to chose something than to fail
           elsif current_match == best_match && id.smoke == chosen.smoke
             puts " ****** warning: multiple methods with the same score of #{current_match}: #{chosen.index} and #{id.index}" if debug_level >= DebugLevel::Minimal
             chosen = id
+            conversionConstructors = current_conversionConstructors
           end
           puts "        match => smoke: #{id.smoke} index: #{id.index} score: #{current_match} chosen: #{chosen ? chosen.index : nil}" if debug_level >= DebugLevel::High
         end
@@ -2837,26 +3243,70 @@ module Qt5
 
       # Additional debugging output
       if debug_level >= DebugLevel::Minimal && chosen.nil? && method !~ /^operator/
-        id = find_pclassid(normalize_classname(klass.name))
+        id = find_pclassid(normalize_classname(ruby_classname))
         hash = findAllMethods(id)
-        constructor_names = nil
-        if method == classname
+        candidate_names = nil
+
+        constructor_method = constructor_name_from_classname(classname)
+
+        if method == constructor_method
           puts "No matching constructor found, possibles:\n"
-          constructor_names = hash.keys.grep(/^#{classname}/)
+          candidate_names = hash.keys.grep(/^#{constructor_method}/)
         else
           puts "Possible prototypes:"
-          constructor_names = hash.keys
+          candidate_names = hash.keys
         end
-        method_ids = hash.values_at(*constructor_names).flatten
+        method_ids = hash.values_at(*candidate_names).flatten
         puts dumpCandidates(method_ids)
-      else
-        puts "setCurrentMethod(smokeList index: #{chosen.smoke}, meth index: #{chosen.index})" if debug_level >= DebugLevel::High && chosen
       end
 
       # Select the chosen method
-      @@method_lookup_cache[lookup_str] = chosen
-      setCurrentMethod(chosen) if chosen
-      return nil
+      @@method_lookup_cache[lookup_str] = [chosen, conversionConstructors]
+      return chosen, conversionConstructors
+    end
+
+    # Looks up and executes a Qt method
+    #
+    # package - Always the string 'Qt5'
+    # method  - Methodname as a string
+    # klass   - Ruby class object
+    # this    - instance of class - unused
+    # args    - arguments to method call
+    #
+    def Internal.do_method_missing(package, method, klass, this, *args)
+      # Determine class name
+      if klass.class == Module
+        # If a module use the module's name - typically Qt
+        classname = klass.name
+      else
+        # Lookup Qt class name from Ruby class name
+        classname = @@cpp_names[klass.name]
+        if classname.nil?
+          # Make sure we haven't backed all the way up to Object
+          if klass != Object and klass != Qt5 and klass.superclass != nil
+            # Don't recognize this class so try the superclass
+            return do_method_missing(package, method, klass.superclass, this, *args)
+          else
+            # Give up if we back all the way up to Object
+            return nil
+          end
+        end
+      end
+
+      chosen, conversionConstructors = find_method_for_call(method, classname, klass.name, *args)
+
+      if debug_level >= DebugLevel::High && chosen
+        puts "setCurrentMethod(smokeList index: #{chosen.smoke}, meth index: #{chosen.index})"
+        conversionConstructors.each do |arg_num, method|
+          puts "setCurrentMethodConversion(arg num: #{arg_num}, smokeList index: #{method.smoke}, meth index: #{method.index})"
+        end
+      end
+
+      if chosen
+        setCurrentMethod(chosen)
+        conversionConstructors.each { |arg_num, method| setCurrentMethodConversion(arg_num, method) }
+      end
+      return chosen, conversionConstructors
     end
 
     def Internal.init_all_classes()
@@ -2923,22 +3373,58 @@ module Qt5
       end
     end
 
+    def Internal.makeMetaTypeData(typename, string_table)
+      if typename.empty?
+        return TypeVoid
+      else
+        return 0x80000000 | string_table.call(typename)
+      end
+    end
+
     def Internal.makeMetaData(classname, classinfos, dbus, signals, slots, properties = [], enums = [], constructors = [])
       # Each entry in 'stringdata' corresponds to a string in the
       # QtByteArrayData array pointed to by QtMetaObject::string_data.
       stringdata = []
       string_table = string_table_handler(stringdata)
 
+      # if there are any methods that are revisioned, add another signals.length + slots.length
+      haveRevisionedMethods = (signals.any? { |entry| (entry.access & MethodRevisioned) != 0 }) ||
+              (slots.any? { |entry| (entry.access & MethodRevisioned) != 0 })
+      haveNotifyableProperties = properties.any? { |entry| (entry.flags & PropertyNotify) != 0 }
+      haveRevisionedProperties = properties.any? { |entry| (entry.flags & PropertyRevisioned) != 0 }
+
+      method_count = signals.length + slots.length
+
+      header_data_size = 14
+      classinfos_data_size = 2 * classinfos.length
+      method_data_size = (haveRevisionedMethods ? 6 : 5) * method_count
+      parameters_data_size = 0
+      # for each signal, slot, constructor: return type, parameter types, then parameter names
+      signals.each { |entry| parameters_data_size += 1 + entry.args.length * 2 }
+      slots.each { |entry| parameters_data_size += 1 + entry.args.length * 2 }
+      constructors.each { |entry| parameters_data_size += 1 + entry.args.length * 2 }
+      properties_data_size = (3 + (haveNotifyableProperties ? 1 : 0) + (haveRevisionedProperties ? 1 : 0)) * properties.length
+      enums_data_size = 5 * enums.length
+      constructors_data_size = 5 * method_count
+
+      classinfos_data_offset = header_data_size
+      methods_data_offset = classinfos_data_offset + classinfos_data_size
+      parameters_data_offset = methods_data_offset + method_data_size
+      properties_data_offset = parameters_data_offset + parameters_data_size
+      enums_data_offset = properties_data_offset + properties_data_size
+      # one entry of unknown use containing the number of constructors before the actual constructor data
+      constructors_data_offset = enums_data_offset + enums_data_size + 1
+      enumKV_data_offset = constructors_data_offset + constructors_data_size + 1
+
       # This is used to create the array of uints that make up the
       # qt_meta_data_<classname> structure in the metaObject
       data = [8,                 # revision
           string_table.call(classname),   # classname
-          classinfos.length, classinfos.length > 0 ? 14 : 0,   # classinfo
-          signals.length + slots.length,
-          14 + (2*classinfos.length),   # methods
-          0, 0,               # properties
-          0, 0,               # enums/sets
-          constructors.length, 0,               # constructors
+          classinfos.length,   classinfos.length   > 0 ? classinfos_data_offset   : 0, # classinfo: count, offset
+          method_count,        method_count        > 0 ? methods_data_offset      : 0, # methods: count, offset
+          properties.length,   properties.length   > 0 ? properties_data_offset   : 0, # properties: count, offset
+          enums.length,        enums.length        > 0 ? enums_data_offset        : 0, # enums/sets: count, offset
+          constructors.length, constructors.length > 0 ? constructors_data_offset : 0, # constructors: count, offset
           0,                  # flags
           signals.length]     # signalCount
 
@@ -2947,13 +3433,8 @@ module Qt5
         data.push string_table.call(entry[1])    # value
       end
 
-      parametersBase = data.length + (5 * (signals.length + slots.length) )
-      # if there are any methods that are revisioned, add another signals.length + slots.length
-      haveRevisionedMethods = (signals.any? { |entry| (entry.access & MethodRevisioned) != 0 }) ||
-              (slots.any? { |entry| (entry.access & MethodRevisioned) != 0 })
-      if haveRevisionedMethods
-          parametersBase += signals.length + slots.length
-      end
+      parametersBase = parameters_data_offset
+
       parameterData = []
 
       signals.each do |entry|
@@ -2966,10 +3447,11 @@ module Qt5
         else
           data.push entry.access  # flags, always protected for now
         end
-        parametersBase += 1 + entry.args.length * 2   # return type, parameter types, then parameter names
-        parameterData.push 0x80000000 | string_table.call(entry.reply_type)
+        # return type, parameter types, then parameter names
+        parametersBase += 1 + entry.args.length * 2
+        parameterData.push makeMetaTypeData(entry.reply_type, string_table)
         entry.args.each do |param|
-            parameterData.push 0x80000000 | string_table.call(param.type)
+            parameterData.push makeMetaTypeData(param.type, string_table)
         end
         entry.args.each do |param|
             parameterData.push string_table.call(param.name)
@@ -2987,9 +3469,9 @@ module Qt5
           data.push entry.access    # flags, always public for now
         end
         parametersBase += 1 + entry.args.length * 2   # return type, parameter types, then parameter names
-        parameterData.push 0x80000000 | string_table.call(entry.reply_type)
+        parameterData.push makeMetaTypeData(entry.reply_type, string_table)
         entry.args.each do |param|
-            parameterData.push 0x80000000 | string_table.call(param.type)
+            parameterData.push makeMetaTypeData(param.type, string_table)
         end
         entry.args.each do |param|
             parameterData.push string_table.call(param.name)
@@ -3000,7 +3482,6 @@ module Qt5
         signals.each do |entry|
           data.push entry.revision || 0   #revision
         end
-
         slots.each do |entry|
           data.push entry.revision || 0   #revision
         end
@@ -3011,9 +3492,9 @@ module Qt5
       # The parameter descriptions are all in one place, but they don't have to be.
       constructors.each do |entry|
         parametersBase += 1 + entry.args.length * 2   # return type, parameter types, then parameter names
-        parameterData.push 0x80000000 | string_table.call(entry.reply_type)
+        parameterData.push makeMetaTypeData(entry.reply_type, string_table)
         entry.args.each do |param|
-            parameterData.push 0x80000000 | string_table.call(param.type)
+            parameterData.push makeMetaTypeData(param.type, string_table)
         end
         entry.args.each do |param|
             parameterData.push string_table.call(param.name)
@@ -3022,15 +3503,50 @@ module Qt5
 
       data += parameterData
 
-      # properties
+      properties.each do |entry|
+        data.push string_table.call(entry.name)
+        data.push makeMetaTypeData(entry.type, string_table)
+        data.push entry.flags
+      end
+      if haveNotifyableProperties
+        properties.each_with_index do |entry,index|
+          if entry.notify.nil?
+            data.push 0
+          else
+            notify = -1
+            signals.each do |entry|
+              notify = index if entry.name == entry.notify.to_s
+            end
+            if notify != -1
+              data.push notify
+            else
+              data.push 0
+            end
+          end
+        end
+      end
+      if haveRevisionedProperties
+        properties.each do |entry|
+          data.push entry.revision || 0
+        end
+      end
 
-      # enum
+      enumKVBase = enumKV_data_offset
+      enumKVData = []
+
+      enums.each do | entry |
+        data.push string_table.call(entry.name)
+        data.push string_table.call(entry.enum)
+        data.push entry.flags
+        data.push enumKVBase
+        entry.map do | key, value |
+          enumKVData.push string_table.call(key)
+          enumKVData.push value
+          enumKVBase += 2
+        end
+      end
 
       data.push constructors.length
-
-      if constructors.length != 0
-          data[13] = data.length
-      end
 
       parametersBase = constructorsParametersBase
 
@@ -3046,6 +3562,8 @@ module Qt5
         end
         parametersBase += 1 + entry.args.length * 2   # return type, parameter types, then parameter names
       end
+
+      data += enumKVData
 
       return [stringdata, data]
     end
@@ -3066,11 +3584,13 @@ module Qt5
       end
 
       if meta.metaobject.nil? or meta.changed
-        stringdata, data = makeMetaData(  qobject.class.name,
-                          meta.classinfos,
-                          meta.dbus,
-                          meta.signals,
-                          meta.slots )
+        puts "creating metaobject for class #{klass.name}"
+        stringdata, data = makeMetaData( qobject.class.name,
+                                         meta.classinfos,
+                                         meta.dbus,
+                                         meta.signals,
+                                         meta.slots,
+                                         meta.properties )
         meta.metaobject = make_metaObject(qobject, parentMeta, stringdata, data)
         meta.changed = false
       end
@@ -3136,9 +3656,10 @@ module Qt5
   #  :reply_type is 'int'
   QObjectMember = Struct.new :name, :args, :reply_type, :access
   QObjectMemberArg = Struct.new :name, :type
+  QObjectProperty = Struct.new :name, :type, :flags, :member, :read, :write, :reset, :notify, :revision, :designable, :scriptable, :stored, :user, :editable
 
   class MetaInfo
-    attr_accessor :classinfos, :dbus, :signals, :slots, :metaobject, :mocargs, :changed
+    attr_accessor :classinfos, :dbus, :signals, :slots, :properties, :metaobject, :mocargs, :changed
 
     def initialize(klass)
       Meta[klass.name] = self
@@ -3147,6 +3668,7 @@ module Qt5
       @signals = []
       @slots = []
       @classinfos = []
+      @properties = []
       @dbus = false
       @changed = false
       Internal.addMetaObjectMethods(klass)
@@ -3224,6 +3746,32 @@ module Qt5
       if key == 'D-Bus Interface'
         @dbus = true
       end
+    end
+
+    def add_property(type, name, member: nil, read: nil, write: nil, reset: nil, notify: nil, revision: nil, designable: nil, scriptable: nil, stored: nil, user: nil, constant: nil, final: nil, required: nil, editable: nil)
+      flags = 0
+      flags |= Internal::PropertyReadable if member || read
+      flags |= Internal::PropertyWritable if member || write
+      flags |= Internal::PropertyResettable if reset
+      flags |= Internal::PropertyConstant if constant
+      flags |= Internal::PropertyFinal if final
+      flags |= Internal::PropertyDesignable if designable.nil? || designable
+      flags |= Internal::PropertyScriptable if scriptable.nil? || scriptable
+      flags |= Internal::PropertyStored if stored.nil? || stored
+      flags |= Internal::PropertyEditable if editable
+      flags |= Internal::PropertyUser if user
+      flags |= Internal::PropertyRequired if required
+      flags |= Internal::PropertyRevisioned if revision
+      flags |= Internal::PropertyNotify if notify
+      flags |= Internal::PropertyStdCppSet if read == name && write == "set"+name.capitalize
+      # qt sets these if the entry is empty, but moc does not?
+      #PropertyResolveDesignable
+      #PropertyResolveScriptable
+      #PropertyResolveStored
+      #PropertyResolveEditable
+      #PropertyResolveUser
+      obj = QObjectProperty.new(name, type, flags, member, read, write, reset, notify, revision, designable, scriptable, stored, user, editable)
+      @properties.push obj
     end
   end # Qt5::MetaInfo
 

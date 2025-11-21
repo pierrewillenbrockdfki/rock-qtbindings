@@ -39,15 +39,15 @@ namespace QtRuby {
 class Q_DECL_EXPORT MethodReturnValueBase : public Marshall 
 {
 public:
-	MethodReturnValueBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack);
+	MethodReturnValueBase(Smoke::ModuleIndex mi, Smoke::Stack stack);
 	const Smoke::Method &method();
-	Smoke::StackItem &item();
-	Smoke *smoke();
-	SmokeType type();
-	void next();
-	bool cleanup();
-	void unsupported();
-    VALUE * var();
+	Smoke::StackItem &item() override;
+	Smoke *smoke() override;
+	SmokeType type() override;
+	void next() override;
+	bool cleanup() override;
+	void unsupported() override;
+    VALUE * var() override;
 protected:
 	Smoke *_smoke;
 	Smoke::Index _method;
@@ -60,8 +60,8 @@ protected:
 
 class Q_DECL_EXPORT VirtualMethodReturnValue : public MethodReturnValueBase {
 public:
-	VirtualMethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, VALUE retval);
-	Marshall::Action action();
+	VirtualMethodReturnValue(Smoke::ModuleIndex mi, Smoke::Stack stack, VALUE retval);
+	Marshall::Action action() override;
 
 private:
 	VALUE _retval2;
@@ -70,30 +70,32 @@ private:
 
 class Q_DECL_EXPORT MethodReturnValue : public MethodReturnValueBase {
 public:
-	MethodReturnValue(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, VALUE * retval);
-    Marshall::Action action();
+	MethodReturnValue(Smoke::ModuleIndex mi, Smoke::Stack stack, VALUE * retval);
+    Marshall::Action action() override;
 
 private:
-	const char *classname();
+	const char *classname() override;
 };
 
 class Q_DECL_EXPORT MethodCallBase : public Marshall
 {
 public:
-	MethodCallBase(Smoke *smoke, Smoke::Index meth);
-	MethodCallBase(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack);
-	Smoke *smoke();
-	SmokeType type();
-	Smoke::StackItem &item();
+	MethodCallBase(Smoke::ModuleIndex mi, QHash<unsigned int, Smoke::ModuleIndex> const &conversions);
+	MethodCallBase(Smoke::ModuleIndex mi, QHash<unsigned int, Smoke::ModuleIndex> const &conversions,
+				   Smoke::Stack stack);
+	Smoke *smoke() override;
+	SmokeType type() override;
+	Smoke::StackItem &item() override;
 	const Smoke::Method &method();
 	virtual int items() = 0;
 	virtual void callMethod() = 0;	
-	void next();
-	void unsupported();
+	void next() override;
+	void unsupported() override;
 
 protected:
 	Smoke *_smoke;
 	Smoke::Index _method;
+	QHash<unsigned int, Smoke::ModuleIndex> _conversionConstructors;
 	Smoke::Stack _stack;
 	int _cur;
 	Smoke::Index *_args;
@@ -105,13 +107,14 @@ protected:
 
 class Q_DECL_EXPORT VirtualMethodCall : public MethodCallBase {
 public:
-	VirtualMethodCall(Smoke *smoke, Smoke::Index meth, Smoke::Stack stack, VALUE obj, VALUE *sp);
+	VirtualMethodCall(Smoke::ModuleIndex mi, QHash<unsigned int, Smoke::ModuleIndex> const &conversions,
+					  Smoke::Stack stack, VALUE obj, VALUE *sp);
 	~VirtualMethodCall();
-	Marshall::Action action();
-	VALUE * var();
-	int items();
-	void callMethod();
-	bool cleanup();
+	Marshall::Action action() override;
+	VALUE * var() override;
+	int items() override;
+	void callMethod() override;
+	bool cleanup() override;
  
 private:
 	VALUE _obj;
@@ -120,16 +123,17 @@ private:
 
 class Q_DECL_EXPORT MethodCall : public MethodCallBase {
 public:
-	MethodCall(Smoke *smoke, Smoke::Index method, VALUE target, VALUE *sp, int items);
+	MethodCall(Smoke::ModuleIndex mi, QHash<unsigned int, Smoke::ModuleIndex> const &conversionConstructors,
+			   VALUE target, VALUE *sp, int items);
 	~MethodCall();
-	Marshall::Action action();
-	VALUE * var();
+	Marshall::Action action() override;
+	VALUE * var() override;
 
-	inline void callMethod() {
+	inline void callMethod() override {
 		if(_called) return;
 		_called = true;
 
-		if (_target == Qnil && !(method().flags & Smoke::mf_static)) {
+		if (_target == Qnil && !(method().flags & (Smoke::mf_static | Smoke::mf_ctor))) {
 			rb_raise(rb_eArgError, "%s is not a class method\n", _smoke->methodNames[method().name]);
 		}
 	
@@ -151,18 +155,18 @@ public:
 			s[1].s_voidp = qtruby_modules[_smoke].binding;
 			(*fn)(0, _stack[0].s_voidp, s);
 		}
-		MethodReturnValue r(_smoke, _method, _stack, &_retval);
+		MethodReturnValue r(Smoke::ModuleIndex(_smoke, _method), _stack, &_retval);
 	}
 
-	int items();
-	bool cleanup();
+	int items() override;
+	bool cleanup() override;
 private:
 	VALUE _target;
 	smokeruby_object * _o;
 	VALUE *_sp;
 	int _items;
 	VALUE _retval;
-	const char *classname();
+	const char *classname() override;
 };
 
 
@@ -171,14 +175,14 @@ public:
 	SigSlotBase(QList<MocArgument*> args);
 	~SigSlotBase();
 	const MocArgument &arg();
-	SmokeType type();
-	Smoke::StackItem &item();
-	VALUE * var();
-	Smoke *smoke();
+	SmokeType type() override;
+	Smoke::StackItem &item() override;
+	VALUE * var() override;
+	Smoke *smoke() override;
 	virtual const char *mytype() = 0;
 	virtual void mainfunction() = 0;
-	void unsupported();
-	void next(); 
+	void unsupported() override;
+	void next() override;
 	void prepareReturnValue(void** o);
 
 protected:
@@ -197,12 +201,12 @@ class Q_DECL_EXPORT EmitSignal : public SigSlotBase {
 	VALUE * _result;
  public:
     EmitSignal(QObject *obj, int id, int items, QList<MocArgument*> args, VALUE * sp, VALUE * result);
-    Marshall::Action action();
-    Smoke::StackItem &item();
-	const char *mytype();
+    Marshall::Action action() override;
+    Smoke::StackItem &item() override;
+	const char *mytype() override;
 	void emitSignal();
-	void mainfunction();
-	bool cleanup();
+	void mainfunction() override;
+	bool cleanup() override;
 
 };
 
@@ -212,12 +216,34 @@ class Q_DECL_EXPORT InvokeNativeSlot : public SigSlotBase {
 	VALUE * _result;
  public:
     InvokeNativeSlot(QObject *obj, int id, int items, QList<MocArgument*> args, VALUE * sp, VALUE * result);
-    Marshall::Action action();
-    Smoke::StackItem &item();
-	const char *mytype();
+    Marshall::Action action() override;
+    Smoke::StackItem &item() override;
+	const char *mytype() override;
 	void invokeSlot();
-	void mainfunction();
-	bool cleanup();
+	void mainfunction() override;
+	bool cleanup() override;
+};
+
+/*
+	Converts a ruby value returned by a slot invocation to a Qt slot
+	reply type
+*/
+class SlotReturnValue : public Marshall {
+    QList<MocArgument*>	_replyType;
+    Smoke::Stack _stack;
+	VALUE * _result;
+public:
+    SlotReturnValue(void ** o, VALUE * result, QList<MocArgument*> replyType);
+
+    SmokeType type() override;
+    Marshall::Action action() override;
+    Smoke::StackItem &item() override;
+    VALUE * var() override;
+    void unsupported() override;
+    Smoke *smoke() override;
+    void next() override;
+    bool cleanup() override;
+    ~SlotReturnValue() override;
 };
 
 class Q_DECL_EXPORT InvokeSlot : public SigSlotBase {
@@ -227,12 +253,12 @@ class Q_DECL_EXPORT InvokeSlot : public SigSlotBase {
 public:
     InvokeSlot(VALUE obj, ID slotname, QList<MocArgument*> args, void ** o);
 	~InvokeSlot();
-    Marshall::Action action();
-	const char *mytype();
-    bool cleanup();
+    Marshall::Action action() override;
+	const char *mytype() override;
+    bool cleanup() override;
 	void copyArguments();
 	void invokeSlot(); 
-	void mainfunction();
+	void mainfunction() override;
 };
 
 }

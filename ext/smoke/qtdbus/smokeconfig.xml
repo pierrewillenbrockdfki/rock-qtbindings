@@ -16,6 +16,25 @@
         <typeName>QString</typeName>
         <typeName>QDBusObjectPath</typeName>
         <typeName>QDBusSignature</typeName>
+        <typeName>QDBusVariant</typeName>
+        <!-- QList<*> has special marshallers and thus are represented as Smoke::t_voidp -->
+        <typeName>QList&lt;QObject*&gt;</typeName>
+        <typeName>QList&lt;QModelIndex&gt;</typeName>
+        <typeName>QList&lt;QFileInfo&gt;</typeName>
+        <typeName>QList&lt;int&gt;</typeName>
+        <typeName>QList&lt;QByteArray&gt;</typeName>
+        <typeName>QList&lt;QPair&lt;QString, QString&gt; &gt;</typeName>
+        <typeName>QList&lt;QVariant&gt;</typeName>
+        <typeName>QList&lt;QUrl&gt;</typeName>
+        <typeName>QMap&lt;int,QVariant&gt;</typeName>
+        <typeName>QMap&lt;QString,QVariant&gt;</typeName>
+        <typeName>QVariantMap</typeName>
+        <typeName>QModelIndexList</typeName>
+        <typeName>QObjectList</typeName>
+        <!--typeName>QByteArray</typeName-->
+        <typeName>QVariantList</typeName>
+        <typeName>QVector&lt;int&gt;</typeName>
+        <typeName>QVector&lt;QPointF&gt;</typeName>
     </voidpTypes>
     <exclude>
         <!-- we don't want private stuff in smoke.. -->
@@ -68,15 +87,9 @@
         <class>QDBusAbstractAdaptor</class>
         <class>QDBusAbstractInterface</class>
         <class>QDBusAbstractInterfaceBase</class>
-        <class>QDBusArgument</class>
-        <class>QDBusConnection</class>
-        <class>QDBusConnectionInterface</class>
         <class>QDBusContext</class>
         <class>QDBusDemarshaller</class>
-        <class>QDBusError</class>
-        <class>QDBusInterface</class>
         <class>QDBusMarshaller</class>
-        <class>QDBusMessage</class>
         <class>QDBusMetaType</class>
         <class>QDBusPendingCall</class>
         <class>QDBusPendingCallWatcher</class>
@@ -84,6 +97,22 @@
         <class>QDBusServiceWatcher</class>
         <class>QDBusUnixFileDescriptor</class>
         <class>QDBusVirtualObject</class>
+
+        <!-- Extended in qtruby.rb -->
+        <class>QDBusConnection</class>
+        <class>QDBusConnectionInterface</class>
+        <class>QDBusError</class>
+        <class>QDBusInterface</class>
+        <class>QDBusArgument</class>
+        <class>QDBusMessage</class>
+
+        <class>QFlags&lt;QDBusConnection::ConnectionCapability&gt;</class>
+        <class>QFlags&lt;QDBusConnection::RegisterOption&gt;</class>
+        <class>QFlags&lt;QDBusConnection::VirtualObjectRegisterOption&gt;</class>
+        <class>QFlags&lt;QDBusServiceWatcher::WatchModeFlag&gt;</class>
+
+        <!-- Reimplemented in qtruby5.rb -->
+        <!--class>QDBusVariant</class-->
 
         <!-- namespaces -->
         <class>QDBus</class>

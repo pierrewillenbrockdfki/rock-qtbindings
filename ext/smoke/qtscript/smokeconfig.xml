@@ -62,5 +62,11 @@
         <class>QScriptValue</class>
         <class>QScriptValueIterator</class>
         <class>QScriptSyntaxCheckResult</class>
+
+        <class>QFlags&lt;QScriptClass::QueryFlag&gt;</class>
+        <class>QFlags&lt;QScriptEngine::QObjectWrapOption&gt;</class>
+        <class>QFlags&lt;QScriptValue::PropertyFlag&gt;</class>
+        <class>QFlags&lt;QScriptValue::ResolveFlag&gt;</class>
+
     </classList>
 </config>

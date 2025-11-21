@@ -8,6 +8,24 @@
         <!-- both are classes, but they are represented as Smoke::t_voidp -->
         <typeName>QStringList</typeName>
         <typeName>QString</typeName>
+        <!-- QList<*> has special marshallers and thus are represented as Smoke::t_voidp -->
+        <typeName>QList&lt;QObject*&gt;</typeName>
+        <typeName>QList&lt;QModelIndex&gt;</typeName>
+        <typeName>QList&lt;QFileInfo&gt;</typeName>
+        <typeName>QList&lt;int&gt;</typeName>
+        <typeName>QList&lt;QByteArray&gt;</typeName>
+        <typeName>QList&lt;QPair&lt;QString, QString&gt; &gt;</typeName>
+        <typeName>QList&lt;QVariant&gt;</typeName>
+        <typeName>QList&lt;QUrl&gt;</typeName>
+        <typeName>QMap&lt;int,QVariant&gt;</typeName>
+        <typeName>QMap&lt;QString,QVariant&gt;</typeName>
+        <typeName>QVariantMap</typeName>
+        <typeName>QModelIndexList</typeName>
+        <typeName>QObjectList</typeName>
+        <!--typeName>QByteArray</typeName-->
+        <typeName>QVariantList</typeName>
+        <typeName>QVector&lt;int&gt;</typeName>
+        <typeName>QVector&lt;QPointF&gt;</typeName>
     </voidpTypes>
     <exclude>
         <!-- we don't want private stuff in smoke.. -->
@@ -41,11 +59,6 @@
         <signature>QBasicMutex\* QBasicMutex::QBasicMutex\(const QBasicMutex&amp;\)</signature>
         <signature>QCborStreamWriter\* QCborStreamWriter::QCborStreamWriter\(const QCborStreamWriter&amp;\)</signature>
         <signature>QCborStreamWriter&amp; QCborStreamWriter::operator=\(const QCborStreamWriter&amp;\)</signature>
-        <!-- This is the type system failing to understand "Connection" actually
-             is ::QMetaObject::Connection -->
-        <signature>QMetaObject::Connection\* QMetaObject::Connection::Connection\(const Connection&amp;\)</signature>
-        <!-- Not sure where the parser found operator void*() -->
-        <signature>void\* QMetaObject::Connection::operator void\*\(\) const</signature>
         <!-- For Q*Application::compressEvent, which is internal, can be
              called from any thread and cannot meaningfully be overridden
              because that needs access to qt internals -->
@@ -56,33 +69,12 @@
         <signature>.*qFindString.*</signature>
         <!-- windows internal helper functions -->
         <signature>.*qFrom.*Endian_helper.*</signature>
-        <!-- QGlobalSpace: "static" and "QGlobalSpace::" strings are not present when filtering -->
-        <!-- Some of these are the result of parse errors. -->
-        <!-- There seems to be a parsing problem with the QCbor* classes -->
-        <!-- operator[] does not make sense in global space? -->
-        <signature>const QCborValue operator\[\]\(.*</signature>
-        <signature>QCborValueRef operator\[\]\(.*</signature>
-        <signature>QCborArray operator\+\(const QCborValue&amp;\)</signature>
-        <signature>QCborArray&amp; operator&lt;&lt;\(const QCborValue&amp;\)</signature>
-        <signature>QCborArray&amp; operator\+=\(const QCborValue&amp;\)</signature>
-        <signature>QCborValue&amp; operator=\(const QCborValue&amp;\)</signature>
-        <signature>bool operator&lt;\(const QCborArray&amp;\)</signature>
-        <signature>bool operator!=\(const QCborValue&amp;\)</signature>
-        <signature>bool operator==\(const QCborValue&amp;\)</signature>
-        <signature>bool operator&lt;\(const QCborValue&amp;\)</signature>
-        <signature>bool operator&lt;\(const QCborMap&amp;\)</signature>
-        <signature>bool operator!\(\)</signature>
-        <signature>void\* operator-&gt;\(\)</signature>
-        <!-- This function is templated -->
-        <signature>QDebug operator&lt;&lt;\(QDebug,.*</signature>
-        <!-- QUrlTwoFlags is templated -->
-        <signature>QUrlTwoFlags operator.*</signature>
-        <signature>QUrlTwoFlags&amp; operator.*</signature>
-        <!-- More template functions -->
-        <signature>Code operator Code\(\)</signature>
-        <signature>E2 operator int\(\)</signature>
-        <signature>E2 operator QFlags&lt;E2&gt;\(\)</signature>
-        <signature>E2 operator QFlags&lt;E1&gt;\(\)</signature>
+        <!-- This cannot be instantiated; clang may tell us that this is so, but we do not check, yet -->
+        <signature>QSet&lt;QVariant&gt; QList&lt;QVariant&gt;::toSet\(\) const</signature>
+
+        <!-- This seems to be forward declared but there is no implementation in the libraries -->
+        <signature>.*operator&gt;&gt;\(QDataStream&amp;,\s*QCborSimpleType&amp;\)</signature>
+        <signature>.*operator&lt;&lt;\(QDataStream&amp;,\s*QCborSimpleType\)</signature>
     </exclude>
     <functions>
         <!-- include functions starting with 'q' -->
@@ -111,9 +103,8 @@
         <class>QBitArray</class>
         <class>QBitRef</class>
         <class>QBuffer</class>
-        <class>QByteArray</class>
+        <!--class>QByteArray</class-->
         <class>QByteArrayMatcher</class>
-        <class>QByteRef</class>
         <class>QCborArray</class>
         <class>QCborMap</class>
         <class>QCborStreamReader</class>
@@ -283,6 +274,60 @@
         <class>QXmlStreamReader</class>
         <class>QXmlStreamStringRef</class>
         <class>QXmlStreamWriter</class>
+        <!-- templated QFlags -->
+        <class>QFlags&lt;QIODevice::OpenModeFlag&gt;</class>
+        <class>QIODevice::OpenMode</class>
+
+        <class>QFlags&lt;QAbstractItemModel::CheckIndexOption&gt;</class>
+        <class>QFlags&lt;QArrayData::AllocationOption&gt;</class>
+        <class>QFlags&lt;QByteArray::Base64Option&gt;</class>
+        <class>QFlags&lt;QCborValue::DiagnosticNotationOption&gt;</class>
+        <class>QFlags&lt;QCborValue::EncodingOption&gt;</class>
+        <class>QFlags&lt;QCommandLineOption::Flag&gt;</class>
+        <class>QFlags&lt;QDir::Filter&gt;</class>
+        <class>QFlags&lt;QDirIterator::IteratorFlag&gt;</class>
+        <class>QFlags&lt;QDir::SortFlag&gt;</class>
+        <class>QFlags&lt;QEventLoop::ProcessEventsFlag&gt;</class>
+        <class>QFlags&lt;QFileDevice::FileHandleFlag&gt;</class>
+        <class>QFlags&lt;QFileDevice::Permission&gt;</class>
+        <class>QFlags&lt;QIODevice::OpenModeFlag&gt;</class>
+        <class>QFlags&lt;QItemSelectionModel::SelectionFlag&gt;</class>
+        <class>QFlags&lt;QLibrary::LoadHint&gt;</class>
+        <class>QFlags&lt;QLocale::DataSizeFormat&gt;</class>
+        <class>QFlags&lt;QLocale::NumberOption&gt;</class>
+        <class>QFlags&lt;QMetaType::TypeFlag&gt;</class>
+        <class>QFlags&lt;QRegularExpression::MatchOption&gt;</class>
+        <class>QFlags&lt;QRegularExpression::PatternOption&gt;</class>
+        <class>QFlags&lt;QStandardPaths::LocateOption&gt;</class>
+        <class>QFlags&lt;QString::SectionFlag&gt;</class>
+        <class>QFlags&lt;Qt::DropAction&gt;</class>
+        <class>QFlags&lt;QTextBoundaryFinder::BoundaryReason&gt;</class>
+        <class>QFlags&lt;QTextCodec::ConversionFlag&gt;</class>
+        <class>QFlags&lt;QTextStream::NumberFlag&gt;</class>
+        <class>QFlags&lt;Qt::FindChildOption&gt;</class>
+        <class>QFlags&lt;Qt::ItemFlag&gt;</class>
+        <class>QFlags&lt;Qt::MatchFlag&gt;</class>
+        <class>QFlags&lt;Qt::SplitBehaviorFlags&gt;</class>
+        <class>QFlags&lt;QUrl::ComponentFormattingOption&gt;</class>
+        <class>QFlags&lt;QUrl::UserInputResolutionOption&gt;</class>
+
+        <class>QList&lt;QObject*&gt;</class>
+        <class>QList&lt;QModelIndex&gt;</class>
+        <class>QList&lt;QFileInfo&gt;</class>
+        <class>QList&lt;int&gt;</class>
+        <class>QList&lt;QByteArray&gt;</class>
+        <class>QList&lt;QPair&lt;QString, QString&gt; &gt;</class>
+        <class>QList&lt;QVariant&gt;</class>
+        <class>QList&lt;QUrl&gt;</class>
+        <class>QMap&lt;int,QVariant&gt;</class>
+        <class>QMap&lt;QString,QVariant&gt;</class>
+        <class>QVariantMap</class>
+        <class>QModelIndexList</class>
+        <class>QObjectList</class>
+        <class>QByteArray</class>
+        <class>QVariantList</class>
+        <class>QVector&lt;int&gt;</class>
+        <class>QVector&lt;QPointF&gt;</class>
 
         <!-- namespaces -->
         <class>Qt</class>

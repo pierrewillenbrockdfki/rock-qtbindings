@@ -816,26 +816,40 @@ construct_copy(smokeruby_object *o)
     const char *className = o->smoke->className(o->classId);
     int classNameLen = strlen(className);
 
-    // copy constructor signature
-    QByteArray ccSig(className);
+    // munged copy constructor signature
+    QString ccSig(className);
+    // drop all template argument declarations
+    QRegularExpression templateArgFinder("<[^<>]*>");
+    while(templateArgFinder.match(ccSig).hasMatch()) {
+        ccSig.replace(templateArgFinder, "");
+    }
+    // extract the last element
     int pos = ccSig.lastIndexOf("::");
     if (pos != -1) {
         ccSig = ccSig.mid(pos + strlen("::"));
     }
     ccSig.append("#");
-    Smoke::ModuleIndex ccId = o->smoke->findMethodName(className, ccSig);
+    Smoke::ModuleIndex ccId = o->smoke->findMethodName(className, ccSig.toLocal8Bit());
+    if (ccId.index == 0) {
+        qWarning("construct_copy() failed %s(%s)::%s %p: could not find method\n", resolve_classname(o), className, qPrintable(ccSig), o->ptr);
+        return 0;
+    }
+
+    Smoke::ModuleIndex classIdx(o->smoke, o->classId);
+    if (classIdx.index == 0) {
+        qWarning("construct_copy() failed %s(%s) %p: could not find class\n", resolve_classname(o), className, o->ptr);
+        return 0;
+    }
+
+    Smoke::ModuleIndex ccMeth = o->smoke->findMethod(classIdx, ccId);
+    if (ccMeth.index == 0) {
+        qWarning("construct_copy() failed %s(%s) %p: could not find method in class\n", resolve_classname(o), className, o->ptr);
+        return 0;
+    }
 
     char *ccArg = new char[classNameLen + 8];
     sprintf(ccArg, "const %s&", className);
 
-    Smoke::ModuleIndex classIdx(o->smoke, o->classId);
-    Smoke::ModuleIndex ccMeth = o->smoke->findMethod(classIdx, ccId);
-
-    if (ccMeth.index == 0) {
-        qWarning("construct_copy() failed %s %p\n", resolve_classname(o), o->ptr);
-        delete[] ccArg;
-        return 0;
-    }
     Smoke::Index method = ccMeth.smoke->methodMaps[ccMeth.index].method;
     if (method > 0) {
         // Make sure it's a copy constructor
@@ -963,6 +977,7 @@ marshall_basetype(Marshall *m)
 
 static void marshall_void(Marshall * /*m*/) {}
 static void marshall_unknown(Marshall *m) {
+    qWarning("Unknown type %s", m->type().name());
     m->unsupported();
 }
 
@@ -2495,6 +2510,7 @@ Q_DECL_EXPORT TypeHandler Qt_handlers[] = {
     { "int&", marshall_it<int *> },
     { "KIO::filesize_t", marshall_it<long long> },
     { "long long", marshall_it<long long> },
+    { "long long&", marshall_it<long long> },
     { "long long int", marshall_it<long long> },
     { "long long int&", marshall_it<long long> },
     { "QDBusVariant", marshall_QDBusVariant },
@@ -2539,9 +2555,9 @@ Q_DECL_EXPORT TypeHandler Qt_handlers[] = {
     { "QList<QRectF>&", marshall_QRectFList },
     { "QList<qreal>", marshall_QListqreal },
     { "QList<double>", marshall_QListqreal },
+    { "QList<double>&", marshall_QListqreal },
     { "QwtValueList", marshall_QListqreal },
     { "QwtValueList&", marshall_QListqreal },
-    { "QList<double>&", marshall_QListqreal },
     { "QList<QObject*>", marshall_QObjectList },
     { "QList<QObject*>&", marshall_QObjectList },
     { "QList<QTableWidgetItem*>", marshall_QTableWidgetItemList },
@@ -2566,7 +2582,6 @@ Q_DECL_EXPORT TypeHandler Qt_handlers[] = {
     { "qlonglong", marshall_it<long long> },
     { "qlonglong&", marshall_it<long long> },
     { "QMap<int,QVariant>", marshall_QMapintQVariant },
-    { "QMap<int,QVariant>", marshall_QMapIntQVariant },
     { "QMap<int,QVariant>&", marshall_QMapIntQVariant },
     { "QMap<QString,QString>", marshall_QMapQStringQString },
     { "QMap<QString,QString>&", marshall_QMapQStringQString },
@@ -2635,8 +2650,10 @@ Q_DECL_EXPORT TypeHandler Qt_handlers[] = {
     { "signed int&", marshall_it<int *> },
     { "uchar*", marshall_ucharP },
     { "unsigned char*", marshall_ucharP },
-    { "unsigned long long int", marshall_it<long long> },
-    { "unsigned long long int&", marshall_it<long long> },
+    { "unsigned long long int", marshall_it<unsigned long long> },
+    { "unsigned long long int&", marshall_it<unsigned long long> },
+    { "unsigned long long", marshall_it<unsigned long long> },
+    { "unsigned long long&", marshall_it<unsigned long long> },
     { "void", marshall_void },
     { "void**", marshall_voidP_array },
     { "WId", marshall_it<WId> },
@@ -2704,22 +2721,35 @@ void install_handlers(TypeHandler *h) {
 }
 
 Marshall::HandlerFn getMarshallFn(const SmokeType &type) {
-	if (type.elem())
+
+	if (type.elem()) {
+		qDebug() << "Marshalling type" << type.name() << "as basetype" << Qt::endl;
 		return marshall_basetype;
-	if (!type.name())
+	}
+	if (!type.name()) {
+		qDebug() << "Marshalling type" << type.name() << "as void" << Qt::endl;
 		return marshall_void;
+	}
 
 	TypeHandler *h = type_handlers[type.name()];
+	if(h) {
+		qDebug() << "Marshalling type" << type.name() << "using type_handlers" << Qt::endl;
+	}
 
 	if (h == 0 && type.isConst() && strlen(type.name()) > strlen("const ")) {
 		h = type_handlers[type.name() + strlen("const ")];
+		if(h) {
+			qDebug() << "Marshalling type" << type.name() << "without const using type_handlers" << Qt::endl;
+		}
 	}
 
-        char last_char = type.name()[strlen(type.name()) - 1];
-        if (h == 0 && strncmp(type.name(), "QFlags", 6) == 0 && last_char == '&')
-        {
-          h = type_handlers["QFlags&"];
+    char last_char = type.name()[strlen(type.name()) - 1];
+    if (h == 0 && strncmp(type.name(), "QFlags", 6) == 0 && last_char == '&') {
+        h = type_handlers["QFlags&"];
+        if (h) {
+            qDebug() << "Marshalling type" << type.name() << "using type_handlers[\"QFlags&\"]" << Qt::endl;
         }
+    }
 
 	if (h != 0) {
 		return h->fn;

@@ -82,5 +82,7 @@
         <class>QXmlSchema</class>
         <class>QXmlSchemaValidator</class>
         <class>QXmlSerializer</class>
+
+        <class>QFlags&lt;QAbstractXmlNodeModel::NodeCopySetting&gt;</class>
       </classList>
 </config>
