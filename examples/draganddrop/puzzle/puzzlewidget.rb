@@ -102,7 +102,6 @@ puts "dragMoveEvent event.dropAction = Qt5::MoveAction"
 puts "dropEvent event.dropAction = Qt5::MoveAction"
             event.dropAction = Qt5::MoveAction
             event.accept()
-p event.dropAction    
             if location == Qt5::Point.new(square.x()/80, square.y()/80)
                 @inPlace += 1
                 if @inPlace == 25

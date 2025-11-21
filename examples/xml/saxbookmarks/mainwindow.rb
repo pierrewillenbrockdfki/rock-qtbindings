@@ -88,7 +88,7 @@ class MainWindow < Qt5::MainWindow
 		end
 	
 	    file = Qt5::File.new(fileName)
-	    if !file.open(Qt5::File::WriteOnly | Qt5::File::Text.to_i)
+	    if !file.open(Qt5::File::WriteOnly | Qt5::File::Text)
 	        Qt5::MessageBox.warning(self, tr("SAX Bookmarks"),
 	                             tr("Cannot write file %s:\n%s." %
 	                             [fileName, file.errorString]))

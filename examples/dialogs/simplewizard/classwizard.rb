@@ -27,46 +27,49 @@ require './simplewizard.rb'
     
 class ClassWizard < SimpleWizard
 
-    attr_accessor :firstPage, :secondPage, :thirdPage
+    attr_accessor :classInfoPage, :codeStylePage, :outputFilesPage
 
     def initialize(parent = nil)
         super(parent)
-        setNumPages(3)
+        setNumPages(4)
     end
     
     def createPage(index)
         case index
         when 0
-            @firstPage = FirstPage.new(self)
-            return @firstPage
+            @introPage = IntroPage.new(self)
+            return @introPage
         when 1
-            @secondPage = SecondPage.new(self)
-            return @secondPage
+            @classInfoPage = ClassInfoPage.new(self)
+            return @classInfoPage
         when 2
-            @thirdPage = ThirdPage.new(self)
-            return @thirdPage
+            @codeStylePage = CodeStylePage.new(self)
+            return @codeStylePage
+        when 3
+            @outputFilesPage = OutputFilesPage.new(self)
+            return @outputFilesPage
         end
         return nil
     end
     
     def accept()
-        className = @firstPage.classNameLineEdit.text
-        baseClass = @firstPage.baseClassLineEdit.text
-        qobjectMacro = @firstPage.qobjectMacroCheckBox.checked?
-        qobjectCtor = @firstPage.qobjectCtorRadioButton.checked?
-        qwidgetCtor = @firstPage.qwidgetCtorRadioButton.checked?
-        defaultCtor = @firstPage.defaultCtorRadioButton.checked?
-        copyCtor = @firstPage.copyCtorCheckBox.checked?
+        className = @classInfoPage.classNameLineEdit.text
+        baseClass = @classInfoPage.baseClassLineEdit.text
+        qobjectMacro = @classInfoPage.qobjectMacroCheckBox.checked?
+        qobjectCtor = @classInfoPage.qobjectCtorRadioButton.checked?
+        qwidgetCtor = @classInfoPage.qwidgetCtorRadioButton.checked?
+        defaultCtor = @classInfoPage.defaultCtorRadioButton.checked?
+        copyCtor = @classInfoPage.copyCtorCheckBox.checked?
     
-        comment = @secondPage.commentCheckBox.checked?
-        protect = @secondPage.protectCheckBox.checked?
-        macroName = @secondPage.macroNameLineEdit.text
-        includeBase = @secondPage.includeBaseCheckBox.checked?
-        baseInclude = @secondPage.baseIncludeLineEdit.text
+        comment = @codeStylePage.commentCheckBox.checked?
+        protect = @codeStylePage.protectCheckBox.checked?
+        macroName = @codeStylePage.macroNameLineEdit.text
+        includeBase = @codeStylePage.includeBaseCheckBox.checked?
+        baseInclude = @codeStylePage.baseIncludeLineEdit.text
     
-        outputDir = @thirdPage.outputDirLineEdit.text
-        header = @thirdPage.headerLineEdit.text
-        implementation = @thirdPage.implementationLineEdit.text
+        outputDir = @outputFilesPage.outputDirLineEdit.text
+        header = @outputFilesPage.headerLineEdit.text
+        implementation = @outputFilesPage.implementationLineEdit.text
     
         block = Qt5::ByteArray.new
     
@@ -193,7 +196,31 @@ class ClassWizard < SimpleWizard
     end
 end
 
-class FirstPage < Qt5::Widget
+class IntroPage < Qt5::Widget
+
+    def initialize(wizard)
+        super(wizard)
+
+        #setTitle(tr("Introduction"))
+        #setPixmap(Qt5::Wizard::WatermarkPixmap, Qt5.Pixmap.new(":/images/watermark1.png"))
+
+        @label = Qt5::Label.new(tr("This wizard will generate a skeleton C++ class " +
+                          "definition, including a few functions. You simply " +
+                          "need to specify the class name and set a few " +
+                          "options to produce a header file and an " +
+                          "implementation file for your new C++ class."))
+        @label.setWordWrap(true)
+
+        layout = Qt5::VBoxLayout.new
+        layout.addWidget(@label)
+        setLayout(layout)
+
+        wizard.buttonEnabled = true
+    end
+
+end
+
+class ClassInfoPage < Qt5::Widget
 
     attr_accessor :classNameLineEdit, :baseClassLineEdit, :headerLineEdit,
                   :qobjectMacroCheckBox, :qobjectCtorRadioButton,
@@ -263,7 +290,7 @@ class FirstPage < Qt5::Widget
     end
 end
 
-class SecondPage < Qt5::Widget
+class CodeStylePage < Qt5::Widget
 
     attr_accessor :commentCheckBox, :protectCheckBox, :includeBaseCheckBox,
                   :macroNameLineEdit, :baseIncludeLineEdit,
@@ -290,10 +317,10 @@ class SecondPage < Qt5::Widget
         @baseIncludeLineEdit = Qt5::LineEdit.new
         @baseIncludeLabel.buddy = @baseIncludeLineEdit
     
-        className = wizard.firstPage.classNameLineEdit.text()
+        className = wizard.classInfoPage.classNameLineEdit.text()
         @macroNameLineEdit.text = className.upcase + "_H"
     
-        baseClass = wizard.firstPage.baseClassLineEdit.text()
+        baseClass = wizard.classInfoPage.baseClassLineEdit.text()
         if baseClass.empty?
             @includeBaseCheckBox.enabled = false
             @baseIncludeLabel.enabled = false
@@ -333,7 +360,7 @@ class SecondPage < Qt5::Widget
 end
 
 
-class ThirdPage < Qt5::Widget
+class OutputFilesPage < Qt5::Widget
 
     attr_accessor :outputDirLineEdit, :headerLineEdit, :implementationLineEdit
 
@@ -354,10 +381,10 @@ class ThirdPage < Qt5::Widget
         @implementationLineEdit = Qt5::LineEdit.new
         @implementationLabel.buddy = @implementationLineEdit
     
-        className = wizard.firstPage.classNameLineEdit.text()
+        className = wizard.classInfoPage.classNameLineEdit.text()
         @headerLineEdit.text = className.downcase + ".h"
         @implementationLineEdit.text = className.downcase + ".cpp"
-        @outputDirLineEdit.text = Qt5::Dir.toNativeSeparators(Qt5::Dir.homePath())
+        @outputDirLineEdit.text = Qt5::Dir.toNativeSeparators(Qt5::Dir.tempPath())
     
         self.layout = Qt5::GridLayout.new do |l|
             l.addWidget(@topLabel, 0, 0, 1, 2)

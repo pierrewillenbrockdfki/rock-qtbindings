@@ -29,11 +29,11 @@ require 'Qt5'
 require './ping-common.rb'
 
 class Pong < Qt5::DBusAbstractAdaptor
-    q_classinfo("D-Bus Interface", "com.trolltech.QtDBus.ComplexPong.Pong")
+    q_classinfo("D-Bus Interface", "com.trolltech.QtRubyDBus.ComplexPong.Pong")
 
     signals :aboutToQuit
-    slots 'QDBusVariant query(QString)', :quit,
-			'QString value()', 'setValue(QString)'
+    slots 'QDBusVariant query(QString)', :quit
+    q_property 'QString', 'value', member: :value
     
     # the property
     def value()
@@ -60,7 +60,7 @@ class Pong < Qt5::DBusAbstractAdaptor
             if !q.index("european").nil?
                 return Qt5::DBusVariant.new(11.0)
             end
-            return Qt5::DBusVariant.new(Qt5::ByteArray.new("african or european?"))
+            return Qt5::DBusVariant.new("african or european?")
         end
     
         return Qt5::DBusVariant.new("Sorry, I don't know the answer")

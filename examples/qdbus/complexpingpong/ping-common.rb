@@ -1,1 +1,1 @@
-SERVICE_NAME = "com.trolltech.QtDBus.PingExample"
+SERVICE_NAME = "com.trolltech.QtRubyDBus.PingExample"

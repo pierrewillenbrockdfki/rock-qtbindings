@@ -79,10 +79,10 @@ class MainWindow < Qt5::MainWindow
     
     def penWidth()
         ok = Qt5::Boolean.new
-        newWidth = Qt5::InputDialog::getInteger(self, tr("Scribble"),
-                                                tr("Select pen width:"),
-                                                @scribbleArea.penWidth(),
-                                                1, 50, 1, ok)
+        newWidth = Qt5::InputDialog::getInt(self, tr("Scribble"),
+                                            tr("Select pen width:"),
+                                            @scribbleArea.penWidth(),
+                                            1, 50, 1, ok)
         if ok
             @scribbleArea.penWidth = newWidth
         end

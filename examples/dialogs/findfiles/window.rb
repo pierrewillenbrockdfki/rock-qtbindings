@@ -112,7 +112,7 @@ class Window < Qt5::Widget
     
             file = Qt5::File.new(directory.absoluteFilePath(files[i]))
     
-            if file.open(Qt5::IODevice::ReadOnly.to_i)
+            if file.open(Qt5::IODevice::ReadOnly)
                 inf = Qt5::TextStream.new(file)
                 while !inf.atEnd()
                     if progressDialog.wasCanceled()

@@ -102,6 +102,7 @@ class Client < Qt5::Dialog
     
             #TODO QDataStream::operator>> wants references(&), but we seem to
             #supply a literal. Not sure if this can work with ruby, at all.
+            #TODO getting the correct operator>> could be an issue, here. there are variants from qint8 to quint64
             inf >> @blockSize
         end
     

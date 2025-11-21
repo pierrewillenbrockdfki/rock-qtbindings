@@ -30,7 +30,7 @@ class DragWidget < Qt5::Widget
 	def initialize(parent = nil)
 	    super(parent)
 	    dictionaryFile = Qt5::File.new("words.txt")
-	    dictionaryFile.open(Qt5::File::ReadOnly.to_i)
+	    dictionaryFile.open(Qt5::File::ReadOnly)
 	    inputStream = Qt5::TextStream.new(dictionaryFile)
 	
 	    x = 5
@@ -93,7 +93,7 @@ class DragWidget < Qt5::Widget
 	def dropEvent(event)
 	    if event.mimeData().hasFormat("application/x-fridgemagnet")
 	        itemData = event.mimeData().data("application/x-fridgemagnet")
-	        dataStream = Qt5::DataStream.new(itemData, Qt5::IODevice::ReadOnly.to_i)
+	        dataStream = Qt5::DataStream.new(itemData, Qt5::IODevice::ReadOnly)
 	        
 	        text = ""
 	        offset = Qt5::Point.new

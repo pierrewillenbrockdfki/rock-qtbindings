@@ -429,7 +429,7 @@ class PieView < Qt5::AbstractItemView
             for column in 0...columns do
                 index = model.index(row, column, rootIndex)
                 region = itemRegion(index)
-                if !region.intersect(Qt5::Region.new(contentsRect)).empty?
+                if !region.intersects(contentsRect)
                     indexes.push(index)
                 end
             end

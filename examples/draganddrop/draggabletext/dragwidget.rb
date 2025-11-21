@@ -30,7 +30,7 @@ class DragWidget < Qt5::Widget
     def initialize(parent = nil)
         super(parent)
         dictionaryFile = Qt5::File.new("words.txt")
-        dictionaryFile.open(Qt5::IODevice::ReadOnly.to_i)
+        dictionaryFile.open(Qt5::IODevice::ReadOnly)
         inputStream = Qt5::TextStream.new(dictionaryFile)
     
         x = 5

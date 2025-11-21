@@ -72,6 +72,7 @@ class SimpleWizard < Qt5::Dialog
         @finishButton.enabled = true
     
         oldPage = @history.last
+        @history.pop
         switchPage(oldPage)
     end
     

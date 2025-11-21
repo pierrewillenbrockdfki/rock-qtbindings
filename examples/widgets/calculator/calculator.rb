@@ -88,9 +88,9 @@ class Calculator < Qt5::Dialog
         @addToMemoryButton = createButton(tr("M+"), memoryColor,
                                         SLOT('addToMemory()'))
     
-        @divisionButton = createButton(tr("\367"), operatorColor,
+        @divisionButton = createButton(tr("÷"), operatorColor,
                                     SLOT('multiplicativeOperatorClicked()'))
-        @timesButton = createButton(tr("\327"), operatorColor,
+        @timesButton = createButton(tr("×"), operatorColor,
                                 SLOT('multiplicativeOperatorClicked()'))
         @minusButton = createButton(tr("-"), operatorColor,
                                 SLOT('additiveOperatorClicked()'))
@@ -99,7 +99,7 @@ class Calculator < Qt5::Dialog
     
         @squareRootButton = createButton(tr("Sqrt"), operatorColor,
                                         SLOT('unaryOperatorClicked()'))
-        @powerButton = createButton(tr("x\262"), operatorColor,
+        @powerButton = createButton(tr("x²"), operatorColor,
                                 SLOT('unaryOperatorClicked()'))
         @reciprocalButton = createButton(tr("1/x"), operatorColor,
                                         SLOT('unaryOperatorClicked()'))

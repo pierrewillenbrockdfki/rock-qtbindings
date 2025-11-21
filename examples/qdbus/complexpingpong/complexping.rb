@@ -34,14 +34,16 @@ class Ping < Qt5::Object
             return
         end
 
+        puts "Looking for remote"
         # find our remote
-        iface = Qt5::DBusInterface.new(SERVICE_NAME, "/", "com.trolltech.QtDBus.ComplexPong.Pong",
+        iface = Qt5::DBusInterface.new(SERVICE_NAME, "/", "com.trolltech.QtRubyDBus.ComplexPong.Pong",
                                    Qt5::DBusConnection.sessionBus, self)
         if !iface.valid?
             $stderr.puts("%s" % Qt5::DBusConnection.sessionBus.lastError.message)
             Qt5::CoreApplication.instance.quit
         end
     
+        puts "Connecting to remote aboutToQuit"
         connect(iface, SIGNAL(:aboutToQuit), Qt5::CoreApplication.instance(), SLOT(:quit))
     
         while true
@@ -57,9 +59,9 @@ class Ping < Qt5::Object
                     puts("value = %s" % reply)
                 end
             elsif line =~ /^value=/
-                iface.setValue Qt5::Variant.new(line[6, line.length])
+                iface.setProperty "value", Qt5::Variant.new(line[6, line.length])
             else
-                reply = Qt5::DBusReply.new(iface.call("query", Qt5::Variant.new(line)))
+                reply = Qt5::DBusReply.new(iface.call("query", line))
                 if reply.valid?
                     puts("Reply was: %s" % reply.value.value)
                 end

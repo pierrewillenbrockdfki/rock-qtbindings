@@ -117,9 +117,9 @@ class Window < Qt5::Widget
         @iconLabel = Qt5::Label.new("Icon:")
 
         @iconComboBox = Qt5::ComboBox.new
-        @iconComboBox.addItem(Qt5::Icon.new(":/images/bad.svg"), tr("Bad"))
-        @iconComboBox.addItem(Qt5::Icon.new(":/images/heart.svg"), tr("Heart"))
-        @iconComboBox.addItem(Qt5::Icon.new(":/images/trash.svg"), tr("Trash"))
+        @iconComboBox.addItem(Qt5::Icon.new(":/images/bad.png"), tr("Bad"))
+        @iconComboBox.addItem(Qt5::Icon.new(":/images/heart.png"), tr("Heart"))
+        @iconComboBox.addItem(Qt5::Icon.new(":/images/trash.png"), tr("Trash"))
 
         @showIconCheckBox = Qt5::CheckBox.new(tr("Show icon"))
         @showIconCheckBox.checked = true

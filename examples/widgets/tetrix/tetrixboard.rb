@@ -271,7 +271,7 @@ class TetrixBoard < Qt5::Frame
     end
     
     def newPiece()
-        @curPiece = @nextPiece
+        @curPiece.shape = @nextPiece.shape
         @nextPiece.setRandomShape()
         showNextPiece()
         @curX = BoardWidth / 2 + 1
