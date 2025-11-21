@@ -39,9 +39,14 @@ SmokeDataFile::SmokeDataFile()
 {
     qDebug("preparing SMOKE data [%s]", qPrintable(Options::module));
     
-    for (QHash<QString, Class>::const_iterator iter = ::classes.constBegin(); iter != ::classes.constEnd(); iter++) {
-        if (Options::classList.contains(iter.key()) && !iter.value().isForwardDecl()) {
+    for (auto iter = ::classes.constBegin(); iter != ::classes.constEnd(); iter++) {
+        if (Options::classList.contains(iter.key()) && !iter.value()->isForwardDecl()) {
             classIndex[iter.key()] = 1;
+            qDebug() << "Including class " << iter.key() << Qt::endl;
+        } else if (iter.value()->isForwardDecl()) {
+            qDebug() << "Filtering class (forward) " << iter.key() << Qt::endl;
+        } else {
+            qDebug() << "Filtering class " << iter.key() << Qt::endl;
         }
     }
     
@@ -52,15 +57,18 @@ SmokeDataFile::SmokeDataFile()
     
     // Collect the classes that are inherited by classes in this smoke module and provide virtual methods.
     // These classes need to be indexed as well.
-    foreach (const QString& className, includedClasses) {
-        const Class* klass = &classes[className];
+    Q_FOREACH (const QString& className, includedClasses) {
+        const Class* klass = classes[className];
         QList<const Method*> list = Util::virtualMethodsForClass(klass);
-        foreach (const Method* meth, list) {
+        Q_FOREACH (const Method* meth, list) {
             usedTypes << meth->type();
-            foreach (const Parameter& param, meth->parameters()) {
+            usedTypes << meth->type()->resolveTypedefs();
+            Q_FOREACH (const Parameter& param, meth->parameters()) {
                 usedTypes << param.type();
+                usedTypes << param.type()->resolveTypedefs();
                 if (meth->isSlot() || meth->isSignal() || meth->isQPropertyAccessor()) {
                     usedTypes << Util::normalizeType(param.type());
+                    usedTypes << Util::normalizeType(param.type()->resolveTypedefs());
                 }
             }
             declaredVirtualMethods[meth->getClass()] << meth;
@@ -68,27 +76,49 @@ SmokeDataFile::SmokeDataFile()
     }
     
     // if a class is used somewhere but not listed in the class list, mark it external
-    for (QHash<QString, Class>::iterator iter = ::classes.begin(); iter != ::classes.end(); iter++) {
-        if (iter.value().isTemplate() || Options::voidpTypes.contains(iter.key()))
+    for (auto iter = ::classes.begin(); iter != ::classes.end(); iter++) {
+        if (iter.value()->isTemplate() || Options::voidpTypes.contains(iter.key()))
             continue;
         
-        if (   (isClassUsed(&iter.value()) && iter.value().access() != Access_private)
-            || superClasses.contains(&iter.value())
-            || declaredVirtualMethods.contains(&iter.value()))
+        if (   (isClassUsed(iter.value()) && iter.value()->access() != Access_private)
+            || superClasses.contains(iter.value())
+            || declaredVirtualMethods.contains(iter.value()))
         {
             classIndex[iter.key()] = 1;
             
-            if (!Options::classList.contains(iter.key()) || iter.value().isForwardDecl())
-                externalClasses << &iter.value();
+            if (!Options::classList.contains(iter.key()) || iter.value()->isForwardDecl())
+                externalClasses << iter.value();
             else if (!includedClasses.contains(iter.key()))
                 includedClasses << iter.key();
-        } else if (iter.value().isNameSpace() && (Options::classList.contains(iter.key()) || iter.key() == "QGlobalSpace")) {
+        } else if (iter.value()->isNameSpace() && (Options::classList.contains(iter.key()) || iter.key() == "QGlobalSpace")) {
             // wanted namespace or QGlobalSpace
             classIndex[iter.key()] = 1;
-            includedClasses << iter.key();
+            if (!includedClasses.contains(iter.key())) {
+                includedClasses << iter.key();
+            }
         }
     }
     
+    Q_FOREACH (const QString& className, includedClasses) {
+        const Class* klass = classes[className];
+        qDebug() << "Adding enums for class" << className << Qt::endl;
+        Q_FOREACH (const BasicTypeDeclaration *decl, klass->enums()) {
+            const Enum *e = 0;
+            if (!(e = dynamic_cast<const Enum *>(decl)))
+                continue;
+            if (e->access() == Access_private)
+                continue;
+            if (e->name().isEmpty())
+                continue;
+            QString enumString = e->toString();
+            if(!types.contains(enumString)) {
+                qFatal("enum type was not registered in type system: %s in class %s", qPrintable(enumString), qPrintable(className));
+            }
+            usedTypes << types[enumString];
+            qDebug("adding enum type: %s in %s", qPrintable(types[enumString]->toString()), qPrintable(klass->toString()));
+        }
+    }
+
     // build class index here because the list needs to be sorted
     int i = 1;
     for (QMap<QString, int>::iterator iter = classIndex.begin(); iter != classIndex.end(); iter++) {
@@ -98,7 +128,7 @@ SmokeDataFile::SmokeDataFile()
 
 bool SmokeDataFile::isClassUsed(const Class* klass)
 {
-    for (QSet<Type*>::const_iterator it = usedTypes.constBegin(); it != usedTypes.constEnd(); it++) {
+    for (QSet<Type const*>::const_iterator it = usedTypes.constBegin(); it != usedTypes.constEnd(); it++) {
         if ((*it)->getClass() == klass)
             return true;
     }
@@ -108,8 +138,8 @@ bool SmokeDataFile::isClassUsed(const Class* klass)
 QString SmokeDataFile::getTypeFlags(const Type *t, int *classIdx)
 {
     if (t->getTypedef()) {
-        Type resolved = t->getTypedef()->resolve();
-        return getTypeFlags(&resolved, classIdx);
+        //some types should not be resolved, so do not recurse.
+        t = t->resolveTypedefs();
     }
 
     QString flags = "0";
@@ -118,7 +148,7 @@ QString SmokeDataFile::getTypeFlags(const Type *t, int *classIdx)
         flags += "|Smoke::t_voidp";
     } else if (t->getClass()) {
         if (t->getClass()->isTemplate()) {
-            if (Options::qtMode && t->getClass()->name() == "QFlags" && !t->isRef() && t->pointerDepth() == 0) {
+            if (Options::qtMode && !t->isRef() && t->pointerDepth() == 0) {
                 flags += "|Smoke::t_uint";
             } else {
                 flags += "|Smoke::t_voidp";
@@ -179,7 +209,7 @@ void SmokeDataFile::write()
     QFile argNames(Options::outputDir.filePath(QStringLiteral("%1.argnames.txt").arg(Options::module)));
     argNames.open(QFile::ReadWrite | QFile::Truncate);
     QTextStream outArgNames(&argNames);
-    foreach (const QFileInfo& file, Options::headerList)
+    Q_FOREACH (const QFileInfo& file, Options::headerList)
         out << "#include <" << file.fileName() << ">\n";
     out << "\n#include <smoke.h>\n";
     out << "#include <" << Options::module << "_smoke.h>\n\n";
@@ -192,15 +222,15 @@ void SmokeDataFile::write()
     out << "static void *cast(void *xptr, Smoke::Index from, Smoke::Index to) {\n";
     out << "  switch(from) {\n";
     for (QMap<QString, int>::const_iterator iter = classIndex.constBegin(); iter != classIndex.constEnd(); iter++) {
-        const Class& klass = classes[iter.key()];
-        if (klass.isNameSpace())
+        const Class *klass = classes[iter.key()];
+        if (klass->isNameSpace())
             continue;
         
         QSet<int> indices; // avoid duplicate case values (diamond-shaped inheritance)
         
         out << "    case " << iter.value() << ":   //" << iter.key() << "\n";
         out << "      switch(to) {\n";
-        foreach (const Class* base, Util::superClassList(&klass)) {
+        Q_FOREACH (const Class* base, Util::superClassList(klass)) {
             QString className = base->toString();
             
             if (includedClasses.contains(className) || externalClasses.contains((Class *) base)) {
@@ -210,11 +240,11 @@ void SmokeDataFile::write()
                 indices << index;
                 
                 out << QStringLiteral("        case %1: return (void*)(%2*)(%3*)xptr;\n")
-                    .arg(index).arg(className).arg(klass.toString());
+                    .arg(index).arg(className).arg(klass->toString());
             }
         }
-        out << QStringLiteral("        case %1: return (void*)(%2*)xptr;\n").arg(iter.value()).arg(klass.toString());
-        foreach (const Class* desc, Util::descendantsList(&klass)) {
+        out << QStringLiteral("        case %1: return (void*)(%2*)xptr;\n").arg(iter.value()).arg(klass->toString());
+        Q_FOREACH (const Class* desc, Util::descendantsList(klass)) {
             QString className = desc->toString();
             
             if (includedClasses.contains(className)) {
@@ -223,12 +253,12 @@ void SmokeDataFile::write()
                     continue;
                 indices << index;
                 
-                if (Util::isVirtualInheritancePath(desc, &klass)) {
+                if (Util::isVirtualInheritancePath(desc, klass)) {
                     out << QStringLiteral("        case %1: return (void*)dynamic_cast<%2*>((%3*)xptr);\n")
-                        .arg(index).arg(className).arg(klass.toString());
+                        .arg(index).arg(className).arg(klass->toString());
                 } else {
                     out << QStringLiteral("        case %1: return (void*)(%2*)(%3*)xptr;\n")
-                        .arg(index).arg(className).arg(klass.toString());
+                        .arg(index).arg(className).arg(klass->toString());
                 }
             }
         }
@@ -249,12 +279,12 @@ void SmokeDataFile::write()
     
     int currentIdx = 1;
     for (QMap<QString, int>::const_iterator iter = classIndex.constBegin(); iter != classIndex.constEnd(); iter++) {
-        Class& klass = classes[iter.key()];
-        if (!klass.baseClasses().count() || externalClasses.contains(&klass))
+        Class* klass = classes[iter.key()];
+        if (!klass->baseClasses().count() || externalClasses.contains(klass))
             continue;
         QVector<int> indices;
         QStringList comment;
-        foreach (const Class::BaseClassSpecifier& base, klass.baseClasses()) {
+        Q_FOREACH (const Class::BaseClassSpecifier& base, klass->baseClasses()) {
             if (base.access == Access_private)
                 continue;
             QString className = base.baseClass->toString();
@@ -281,31 +311,31 @@ void SmokeDataFile::write()
         }
         
         // store the index into inheritanceList for the class
-        inheritanceIndex[&klass] = idx;
+        inheritanceIndex[klass] = idx;
     }
     out << "};\n\n";
     
     // xenum functions
     out << "// These are the xenum functions for manipulating enum pointers\n";
     QSet<QString> enumClassesHandled;
-    for (QHash<QString, Enum>::const_iterator it = enums.constBegin(); it != enums.constEnd(); it++) {
-        if (!it.value().isValid())
+    for (auto it = enums.constBegin(); it != enums.constEnd(); it++) {
+        if (!it.value()->isValid())
             continue;
         
         QString smokeClassName;
-        if (it.value().parent()) {
-            smokeClassName = it.value().parent()->toString();
+        if (it.value()->parent()) {
+            smokeClassName = it.value()->parent()->toString();
         } else {
-            smokeClassName = it.value().nameSpace();
+            smokeClassName = it.value()->nameSpace();
         }
         
-        if (!smokeClassName.isEmpty() && includedClasses.contains(smokeClassName) && it.value().access() != Access_private) {
+        if (!smokeClassName.isEmpty() && includedClasses.contains(smokeClassName) && it.value()->access() != Access_private) {
             if (enumClassesHandled.contains(smokeClassName) || Options::voidpTypes.contains(smokeClassName))
                 continue;
             enumClassesHandled << smokeClassName;
-            smokeClassName.replace("::", "__");
+            smokeClassName.replace("::", "__").replace("<", "__of__").replace(">", "__").replace(",", "__and__").replace("*","__ptr__");
             out << "void xenum_" << smokeClassName << "(Smoke::EnumOperation, Smoke::Index, void*&, long&);\n";
-        } else if (smokeClassName.isEmpty() && it.value().access() != Access_private) {
+        } else if (smokeClassName.isEmpty() && it.value()->access() != Access_private) {
             if (enumClassesHandled.contains("QGlobalSpace"))
                 continue;
             out << "void xenum_QGlobalSpace(Smoke::EnumOperation, Smoke::Index, void*&, long&);\n";
@@ -316,10 +346,10 @@ void SmokeDataFile::write()
     // xcall functions
     out << "\n// Those are the xcall functions defined in each x_*.cpp file, for dispatching method calls\n";
     for (QMap<QString, int>::const_iterator iter = classIndex.constBegin(); iter != classIndex.constEnd(); iter++) {
-        Class& klass = classes[iter.key()];
-        if (externalClasses.contains(&klass) || klass.isTemplate())
+        Class* klass = classes[iter.key()];
+        if (externalClasses.contains(klass) || klass->isTemplate())
             continue;
-        QString smokeClassName = QString(klass.toString()).replace("::", "__");
+        QString smokeClassName = QString(klass->toString()).replace("::", "__").replace("<", "__of__").replace(">", "__").replace(",", "__and__").replace("*","__ptr__");
         out << "void xcall_" << smokeClassName << "(Smoke::Index, void*, Smoke::Stack);\n";
     }
     
@@ -333,12 +363,12 @@ void SmokeDataFile::write()
         if (!iter.value())
             continue;
         
-        Class* klass = &classes[iter.key()];
+        Class* klass = classes[iter.key()];
         
         if (externalClasses.contains(klass)) {
             out << "    { \""  << iter.key() << "\", true, 0, 0, 0, 0, 0 },\t//" << iter.value() << "\n";
         } else {
-            QString smokeClassName = QString(iter.key()).replace("::", "__");
+            QString smokeClassName = QString(iter.key()).replace("::", "__").replace("<", "__of__").replace(">", "__").replace(",", "__and__").replace("*","__ptr__");
             out << "    { \"" << iter.key() << "\", false" << ", "
                 << inheritanceIndex.value(klass, 0) << ", xcall_" << smokeClassName << ", "
                 << (enumClassesHandled.contains(iter.key()) ? QStringLiteral("xenum_").append(smokeClassName) : "0") << ", ";
@@ -366,8 +396,8 @@ void SmokeDataFile::write()
         << "// Name, class ID if arg is a class, and TypeId\n";
     out << "static Smoke::Type types[] = {\n";
     out << "    { 0, 0, 0 },\t//0 (no type)\n";
-    QMap<QString, Type*> sortedTypes;
-    for (QSet<Type*>::const_iterator it = usedTypes.constBegin(); it != usedTypes.constEnd(); it++) {
+    QMap<QString, Type const*> sortedTypes;
+    for (QSet<Type const*>::const_iterator it = usedTypes.constBegin(); it != usedTypes.constEnd(); it++) {
         QString typeString = (*it)->toString();
         if (!typeString.isEmpty()) {
             sortedTypes.insert(typeString, *it);
@@ -375,14 +405,15 @@ void SmokeDataFile::write()
     }
     
     int i = 1;
-    for (QMap<QString, Type*>::const_iterator it = sortedTypes.constBegin(); it != sortedTypes.constEnd(); it++) {
-        Type* t = it.value();
+    for (QMap<QString, Type const*>::const_iterator it = sortedTypes.constBegin(); it != sortedTypes.constEnd(); it++) {
+        Type const* t = it.value();
         // don't include void as a type
         if (t == Type::Void)
             continue;
         int classIdx = 0;
         QString flags = getTypeFlags(t, &classIdx);
         typeIndex[t] = i;
+        qDebug() << "Typeindex " << i << t << t->toString() << Qt::endl;
         out << "    { \"" << it.key() << "\", " << classIdx << ", " << flags << " },\t//" << i++ << "\n";
     }
     out << "};\n\n";
@@ -400,14 +431,16 @@ void SmokeDataFile::write()
     
     currentIdx = 1;
     for (QMap<QString, int>::const_iterator iter = classIndex.constBegin(); iter != classIndex.constEnd(); iter++) {
-        Class* klass = &classes[iter.key()];
+        Class* klass = classes[iter.key()];
         bool isExternal = externalClasses.contains(klass);
         bool isDeclaredVirtual = declaredVirtualMethods.contains(klass);
         if (isExternal && !isDeclaredVirtual)
             continue;
         QMap<QString, QList<const Member*> >& map = classMungedNames[klass];
-        foreach (const Method& meth, klass->methods()) {
+        Q_FOREACH (const Method& meth, klass->methods()) {
             if (meth.access() == Access_private)
+                continue;
+            if (meth.isDeleted())
                 continue;
             if (isExternal && !declaredVirtualMethods[klass].contains(&meth))
                 continue;
@@ -429,9 +462,10 @@ void SmokeDataFile::write()
                 outArgNames << klass->name() << "," << meth.name();
             }
             for (int i = 0; i < indices.size(); i++) {
-                Type* t = meth.parameters()[i].type();
+                Type const* t = meth.parameters()[i].type()->resolveTypedefs();
                 if (!typeIndex.contains(t)) {
-                    qFatal("missing type: %s in method %s (while building munged names map)", qPrintable(t->toString()), qPrintable(meth.toString(false, true)));
+                    qFatal("missing type: %s(%p) of parameter %d(%s) in method %s (while building munged names map, canonical ptr: %p)", qPrintable(t->toString()), t, i,
+                           qPrintable(meth.parameters()[i].name()), qPrintable(meth.toString(false, true)), types[t->toString()]);
                 }
                 outArgNames << ",";
                 outArgNames << (indices[i] = typeIndex[t]);
@@ -465,12 +499,12 @@ void SmokeDataFile::write()
             }
             parameterIndices[&meth] = idx;
         }
-        foreach (BasicTypeDeclaration* decl, klass->children()) {
+        Q_FOREACH (BasicTypeDeclaration* decl, klass->enums()) {
             const Enum* e = 0;
             if ((e = dynamic_cast<Enum*>(decl))) {
                 if (e->access() == Access_private)
                     continue;
-                foreach (const EnumMember& member, e->members()) {
+                Q_FOREACH (const EnumMember& member, e->members()) {
                     methodNames[member.name()] = 1;
                     map[member.name()].append(&member);
                 }
@@ -498,7 +532,7 @@ void SmokeDataFile::write()
     i = 1;
     int methodCount = 1;
     for (QMap<QString, int>::const_iterator iter = classIndex.constBegin(); iter != classIndex.constEnd(); iter++) {
-        Class* klass = &classes[iter.key()];
+        Class* klass = classes[iter.key()];
         const Method* destructor = 0;
         bool isExternal = false;
         if (externalClasses.contains(klass))
@@ -509,10 +543,12 @@ void SmokeDataFile::write()
         QList<const Method*> virtualMethods = Util::virtualMethodsForClass(klass);
         
         int xcall_index = 1;
-        foreach (const Method& meth, klass->methods()) {
+        Q_FOREACH (const Method& meth, klass->methods()) {
             if (isExternal && !declaredVirtualMethods[klass].contains(&meth))
                 continue;
             if (meth.access() == Access_private)
+                continue;
+            if (meth.isDeleted())
                 continue;
             if (meth.isDestructor()) {
                 destructor = &meth;
@@ -587,22 +623,22 @@ void SmokeDataFile::write()
             methodCount++;
         }
         // enums
-        foreach (BasicTypeDeclaration* decl, klass->children()) {
+        Q_FOREACH (BasicTypeDeclaration* decl, klass->enums()) {
             const Enum* e = 0;
             if ((e = dynamic_cast<Enum*>(decl))) {
                 if (e->access() == Access_private)
                     continue;
 
-                Type *enumType;
+                Type const *enumType;
                 if (e->name().isEmpty()) {
                     // unnamed enum
-                    enumType = &types["long"];
+                    enumType = types["long"];
                 } else {
-                    enumType = &types[e->toString()];
+                    enumType = types[e->toString()];
                 }
 
                 int index = 0;
-                QHash<Type*, int>::const_iterator typeIt;
+                QHash<Type const*, int>::const_iterator typeIt;
                 if ((typeIt = typeIndex.find(enumType)) == typeIndex.end()) {
                     // this enum doesn't have an index, so we don't want it here
                     continue;
@@ -610,7 +646,7 @@ void SmokeDataFile::write()
                     index = *typeIt;
                 }
 
-                foreach (const EnumMember& member, e->members()) {
+                Q_FOREACH (const EnumMember& member, e->members()) {
                     out << "    {" << iter.value() << ", " << methodNames[member.name()]
                         << ", 0, 0, Smoke::mf_static|Smoke::mf_enum, " << index
                         << ", " << xcall_index << "},";
@@ -657,11 +693,11 @@ void SmokeDataFile::write()
         {
             if (munged_it.value().size() < 2)
                 continue;
-            foreach (const Member* member, munged_it.value()) {
+            Q_FOREACH (const Member* member, munged_it.value()) {
                 out << "    " << methodIdx[member] << ',';
                 
                 // comment
-                out << "  // Member \"" << klass->toString() << "::" << member->name();
+                out << "  // " << i << " Member \"" << klass->toString() << "::" << member->name();
                 const Method* meth = 0;
                 if ((meth = dynamic_cast<const Method*>(member))) {
                     out << '(';
@@ -689,7 +725,7 @@ void SmokeDataFile::write()
     out << "    {0, 0, 0},\t//0 (no method)\n";
 
     for (QMap<QString, int>::const_iterator iter = classIndex.constBegin(); iter != classIndex.constEnd(); iter++) {
-        Class* klass = &classes[iter.key()];
+        Class* klass = classes[iter.key()];
         if (externalClasses.contains(klass))
             continue;
         
@@ -730,7 +766,7 @@ void SmokeDataFile::write()
     out << "Smoke *" << Options::module << "_Smoke = 0;\n\n";
     out << "// Create the Smoke instance encapsulating all the above.\n";
     out << "void init_" << Options::module << "_Smoke() {\n";
-    foreach (const QString& str, Options::parentModules) {
+    Q_FOREACH (const QString& str, Options::parentModules) {
         out << "    init_" << str << "_Smoke();\n";
     }
     out << "    if (initialized) return;\n";

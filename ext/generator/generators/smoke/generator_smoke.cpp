@@ -176,6 +176,7 @@ int generate()
                     }
                     if (elem.tagName() == "class") {
                         Options::classList << elem.text();
+                        qDebug() << "Including class " << elem.text() << Qt::endl;
                     } else {
                         qCritical() << "Unexpected element " << elem.tagName() << " in classList";
                         exit(EXIT_FAILURE);

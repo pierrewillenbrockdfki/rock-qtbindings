@@ -29,7 +29,7 @@ void generate()
 {
     foreach (const QString& className, classes.keys()) {
         std::cout << qPrintable(className);
-        if (classes[className].isForwardDecl())
+        if (classes[className]->isForwardDecl())
             std::cout << " [forward declaration]";
         std::cout << std::endl;
     }

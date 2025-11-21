@@ -2,6 +2,9 @@ project(smokegenerator)
 
 find_package(Qt5 REQUIRED COMPONENTS Core Xml)
 
+find_package(Clang REQUIRED)
+find_package(LLVM REQUIRED)
+
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
@@ -11,16 +14,10 @@ endif (NOT LIB_INSTALL_DIR)
 
 include_directories(${Qt5Core_INCLUDE_DIRS} parser)
 
-add_subdirectory(parser)
-
 set(generator_SRC
     main.cpp
-    generatorenvironment.cpp
-    generatorvisitor.cpp
-    generatorpreprocessor.cpp
+    clanggeneratorvisitor.cpp
     options.cpp
-    type_compiler.cpp
-    name_compiler.cpp
     type.cpp
 )
 
@@ -29,11 +26,16 @@ set (CMAKE_SKIP_BUILD_RPATH FALSE)
 set (CMAKE_SKIP_RPATH FALSE)
 
 add_executable(smokegen ${generator_SRC})
-target_link_libraries(smokegen Qt5::Core Qt5::Xml cppparser)
+target_link_libraries(smokegen
+    Qt5::Core Qt5::Xml
+    clang-cpp LLVM
+    )
 set_target_properties(smokegen PROPERTIES COMPILE_DEFINITIONS __GENERATOR_BUILDING ENABLE_EXPORTS TRUE)
 target_compile_options(smokegen PRIVATE -fPIC -Wall)
+target_compile_definitions(smokegen PRIVATE QT_NO_KEYWORDS)
+target_include_directories(smokegen PRIVATE ${CLANG_INCLUDE_DIRS})
 
 install(TARGETS smokegen DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
-install(FILES generatorenvironment.h  generator_export.h  generatorpreprocessor.h  generatorvisitor.h  name_compiler.h  options.h  type_compiler.h  type.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/smokegen)
+install(FILES generator_export.h options.h type.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include/smokegen)
 
 add_subdirectory(generators)

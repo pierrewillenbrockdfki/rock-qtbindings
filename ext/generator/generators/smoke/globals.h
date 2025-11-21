@@ -72,9 +72,9 @@ struct SmokeDataFile
 
     QMap<QString, int> classIndex;
     QHash<const Member*, int> methodIdx;
-    QHash<Type*, int> typeIndex;
+    QHash<Type const*, int> typeIndex;
     QSet<Class*> externalClasses;
-    QSet<Type*> usedTypes;
+    QSet<Type const*> usedTypes;
     QStringList includedClasses;
     QHash<const Class*, QSet<const Method*> > declaredVirtualMethods;
 };
@@ -88,6 +88,9 @@ struct SmokeClassFiles
 private:
     QString generateMethodBody(const QString& indent, const QString& className, const QString& smokeClassName, const Method& meth, int index, bool dynamicDispatch, QSet< QString >& includes);
     void generateMethod(QTextStream& out, const QString& className, const QString& smokeClassName, const Method& meth, int index, QSet<QString>& includes);
+    bool methodUsesMemberPointers(const Method& meth);
+    bool methodTypeAccessPossible(const Method& meth);
+    Access typeAccess(const Type *type);
     void generateGetAccessor(QTextStream& out, const QString& className, const Field& field, const Type* type, int index);
     void generateSetAccessor(QTextStream& out, const QString& className, const Field& field, const Type* type, int index);
     void generateEnumMemberCall(QTextStream& out, const QString& className, const EnumMember& member, int index);
@@ -108,7 +111,7 @@ struct Util
     static QList<const Class*> superClassList(const Class* klass);
     static QList<const Class*> descendantsList(const Class* klass);
 
-    static void preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, const QList<QString>& keys);
+    static void preparse(QSet<Type const*> *usedTypes, QSet<const Class*> *superClasses, const QList<QString>& keys);
 
     static bool canClassBeInstanciated(const Class* klass);
     static bool canClassBeCopied(const Class* klass);
@@ -123,18 +126,20 @@ struct Util
     static void addCopyConstructor(Class* klass);
     static void addDestructor(Class* klass);
     static void addOverloads(const Method& meth);
-    static void addAccessorMethods(const Field& field, QSet<Type*> *usedTypes);
+    static void addAccessorMethods(const Field& field, QSet<Type const*> *usedTypes);
 
     static QChar munge(const Type *type);
     static QString mungedName(const Method&);
 
-    static Type* normalizeType(const Type* type);
+    static Type const* normalizeType(const Type* type);
 
     static QString stackItemField(const Type* type);
     static QString assignmentString(const Type* type, const QString& var);
     static QList<const Method*> collectVirtualMethods(const Class* klass);
     static const Method* isVirtualOverriden(const Method& meth, const Class* klass);
     static QList<const Method*> virtualMethodsForClass(const Class* klass);
+
+    static Access typeAccess(const Type *type);
 };
 
 #endif

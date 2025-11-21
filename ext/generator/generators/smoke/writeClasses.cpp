@@ -54,8 +54,9 @@ void SmokeClassFiles::write(const QList<QString>& keys)
         
         // write the class code to a QString so we can later prepend the #includes
         if (i == Options::parts - 1) count2 = -1;
-        foreach (const QString& str, keys.mid(count * i, count2)) {
-            const Class* klass = &classes[str];
+        Q_FOREACH (const QString& str, keys.mid(count * i, count2)) {
+            qDebug() << "Writing class" << str << Qt::endl;
+            const Class* klass = classes[str];
             includes.insert(klass->fileName());
             writeClass(classOut, klass, str, includes);
         }
@@ -72,7 +73,7 @@ void SmokeClassFiles::write(const QList<QString>& keys)
         // ... and the #includes
         QList<QString> sortedIncludes = includes.toList();
         qSort(sortedIncludes.begin(), sortedIncludes.end());
-        foreach (const QString& str, sortedIncludes) {
+        Q_FOREACH (const QString& str, sortedIncludes) {
             if (str.isEmpty())
                 continue;
             fileOut << "#include <" << str << ">\n";
@@ -108,13 +109,14 @@ QString SmokeClassFiles::generateMethodBody(const QString& indent, const QString
         if (func)
             includes.insert(func->fileName());
 
-        if (meth.type()->getClass())
-            includes.insert(meth.type()->getClass()->fileName());
+        Type const *rettype = meth.type();
+        if (rettype->getClass())
+            includes.insert(rettype->getClass()->fileName());
 
-        if (meth.type()->isFunctionPointer() || meth.type()->isArray())
-            out << meth.type()->toString("xret", true) << " = ";
-        else if (meth.type() != Type::Void)
-            out << meth.type()->toString(QString(), true) << " xret = ";
+        if (rettype->isFunctionPointer() || rettype->isArray())
+            out << rettype->toString("xret", true) << " = ";
+        else if (rettype != Type::Void)
+            out << rettype->toString(QString(), true) << " xret = ";
 
         if (!(meth.flags() & Method::Static)) {
             if (meth.isConst()) {
@@ -136,26 +138,28 @@ QString SmokeClassFiles::generateMethodBody(const QString& indent, const QString
     for (int j = 0; j < meth.parameters().count(); j++) {
         const Parameter& param = meth.parameters()[j];
 
-        if (param.type()->getClass())
-            includes.insert(param.type()->getClass()->fileName());
+        Type const *parmtype = param.type();
+
+        if (parmtype->getClass())
+            includes.insert(parmtype->getClass()->fileName());
 
         if (j > 0) out << ",";
 
-        QString field = Util::stackItemField(param.type());
-        QString typeName = param.type()->toString(QString(), true);
-        if (param.type()->isArray()) {
-            Type t = *param.type();
+        QString field = Util::stackItemField(parmtype);
+        QString typeName = parmtype->toString(QString(), true);
+        if (parmtype->isArray()) {
+            Type t = *parmtype;
             t.setPointerDepth(t.pointerDepth() + 1);
             t.setIsRef(false);
             typeName = t.toString(QString(), true);
             out << '*';
-        } else if (field == "s_class" && (param.type()->pointerDepth() == 0 || param.type()->isRef()) && !param.type()->isFunctionPointer()) {
+        } else if (field == "s_class" && (parmtype->pointerDepth() == 0 || parmtype->isRef()) && !parmtype->isFunctionPointer()) {
             // references and classes are passed in s_class
             typeName.append('*');
             out << '*';
+            // casting to a reference doesn't make sense in this case
+            if (parmtype->isRef() && !parmtype->isFunctionPointer()) typeName.replace('&', "");
         }
-        // casting to a reference doesn't make sense in this case
-        if (param.type()->isRef() && !param.type()->isFunctionPointer()) typeName.replace('&', "");
         out << "(" << typeName << ")" << "x[" << j + 1 << "]." << field;
     }
 
@@ -168,8 +172,9 @@ QString SmokeClassFiles::generateMethodBody(const QString& indent, const QString
     }
 
     out << ");\n";
-    if (meth.type() != Type::Void) {
-        out << indent << "x[0]." << Util::stackItemField(meth.type()) << " = " << Util::assignmentString(meth.type(), "xret") << ";\n";
+    Type const *rettype = meth.type();
+    if (rettype != Type::Void) {
+        out << indent << "x[0]." << Util::stackItemField(rettype) << " = " << Util::assignmentString(rettype, "xret") << ";\n";
     } else {
         out << indent << "(void)x; // noop (for compiler warning)\n";
     }
@@ -219,6 +224,40 @@ void SmokeClassFiles::generateMethod(QTextStream& out, const QString& className,
         }
         out << ") : " << meth.getClass()->name() << '(' << x_list.join(", ") << ") {}\n";
     }
+}
+
+bool SmokeClassFiles::methodUsesMemberPointers(const Method& meth) {
+    Type const *rettype = meth.type()->resolveTypedefs();
+    for(unsigned int i = 0; i < rettype->pointerDepth(); i++) {
+        if (rettype->memberPointerOf(i)) {
+            return true;
+        }
+    }
+    for (auto const &param : meth.parameters()) {
+        Type const *parmtype = param.type()->resolveTypedefs();
+        for (unsigned int i = 0; i < parmtype->pointerDepth(); i++) {
+            if (parmtype->memberPointerOf(i)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool SmokeClassFiles::methodTypeAccessPossible(const Method &meth) {
+    for(unsigned int i = 0; i < meth.type()->pointerDepth(); i++) {
+        if (Util::typeAccess(meth.type()) == Access_private) {
+            return false;
+        }
+    }
+    for (auto const &param : meth.parameters()) {
+        for (unsigned int i = 0; i < param.type()->pointerDepth(); i++) {
+            if (Util::typeAccess(param.type()) == Access_private) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 void SmokeClassFiles::generateGetAccessor(QTextStream& out, const QString& className, const Field& field,
@@ -283,22 +322,25 @@ void SmokeClassFiles::generateEnumMemberCall(QTextStream& out, const QString& cl
 void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth, QSet<QString>& includes)
 {
     QString x_params, x_list;
-    QString type = meth.type()->toString(QString(), true);
-    if (meth.type()->getClass())
-        includes.insert(meth.type()->getClass()->fileName());
+    Type const *rettype = meth.type();
+    QString type = rettype->toString(QString(), true);
+    if (rettype->getClass())
+        includes.insert(rettype->getClass()->fileName());
     
     out << "    virtual " << type << " " << meth.name() << "(";
     for (int i = 0; i < meth.parameters().count(); i++) {
         if (i > 0) { out << ", "; x_list.append(", "); }
         const Parameter& param = meth.parameters()[i];
+        Type const *parmtype = param.type();
+        if (parmtype->getClass())
+            includes.insert(parmtype->getClass()->fileName());
         
-        if (param.type()->getClass())
-            includes.insert(param.type()->getClass()->fileName());
-        
-        out << param.type()->toString(QString(), true) << " x" << i + 1;
-        x_params += QStringLiteral("        x[%1].%2 = %3;\n")
-            .arg(QString::number(i + 1)).arg(Util::stackItemField(param.type()))
-            .arg(Util::assignmentString(param.type(), "x" + QString::number(i + 1)));
+        out << parmtype->toString(QString(), true) << " x" << i + 1;
+        x_params += QStringLiteral("        x[%1].%2 = %3;//%4\n")
+            .arg(QString::number(i + 1))
+            .arg(Util::stackItemField(parmtype))
+            .arg(Util::assignmentString(parmtype, "x" + QString::number(i + 1)))
+            .arg(parmtype->toString());
         x_list += "x" + QString::number(i + 1);
     }
     out << ") ";
@@ -308,7 +350,7 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
         out << "throw(";
         for (int i = 0; i < meth.exceptionTypes().count(); i++) {
             if (i > 0) out << ", ";
-            out << meth.exceptionTypes()[i].toString(QString(), true);
+            out << meth.exceptionTypes()[i]->toString(QString(), true);
         }
         out << ") ";
     }
@@ -319,13 +361,13 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
     
     if (meth.flags() & Method::PureVirtual) {
         out << QStringLiteral("        if (this->_binding->callMethod(%1, (void*)this, x, true /*pure virtual*/)) ").arg(m_smokeData->methodIdx[&meth]);
-        if (meth.type() == Type::Void) {
+        if (rettype == Type::Void) {
             out << "return;\n";
         } else {
-            QString field = Util::stackItemField(meth.type());
-            if (meth.type()->pointerDepth() == 0 && field == "s_class") {
+            QString field = Util::stackItemField(rettype);
+            if (rettype->pointerDepth() == 0 && field == "s_class") {
                 QString tmpType = type;
-                if (meth.type()->isRef()) tmpType.replace('&', "");
+                if (rettype->isRef()) tmpType.replace('&', "");
                 tmpType.append('*');
                 out << "{\n";
                 out << "            " << tmpType << " xptr = (" << tmpType << ")x[0].s_class;\n";
@@ -334,7 +376,7 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
                 out << "            return xret;\n";
                 out << "        }\n";
             } else {
-                out << QStringLiteral("return (%1)x[0].%2;\n").arg(type, Util::stackItemField(meth.type()));
+                out << QStringLiteral("return (%1)x[0].%2;\n").arg(type, Util::stackItemField(rettype));
             }
         }
         out << "        // This is the original virtual abstract name\n"
@@ -343,13 +385,13 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
             << "\");\n";
     } else {
         out << QStringLiteral("        if (this->_binding->callMethod(%1, (void*)this, x)) ").arg(m_smokeData->methodIdx[&meth]);
-        if (meth.type() == Type::Void) {
+        if (rettype == Type::Void) {
             out << "return;\n";
         } else {
-            QString field = Util::stackItemField(meth.type());
-            if (meth.type()->pointerDepth() == 0 && field == "s_class") {
+            QString field = Util::stackItemField(rettype);
+            if (rettype->pointerDepth() == 0 && field == "s_class") {
                 QString tmpType = type;
-                if (meth.type()->isRef()) tmpType.replace('&', "");
+                if (rettype->isRef()) tmpType.replace('&', "");
                 tmpType.append('*');
                 out << "{\n";
                 out << "            " << tmpType << " xptr = (" << tmpType << ")x[0].s_class;\n";
@@ -358,11 +400,11 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
                 out << "            return xret;\n";
                 out << "        }\n";
             } else {
-                out << QStringLiteral("return (%1)x[0].%2;\n").arg(type, Util::stackItemField(meth.type()));
+                out << QStringLiteral("return (%1)x[0].%2;\n").arg(type, Util::stackItemField(rettype));
             }
         }
         out << "        ";
-        if (meth.type() != Type::Void)
+        if (rettype != Type::Void)
             out << "return ";
         out << QStringLiteral("this->%1::%2(%3);\n").arg(meth.getClass()->toString()).arg(meth.name()).arg(x_list);
     }
@@ -371,7 +413,7 @@ void SmokeClassFiles::generateVirtualMethod(QTextStream& out, const Method& meth
 
 void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QString& className, QSet<QString>& includes)
 {
-    const QString underscoreName = QString(className).replace("::", "__");
+    const QString underscoreName = QString(className).replace("::", "__").replace("<", "__of__").replace(">", "__").replace(",", "__and__").replace("*","__ptr__");
     const QString smokeClassName = "x_" + underscoreName;
 
     QString switchCode;
@@ -400,11 +442,19 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
     
     int xcall_index = 1;
     const Method *destructor = 0;
-    foreach (const Method& meth, klass->methods()) {
+    Q_FOREACH (const Method& meth, klass->methods()) {
         if (meth.access() == Access_private)
+            continue;
+        if (meth.isDeleted())
             continue;
         if (meth.isDestructor()) {
             destructor = &meth;
+            continue;
+        }
+        if(methodUsesMemberPointers(meth)) {
+            continue;
+        }
+        if(!methodTypeAccessPossible(meth)) {
             continue;
         }
         switchOut << "        case " << xcall_index << ": "
@@ -426,15 +476,12 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
 
     QString enumCode;
     QTextStream enumOut(&enumCode);
-    const Enum* e = 0;
     bool enumFound = false;
-    foreach (const BasicTypeDeclaration* decl, klass->children()) {
-        if (!(e = dynamic_cast<const Enum*>(decl)))
-            continue;
+    Q_FOREACH (const Enum* e, klass->enums()) {
         if (e->access() == Access_private)
             continue;
         
-        foreach (const EnumMember& member, e->members()) {
+        Q_FOREACH (const EnumMember& member, e->members()) {
             switchOut << "        case " << xcall_index << ": " << smokeClassName <<  "::x_" << xcall_index << "(args);\tbreak;\n";
             if (e->parent())
                 generateEnumMemberCall(out, className, member, xcall_index++);
@@ -448,9 +495,21 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
         
         enumFound = true;
         
-        // xenum_operation method code
         QString enumString = e->toString();
-        enumOut << "        case " << m_smokeData->typeIndex[&types[enumString]] << ": //" << enumString << '\n';
+        if(!m_smokeData->typeIndex.contains(types[enumString])) {
+            qFatal("Missing enum type: %s in %s", qPrintable(types[enumString]->toString()), qPrintable(klass->toString()));
+        }
+        if(m_smokeData->typeIndex[types[enumString]] == 0) {
+            qFatal("Missing enum index: %s in %s", qPrintable(types[enumString]->toString()), qPrintable(klass->toString()));
+        }
+        Q_FOREACH (const Enum *e2, klass->enums()) {
+            if(e2->toString() == enumString && e2 != e) {
+                qFatal("Duplicate enum named %s", qPrintable(enumString));
+            }
+        }
+
+        // xenum_operation method code
+        enumOut << "        case " << m_smokeData->typeIndex[types[enumString]] << ": //" << enumString << '\n';
         enumOut << "            switch(xop) {\n";
         enumOut << "                case Smoke::EnumNew:\n";
         enumOut << "                    xdata = (void*)new " << enumString << ";\n";
@@ -468,7 +527,7 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
         enumOut << "            break;\n";
     }
     
-    foreach (const Method* meth, Util::virtualMethodsForClass(klass)) {
+    Q_FOREACH (const Method* meth, Util::virtualMethodsForClass(klass)) {
         generateVirtualMethod(out, *meth, includes);
     }
     
@@ -489,7 +548,7 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
             out << "throw(";
             for (int i = 0; i < destructor->exceptionTypes().count(); i++) {
                 if (i > 0) out << ", ";
-                out << destructor->exceptionTypes()[i].toString(QString(), true);
+                out << destructor->exceptionTypes()[i]->toString(QString(), true);
             }
             out << ") ";
         }
@@ -502,12 +561,12 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
     }
     out << "};\n";
     
+    out << "void xenum_" << underscoreName << "(Smoke::EnumOperation xop, Smoke::Index xtype, void *&xdata, long &xvalue) {\n";
     if (enumFound) {
-        out << "void xenum_" << underscoreName << "(Smoke::EnumOperation xop, Smoke::Index xtype, void *&xdata, long &xvalue) {\n";
         out << "    " << smokeClassName << "::xenum_operation(xop, xtype, xdata, xvalue);\n";
-        out << "}\n";
     }
-    
+    out << "}\n";
+
     // xcall_class function
     out << "void xcall_" << underscoreName << "(Smoke::Index xi, void *obj, Smoke::Stack args) {\n";
     out << "    " << smokeClassName << " *xself = (" << smokeClassName << "*)obj;\n";

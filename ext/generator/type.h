@@ -33,12 +33,11 @@ class GlobalVar;
 class Function;
 class Type;
 
-extern GENERATOR_EXPORT QHash<QString, Class> classes;
-extern GENERATOR_EXPORT QHash<QString, Typedef> typedefs;
-extern GENERATOR_EXPORT QHash<QString, Enum> enums;
+extern GENERATOR_EXPORT QHash<QString, Class*> classes;
+extern GENERATOR_EXPORT QHash<QString, Typedef*> typedefs;
+extern GENERATOR_EXPORT QHash<QString, Enum*> enums;
 extern GENERATOR_EXPORT QHash<QString, Function> functions;
-extern GENERATOR_EXPORT QHash<QString, GlobalVar> globals;
-extern GENERATOR_EXPORT QHash<QString, Type> types;
+extern GENERATOR_EXPORT QHash<QString, Type const *> types;
 
 class Method;
 class Field;
@@ -117,7 +116,7 @@ public:
     const QList<Method>& methods() const { return m_methods; }
     QList<Method>& methodsRef() { return m_methods; }
     void appendMethod(const Method& method) { m_methods.append(method); }
-    
+
     const QList<Field>& fields() const { return m_fields; }
     QList<Field>& fieldsRef() { return m_fields; }
     void appendField(const Field& field) {  m_fields.append(field); }
@@ -125,9 +124,11 @@ public:
     const QList<BaseClassSpecifier>& baseClasses() const { return m_bases; }
     void appendBaseClass(const BaseClassSpecifier& baseClass) { m_bases.append(baseClass); }
     
-    const QList<BasicTypeDeclaration*>& children() const { return m_children; }
-    void appendChild(BasicTypeDeclaration* child) { m_children.append(child); }
-    
+    void appendChild(BasicTypeDeclaration* child) { }
+
+    const QList<Enum*>& enums() const { return m_enums; }
+    void appendEnum(Enum* enum_) { m_enums.append(enum_); }
+
     bool isTemplate() const { return m_isTemplate; }
     void setIsTemplate(bool isTemplate) { m_isTemplate = isTemplate; }
     
@@ -139,25 +140,25 @@ private:
     QList<Method> m_methods;
     QList<Field> m_fields;
     QList<BaseClassSpecifier> m_bases;
-    QList<BasicTypeDeclaration*> m_children;
+    QList<Enum*> m_enums;
 };
 
 class GENERATOR_EXPORT Typedef : public BasicTypeDeclaration
 {
 public:
-    Typedef(Type* type = 0, const QString& name = QString(), const QString nspace = QString(), Class* parent = 0)
+    Typedef(Type const* type = 0, const QString& name = QString(), const QString nspace = QString(), Class* parent = 0)
             : BasicTypeDeclaration(name, nspace, parent), m_type(type) {}
     virtual ~Typedef() {}
 
     virtual bool isValid() const { return (!m_name.isEmpty() && m_type); }
 
-    void setType(Type* type) { m_type = type; }
-    Type* type() const { return m_type; }
+    void setType(Type const* type) { m_type = type; }
+    Type const* type() const { return m_type; }
 
-    Type resolve() const;
+    Type const *resolve() const;
 
 private:
-    Type* m_type;
+    Type const* m_type;
 };
 
 class EnumMember;
@@ -173,6 +174,7 @@ public:
     QList<EnumMember>& membersRef() { return m_members; }
     void appendMember(const EnumMember& member) { m_members.append(member); }
     bool isClass() const { return m_isClass; }
+    void setIsClass(bool isClass) { m_isClass = isClass; }
 
 private:
     QList<EnumMember> m_members;
@@ -191,7 +193,7 @@ public:
     };
     Q_DECLARE_FLAGS(Flags, Flag)
 
-    Member(BasicTypeDeclaration* typeDecl = 0, const QString& name = QString(), Type* type = 0, Access access = Access_public)
+    Member(BasicTypeDeclaration* typeDecl = 0, const QString& name = QString(), Type const* type = 0, Access access = Access_public)
         : m_typeDecl(typeDecl), m_name(name), m_type(type), m_access(access) {}
     virtual ~Member() {}
 
@@ -203,8 +205,8 @@ public:
     void setName(const QString& name) { m_name = name; }
     QString name() const { return m_name; }
 
-    void setType(Type* type) { m_type = type; }
-    Type* type() const { return m_type; }
+    void setType(Type const* type) { m_type = type; }
+    Type const* type() const { return m_type; }
 
     void setAccess(Access access) { m_access = access; }
     Access access() const { return m_access; }
@@ -218,7 +220,7 @@ public:
 protected:
     BasicTypeDeclaration* m_typeDecl;
     QString m_name;
-    Type* m_type;
+    Type const* m_type;
     Access m_access;
     Flags m_flags;
 };
@@ -245,7 +247,7 @@ protected:
 class GENERATOR_EXPORT Parameter
 {
 public:
-    Parameter(const QString& name = QString(), Type* type = 0, const QString& defaultValue = QString())
+    Parameter(const QString& name = QString(), Type const* type = 0, const QString& defaultValue = QString())
         : m_name(name), m_type(type), m_defaultValue(defaultValue) {}
     virtual ~Parameter() {}
 
@@ -254,8 +256,8 @@ public:
     void setName(const QString& name) { m_name = name; }
     QString name() const { return m_name; }
 
-    void setType(Type* type) { m_type = type; }
-    Type* type() const { return m_type; }
+    void setType(Type const* type) { m_type = type; }
+    Type const* type() const { return m_type; }
 
     bool isDefault() const { return !m_defaultValue.isEmpty(); }
 
@@ -266,7 +268,7 @@ public:
 
 protected:
     QString m_name;
-    Type* m_type;
+    Type const* m_type;
     QString m_defaultValue;
 };
 
@@ -275,9 +277,9 @@ typedef QList<Parameter> ParameterList;
 class GENERATOR_EXPORT Method : public Member
 {
 public:
-    Method(Class* klass = 0, const QString& name = QString(), Type* type = 0, Access access = Access_public, ParameterList params = ParameterList())
+    Method(Class* klass = 0, const QString& name = QString(), Type const* type = 0, Access access = Access_public, ParameterList params = ParameterList())
         : Member(klass, name, type, access), m_params(params), m_isConstructor(false), m_isDestructor(false), m_isConst(false), m_is_accessor(false),
-          m_hasExceptionSpec(false), m_isSignal(false), m_isSlot(false) {}
+          m_hasExceptionSpec(false), m_isSignal(false), m_isSlot(false), m_isDeleted(false) {}
     virtual ~Method() {}
 
     Class* getClass() const { return static_cast<Class*>(m_typeDecl); }
@@ -304,6 +306,9 @@ public:
     void setIsSlot(bool isSlot) { m_isSlot = isSlot; }
     bool isSlot() const { return m_isSlot; }
 
+    void setIsDeleted(bool isDeleted) { m_isDeleted = isDeleted; }
+    bool isDeleted() const { return m_isDeleted; }
+
     // TODO: This actually doesn't belong here. Better add a dynamic property system to Member subclasses.
     //       Then we can also get rid of the various method => foo maps in the 'Util' struct.
     const QStringList& remainingDefaultValues() const { return m_remainingValues; }
@@ -312,8 +317,8 @@ public:
     void setHasExceptionSpec(bool hasSpec) { m_hasExceptionSpec = hasSpec; }
     bool hasExceptionSpec() const { return m_hasExceptionSpec; }
 
-    void appendExceptionType(const Type& type) { m_exceptionTypes.append(type); }
-    const QList<Type>& exceptionTypes() const { return m_exceptionTypes; }
+    void appendExceptionType(Type const* type) { m_exceptionTypes.append(type); }
+    const QList<Type const*>& exceptionTypes() const { return m_exceptionTypes; }
 
     virtual QString toString(bool withAccess = false, bool withClass = false, bool withInitializer = true) const;
 
@@ -326,14 +331,15 @@ protected:
     bool m_hasExceptionSpec;
     bool m_isSignal;
     bool m_isSlot;
-    QList<Type> m_exceptionTypes;
+    bool m_isDeleted;
+    QList<Type const*> m_exceptionTypes;
     QStringList m_remainingValues;
 };
 
 class GENERATOR_EXPORT Field : public Member
 {
 public:
-    Field(Class* klass = 0, const QString& name = QString(), Type* type = 0, Access access = Access_public)
+    Field(Class* klass = 0, const QString& name = QString(), Type const* type = 0, Access access = Access_public)
         : Member(klass, name, type, access) {}
     virtual ~Field() {}
 
@@ -343,7 +349,7 @@ public:
 class GENERATOR_EXPORT GlobalVar
 {
 public:
-    GlobalVar(const QString& name = QString(), const QString nspace = QString(), Type* type = 0) : m_name(name), m_nspace(nspace), m_type(type) {}
+    GlobalVar(const QString& name = QString(), const QString nspace = QString(), Type const* type = 0) : m_name(name), m_nspace(nspace), m_type(type) {}
     virtual ~GlobalVar() {}
 
     bool isValid() const { return (!m_name.isEmpty() && m_type); }
@@ -361,8 +367,8 @@ public:
     void setNameSpace(const QString& nspace) { m_nspace = nspace; }
     QString nameSpace() const { return m_nspace; }
 
-    void setType(Type* type) { m_type = type; }
-    Type* type() const { return m_type; }
+    void setType(Type const* type) { m_type = type; }
+    Type const* type() const { return m_type; }
 
     void setFileName(const QString& fileName) { m_file = fileName; }
     QString fileName() const { return m_file; }
@@ -372,14 +378,14 @@ public:
 protected:
     QString m_name;
     QString m_nspace;
-    Type* m_type;
+    Type const* m_type;
     QString m_file;
 };
 
 class GENERATOR_EXPORT Function : public GlobalVar
 {
 public:
-    Function(const QString& name = QString(), const QString nspace = QString(), Type* type = 0, ParameterList params = ParameterList())
+    Function(const QString& name = QString(), const QString nspace = QString(), Type const* type = 0, ParameterList params = ParameterList())
         : GlobalVar(name, nspace, type), m_params(params) {}
 
     const ParameterList& parameters() const { return m_params; }
@@ -391,6 +397,17 @@ protected:
     ParameterList m_params;
 };
 
+/**
+ *
+ * This appears to be:
+ * classname 'volatile'? 'const'? ('*' 'const'?)* '&'? typename ('['num']')*
+ * othertype 'volatile'? 'const'? ('*' 'const'?)* '&'? typedefname ('['num']')*
+ * enumname 'volatile'? 'const'? ('*' 'const'?)* '&'? typename ('['num']')*
+ * othertype 'volatile'? 'const'? '(' ('*' 'const'?)* '&'? functypename')' '(' parameterdecl* ')'
+ *
+ * the first (inner) const(and volatile) is represented by the isConst(isVolatile) function.
+ * the next outer const belonging to the first pointer is represented by the isCOnstPointer(0) function etc.
+ */
 class GENERATOR_EXPORT Type
 {
 public:
@@ -442,6 +459,9 @@ public:
     void setIsConstPointer(int depth, bool isConst) { m_constPointer[depth] = isConst; }
     bool isConstPointer(int depth) const { return m_constPointer.value(depth, false); }
     
+    void setMemberPointerOf(int depth, Class *memberPointerOf) { m_memberPointerOf[depth] = memberPointerOf; }
+    Class *memberPointerOf(int depth) const { return m_memberPointerOf.value(depth, nullptr); }
+
     void setIsRef(bool isRef) { m_isRef = isRef; }
     bool isRef() const { return m_isRef; }
 
@@ -455,9 +475,9 @@ public:
     void setArrayLength(int dim, int length) { m_arrayLengths[dim] = length; }
     int arrayLength(int dim) const { return m_arrayLengths[dim]; }
 
-    const QList<Type>& templateArguments() const { return m_templateArgs; }
-    void appendTemplateArgument(const Type& type) { m_templateArgs.append(type); }
-    void setTemplateArguments(const QList<Type>& types) { m_templateArgs = types; }
+    const QList<Type const *>& templateArguments() const { return m_templateArgs; }
+    void appendTemplateArgument(const Type *type) { m_templateArgs.append(type); }
+    void setTemplateArguments(const QList<Type const *>& types) { m_templateArgs = types; }
 
     void setIsFunctionPointer(bool isPtr) { m_isFunctionPointer = isPtr; }
     bool isFunctionPointer() const { return m_isFunctionPointer; }
@@ -467,16 +487,40 @@ public:
     QString toString(const QString& fnPtrName = QString(), bool fqn = false) const;
 
     // on windows, we can't reference 'types' here, because it's marked __declspec(dllexport) above.
-    static Type* registerType(const Type& type)
+    static Type const * registerType(const Type& type)
 #ifndef Q_OS_WIN
     {
         QString typeString = type.toString();
-        QHash<QString, Type>::iterator iter = types.insert(typeString, type);
-        return &iter.value();
+    if(types.contains("size_type")) {
+        if(types["size_type"]->toString() != "size_type") {
+            qDebug() << "Before registering" << typeString << Qt::endl;
+            qFatal("Bad size_type from registry, maps to %s", qPrintable(types["size_type"]->toString()));
+        }
+    }
+        auto iter = types.find(typeString);
+        if(iter == types.end()) {
+            iter = types.insert(typeString, new Type(type));
+        }
+        Type const *ptr = iter.value();
+    if(ptr->toString() != type.toString()) {
+        qFatal("Type %s maps to type %s from registry", qPrintable(type.toString()), qPrintable(ptr->toString()));
+    }
+    if(ptr->toString() != types[ptr->toString()]->toString()) {
+        qFatal("Type %s maps to type %s from registry", qPrintable(ptr->toString()), qPrintable(types[ptr->toString()]->toString()));
+    }
+    if(types.contains("size_type")) {
+        if(types["size_type"]->toString() != "size_type") {
+            qDebug() << "When registering" << typeString << Qt::endl;
+            qFatal("Bad size_type from registry, maps to %s", qPrintable(types["size_type"]->toString()));
+        }
+    }
+        return iter.value();
     }
 #else
     ;
 #endif
+
+    Type const *resolveTypedefs() const;
 
     static const Type* Void;
 
@@ -488,9 +532,10 @@ protected:
     bool m_isConst, m_isVolatile;
     int m_pointerDepth;
     QHash<int, bool> m_constPointer;
+    QHash<int, Class*> m_memberPointerOf;
     bool m_isRef;
     bool m_isIntegral;
-    QList<Type> m_templateArgs;
+    QList<Type const *> m_templateArgs;
     bool m_isFunctionPointer;
     ParameterList m_params;
     QVector<int> m_arrayLengths;

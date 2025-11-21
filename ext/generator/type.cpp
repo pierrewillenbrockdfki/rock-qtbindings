@@ -19,17 +19,16 @@
 #include "type.h"
 #include "options.h"
 
-QHash<QString, Class> classes;
-QHash<QString, Typedef> typedefs;
-QHash<QString, Enum> enums;
+QHash<QString, Class *> classes;
+QHash<QString, Typedef *> typedefs;
+QHash<QString, Enum *> enums;
 QHash<QString, Function> functions;
-QHash<QString, GlobalVar> globals;
-QHash<QString, Type> types;
+QHash<QString, Type const *> types;
 
 QString BasicTypeDeclaration::toString() const
 {
     QString ret;
-    Class* parent = m_parent;
+    Class const* parent = m_parent;
     while (parent) {
         ret.prepend(parent->name() + "::");
         parent = parent->parent();
@@ -55,7 +54,9 @@ QString Member::toString(bool withAccess, bool withClass) const
         ret += "static ";
     if (m_flags & Virtual)
         ret += "virtual ";
-    ret += m_type->toString() + " ";
+    if(m_type) {
+        ret += m_type->toString() + " ";
+    }
     if (withClass)
         ret += m_typeDecl->toString() + "::";
     ret += m_name;
@@ -94,38 +95,50 @@ QString Method::toString(bool withAccess, bool withClass, bool withInitializer) 
 const Type* Type::Void = Type::registerType(Type("void"));
 
 #ifdef Q_OS_WIN
-Type* Type::registerType(const Type& type)
+Type const* Type::registerType(const Type& type)
 {
     QString typeString = type.toString();
-    QHash<QString, Type>::iterator iter = types.insert(typeString, type);
-    return &iter.value();
+    auto iter = types.find(typeString);
+    if(iter == types.end()) {
+        iter = types.insert(typeString, new Type(type));
+    }
+    return iter.value();
 }
 #endif
 
-Type Typedef::resolve() const {
+Type const *Typedef::resolve() const {
+    // not pretty, but safe. 'this' (without const) will never be returned or modified from here on.
+    const Type tmp(const_cast<Typedef*>(this));
+
+    return tmp.resolveTypedefs();
+}
+
+Type const *Type::resolveTypedefs() const {
     bool isRef = false, isConst = false, isVolatile = false;
     QList<bool> pointerDepth;
 
-    // not pretty, but safe. 'this' (without const) will never be returned or modified from here on.
-    const Type tmp(const_cast<Typedef*>(this));
-    const Type* t = &tmp;
+    const Type* t = this;
 
-    while (t->getTypedef() && !ParserOptions::notToBeResolved.contains(t->getTypedef()->name())) {
+    for (int i = t->pointerDepth() - 1; i >= 0; i--) {
+        pointerDepth.prepend(t->isConstPointer(i));
+    }
+    while (t->getTypedef() &&
+            !t->isFunctionPointer() &&
+            !t->isArray() &&
+            !ParserOptions::notToBeResolved.contains(t->getTypedef()->name())) {
         if (!isRef) isRef = t->isRef();
         if (!isConst) isConst = t->isConst();
         if (!isVolatile) isVolatile = t->isVolatile();
-        t = t->getTypedef()->type();
+        auto tdt = t->getTypedef()->type();
+        if(!tdt) {
+            qDebug() << "There is no type associated with typedef" << t->toString() << Qt::endl;
+        }
+        t = tdt;
         for (int i = t->pointerDepth() - 1; i >= 0; i--) {
             pointerDepth.prepend(t->isConstPointer(i));
         }
     }
     Type ret = *t;
-
-    // not fully resolved -> erase the typedef pointer and only set a name
-    if (ret.getTypedef()) {
-        ret.setName(ret.getTypedef()->name());
-        ret.setTypedef(0);
-    }
 
     if (isRef) ret.setIsRef(true);
     if (isConst) ret.setIsConst(true);
@@ -135,7 +148,9 @@ Type Typedef::resolve() const {
     for (int i = 0; i < pointerDepth.count(); i++) {
         ret.setIsConstPointer(i, pointerDepth[i]);
     }
-    return ret;
+
+    Type const *retref = registerType(ret);
+    return retref;
 }
 
 QString GlobalVar::toString() const
@@ -170,7 +185,7 @@ QString Type::toString(const QString& fnPtrName, bool fqn) const
         ret += "<";
         for (int i = 0; i < m_templateArgs.count(); i++) {
             if (i > 0) ret += ',';
-            ret += m_templateArgs[i].toString();
+            ret += m_templateArgs[i]->toString();
         }
         ret += ">";
     }
@@ -179,6 +194,9 @@ QString Type::toString(const QString& fnPtrName, bool fqn) const
     if (isArray() && (m_pointerDepth > 0 || m_isRef)) ret += '(';
     
     for (int i = 0; i < m_pointerDepth; i++) {
+        if (memberPointerOf(i)) {
+            ret += memberPointerOf(i)->toString() + "::";
+        }
         ret += "*";
         if (isConstPointer(i)) ret += " const ";
     }
@@ -188,7 +206,7 @@ QString Type::toString(const QString& fnPtrName, bool fqn) const
     if (isArray()) ret += fnPtrName;
     if (isArray() && (m_pointerDepth > 0 || m_isRef)) ret += ')';
     
-    foreach(int size, m_arrayLengths) {
+    Q_FOREACH(int size, m_arrayLengths) {
         ret += '[' + QString::number(size) + ']';
     }
     
