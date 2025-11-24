@@ -595,7 +595,11 @@ findMethod(VALUE /*self*/, VALUE c_value, VALUE name_value)
 #ifdef DEBUG
     if (do_debug & qtdb_calls) qWarning("Found method %s::%s => %d", c, name, meth.index);
 #endif
-    if(!meth.index) {
+    /* find unary alternatives in global scopes.
+     * Normal functions are always unary, operators only if invoked on a namespace/global scope
+     * (otherwise the class object becomes a parameter for the then unary method)
+     */
+    if(!meth.index && (strcmp(c,"") == 0 || strcmp(c,"Qt") == 0 || strncmp(name, "operator", 8) != 0)) {
         // since every smoke module defines a class 'QGlobalSpace' we can't rely on the classMap,
         // so we search for methods by hand
         Q_FOREACH (Smoke* s, smokeList) {
@@ -618,7 +622,7 @@ findMethod(VALUE /*self*/, VALUE c_value, VALUE name_value)
         return result;
     // empty list
     } else {
-        foreach (Smoke::ModuleIndex meth, milist) {
+        Q_FOREACH (Smoke::ModuleIndex meth, milist) {
             if (meth.index > 0) {
                 Smoke::Index i = meth.smoke->methodMaps[meth.index].method;
                 if (i == 0) {		// shouldn't happen
