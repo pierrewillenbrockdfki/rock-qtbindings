@@ -1391,7 +1391,7 @@ value_to_type_flag(VALUE ruby_value)
 	} else {
 		r = "U";
 	}
-	qDebug("type flag of ruby classname %s is %s", classname, r);
+	//qDebug("type flag of ruby classname %s is %s", classname, r);
 
     return r;
 }

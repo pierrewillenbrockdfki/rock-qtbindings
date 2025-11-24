@@ -405,7 +405,7 @@ VirtualMethodReturnValue::VirtualMethodReturnValue(Smoke::ModuleIndex mi, Smoke:
             target_type.resize(target_type.size()-1);
         }
         if(target_type != actual_type_flag) {
-            qDebug() << "Trying to marshall return value from type" << actual_type_flag << "to type" << target_type << Qt::endl;
+            //qDebug() << "Trying to marshall return value from type" << actual_type_flag << "to type" << target_type << Qt::endl;
             // so, now we need to look for a constructor of target_type that takes actual_type_flag, potentially with const or * and setup the construction of that.
 
             VALUE *temp_stack = ALLOCA_N(VALUE, 4);

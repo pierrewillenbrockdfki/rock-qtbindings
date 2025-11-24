@@ -97,25 +97,25 @@ QString ClangGeneratorVisitor::getClassName(clang::NamedDecl const *nd) const {
 }
 
 Class *ClangGeneratorVisitor::findOrCreateClass(clang::NamedDecl const *nd) const {
-    qDebug() << "begin findOrCreateClass" << Qt::endl;
+    //qDebug() << "begin findOrCreateClass" << Qt::endl;
     auto fqn = getFullyQualifiedName(nd);
     if(nd->getName() == "") {
         //we don't want these is classes[].
-        qDebug() << "end findOrCreateClass" << Qt::endl;
+        //qDebug() << "end findOrCreateClass" << Qt::endl;
         return nullptr;
     }
     if (!classes.contains(fqn)) {
         QString nspace = getNestedNameSpecifier(nd);
         QString name = getClassName(nd);
-        qDebug() << "Creating class" << fqn << ":" << name << "in" << nspace << Qt::endl;
+        //qDebug() << "Creating class" << fqn << ":" << name << "in" << nspace << Qt::endl;
 
         Class *parent = nullptr;
         auto Ctx = nd->getDeclContext();
         if (Ctx && clang::isa<clang::NamedDecl>(Ctx)) {
             parent = findOrCreateClass(clang::cast<clang::NamedDecl>(Ctx));
-            qDebug() << " parent of class " << fqn << " is " << parent->toString() << Qt::endl;
+            //qDebug() << " parent of class " << fqn << " is " << parent->toString() << Qt::endl;
         } else {
-            qDebug() << " no parent of class " << fqn << Qt::endl;
+            //qDebug() << " no parent of class " << fqn << Qt::endl;
         }
         if (!classes.contains(fqn)) {
             Class *c = new Class(name, QString(), parent);
@@ -133,7 +133,7 @@ Class *ClangGeneratorVisitor::findOrCreateClass(clang::NamedDecl const *nd) cons
                     std::string dumped;
                     llvm::raw_string_ostream dumpStream(dumped);
                     nd->dump(dumpStream);
-                    qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
+                    //qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
                 }
                 qFatal("This is not a class");
             }
@@ -146,7 +146,7 @@ Class *ClangGeneratorVisitor::findOrCreateClass(clang::NamedDecl const *nd) cons
             }
         }
     }
-    qDebug() << "end findOrCreateClass" << Qt::endl;
+    //qDebug() << "end findOrCreateClass" << Qt::endl;
     return classes[fqn];
 }
 
@@ -155,18 +155,18 @@ Typedef *ClangGeneratorVisitor::findOrCreateTypedef(clang::NamedDecl const *nd, 
     if (!typedefs.contains(fqn)) {
         QString nspace = getNestedNameSpecifier(nd);
         QString name = QString::fromStdString(nd->getNameAsString());
-        qDebug() << "Creating typedef" << fqn << ":" << name << " in" << nspace << Qt::endl;
+        //qDebug() << "Creating typedef" << fqn << ":" << name << " in" << nspace << Qt::endl;
         Class *parent = nullptr;
         auto Ctx = nd->getDeclContext();
         if (Ctx && clang::isa<clang::ClassTemplateSpecializationDecl>(Ctx)) {
-            qDebug() << " parent is template specialization, fqn: " << getFullyQualifiedName(clang::cast<clang::NamedDecl>(Ctx)) << Qt::endl;
+            //qDebug() << " parent is template specialization, fqn: " << getFullyQualifiedName(clang::cast<clang::NamedDecl>(Ctx)) << Qt::endl;
             parent = findOrCreateClass(clang::cast<clang::NamedDecl>(Ctx));
-            qDebug() << " parent of typedef " << fqn << " is " << parent->toString() << Qt::endl;
+            //qDebug() << " parent of typedef " << fqn << " is " << parent->toString() << Qt::endl;
         } else if (Ctx && clang::isa<clang::NamedDecl>(Ctx)) {
             parent = findOrCreateClass(clang::cast<clang::NamedDecl>(Ctx));
-            qDebug() << " parent of typedef " << fqn << " is " << parent->toString() << Qt::endl;
+            //qDebug() << " parent of typedef " << fqn << " is " << parent->toString() << Qt::endl;
         } else {
-            qDebug() << " no parent of typedef " << fqn << Qt::endl;
+            //qDebug() << " no parent of typedef " << fqn << Qt::endl;
         }
         if (!typedefs.contains(fqn)) {
             Typedef *td = new Typedef(type, name, QString(), parent);
@@ -174,13 +174,13 @@ Typedef *ClangGeneratorVisitor::findOrCreateTypedef(clang::NamedDecl const *nd, 
             td->setFileName(m_header);
             if (nd->getAccess() == clang::AccessSpecifier::AS_private) {
                 td->setAccess(Access_private);
-                qDebug() << "is private typedef:" << fqn;
+                //qDebug() << "is private typedef:" << fqn;
             } else if (nd->getAccess() == clang::AccessSpecifier::AS_protected) {
                 td->setAccess(Access_protected);
-                qDebug() << "is protected typedef:" << fqn;
+                //qDebug() << "is protected typedef:" << fqn;
             } else  {
                 td->setAccess(Access_public);
-                qDebug() << "is public typedef:" << fqn;
+                //qDebug() << "is public typedef:" << fqn;
             }
         }
     }
@@ -192,7 +192,7 @@ Enum *ClangGeneratorVisitor::findOrCreateEnum(clang::NamedDecl const *nd) const 
     if (!enums.contains(fqn)) {
         QString nspace = getNestedNameSpecifier(nd);
         QString name = QString::fromStdString(nd->getNameAsString());
-        qDebug() << "Creating enum" << fqn << ":" << name << "in" << nspace << Qt::endl;
+        //qDebug() << "Creating enum" << fqn << ":" << name << "in" << nspace << Qt::endl;
         Class *parent = nullptr;
         auto Ctx = nd->getDeclContext();
         if (Ctx && clang::isa<clang::NamedDecl>(Ctx)) {
@@ -229,7 +229,7 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
         std::string dumped;
         llvm::raw_string_ostream dumpStream(dumped);
         t->dump(dumpStream, *context);
-        qDebug().noquote() << "Converting type" << (isVolatile ? "volatile" : "") << (isConst ? "const" : "") <<  Qt::endl << QString::fromStdString(dumped) << Qt::endl;
+        //qDebug().noquote() << "Converting type" << (isVolatile ? "volatile" : "") << (isConst ? "const" : "") <<  Qt::endl << QString::fromStdString(dumped) << Qt::endl;
     }
 
     if(clang::isa<clang::DecltypeType>(t)) {
@@ -371,7 +371,7 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
         auto decl = t->getAs<clang::RecordType>()->getDecl();
         if(clang::isa<clang::CXXRecordDecl>(decl)) {
             auto fqn = getFullyQualifiedName(decl);
-            qDebug() << "RecordType with CXXRecordDecl asString: " << fqn;
+            //qDebug() << "RecordType with CXXRecordDecl asString: " << fqn;
             //and here we can create the class.
             Class *c = findOrCreateClass(decl);
             if(c) {
@@ -382,7 +382,7 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
                 result.setName("");
             }
         } else {
-            qDebug() << "RecordType asString: " << QString::fromStdString(decl->getQualifiedNameAsString());
+            //qDebug() << "RecordType asString: " << QString::fromStdString(decl->getQualifiedNameAsString());
         }
     } else if(clang::isa<clang::TypedefType>(t)) {
         auto decl = t->getAs<clang::TypedefType>()->getDecl();
@@ -394,7 +394,7 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
         result.setIsConst(isConst);
         result.setIsVolatile(isVolatile);
         if (types.contains(result.toString())) {
-            qDebug() << "Type" << result.toString() << "maps to" << types[result.toString()] << types[result.toString()]->toString() << Qt::endl;
+            //qDebug() << "Type" << result.toString() << "maps to" << types[result.toString()] << types[result.toString()]->toString() << Qt::endl;
             if(result.toString() != types[result.toString()]->toString()) {
                 qFatal("Type retrieved from registry show incorrect toString");
             }
@@ -406,7 +406,7 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
         Type const *type = nullptr;
         QString actual_type_name = QString::fromStdString(decl->getTargetDecl()->getQualifiedNameAsString());
         if (!types.contains(actual_type_name)) {
-            qDebug() << "Cannot find type for " << actual_type_name << Qt::endl;
+            //qDebug() << "Cannot find type for " << actual_type_name << Qt::endl;
         } else {
             type = types[actual_type_name];
         }
@@ -415,7 +415,7 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
         result.setIsConst(isConst);
         result.setIsVolatile(isVolatile);
         if (types.contains(result.toString())) {
-            qDebug() << "Type" << result.toString() << "maps to" << types[result.toString()] << types[result.toString()]->toString() << Qt::endl;
+            //qDebug() << "Type" << result.toString() << "maps to" << types[result.toString()] << types[result.toString()]->toString() << Qt::endl;
         }
     } else if(clang::isa<clang::ElaboratedType>(t)) {
         result = makeTypeFromQualType(t->getAs<clang::ElaboratedType>()->getNamedType());
@@ -431,14 +431,14 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
         result.setIsConst(isConst);
         result.setIsVolatile(isVolatile);
 
-        qDebug() << "enums toString says:" << e->toString() << Qt::endl << "results toString says:" << result.toString() << Qt::endl;
+        //qDebug() << "enums toString says:" << e->toString() << Qt::endl << "results toString says:" << result.toString() << Qt::endl;
 
     } else if(clang::isa<clang::TemplateSpecializationType>(t)) {
         auto tst = t->getAs<clang::TemplateSpecializationType>();
         auto nosugar = tst->desugar();
         clang::Type const *nosugart = nosugar.getTypePtr();
         if(t == nosugart) {
-            qDebug() << "Don't know what to do with TemplateSpecializationType desugaring to itself";
+            //qDebug() << "Don't know what to do with TemplateSpecializationType desugaring to itself";
         } else {
             result = makeTypeFromQualType(nosugar);
         }
@@ -462,7 +462,7 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
     } else if(clang::isa<clang::BlockPointerType>(t)) {//function pointers
         */
     } else {
-        qDebug() << "Don't know what to do with type";
+        //qDebug() << "Don't know what to do with type";
     }
     //Type result(name, isConst, isVolatile, pointerDepth, isRef);
     //Type result(e, isConst, isVolatile, pointerDepth, isRef);
@@ -472,8 +472,8 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
     std::string dumped;
     llvm::raw_string_ostream dumpStream(dumped);
     t->dump(dumpStream, *context);
-    qDebug().noquote() << "Converted type" << (isVolatile?"volatile":"") << (isConst?"const":"") <<  Qt::endl << QString::fromStdString(dumped)
-    << "to" << Qt::endl << result.toString() << Qt::endl;
+    //qDebug().noquote() << "Converted type" << (isVolatile?"volatile":"") << (isConst?"const":"") <<  Qt::endl << QString::fromStdString(dumped)
+    //<< "to" << Qt::endl << result.toString() << Qt::endl;
 
     return result;
 }
@@ -548,7 +548,7 @@ bool ClangGeneratorVisitor::VisitEnumDecl(clang::EnumDecl *Declaration)
         std::string dumped;
         llvm::raw_string_ostream dumpStream(dumped);
         Declaration->dump(dumpStream);
-        qDebug().noquote() << "enum:\n" << QString::fromStdString(dumped) << Qt::endl;
+        //qDebug().noquote() << "enum:\n" << QString::fromStdString(dumped) << Qt::endl;
     }
     Enum *e;
     if(Declaration->getIdentifier()) {
@@ -556,16 +556,16 @@ bool ClangGeneratorVisitor::VisitEnumDecl(clang::EnumDecl *Declaration)
         Type const *t = makeTypePtrFromQualType(context->getEnumType(Declaration));
         e = t->getEnum();
         if (e->parent()) {
-            qDebug("parsing enum type: %s in %s", qPrintable(t->toString()), qPrintable(e->parent()->toString()));
+            //qDebug("parsing enum type: %s in %s", qPrintable(t->toString()), qPrintable(e->parent()->toString()));
         } else {
-            qDebug("parsing enum type: %s in global scope", qPrintable(t->toString()));
+            //qDebug("parsing enum type: %s in global scope", qPrintable(t->toString()));
         }
     } else {
         e = findOrCreateEnum(Declaration);
         if (e->parent()) {
-            qDebug("parsing enum type: anonymous in %s", qPrintable(e->parent()->toString()));
+            //qDebug("parsing enum type: anonymous in %s", qPrintable(e->parent()->toString()));
         } else {
-            qDebug("parsing enum type: anonymous in global scope");
+            //qDebug("parsing enum type: anonymous in global scope");
         }
     }
     e->setIsClass(Declaration->isScoped());
@@ -607,11 +607,11 @@ void ClangGeneratorVisitor::setupCXXMethod(Class *c, clang::CXXMethodDecl const 
     if (Declaration->getRefQualifier() != clang::RQ_None)
         return;
 
-    qDebug() << "Method" << declName << Qt::endl;
-    qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
+    //qDebug() << "Method" << declName << Qt::endl;
+    //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
 
-    qDebug() << "Template Kind is " << (int)Declaration->getTemplatedKind() << Qt::endl;
-    qDebug() << "in class" << c->name() << Qt::endl;
+    //qDebug() << "Template Kind is " << (int)Declaration->getTemplatedKind() << Qt::endl;
+    //qDebug() << "in class" << c->name() << Qt::endl;
 
     Type const* returnType = makeTypePtrFromQualType(Declaration->getReturnType()->getCanonicalTypeUnqualified());
     if(!returnType) {
@@ -624,11 +624,11 @@ void ClangGeneratorVisitor::setupCXXMethod(Class *c, clang::CXXMethodDecl const 
         }
     }
 
-    qDebug() << "method " << declName << returnType->toString() << Qt::endl;
+    //qDebug() << "method " << declName << returnType->toString() << Qt::endl;
     std::string dumped;
     llvm::raw_string_ostream dumpStream(dumped);
     Declaration->dump(dumpStream);
-    qDebug().noquote() << QString::fromStdString(dumped);
+    //qDebug().noquote() << QString::fromStdString(dumped);
 
     //we cannot get back to the AccessSpecDecl from the CXXMethodDecl alone to check if the specifier is a qt signal or slot.
     //so, for the time being, we will need to traverse the CXXRecordDecl and track the access state, and finally modify
@@ -661,13 +661,13 @@ void ClangGeneratorVisitor::setupCXXMethod(Class *c, clang::CXXMethodDecl const 
                 std::string dumped;
                 llvm::raw_string_ostream dumpStream(dumped);
                 defaultarg->dump(dumpStream, *context);
-                qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
+                //qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
             }
 
             ClangDefaultExpressionVisitor ev(clang::PrintingPolicy(context->getLangOpts()), context);
             ev.Visit(defaultarg);
             defaultValue = ev.str();
-            qDebug() << "converts to: " << defaultValue << Qt::endl;
+            //qDebug() << "converts to: " << defaultValue << Qt::endl;
             if(defaultValue.isEmpty()) {
                 qWarning("Default value resolved to empty string");
             }
@@ -679,7 +679,7 @@ void ClangGeneratorVisitor::setupCXXMethod(Class *c, clang::CXXMethodDecl const 
         }
         currentMethod.appendParameter(Parameter(name, t, defaultValue));
 
-        qDebug() << "parameter " << name << t->toString() << Qt::endl;
+        //qDebug() << "parameter " << name << t->toString() << Qt::endl;
     }
 
     // const & volatile modifiers
@@ -730,8 +730,8 @@ void ClangGeneratorVisitor::setupCXXCtor(Class *c, clang::CXXConstructorDecl con
     if (Declaration->getEllipsisLoc().isValid())
         return;
 
-    qDebug() << "Constructor" << declName << Qt::endl;
-    qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
+    //qDebug() << "Constructor" << declName << Qt::endl;
+    //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
 
     // constructors return a pointer to the class they create
     Type t(c);
@@ -761,7 +761,7 @@ void ClangGeneratorVisitor::setupCXXCtor(Class *c, clang::CXXConstructorDecl con
     currentMethod.setIsSlot(false);
     currentMethod.setIsDeleted(Declaration->isDeleted());
     if (currentMethod.isDeleted()) {
-        qDebug() << "is deleted" << Qt::endl;
+        //qDebug() << "is deleted" << Qt::endl;
     }
 
     // build parameter list
@@ -778,13 +778,13 @@ void ClangGeneratorVisitor::setupCXXCtor(Class *c, clang::CXXConstructorDecl con
                 std::string dumped;
                 llvm::raw_string_ostream dumpStream(dumped);
                 defaultarg->dump(dumpStream, *context);
-                qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
+                //qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
             }
 
             ClangDefaultExpressionVisitor ev(clang::PrintingPolicy(context->getLangOpts()), context);
             ev.Visit(defaultarg);
             defaultValue = ev.str();
-            qDebug() << "converts to: " << defaultValue << Qt::endl;
+            //qDebug() << "converts to: " << defaultValue << Qt::endl;
             if (defaultValue.isEmpty()) {
                 qWarning("Default value resolved to empty string");
             }
@@ -796,7 +796,7 @@ void ClangGeneratorVisitor::setupCXXCtor(Class *c, clang::CXXConstructorDecl con
         }
         currentMethod.appendParameter(Parameter(name, t, defaultValue));
 
-        qDebug() << "parameter " << name << t->toString() << Qt::endl;
+        //qDebug() << "parameter " << name << t->toString() << Qt::endl;
     }
 
     // const & volatile modifiers
@@ -829,8 +829,8 @@ void ClangGeneratorVisitor::setupCXXDtor(Class *c, clang::CXXDestructorDecl cons
 
     // we don't care about methods with ellipsis paramaters (i.e. 'foo(const char*, ...)') for now..
 
-    qDebug() << "Destructor" << declName << Qt::endl;
-    qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
+    //qDebug() << "Destructor" << declName << Qt::endl;
+    //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
 
     // destructors don't have a return type.. so return void
     Type *returnType = const_cast<Type *>(Type::Void);
@@ -864,13 +864,13 @@ void ClangGeneratorVisitor::setupCXXDtor(Class *c, clang::CXXDestructorDecl cons
                 std::string dumped;
                 llvm::raw_string_ostream dumpStream(dumped);
                 defaultarg->dump(dumpStream, *context);
-                qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
+                //qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
             }
 
             ClangDefaultExpressionVisitor ev(clang::PrintingPolicy(context->getLangOpts()), context);
             ev.Visit(defaultarg);
             defaultValue = ev.str();
-            qDebug() << "converts to: " << defaultValue << Qt::endl;
+            //qDebug() << "converts to: " << defaultValue << Qt::endl;
             if (defaultValue.isEmpty()) {
                 qWarning("Default value resolved to empty string");
             }
@@ -920,10 +920,10 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
     if (Declaration->getRefQualifier() != clang::RQ_None)
         return;
 
-    qDebug() << "Conversion operator" << declName << Qt::endl;
-    qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
+    //qDebug() << "Conversion operator" << declName << Qt::endl;
+    //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
 
-    qDebug() << "in class" << c->name() << Qt::endl;
+    //qDebug() << "in class" << c->name() << Qt::endl;
 
     Type const *returnType = makeTypePtrFromQualType(Declaration->getReturnType()->getCanonicalTypeUnqualified());
     if(!returnType) {
@@ -936,11 +936,11 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
         }
     }
 
-    qDebug() << "method " << declName << returnType->toString() << Qt::endl;
+    //qDebug() << "method " << declName << returnType->toString() << Qt::endl;
     std::string dumped;
     llvm::raw_string_ostream dumpStream(dumped);
     Declaration->dump(dumpStream);
-    qDebug().noquote() << QString::fromStdString(dumped);
+    //qDebug().noquote() << QString::fromStdString(dumped);
 
     Access clangaccess = Access_public;
     if (Declaration->getAccess() == clang::AccessSpecifier::AS_private) {
@@ -969,13 +969,13 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
                 std::string dumped;
                 llvm::raw_string_ostream dumpStream(dumped);
                 defaultarg->dump(dumpStream, *context);
-                qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
+                //qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
             }
 
             ClangDefaultExpressionVisitor ev(clang::PrintingPolicy(context->getLangOpts()), context);
             ev.Visit(defaultarg);
             defaultValue = ev.str();
-            qDebug() << "converts to: " << defaultValue << Qt::endl;
+            //qDebug() << "converts to: " << defaultValue << Qt::endl;
             if (defaultValue.isEmpty()) {
                 qWarning("Default value resolved to empty string");
             }
@@ -987,7 +987,7 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
         }
         currentMethod.appendParameter(Parameter(name, t, defaultValue));
 
-        qDebug() << "parameter " << name << t->toString() << Qt::endl;
+        //qDebug() << "parameter " << name << t->toString() << Qt::endl;
     }
 
     // const & volatile modifiers
@@ -1152,7 +1152,7 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl const *
             std::string dumped;
             llvm::raw_string_ostream dumpStream(dumped);
             m->dump(dumpStream);
-            qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
+            //qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
             qFatal("Conversion func is not a CXXConversionDecl");
         }
     }
@@ -1166,7 +1166,7 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl const *
         } else  {
             clangaccess = Access_public;
         }
-        qDebug() << "Field" << c->name() << "::" << QString::fromStdString(f->getNameAsString()) << Qt::endl;
+        //qDebug() << "Field" << c->name() << "::" << QString::fromStdString(f->getNameAsString()) << Qt::endl;
         Type const *t = makeTypePtrFromQualType(f->getType());
         if(t) {
             c->appendField(Field(c, QString::fromStdString(f->getName().str()), t, clangaccess));
@@ -1187,7 +1187,7 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl const *
                 } else  {
                     clangaccess = Access_public;
                 }
-                qDebug() << "Static Field" << c->name() << "::" << QString::fromStdString(vd->getNameAsString()) << Qt::endl;
+                //qDebug() << "Static Field" << c->name() << "::" << QString::fromStdString(vd->getNameAsString()) << Qt::endl;
                 Type const *t = makeTypePtrFromQualType(vd->getType());
                 if (t) {
                     Field nf(c, QString::fromStdString(vd->getName().str()), t, clangaccess);
@@ -1202,7 +1202,7 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl const *
 bool ClangGeneratorVisitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *Declaration)
 {
     if(Declaration->getName() == "") {
-        qDebug() << "Skipping anonymous class" << QString::fromStdString(Declaration->getQualifiedNameAsString()) << Qt::endl;
+        //qDebug() << "Skipping anonymous class" << QString::fromStdString(Declaration->getQualifiedNameAsString()) << Qt::endl;
         return true;
     }
     Class *_class = findOrCreateClass(Declaration);
@@ -1210,15 +1210,15 @@ bool ClangGeneratorVisitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *Declarat
     //setupCXXClass(_class, Declaration);
 
     if(!Declaration->isCompleteDefinition()) {
-        qDebug() << "Skipping class without definition" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
+        //qDebug() << "Skipping class without definition" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
         std::string dumped;
         llvm::raw_string_ostream dumpStream(dumped);
         Declaration->dump(dumpStream);
-        qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
+        //qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
         return true;
     }
     if(Declaration->isTemplateDecl()) {
-        qDebug() << "Skipping class that is template" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
+        //qDebug() << "Skipping class that is template" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
         return true;
     }
 
@@ -1231,18 +1231,18 @@ bool ClangGeneratorVisitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *Declarat
     if (classes.contains(name) && !classes[name]->isForwardDecl()) {
         scopes.push_back(ClassScope(_class, false, false, QList<ClangQProperty>()));
         inClass++;
-        qDebug() << "Skipping class with definition but already parsed begin" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
+        //qDebug() << "Skipping class with definition but already parsed begin" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
         bool res = SuperClass::TraverseCXXRecordDecl(Declaration);
-        qDebug() << "Skipping class with definition but already parsed end" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
+        //qDebug() << "Skipping class with definition but already parsed end" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
         scopes.pop();
         inClass--;
         return res;
     }
     if (inTemplate) {
         _class->setIsTemplate(true);
-        qDebug() << "Skipping template class begin" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
+        //qDebug() << "Skipping template class begin" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
         bool res = SuperClass::TraverseCXXRecordDecl(Declaration);
-        qDebug() << "Skipping template class end" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
+        //qDebug() << "Skipping template class end" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
         return res;
     }
 
@@ -1267,12 +1267,12 @@ bool ClangGeneratorVisitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *Declarat
         }
     }
 
-    qDebug() << "Parsing class begin" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
+    //qDebug() << "Parsing class begin" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
 
     // This will visit the members before visiting the CXXRecordDecl
     bool res = SuperClass::TraverseCXXRecordDecl(Declaration);
 
-    qDebug() << "Parsing class end" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
+    //qDebug() << "Parsing class end" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
 
     scopes.pop();
     inClass--;
@@ -1327,8 +1327,8 @@ bool ClangGeneratorVisitor::VisitCXXConstructorDecl(clang::CXXConstructorDecl *D
     if(inTemplate)
         return true;
 
-    qDebug() << "Constructor" << declName << Qt::endl;
-    qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
+    //qDebug() << "Constructor" << declName << Qt::endl;
+    //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
 
     if (!inMethod && inClass) {
 
@@ -1360,7 +1360,7 @@ bool ClangGeneratorVisitor::VisitCXXConstructorDecl(clang::CXXConstructorDecl *D
         currentMethod.setIsSlot(false);
         currentMethod.setIsDeleted(Declaration->isDeleted());
         if(currentMethod.isDeleted()) {
-            qDebug() << "is deleted" << Qt::endl;
+            //qDebug() << "is deleted" << Qt::endl;
         }
 
         // build parameter list
@@ -1378,13 +1378,13 @@ bool ClangGeneratorVisitor::VisitCXXConstructorDecl(clang::CXXConstructorDecl *D
                     std::string dumped;
                     llvm::raw_string_ostream dumpStream(dumped);
                     defaultarg->dump(dumpStream, *context);
-                    qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
+                    //qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
                 }
 
                 ClangDefaultExpressionVisitor ev(clang::PrintingPolicy(context->getLangOpts()), context);
                 ev.Visit(defaultarg);
                 defaultValue = ev.str();
-                qDebug() << "converts to: " << defaultValue << Qt::endl;
+                //qDebug() << "converts to: " << defaultValue << Qt::endl;
                 if(defaultValue.isEmpty()) {
                     qWarning("Default value resolved to empty string");
                 }
@@ -1396,7 +1396,7 @@ bool ClangGeneratorVisitor::VisitCXXConstructorDecl(clang::CXXConstructorDecl *D
             }
             currentMethod.appendParameter(Parameter(name, t, defaultValue));
 
-            qDebug() << "parameter " << name << t->toString() << Qt::endl;
+            //qDebug() << "parameter " << name << t->toString() << Qt::endl;
         }
 
         inMethod = false;
@@ -1433,8 +1433,8 @@ bool ClangGeneratorVisitor::VisitCXXDestructorDecl(clang::CXXDestructorDecl *Dec
     if(inTemplate)
         return true;
 
-    qDebug() << "Destructor" << declName << Qt::endl;
-    qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
+    //qDebug() << "Destructor" << declName << Qt::endl;
+    //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
 
     if (!inMethod && inClass) {
         // detect Q_PROPERTIES
@@ -1472,13 +1472,13 @@ bool ClangGeneratorVisitor::VisitCXXDestructorDecl(clang::CXXDestructorDecl *Dec
                     std::string dumped;
                     llvm::raw_string_ostream dumpStream(dumped);
                     defaultarg->dump(dumpStream, *context);
-                    qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
+                    //qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
                 }
 
                 ClangDefaultExpressionVisitor ev(clang::PrintingPolicy(context->getLangOpts()), context);
                 ev.Visit(defaultarg);
                 defaultValue = ev.str();
-                qDebug() << "converts to: " << defaultValue << Qt::endl;
+                //qDebug() << "converts to: " << defaultValue << Qt::endl;
                 if(defaultValue.isEmpty()) {
                     qWarning("Default value resolved to empty string");
                 }
@@ -1538,11 +1538,11 @@ bool ClangGeneratorVisitor::VisitCXXConversionDecl(clang::CXXConversionDecl *Dec
     if(inTemplate)
         return true;
 
-    qDebug() << "Conversion operator" << declName << Qt::endl;
-    qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
+    //qDebug() << "Conversion operator" << declName << Qt::endl;
+    //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
 
     if (!inMethod && inClass) {
-        qDebug() << "in class" << scopes.top().klass->name() << Qt::endl;
+        //qDebug() << "in class" << scopes.top().klass->name() << Qt::endl;
 
         Type const* returnType = makeTypePtrFromQualType(Declaration->getReturnType()->getCanonicalTypeUnqualified());
         if (!returnType) {
@@ -1555,11 +1555,11 @@ bool ClangGeneratorVisitor::VisitCXXConversionDecl(clang::CXXConversionDecl *Dec
             }
         }
 
-        qDebug() << "method " << declName << returnType->toString() << Qt::endl;
+        //qDebug() << "method " << declName << returnType->toString() << Qt::endl;
         std::string dumped;
         llvm::raw_string_ostream dumpStream(dumped);
         Declaration->dump(dumpStream);
-        qDebug().noquote() << QString::fromStdString(dumped);
+        //qDebug().noquote() << QString::fromStdString(dumped);
 
         Access clangaccess = Access_public;
         if (Declaration->getAccess() == clang::AccessSpecifier::AS_private) {
@@ -1591,13 +1591,13 @@ bool ClangGeneratorVisitor::VisitCXXConversionDecl(clang::CXXConversionDecl *Dec
                     std::string dumped;
                     llvm::raw_string_ostream dumpStream(dumped);
                     defaultarg->dump(dumpStream, *context);
-                    qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
+                    //qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
                 }
 
                 ClangDefaultExpressionVisitor ev(clang::PrintingPolicy(context->getLangOpts()), context);
                 ev.Visit(defaultarg);
                 defaultValue = ev.str();
-                qDebug() << "converts to: " << defaultValue << Qt::endl;
+                //qDebug() << "converts to: " << defaultValue << Qt::endl;
                 if(defaultValue.isEmpty()) {
                     qWarning("Default value resolved to empty string");
                 }
@@ -1609,7 +1609,7 @@ bool ClangGeneratorVisitor::VisitCXXConversionDecl(clang::CXXConversionDecl *Dec
             }
             currentMethod.appendParameter(Parameter(name, t, defaultValue));
 
-            qDebug() << "parameter " << name << t->toString() << Qt::endl;
+            //qDebug() << "parameter " << name << t->toString() << Qt::endl;
         }
 
         inMethod = false;
@@ -1672,11 +1672,11 @@ bool ClangGeneratorVisitor::VisitCXXMethodDecl(clang::CXXMethodDecl *Declaration
     if(inTemplate)
         return true;
 
-    qDebug() << "Method" << declName << Qt::endl;
-    qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
+    //qDebug() << "Method" << declName << Qt::endl;
+    //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
 
     if (!inMethod && inClass) {
-        qDebug() << "in class" << scopes.top().klass->name() << Qt::endl;
+        //qDebug() << "in class" << scopes.top().klass->name() << Qt::endl;
 
         Type const* returnType = makeTypePtrFromQualType(Declaration->getReturnType()->getCanonicalTypeUnqualified());
         if (!returnType) {
@@ -1689,11 +1689,11 @@ bool ClangGeneratorVisitor::VisitCXXMethodDecl(clang::CXXMethodDecl *Declaration
             }
         }
 
-        qDebug() << "method " << declName << returnType->toString() << Qt::endl;
+        //qDebug() << "method " << declName << returnType->toString() << Qt::endl;
         std::string dumped;
         llvm::raw_string_ostream dumpStream(dumped);
         Declaration->dump(dumpStream);
-        qDebug().noquote() << QString::fromStdString(dumped);
+        //qDebug().noquote() << QString::fromStdString(dumped);
 
         //we cannot get back to the AccessSpecDecl from the CXXMethodDecl alone to check if the specifier is a qt signal or slot.
         //so, for the time being, we will need to traverse the CXXRecordDecl and track the access state, and finally modify
@@ -1729,13 +1729,13 @@ bool ClangGeneratorVisitor::VisitCXXMethodDecl(clang::CXXMethodDecl *Declaration
                     std::string dumped;
                     llvm::raw_string_ostream dumpStream(dumped);
                     defaultarg->dump(dumpStream, *context);
-                    qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
+                    //qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
                 }
 
                 ClangDefaultExpressionVisitor ev(clang::PrintingPolicy(context->getLangOpts()), context);
                 ev.Visit(defaultarg);
                 defaultValue = ev.str();
-                qDebug() << "converts to: " << defaultValue << Qt::endl;
+                //qDebug() << "converts to: " << defaultValue << Qt::endl;
                 if(defaultValue.isEmpty()) {
                     qWarning("Default value resolved to empty string");
                 }
@@ -1747,7 +1747,7 @@ bool ClangGeneratorVisitor::VisitCXXMethodDecl(clang::CXXMethodDecl *Declaration
             }
             currentMethod.appendParameter(Parameter(name, t, defaultValue));
 
-            qDebug() << "parameter " << name << t->toString() << Qt::endl;
+            //qDebug() << "parameter " << name << t->toString() << Qt::endl;
         }
 
         inMethod = false;
@@ -1815,13 +1815,13 @@ bool ClangGeneratorVisitor::VisitFunctionDecl(clang::FunctionDecl *Declaration) 
     if (inTemplate)
         return true;
 
-    qDebug() << "Function" << declName << Qt::endl;
+    //qDebug() << "Function" << declName << Qt::endl;
     std::string dumped;
     llvm::raw_string_ostream dumpStream(dumped);
     Declaration->dump(dumpStream);
-    qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
+    //qDebug().noquote() << QString::fromStdString(dumped) << Qt::endl;
 
-    qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
+    //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
 
     if (!inMethod && !inClass) {
         if (!declName.contains("::")) {
@@ -1853,13 +1853,13 @@ bool ClangGeneratorVisitor::VisitFunctionDecl(clang::FunctionDecl *Declaration) 
                         std::string dumped;
                         llvm::raw_string_ostream dumpStream(dumped);
                         defaultarg->dump(dumpStream, *context);
-                        qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
+                        //qDebug().noquote() << "default:\n" << QString::fromStdString(dumped) << Qt::endl;
                     }
 
                     ClangDefaultExpressionVisitor ev(clang::PrintingPolicy(context->getLangOpts()), context);
                     ev.Visit(defaultarg);
                     defaultValue = ev.str();
-                    qDebug() << "converts to: " << defaultValue << Qt::endl;
+                    //qDebug() << "converts to: " << defaultValue << Qt::endl;
                     if (defaultValue.isEmpty()) {
                         qWarning("Default value resolved to empty string");
                     }

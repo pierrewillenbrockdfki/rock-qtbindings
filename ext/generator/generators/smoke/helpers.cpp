@@ -198,9 +198,9 @@ void Util::preparse(QSet<Type const*> *usedTypes, QSet<const Class*> *superClass
             addCopyConstructor(klass);
             addDestructor(klass);
             checkForAbstractClass(klass);
-            qDebug() << "Collecting types in class" << klass->toString() << Qt::endl;
+            //qDebug() << "Collecting types in class" << klass->toString() << Qt::endl;
             Q_FOREACH (const Method& m, klass->methods()) {
-                qDebug() << "Collecting types in method(checking)" << m.toString() << Qt::endl;
+                //qDebug() << "Collecting types in method(checking)" << m.toString() << Qt::endl;
                 if (m.access() == Access_private)
                     continue;
                 if (m.isDeleted())
@@ -219,12 +219,12 @@ void Util::preparse(QSet<Type const*> *usedTypes, QSet<const Class*> *superClass
                     klass->methodsRef().removeOne(m);
                     continue;
                 }
-                qDebug() << "Collecting types in method" << m.toString() << Qt::endl;
+                //qDebug() << "Collecting types in method" << m.toString() << Qt::endl;
                 addOverloads(m);
                 (*usedTypes) << m.type();
                 (*usedTypes) << m.type()->resolveTypedefs();
                 Q_FOREACH (const Parameter& param, m.parameters()) {
-                    qDebug() << "Collecting type in parameter" << param.type()->toString() << param.type() << types[param.type()->toString()] << Qt::endl;
+                    //qDebug() << "Collecting type in parameter" << param.type()->toString() << param.type() << types[param.type()->toString()] << Qt::endl;
                     if(param.type() != types[param.type()->toString()]) {
                         qFatal("parameter has type that does not match type registry");
                     }
@@ -339,7 +339,7 @@ bool Util::canClassBeCopied(const Class* klass)
         }
     }
 
-    qDebug() << "class" << klass->toString() << "can be copied?" << parentCanBeCopied << privateCopyCtorFound << Qt::endl;
+    //qDebug() << "class" << klass->toString() << "can be copied?" << parentCanBeCopied << privateCopyCtorFound << Qt::endl;
     
     // if the parent can be copied and we didn't find a private copy c'tor, the class is copiable
     bool ret = (parentCanBeCopied && !privateCopyCtorFound);
@@ -534,13 +534,13 @@ QChar Util::munge(const Type *type) {
         // TODO: fix this - neither QStringList nor QString should be mapped to Smoke::t_voidp or munged as ? or $
 
         if (type->pointerDepth() > 1) {
-            qDebug() << "type is multi pointer(munged to \"?\"):" << type->toString() << Qt::endl;
+            //qDebug() << "type is multi pointer(munged to \"?\"):" << type->toString() << Qt::endl;
         }
         if (type->getClass() && type->getClass()->isTemplate()) {
-            qDebug() << "type is class and template(munged to \"?\"):" << type->toString() << Qt::endl;
+            //qDebug() << "type is class and template(munged to \"?\"):" << type->toString() << Qt::endl;
         }
         if (Options::voidpTypes.contains(type->name()) && !Options::scalarTypes.contains(type->name())) {
-            qDebug() << "type is forced to voidp(munged to \"?\"):" << type->toString() << Qt::endl;
+            //qDebug() << "type is forced to voidp(munged to \"?\"):" << type->toString() << Qt::endl;
         }
 
         // reference to array or hash or unknown
@@ -551,29 +551,29 @@ QChar Util::munge(const Type *type) {
                (!type->getClass() && !type->getEnum() && type->name() == "QIntegerForSizeof< void* >::Unsigned"))
     {
         if (type->isIntegral()) {
-            qDebug() << "type is integral(munged to \"$\"):" << type->toString() << Qt::endl;
+            //qDebug() << "type is integral(munged to \"$\"):" << type->toString() << Qt::endl;
         }
         if (type->getEnum()) {
-            qDebug() << "type is enum(munged to \"$\"):" << type->toString() << Qt::endl;
+            //qDebug() << "type is enum(munged to \"$\"):" << type->toString() << Qt::endl;
         }
         if(Options::scalarTypes.contains(type->name())) {
-            qDebug() << "type is forced to scalar(munged to \"$\"):" << type->toString() << Qt::endl;
+            //qDebug() << "type is forced to scalar(munged to \"$\"):" << type->toString() << Qt::endl;
         }
         if (Options::qtMode && !type->isRef() && type->pointerDepth() == 0 &&
                 (type->getClass() && type->getClass()->isTemplate())) {
-            qDebug() << "type is class and template in qtmode(munged to \"$\"):" << type->toString() << Qt::endl;
+            //qDebug() << "type is class and template in qtmode(munged to \"$\"):" << type->toString() << Qt::endl;
         }
         if (!type->getClass() && !type->getEnum() && type->name() == "QIntegerForSizeof< void* >::Unsigned") {
-            qDebug() << "type is QIntegerForSizeof< void* >::Unsigned(munged to \"$\"):" << type->toString() << Qt::endl;
+            //qDebug() << "type is QIntegerForSizeof< void* >::Unsigned(munged to \"$\"):" << type->toString() << Qt::endl;
         }
         // plain scalar
         return '$';
     } else if (type->getClass()) {
-        qDebug() << "type is class(munged to \"#\"):" << type->toString() << Qt::endl;
+        //qDebug() << "type is class(munged to \"#\"):" << type->toString() << Qt::endl;
         // object
         return '#';
     } else {
-        qDebug() << "type is unknown(munged to \"?\"):" << type->toString() << Qt::endl;
+        //qDebug() << "type is unknown(munged to \"?\"):" << type->toString() << Qt::endl;
         // unknown
         return '?';
     }

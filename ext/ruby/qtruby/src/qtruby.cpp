@@ -1694,10 +1694,10 @@ qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
 
 		if(helper_result == Qnil) {
-			qDebug("Property reader is nil");
+			//qDebug("Property reader is nil");
 			return argv[1];
 		}
-		qDebug("Property reader is \"%s\"", rb_id2name(SYM2ID(helper_result)));
+		//qDebug("Property reader is \"%s\"", rb_id2name(SYM2ID(helper_result)));
 
 		ID ruby_method_id = SYM2ID(helper_result);
 
@@ -1726,10 +1726,10 @@ qt_metacall(int /*argc*/, VALUE * argv, VALUE self)
 		VALUE helper_result = rb_funcall2(qt_internal_module, rb_intern("do_property_metacall"), 3, temp_stack);
 
 		if(helper_result == Qnil) {
-			qDebug("Property writer is nil");
+			//qDebug("Property writer is nil");
 			return argv[1];
 		}
-		qDebug("Property writer is \"%s\"", rb_id2name(SYM2ID(helper_result)));
+		//qDebug("Property writer is \"%s\"", rb_id2name(SYM2ID(helper_result)));
 
 		ID ruby_method_id = SYM2ID(helper_result);
 
@@ -2420,8 +2420,7 @@ keyData: int number into QMetaObject::d.data; points to pairs of
 	QMetaObject * meta = new QMetaObject;
 	*meta = ob;
 
-//#ifdef DEBUG
-#if 1
+#ifdef DEBUG
 	printf("make_metaObject() superdata: %p %s\n", &meta->d.superdata, superdata->className());
 
 	printf(
@@ -2941,7 +2940,7 @@ create_qt_class(VALUE /*self*/, VALUE package_value, VALUE module_value)
 	rb_define_singleton_method(module_value, "const_missing", (VALUE (*) (...)) module_method_missing, -1);
 */
 	Q_FOREACH(QString s, packageName.mid(strlen(moduleName) + 2).split("::")) {
-		qDebug("Defining class named %s", qPrintable(s));
+		//qDebug("Defining class named %s", qPrintable(s));
 		klass = rb_define_class_under(klass, (const char*) s.toLocal8Bit(), qt_base_class);
 	}
 

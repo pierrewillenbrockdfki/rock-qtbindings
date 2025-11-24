@@ -2723,32 +2723,32 @@ void install_handlers(TypeHandler *h) {
 Marshall::HandlerFn getMarshallFn(const SmokeType &type) {
 
 	if (type.elem()) {
-		qDebug() << "Marshalling type" << type.name() << "as basetype" << Qt::endl;
+		//qDebug() << "Marshalling type" << type.name() << "as basetype" << Qt::endl;
 		return marshall_basetype;
 	}
 	if (!type.name()) {
-		qDebug() << "Marshalling type" << type.name() << "as void" << Qt::endl;
+		//qDebug() << "Marshalling type" << type.name() << "as void" << Qt::endl;
 		return marshall_void;
 	}
 
 	TypeHandler *h = type_handlers[type.name()];
 	if(h) {
-		qDebug() << "Marshalling type" << type.name() << "using type_handlers" << Qt::endl;
+		//qDebug() << "Marshalling type" << type.name() << "using type_handlers" << Qt::endl;
 	}
 
 	if (h == 0 && type.isConst() && strlen(type.name()) > strlen("const ")) {
 		h = type_handlers[type.name() + strlen("const ")];
-		if(h) {
+		/*if(h) {
 			qDebug() << "Marshalling type" << type.name() << "without const using type_handlers" << Qt::endl;
-		}
+		}*/
 	}
 
     char last_char = type.name()[strlen(type.name()) - 1];
     if (h == 0 && strncmp(type.name(), "QFlags", 6) == 0 && last_char == '&') {
         h = type_handlers["QFlags&"];
-        if (h) {
+        /*if (h) {
             qDebug() << "Marshalling type" << type.name() << "using type_handlers[\"QFlags&\"]" << Qt::endl;
-        }
+        }*/
     }
 
 	if (h != 0) {
