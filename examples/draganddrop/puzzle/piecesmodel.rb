@@ -89,8 +89,8 @@ class PiecesModel < Qt5::AbstractListModel
 	    beginRemoveRows(parent, beginRow, endRow)
 	
 	    while beginRow <= endRow
-	        @pixmaps.delete(beginRow)
-	        @locations.delete(beginRow)
+	        @pixmaps.delete_at(beginRow)
+	        @locations.delete_at(beginRow)
 	        beginRow += 1
 	    end
 	

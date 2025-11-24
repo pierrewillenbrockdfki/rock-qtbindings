@@ -70,7 +70,6 @@ class PuzzleWidget < Qt5::Widget
             findPiece(targetSquare(event.pos)) == -1
     
             @highlightedRect = targetSquare(event.pos())
-puts "dragMoveEvent event.dropAction = Qt5::MoveAction"
             event.dropAction = Qt5::MoveAction
             event.accept()
         else
@@ -99,7 +98,6 @@ puts "dragMoveEvent event.dropAction = Qt5::MoveAction"
             @highlightedRect = Qt5::Rect.new()
             update(square)
     
-puts "dropEvent event.dropAction = Qt5::MoveAction"
             event.dropAction = Qt5::MoveAction
             event.accept()
             if location == Qt5::Point.new(square.x()/80, square.y()/80)
