@@ -34,8 +34,8 @@ module Qt5
     QTDB_ALL = QTDB_VERBOSE | QTDB_VIRTUAL | QTDB_GC | QTDB_CALLS | QTDB_METHOD_MISSING | QTDB_AMBIGUOUS
   end
 
-  #@@debug_level = DebugLevel::Off
-  @@debug_level = DebugLevel::High
+  @@debug_level = DebugLevel::Off
+  #@@debug_level = DebugLevel::High
   def Qt5.debug_level=(level)
     @@debug_level = level
     Internal::setDebug Qt5::QtDebugChannel::QTDB_ALL if level >= DebugLevel::Extensive
@@ -2625,7 +2625,7 @@ module Qt5
       ruby_classname2.sub!(/>/,"")
       ruby_classname2.sub!(/,/,"And")
       ruby_classname2.sub!(/ \*/,"Ptr")
-      puts "Normalized #{classname} to #{ruby_classname} then #{ruby_classname2}"
+      puts "Normalized #{classname} to #{ruby_classname} then #{ruby_classname2}" if debug_level >= DebugLevel::High
       ruby_classname2
     end
 
@@ -2670,7 +2670,7 @@ module Qt5
         end
         classId = Qt5::Internal.findClass(typename)
         if classId.index != 0
-          puts "check if we can construct typename #{typename}(#{classId.index}) from argtype #{argtype}"
+          puts "check if we can construct typename #{typename}(#{classId.index}) from argtype #{argtype}" if debug_level >= DebugLevel::High
 
           method = find_implicit_constructor_method(typename, typename, argtype, arg)
           if method
@@ -2755,7 +2755,7 @@ module Qt5
         end
         classId = Qt5::Internal.findClass(typename)
         if classId.index != 0
-          puts "check if we can construct typename #{typename}(#{classId.index}) from argtype #{argtype}"
+          puts "check if we can construct typename #{typename}(#{classId.index}) from argtype #{argtype}" if debug_level >= DebugLevel::High
 
           method = find_implicit_constructor_method(typename, typename, argtype, arg)
           if method
@@ -2784,7 +2784,7 @@ module Qt5
         else
           t = typename.sub(/^const\s+/, '')
           t.sub!(/[&*]$/, '')
-          puts "checking if #{t} #{typename} is an enum and convertible from #{argtype}"
+          puts "checking if #{t} #{typename} is an enum and convertible from #{argtype}" if debug_level >= DebugLevel::High
           if isEnum(t)
             return 2, nil
           end
@@ -2802,7 +2802,7 @@ module Qt5
         else
           t = typename.sub(/^const\s+/, '')
           t.sub!(/[&*]$/, '')
-          puts "checking if #{t} #{typename} is an enum and convertible from #{argtype}"
+          puts "checking if #{t} #{typename} is an enum and convertible from #{argtype}" if debug_level >= DebugLevel::High
           if isEnum(t)
             return 2 + const_point, nil
           end
@@ -2909,7 +2909,7 @@ module Qt5
     # property - number of the property in this classes scope
     #
     def Internal.do_property_metacall(action, this, property)
-      puts "do_property_metacall #{action.to_s} for #{property} in #{this.class.name}"
+      puts "do_property_metacall #{action.to_s} for #{property} in #{this.class.name}" if debug_level >= DebugLevel::High
       meta = Qt5::Meta[this.class.name] || Qt5::MetaInfo.new(this.class)
       return nil if property >= meta.properties.length
       propobj = meta.properties[property]
@@ -2980,7 +2980,7 @@ module Qt5
     # arg            - argument to constructor
     #
     def Internal.find_implicit_constructor_method(classname, ruby_classname, argtype, arg)
-      puts "find_implicit_constructor_method for #{classname} #{ruby_classname} #{argtype} #{arg.class.to_s}"
+      puts "find_implicit_constructor_method for #{classname} #{ruby_classname} #{argtype} #{arg.class.to_s}" if debug_level >= DebugLevel::High
       lookup_str = "#{classname}::new::[\"#{arg.class.to_s}\"]"
       lookup, conversions = @@method_lookup_cache[lookup_str]
       # @@method_lookup_cache is initialized to return false values on a cache miss
@@ -3104,7 +3104,7 @@ module Qt5
     # args           - arguments to method call
     #
     def Internal.find_method_for_call(method, classname, ruby_classname, *args)
-      puts "find_method_for_call for #{method} #{classname} #{ruby_classname} #{args.collect {|arg| arg.class.to_s} }"
+      puts "find_method_for_call for #{method} #{classname} #{ruby_classname} #{args.collect {|arg| arg.class.to_s} }" if debug_level >= DebugLevel::High
       lookup_str = "#{classname}::#{method}::#{args.collect {|arg| arg.class.to_s} }"
       lookup, conversionConstructors = @@method_lookup_cache[lookup_str]
       # @@method_lookup_cache is initialized to return false values on a cache miss
@@ -3584,7 +3584,7 @@ module Qt5
       end
 
       if meta.metaobject.nil? or meta.changed
-        puts "creating metaobject for class #{klass.name}"
+        puts "creating metaobject for class #{klass.name}" if debug_level >= DebugLevel::High
         stringdata, data = makeMetaData( qobject.class.name,
                                          meta.classinfos,
                                          meta.dbus,
