@@ -75,6 +75,10 @@
         <!-- This seems to be forward declared but there is no implementation in the libraries -->
         <signature>.*operator&gt;&gt;\(QDataStream&amp;,\s*QCborSimpleType&amp;\)</signature>
         <signature>.*operator&lt;&lt;\(QDataStream&amp;,\s*QCborSimpleType\)</signature>
+        <!-- operator<<(const char*) is used instead of the QString one that is more suitable.
+             the opposite operator never matches. -->
+        <signature>QDataStream&amp; QDataStream::operator&lt;&lt;\(const char\*\)</signature>
+        <signature>QDataStream&amp; QDataStream::operator&gt;&gt;\(char\*&amp;\)</signature>
     </exclude>
     <functions>
         <!-- include functions starting with 'q' -->
