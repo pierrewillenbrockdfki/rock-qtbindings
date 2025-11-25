@@ -868,7 +868,9 @@ find_cached_selector(int argc, VALUE * argv, VALUE klass, const char * methodNam
 	return mcid;
 }
 
-void find_object_method(int argc, VALUE * argv, VALUE self) {
+void find_object_method(int argc, VALUE * argv, VALUE self,
+                        Smoke::ModuleIndex &current_method,
+                        QHash<unsigned int, Smoke::ModuleIndex> &current_method_conversion_constructors) {
     const char *methodName = rb_id2name(SYM2ID(argv[0]));
     VALUE klass = rb_funcall(self, rb_intern("class"), 0);
 
@@ -878,7 +880,7 @@ void find_object_method(int argc, VALUE * argv, VALUE self) {
     if (pred.endsWith("?")) {
         smokeruby_object *o = value_obj_info(self);
         if (!o || !o->ptr) {
-            _current_method.index = -1;
+            current_method.index = -1;
             return;
         }
 
@@ -910,10 +912,10 @@ void find_object_method(int argc, VALUE * argv, VALUE self) {
         }
 
         QByteArray mcid = find_cached_selector(argc + 3, temp_stack, klass, methodName,
-                                               _current_method,
-                                               _current_method_conversion_constructors);
+                                               current_method,
+                                               current_method_conversion_constructors);
 
-        if (_current_method.index == -1) {
+        if (current_method.index == -1) {
             // Find the C++ method to call. Do that from Ruby for now
 
             VALUE result = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
@@ -921,22 +923,22 @@ void find_object_method(int argc, VALUE * argv, VALUE self) {
                 VALUE method = rb_ary_entry(result, 0);
                 VALUE conversions = rb_ary_entry(result, 1);
                 // FIXME: damn, this is lame, and it doesn't handle ambiguous methods
-                _current_method = rubyValueToSmokeModuleIndex(method);
+                current_method = rubyValueToSmokeModuleIndex(method);
                 VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
                 for (long i = 0; i < RARRAY_LEN(keys); i++) {
                     VALUE key = rb_ary_entry(keys, i);
                     VALUE meth_value = rb_hash_aref(conversions, key);
                     int arg_num = NUM2INT(key);
-                    _current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
+                    current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
                 }
 
-                if (_current_method.index != -1) {
+                if (current_method.index != -1) {
                     // Success. Cache result.
-                    methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+                    methcache.insert(mcid, QtRuby::MethodCacheElement(current_method, current_method_conversion_constructors));
                 }
             }
         }
-        if (_current_method.index == -1) {
+        if (current_method.index == -1) {
             const char *op = rb_id2name(SYM2ID(argv[0]));
             if (qstrcmp(op, "-") == 0
                     || qstrcmp(op, "+") == 0
@@ -954,18 +956,18 @@ void find_object_method(int argc, VALUE * argv, VALUE self) {
                     VALUE method = rb_ary_entry(result, 0);
                     VALUE conversions = rb_ary_entry(result, 1);
                     // FIXME: damn, this is lame, and it doesn't handle ambiguous methods
-                    _current_method = rubyValueToSmokeModuleIndex(method);
+                    current_method = rubyValueToSmokeModuleIndex(method);
                     VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
                     for (long i = 0; i < RARRAY_LEN(keys); i++) {
                         VALUE key = rb_ary_entry(keys, i);
                         VALUE meth_value = rb_hash_aref(conversions, key);
                         int arg_num = NUM2INT(key);
-                        _current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
+                        current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
                     }
 
-                    if (_current_method.index != -1) {
+                    if (current_method.index != -1) {
                         // Success. Cache result.
-                        methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+                        methcache.insert(mcid, QtRuby::MethodCacheElement(current_method, current_method_conversion_constructors));
                     }
                 }
             }
@@ -1001,7 +1003,7 @@ method_missing(int argc, VALUE * argv, VALUE self)
 		}
 	}
 
-	find_object_method(argc, argv, self);
+    find_object_method(argc, argv, self, _current_method, _current_method_conversion_constructors);
 
     if (_current_method.index != -1) {
         QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv + 1, argc - 1);
@@ -1156,7 +1158,8 @@ class_method_missing(int argc, VALUE * argv, VALUE klass)
         for (int count = 2; count < argc; count++) {
             temp_stack[count - 1] = argv[count];
         }
-        find_object_method(argc - 1, temp_stack, argv[1]);
+        find_object_method(argc - 1, temp_stack, argv[1],
+                           _current_method, _current_method_conversion_constructors);
 
         if (_current_method.index != -1) {
             QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, argv[1], argv + 2, argc - 2);
