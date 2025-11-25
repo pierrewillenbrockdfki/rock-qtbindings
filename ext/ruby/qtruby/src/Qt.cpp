@@ -111,9 +111,6 @@ QHash<Smoke::ModuleIndex, QByteArray> IdToClassNameMap;
 
 #define logger logger_backend
 
-Smoke::ModuleIndex _current_method;
-QHash<unsigned int, Smoke::ModuleIndex> _current_method_conversion_constructors;
-
 
 smokeruby_object *
 alloc_smokeruby_object(bool allocated, Smoke * smoke, int classId, void * ptr)
@@ -1003,10 +1000,14 @@ method_missing(int argc, VALUE * argv, VALUE self)
 		}
 	}
 
-    find_object_method(argc, argv, self, _current_method, _current_method_conversion_constructors);
+    Smoke::ModuleIndex current_method;
+    current_method.index = -1;
+    QHash<unsigned int, Smoke::ModuleIndex> current_method_conversion_constructors;
 
-    if (_current_method.index != -1) {
-        QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv + 1, argc - 1);
+    find_object_method(argc, argv, self, current_method, current_method_conversion_constructors);
+
+    if (current_method.index != -1) {
+        QtRuby::MethodCall c(current_method, current_method_conversion_constructors, self, argv + 1, argc - 1);
         c.next();
         VALUE result = *(c.var());
         return result;
@@ -1160,20 +1161,27 @@ class_method_missing(int argc, VALUE * argv, VALUE klass)
         for (int count = 2; count < argc; count++) {
             temp_stack[count - 1] = argv[count];
         }
-        find_object_method(argc - 1, temp_stack, argv[1],
-                           _current_method, _current_method_conversion_constructors);
 
-        if (_current_method.index != -1) {
-            QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, argv[1], argv + 2, argc - 2);
+        Smoke::ModuleIndex current_method;
+        QHash<unsigned int, Smoke::ModuleIndex> current_method_conversion_constructors;
+
+        find_object_method(argc - 1, temp_stack, argv[1],
+                           current_method, current_method_conversion_constructors);
+
+        if (current_method.index != -1) {
+            QtRuby::MethodCall c(current_method, current_method_conversion_constructors, argv[1], argv + 2, argc - 2);
             c.next();
             VALUE result = *(c.var());
             return result;
         }
 	}
 
-    find_class_method(argc, argv, klass, _current_method, _current_method_conversion_constructors);
+    Smoke::ModuleIndex current_method;
+    QHash<unsigned int, Smoke::ModuleIndex> current_method_conversion_constructors;
 
-    if (_current_method.index == -1) {
+    find_class_method(argc, argv, klass, current_method, current_method_conversion_constructors);
+
+    if (current_method.index == -1) {
         if (rx->indexIn(methodName) == -1) {
             // operator has not been found in class/module, try on first argument object
 
@@ -1190,7 +1198,7 @@ class_method_missing(int argc, VALUE * argv, VALUE klass)
         }
     }
 
-    QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, Qnil, argv + 1, argc - 1);
+    QtRuby::MethodCall c(current_method, current_method_conversion_constructors, Qnil, argv + 1, argc - 1);
     c.next();
     result = *(c.var());
     return result;

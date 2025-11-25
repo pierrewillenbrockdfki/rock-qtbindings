@@ -156,9 +156,6 @@ extern Q_DECL_EXPORT void set_qtruby_embedded(bool yn);
 }
 
 
-extern Q_DECL_EXPORT Smoke::ModuleIndex _current_method;
-extern Q_DECL_EXPORT QHash<unsigned int, Smoke::ModuleIndex> _current_method_conversion_constructors;
-
 extern Q_DECL_EXPORT QHash<Smoke*, QtRubyModule> qtruby_modules;
 extern Q_DECL_EXPORT QList<Smoke*> smokeList;
 
