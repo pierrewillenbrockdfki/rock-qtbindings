@@ -3296,15 +3296,13 @@ module Qt5
       chosen, conversionConstructors = find_method_for_call(method, classname, klass.name, *args)
 
       if debug_level >= DebugLevel::High && chosen
-        puts "setCurrentMethod(smokeList index: #{chosen.smoke}, meth index: #{chosen.index})"
+        puts "chosen method: smokeList index: #{chosen.smoke}, meth index: #{chosen.index}"
         conversionConstructors.each do |arg_num, method|
-          puts "setCurrentMethodConversion(arg num: #{arg_num}, smokeList index: #{method.smoke}, meth index: #{method.index})"
+          puts "automatic conversion constructor for arg num: #{arg_num}: smokeList index: #{method.smoke}, meth index: #{method.index}"
         end
       end
 
       if chosen
-        setCurrentMethod(chosen)
-        conversionConstructors.each { |arg_num, method| setCurrentMethodConversion(arg_num, method) }
         return chosen, conversionConstructors
       end
 

@@ -916,6 +916,7 @@ void find_object_method(int argc, VALUE * argv, VALUE self) {
             if (result != Qnil) {
                 VALUE method = rb_ary_entry(result, 0);
                 VALUE conversions = rb_ary_entry(result, 1);
+                // FIXME: damn, this is lame, and it doesn't handle ambiguous methods
                 _current_method = rubyValueToSmokeModuleIndex(method);
                 VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
                 for (long i = 0; i < RARRAY_LEN(keys); i++) {
@@ -948,6 +949,7 @@ void find_object_method(int argc, VALUE * argv, VALUE self) {
                 if (result != Qnil) {
                     VALUE method = rb_ary_entry(result, 0);
                     VALUE conversions = rb_ary_entry(result, 1);
+                    // FIXME: damn, this is lame, and it doesn't handle ambiguous methods
                     _current_method = rubyValueToSmokeModuleIndex(method);
                     VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
                     for (long i = 0; i < RARRAY_LEN(keys); i++) {
@@ -1098,6 +1100,7 @@ void find_class_method(int argc, VALUE * argv, VALUE klass) {
             if (result != Qnil) {
                 VALUE method = rb_ary_entry(result, 0);
                 VALUE conversions = rb_ary_entry(result, 1);
+                // FIXME: damn, this is lame, and it doesn't handle ambiguous methods
                 _current_method = rubyValueToSmokeModuleIndex(method);
                 VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
                 for (long i = 0; i < RARRAY_LEN(keys); i++) {

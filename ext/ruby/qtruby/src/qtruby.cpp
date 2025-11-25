@@ -1457,6 +1457,7 @@ initialize_qt(int argc, VALUE * argv, VALUE self)
 			if(result != Qnil) {
 				VALUE method = rb_ary_entry(result, 0);
 				VALUE conversions = rb_ary_entry(result, 1);
+				// FIXME: damn, this is lame, and it doesn't handle ambiguous methods
 				_current_method = rubyValueToSmokeModuleIndex(method);
 				VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
 				for(long i = 0; i < RARRAY_LEN(keys); i++) {
@@ -2748,23 +2749,6 @@ isObject(VALUE /*self*/, VALUE obj)
 }
 
 static VALUE
-setCurrentMethod(VALUE self, VALUE meth_value)
-{
-	// FIXME: damn, this is lame, and it doesn't handle ambiguous methods
-	_current_method = rubyValueToSmokeModuleIndex(meth_value);
-	return self;
-}
-
-static VALUE
-setCurrentMethodConversion(VALUE self, VALUE arg_num_value, VALUE meth_value)
-{
-	int arg_num = NUM2INT(arg_num_value);
-
-	_current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
-	return self;
-}
-
-static VALUE
 getClassList(VALUE /*self*/)
 {
 	VALUE class_list = rb_ary_new();
@@ -3124,8 +3108,6 @@ Init_qtruby5()
 	rb_define_module_function(qt_internal_module, "isConstMethod", (VALUE (*) (...)) isConstMethod, 1);
 	rb_define_module_function(qt_internal_module, "isExplicitMethod", (VALUE (*) (...)) isExplicitMethod, 1);
 	rb_define_module_function(qt_internal_module, "isObject", (VALUE (*) (...)) isObject, 1);
-	rb_define_module_function(qt_internal_module, "setCurrentMethod", (VALUE (*) (...)) setCurrentMethod, 1);
-	rb_define_module_function(qt_internal_module, "setCurrentMethodConversion", (VALUE (*) (...)) setCurrentMethodConversion, 2);
 	rb_define_module_function(qt_internal_module, "getClassList", (VALUE (*) (...)) getClassList, 0);
 	rb_define_module_function(qt_internal_module, "create_qt_class", (VALUE (*) (...)) create_qt_class, 2);
 	rb_define_module_function(qt_internal_module, "create_qobject_class", (VALUE (*) (...)) create_qobject_class, 2);
