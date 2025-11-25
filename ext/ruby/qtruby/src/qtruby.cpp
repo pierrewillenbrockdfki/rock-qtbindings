@@ -721,27 +721,26 @@ static Smoke::Index drawlines_line_vector = 0;
 
 		smokeruby_object * o = value_obj_info(rb_ary_entry(argv[0], 0));
 
+		Smoke::ModuleIndex current_method;
+
 		if (qstrcmp(o->smoke->classes[o->classId].className, "QPointF") == 0) {
-			    _current_method_conversion_constructors.clear();
-			_current_method.smoke = qtcore_Smoke;
-			_current_method.index = drawlines_pointf_vector;
+			current_method.smoke = qtcore_Smoke;
+			current_method.index = drawlines_pointf_vector;
 		} else if (qstrcmp(o->smoke->classes[o->classId].className, "QPoint") == 0) {
-			    _current_method_conversion_constructors.clear();
-			_current_method.smoke = qtcore_Smoke;
-			_current_method.index = drawlines_point_vector;
+			current_method.smoke = qtcore_Smoke;
+			current_method.index = drawlines_point_vector;
 		} else if (qstrcmp(o->smoke->classes[o->classId].className, "QLineF") == 0) {
-			    _current_method_conversion_constructors.clear();
-			_current_method.smoke = qtcore_Smoke;
-			_current_method.index = drawlines_linef_vector;
+			current_method.smoke = qtcore_Smoke;
+			current_method.index = drawlines_linef_vector;
 		} else if (qstrcmp(o->smoke->classes[o->classId].className, "QLine") == 0) {
-			    _current_method_conversion_constructors.clear();
-			_current_method.smoke = qtcore_Smoke;
-			_current_method.index = drawlines_line_vector;
+			current_method.smoke = qtcore_Smoke;
+			current_method.index = drawlines_line_vector;
 		} else {
 			return rb_call_super(argc, argv);
 		}
 
-		QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, argc-1);
+		QtRuby::MethodCall c(current_method,
+							 QHash<unsigned int, Smoke::ModuleIndex>(), self, argv, argc-1);
 		c.next();
 		return self;
 	}
@@ -776,19 +775,19 @@ static Smoke::Index drawlines_rect_vector = 0;
 
 		smokeruby_object * o = value_obj_info(rb_ary_entry(argv[0], 0));
 
+		Smoke::ModuleIndex current_method;
+
 		if (qstrcmp(o->smoke->classes[o->classId].className, "QRectF") == 0) {
-			    _current_method_conversion_constructors.clear();
-			_current_method.smoke = qtcore_Smoke;
-			_current_method.index = drawlines_rectf_vector;
+			current_method.smoke = qtcore_Smoke;
+			current_method.index = drawlines_rectf_vector;
 		} else if (qstrcmp(o->smoke->classes[o->classId].className, "QRect") == 0) {
-			    _current_method_conversion_constructors.clear();
-			_current_method.smoke = qtcore_Smoke;
-			_current_method.index = drawlines_rect_vector;
+			current_method.smoke = qtcore_Smoke;
+			current_method.index = drawlines_rect_vector;
 		} else {
 			return rb_call_super(argc, argv);
 		}
 
-		QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, argc-1);
+		QtRuby::MethodCall c(current_method, QHash<unsigned int, Smoke::ModuleIndex>(), self, argv, argc-1);
 		c.next();
 		return self;
 	}
@@ -1058,23 +1057,28 @@ qsignalmapper_mapping(int argc, VALUE * argv, VALUE self)
 		Smoke::ModuleIndex ci(o->smoke, o->classId);
 		Smoke::ModuleIndex meth = o->smoke->findMethod(ci, nameId);
 		Smoke::Index i = meth.smoke->methodMaps[meth.index].method;
-		i = -i;		// turn into ambiguousMethodList index
-		while (meth.smoke->ambiguousMethodList[i] != 0) {
-			if ((qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name, "QObject*" ) == 0
-				&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QObject")
-				&& !Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") )
-				|| (qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name, "QWidget*" ) == 0
-				&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") ) )
-			{
-				    _current_method_conversion_constructors.clear();
-				_current_method.smoke = meth.smoke;
-				_current_method.index = meth.smoke->ambiguousMethodList[i];
-				QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, 1);
-				c.next();
-				return *(c.var());
-			}
+		if(i < 0) {
+			i = -i;		// turn into ambiguousMethodList index
+			while (meth.smoke->ambiguousMethodList[i] != 0) {
+				if ((qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name, "QObject*" ) == 0
+					&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QObject")
+					&& !Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") )
+					|| (qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name, "QWidget*" ) == 0
+					&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") ) )
+				{
+					QtRuby::MethodCall c(Smoke::ModuleIndex(meth.smoke, meth.smoke->ambiguousMethodList[i]),
+										 QHash< unsigned int, Smoke::ModuleIndex >(), self, argv, 1);
+					c.next();
+					return *(c.var());
+				}
 
-			i++;
+				i++;
+			}
+		} else {
+			QtRuby::MethodCall c(Smoke::ModuleIndex(meth.smoke, i),
+									QHash< unsigned int, Smoke::ModuleIndex >(), self, argv, 1);
+			c.next();
+			return *(c.var());
 		}
 	}
 
@@ -1093,23 +1097,28 @@ qsignalmapper_set_mapping(int argc, VALUE * argv, VALUE self)
 		Smoke::ModuleIndex ci(o->smoke, o->classId);
 		Smoke::ModuleIndex meth = o->smoke->findMethod(ci, nameId);
 		Smoke::Index i = meth.smoke->methodMaps[meth.index].method;
-		i = -i;		// turn into ambiguousMethodList index
-		while (meth.smoke->ambiguousMethodList[i] != 0) {
-			if ((qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args + 1]].name, "QObject*" ) == 0
-				&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QObject")
-				&& !Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") )
-				|| (qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args + 1]].name, "QWidget*" ) == 0
-				&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") ) )
-			{
-				    _current_method_conversion_constructors.clear();
-				_current_method.smoke = meth.smoke;
-				_current_method.index = meth.smoke->ambiguousMethodList[i];
-				QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, 2);
-				c.next();
-				return *(c.var());
-			}
+		if(i < 0) {
+			i = -i;		// turn into ambiguousMethodList index
+			while (meth.smoke->ambiguousMethodList[i] != 0) {
+				if ((qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args + 1]].name, "QObject*" ) == 0
+					&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QObject")
+					&& !Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") )
+					|| (qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args + 1]].name, "QWidget*" ) == 0
+					&& Smoke::isDerivedFrom(a->smoke->classes[a->classId].className, "QWidget") ) )
+				{
+					QtRuby::MethodCall c(Smoke::ModuleIndex(meth.smoke, meth.smoke->ambiguousMethodList[i]),
+										 QHash< unsigned int, Smoke::ModuleIndex >(), self, argv, 2);
+					c.next();
+					return *(c.var());
+				}
 
-			i++;
+				i++;
+			}
+		} else {
+			QtRuby::MethodCall c(Smoke::ModuleIndex(meth.smoke, i),
+								 QHash< unsigned int, Smoke::ModuleIndex >(), self, argv, 2);
+			c.next();
+			return *(c.var());
 		}
 	}
 
@@ -1270,22 +1279,28 @@ qvariant_from_value(int argc, VALUE * argv, VALUE self)
 
 		Smoke::ModuleIndex meth = qtcore_Smoke->findMethod(qtcore_Smoke->idClass("QVariant"), nameId);
 		Smoke::Index i = meth.smoke->methodMaps[meth.index].method;
-		i = -i;		// turn into ambiguousMethodList index
-		while (meth.smoke->ambiguousMethodList[i] != 0) {
-			if (qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name, typeName ) == 0 )
-			{
-				    _current_method_conversion_constructors.clear();
-				_current_method.smoke = meth.smoke;
-				_current_method.index = meth.smoke->ambiguousMethodList[i];
-				QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, 0);
-				c.next();
-				return *(c.var());
+		if(i < 0) {
+			i = -i;		// turn into ambiguousMethodList index
+			while (meth.smoke->ambiguousMethodList[i] != 0) {
+				if (qstrcmp(meth.smoke->types[meth.smoke->argumentList[meth.smoke->methods[meth.smoke->ambiguousMethodList[i]].args]].name, typeName ) == 0 )
+				{
+					QtRuby::MethodCall c(Smoke::ModuleIndex(meth.smoke, meth.smoke->ambiguousMethodList[i]),
+										 QHash< unsigned int, Smoke::ModuleIndex >(), self, argv, 0);
+					c.next();
+					return *(c.var());
+				}
+
+				i++;
 			}
 
-			i++;
-		}
 
-		if(do_debug & qtdb_gc) printf("No suitable method for signature QVariant::QVariant(%s) found - looking for another suitable constructor\n", StringValuePtr(argv[1]));
+			if(do_debug & qtdb_gc) printf("No suitable method for signature QVariant::QVariant(%s) found - looking for another suitable constructor\n", StringValuePtr(argv[1]));
+		} else {
+			QtRuby::MethodCall c(Smoke::ModuleIndex(meth.smoke, i),
+								 QHash< unsigned int, Smoke::ModuleIndex >(), self, argv, 0);
+			c.next();
+			return *(c.var());
+		}
 	}
 
 	QVariant * v = 0;
@@ -1364,10 +1379,8 @@ static Smoke::Index new_qvariant_qmap = 0;
 	}
 
 	if (argc == 1 && TYPE(argv[0]) == T_HASH) {
-		    _current_method_conversion_constructors.clear();
-		_current_method.smoke = qtcore_Smoke;
-		_current_method.index = new_qvariant_qmap;
-		QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, argc-1);
+		QtRuby::MethodCall c(Smoke::ModuleIndex(qtcore_Smoke, new_qvariant_qmap),
+							 QHash< unsigned int, Smoke::ModuleIndex >(), self, argv, argc-1);
 		c.next();
 		return *(c.var());
 	} else if (	argc == 1
@@ -1375,10 +1388,8 @@ static Smoke::Index new_qvariant_qmap = 0;
 				&& RARRAY_LEN(argv[0]) > 0
 				&& TYPE(rb_ary_entry(argv[0], 0)) != T_STRING )
 	{
-		    _current_method_conversion_constructors.clear();
-		_current_method.smoke = qtcore_Smoke;
-		_current_method.index = new_qvariant_qlist;
-		QtRuby::MethodCall c(_current_method, _current_method_conversion_constructors, self, argv, argc-1);
+		QtRuby::MethodCall c(Smoke::ModuleIndex(qtcore_Smoke, new_qvariant_qlist),
+							 QHash< unsigned int, Smoke::ModuleIndex >(), self, argv, argc-1);
 		c.next();
 		return *(c.var());
 	}
