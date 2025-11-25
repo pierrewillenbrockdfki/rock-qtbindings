@@ -197,6 +197,8 @@ extern Q_DECL_EXPORT QList<MocArgument*> get_moc_arguments(Smoke* smoke, const c
 
 extern Q_DECL_EXPORT void * construct_copy(smokeruby_object *o);
 
+extern Q_DECL_EXPORT Smoke::ModuleIndex rubyValueToSmokeModuleIndex(VALUE v);
+
 extern "C"
 {
 extern Q_DECL_EXPORT VALUE mapObject(VALUE self, VALUE obj);

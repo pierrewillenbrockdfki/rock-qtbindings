@@ -536,6 +536,16 @@ static char p[CAT_BUFFER_SIZE];
 	return self;
 }
 
+Q_DECL_EXPORT Smoke::ModuleIndex rubyValueToSmokeModuleIndex(VALUE v) {
+	Smoke::ModuleIndex result;
+	int smokeidx = NUM2INT(rb_funcall(v, rb_intern("smoke"), 0));
+	if(smokeidx < 0 || smokeidx > smokeList.size()) {
+		rb_raise(rb_eArgError, "smoke num out of range (class.smoke)");
+	}
+	int index = NUM2INT(rb_funcall(v, rb_intern("index"), 0));
+	return Smoke::ModuleIndex(smokeList[smokeidx], index);
+}
+
 const char *
 resolve_classname(smokeruby_object * o)
 {
@@ -660,31 +670,30 @@ findAllMethods(int argc, VALUE * argv, VALUE /*self*/)
     VALUE rb_mi = argv[0];
     VALUE result = rb_hash_new();
     if (rb_mi != Qnil) {
-        Smoke::Index c = (Smoke::Index) NUM2INT(rb_funcall(rb_mi, rb_intern("index"), 0));
-        Smoke *smoke = smokeList[NUM2INT(rb_funcall(rb_mi, rb_intern("smoke"), 0))];
-        if (c > smoke->numClasses) {
+        Smoke::ModuleIndex mi = rubyValueToSmokeModuleIndex(rb_mi);
+        if (mi.index > mi.smoke->numClasses) {
             return Qnil;
         }
         char * pat = 0L;
         if(argc > 1 && TYPE(argv[1]) == T_STRING)
             pat = StringValuePtr(argv[1]);
 #ifdef DEBUG
-        if (do_debug & qtdb_calls) qWarning("findAllMethods called with classid = %d, pat == %s", c, pat);
+        if (do_debug & qtdb_calls) qWarning("findAllMethods called with classid = %d, pat == %s", mi.index, pat);
 #endif
-        Smoke::Index imax = smoke->numMethodMaps;
+        Smoke::Index imax = mi.smoke->numMethodMaps;
         Smoke::Index imin = 0, icur = -1, methmin, methmax;
         methmin = -1; methmax = -1; // kill warnings
         int icmp = -1;
         while(imax >= imin) {
             icur = (imin + imax) / 2;
-            icmp = smoke->leg(smoke->methodMaps[icur].classId, c);
+            icmp = mi.smoke->leg(mi.smoke->methodMaps[icur].classId, mi.index);
             if (icmp == 0) {
                 Smoke::Index pos = icur;
-                while (icur && smoke->methodMaps[icur-1].classId == c)
+                while (icur && mi.smoke->methodMaps[icur-1].classId == mi.index)
                     icur --;
                 methmin = icur;
                 icur = pos;
-                while(icur < imax && smoke->methodMaps[icur+1].classId == c)
+                while(icur < imax && mi.smoke->methodMaps[icur+1].classId == mi.index)
                     icur ++;
                 methmax = icur;
                 break;
@@ -696,26 +705,26 @@ findAllMethods(int argc, VALUE * argv, VALUE /*self*/)
         }
         if (icmp == 0) {
             for (Smoke::Index i = methmin; i <= methmax; i++) {
-                Smoke::Index m = smoke->methodMaps[i].name;
-                if (pat == 0L || strncmp(smoke->methodNames[m], pat, strlen(pat)) == 0) {
-                    Smoke::Index ix = smoke->methodMaps[i].method;
+                Smoke::Index m = mi.smoke->methodMaps[i].name;
+                if (pat == 0L || strncmp(mi.smoke->methodNames[m], pat, strlen(pat)) == 0) {
+                    Smoke::Index ix = mi.smoke->methodMaps[i].method;
                     VALUE meths = rb_ary_new();
                     if (ix >= 0) {	// single match
-                        const Smoke::Method &methodRef = smoke->methods[ix];
+                        const Smoke::Method &methodRef = mi.smoke->methods[ix];
                         if ((methodRef.flags & Smoke::mf_internal) == 0) {
-                            rb_ary_push(meths, rb_funcall(moduleindex_class, rb_intern("new"), 2, INT2NUM(smokeList.indexOf(smoke)), INT2NUM((int) ix)));
+                            rb_ary_push(meths, rb_funcall(moduleindex_class, rb_intern("new"), 2, INT2NUM(smokeList.indexOf(mi.smoke)), INT2NUM((int) ix)));
                         }
                     } else {		// multiple match
                         ix = -ix;		// turn into ambiguousMethodList index
-                        while (smoke->ambiguousMethodList[ix]) {
-                            const Smoke::Method &methodRef = smoke->methods[smoke->ambiguousMethodList[ix]];
+                        while (mi.smoke->ambiguousMethodList[ix]) {
+                            const Smoke::Method &methodRef = mi.smoke->methods[mi.smoke->ambiguousMethodList[ix]];
                             if ((methodRef.flags & Smoke::mf_internal) == 0) {
-                                rb_ary_push(meths, rb_funcall(moduleindex_class, rb_intern("new"), 2, INT2NUM(smokeList.indexOf(smoke)), INT2NUM((int)smoke->ambiguousMethodList[ix])));
+                                rb_ary_push(meths, rb_funcall(moduleindex_class, rb_intern("new"), 2, INT2NUM(smokeList.indexOf(mi.smoke)), INT2NUM((int)mi.smoke->ambiguousMethodList[ix])));
                             }
                             ix++;
                         }
                     }
-                    rb_hash_aset(result, rb_str_new2(smoke->methodNames[m]), meths);
+                    rb_hash_aset(result, rb_str_new2(mi.smoke->methodNames[m]), meths);
                 }
             }
         }
@@ -731,7 +740,7 @@ findAllMethods(int argc, VALUE * argv, VALUE /*self*/)
 		mf_protected		Protected non-static methods only
 */
 
-#define PUSH_QTRUBY_METHOD		\
+#define PUSH_QTRUBY_METHOD(s)		\
 		if (	(methodRef.flags & (Smoke::mf_internal|Smoke::mf_ctor|Smoke::mf_dtor)) == 0 \
 				&& strcmp(s->methodNames[methodRef.name], "operator=") != 0 \
 				&& strcmp(s->methodNames[methodRef.name], "operator!=") != 0 \
@@ -770,29 +779,28 @@ findAllMethodNames(VALUE /*self*/, VALUE result, VALUE classid, VALUE flags_valu
 
 	unsigned short flags = (unsigned short) NUM2UINT(flags_value);
 	if (classid != Qnil) {
-		Smoke::Index c = (Smoke::Index) NUM2INT(rb_funcall(classid, rb_intern("index"), 0));
-		Smoke* s = smokeList[NUM2INT(rb_funcall(classid, rb_intern("smoke"), 0))];
-		if (c > s->numClasses) {
+		Smoke::ModuleIndex mi = rubyValueToSmokeModuleIndex(classid);
+		if (mi.index > mi.smoke->numClasses) {
 			return Qnil;
 		}
 #ifdef DEBUG
-		if (do_debug & qtdb_calls) qWarning("findAllMethodNames called with classid = %d in module %s", c, s->moduleName());
+		if (do_debug & qtdb_calls) qWarning("findAllMethodNames called with classid = %d in module %s", mi.index, mi.smoke->moduleName());
 #endif
-		Smoke::Index imax = s->numMethodMaps;
+		Smoke::Index imax = mi.smoke->numMethodMaps;
 		Smoke::Index imin = 0, icur = -1, methmin, methmax;
 		methmin = -1; methmax = -1; // kill warnings
 		int icmp = -1;
 
 		while (imax >= imin) {
 			icur = (imin + imax) / 2;
-			icmp = s->leg(s->methodMaps[icur].classId, c);
+			icmp = mi.smoke->leg(mi.smoke->methodMaps[icur].classId, mi.index);
 			if (icmp == 0) {
 				Smoke::Index pos = icur;
-				while(icur && s->methodMaps[icur-1].classId == c)
+				while(icur && mi.smoke->methodMaps[icur-1].classId == mi.index)
 					icur --;
 				methmin = icur;
 				icur = pos;
-				while(icur < imax && s->methodMaps[icur+1].classId == c)
+				while(icur < imax && mi.smoke->methodMaps[icur+1].classId == mi.index)
 					icur ++;
 				methmax = icur;
 				break;
@@ -805,15 +813,15 @@ findAllMethodNames(VALUE /*self*/, VALUE result, VALUE classid, VALUE flags_valu
 
         if (icmp == 0) {
  			for (Smoke::Index i=methmin ; i <= methmax ; i++) {
-				Smoke::Index ix= s->methodMaps[i].method;
+				Smoke::Index ix= mi.smoke->methodMaps[i].method;
 				if (ix > 0) {	// single match
-					const Smoke::Method &methodRef = s->methods[ix];
-					PUSH_QTRUBY_METHOD
+					const Smoke::Method &methodRef = mi.smoke->methods[ix];
+					PUSH_QTRUBY_METHOD(mi.smoke)
 				} else {		// multiple match
 					ix = -ix;		// turn into ambiguousMethodList index
-					while (s->ambiguousMethodList[ix]) {
-						const Smoke::Method &methodRef = s->methods[s->ambiguousMethodList[ix]];
-						PUSH_QTRUBY_METHOD
+					while (mi.smoke->ambiguousMethodList[ix]) {
+						const Smoke::Method &methodRef = mi.smoke->methods[mi.smoke->ambiguousMethodList[ix]];
+						PUSH_QTRUBY_METHOD(mi.smoke)
 						ix++;
 					}
 				}
@@ -904,10 +912,23 @@ void find_object_method(int argc, VALUE * argv, VALUE self) {
         if (_current_method.index == -1) {
             // Find the C++ method to call. Do that from Ruby for now
 
-            (void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
-            if (_current_method.index != -1) {
-                // Success. Cache result.
-                methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+            VALUE result = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
+            if (result != Qnil) {
+                VALUE method = rb_ary_entry(result, 0);
+                VALUE conversions = rb_ary_entry(result, 1);
+                _current_method = rubyValueToSmokeModuleIndex(method);
+                VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
+                for (long i = 0; i < RARRAY_LEN(keys); i++) {
+                    VALUE key = rb_ary_entry(keys, i);
+                    VALUE meth_value = rb_hash_aref(conversions, key);
+                    int arg_num = NUM2INT(key);
+                    _current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
+                }
+
+                if (_current_method.index != -1) {
+                    // Success. Cache result.
+                    methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+                }
             }
         }
         if (_current_method.index == -1) {
@@ -923,13 +944,26 @@ void find_object_method(int argc, VALUE * argv, VALUE self) {
                 op1[1] = '=';
                 op1[2] = '\0';
                 temp_stack[1] = rb_str_new2(op1);
-                (void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
+                VALUE result = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
+                if (result != Qnil) {
+                    VALUE method = rb_ary_entry(result, 0);
+                    VALUE conversions = rb_ary_entry(result, 1);
+                    _current_method = rubyValueToSmokeModuleIndex(method);
+                    VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
+                    for (long i = 0; i < RARRAY_LEN(keys); i++) {
+                        VALUE key = rb_ary_entry(keys, i);
+                        VALUE meth_value = rb_hash_aref(conversions, key);
+                        int arg_num = NUM2INT(key);
+                        _current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
+                    }
+
+                    if (_current_method.index != -1) {
+                        // Success. Cache result.
+                        methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+                    }
+                }
             }
 
-            if (_current_method.index != -1) {
-                // Success. Cache result.
-                methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
-            }
         }
     }
 }
@@ -1060,10 +1094,23 @@ void find_class_method(int argc, VALUE * argv, VALUE klass) {
         QByteArray mcid = find_cached_selector(argc + 3, temp_stack, klass, methodName);
 
         if (_current_method.index == -1) {
-            (void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
-            if (_current_method.index != -1) {
-                // Success. Cache result.
-                methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+            VALUE result = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
+            if (result != Qnil) {
+                VALUE method = rb_ary_entry(result, 0);
+                VALUE conversions = rb_ary_entry(result, 1);
+                _current_method = rubyValueToSmokeModuleIndex(method);
+                VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
+                for (long i = 0; i < RARRAY_LEN(keys); i++) {
+                    VALUE key = rb_ary_entry(keys, i);
+                    VALUE meth_value = rb_hash_aref(conversions, key);
+                    int arg_num = NUM2INT(key);
+                    _current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
+                }
+
+                if (_current_method.index != -1) {
+                    // Success. Cache result.
+                    methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+                }
             }
         }
     }

@@ -1453,10 +1453,23 @@ initialize_qt(int argc, VALUE * argv, VALUE self)
 		QByteArray mcid = find_cached_selector(argc+4, temp_stack, klass, rb_class2name(klass));
 
 		if (_current_method.index == -1) {
-			(void)rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+4, temp_stack);
-			if (_current_method.index != -1) {
-				// Success. Cache result.
-				methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+			VALUE result = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+4, temp_stack);
+			if(result != Qnil) {
+				VALUE method = rb_ary_entry(result, 0);
+				VALUE conversions = rb_ary_entry(result, 1);
+				_current_method = rubyValueToSmokeModuleIndex(method);
+				VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
+				for(long i = 0; i < RARRAY_LEN(keys); i++) {
+					VALUE key = rb_ary_entry(keys, i);
+					VALUE meth_value = rb_hash_aref(conversions, key);
+					int arg_num = NUM2INT(key);
+					_current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
+				}
+
+				if (_current_method.index != -1) {
+					// Success. Cache result.
+					methcache.insert(mcid, QtRuby::MethodCacheElement(_current_method, _current_method_conversion_constructors));
+				}
 			}
 		}
 	}
@@ -1970,20 +1983,15 @@ getIsa(VALUE /*self*/, VALUE classId)
 {
 	VALUE parents_list = rb_ary_new();
 
-	int id = NUM2INT(rb_funcall(classId, rb_intern("index"), 0));
-	int smoke_num = NUM2INT(rb_funcall(classId, rb_intern("smoke"), 0));
-	if(smoke_num < 0 || smoke_num > smokeList.size()) {
-		rb_raise(rb_eArgError, "smoke num out of range (class.smoke)");
-	}
-	Smoke* smoke = smokeList[smoke_num];
+	Smoke::ModuleIndex mi = rubyValueToSmokeModuleIndex(classId);
 
 	Smoke::Index *parents =
-		smoke->inheritanceList +
-		smoke->classes[id].parents;
+		mi.smoke->inheritanceList +
+		mi.smoke->classes[mi.index].parents;
 
 	while(*parents) {
 		//logger("\tparent: %s", qtcore_Smoke->classes[*parents].className);
-		rb_ary_push(parents_list, rb_str_new2(smoke->classes[*parents].className));
+		rb_ary_push(parents_list, rb_str_new2(mi.smoke->classes[*parents].className));
 		parents++;
 	}
 	return parents_list;
@@ -2135,13 +2143,11 @@ debugging(VALUE /*self*/)
 static VALUE
 get_arg_type_name(VALUE /*self*/, VALUE method_value, VALUE idx_value)
 {
-	int method = NUM2INT(rb_funcall(method_value, rb_intern("index"), 0));
-	int smokeIndex = NUM2INT(rb_funcall(method_value, rb_intern("smoke"), 0));
-	Smoke * smoke = smokeList[smokeIndex];
+	Smoke::ModuleIndex index = rubyValueToSmokeModuleIndex(method_value);
 	int idx = NUM2INT(idx_value);
-	const Smoke::Method &m = smoke->methods[method];
-	Smoke::Index *args = smoke->argumentList + m.args;
-	return rb_str_new2((char*)smoke->types[args[idx]].name);
+	const Smoke::Method &m = index.smoke->methods[index.index];
+	Smoke::Index *args = index.smoke->argumentList + m.args;
+	return rb_str_new2((char*)index.smoke->types[args[idx]].name);
 }
 
 static VALUE
@@ -2177,9 +2183,7 @@ static VALUE
 insert_pclassid(VALUE self, VALUE p_value, VALUE mi_value)
 {
 	char *p = StringValuePtr(p_value);
-	int ix = NUM2INT(rb_funcall(mi_value, rb_intern("index"), 0));
-	int smokeidx = NUM2INT(rb_funcall(mi_value, rb_intern("smoke"), 0));
-	Smoke::ModuleIndex mi(smokeList[smokeidx], ix);
+	Smoke::ModuleIndex mi = rubyValueToSmokeModuleIndex(mi_value);
 	classcache.insert(QByteArray(p), mi);
 	IdToClassNameMap.insert(mi, QByteArray(p));
 	return self;
@@ -2188,9 +2192,7 @@ insert_pclassid(VALUE self, VALUE p_value, VALUE mi_value)
 static VALUE
 classid2name(VALUE /*self*/, VALUE mi_value)
 {
-	int ix = NUM2INT(rb_funcall(mi_value, rb_intern("index"), 0));
-	int smokeidx = NUM2INT(rb_funcall(mi_value, rb_intern("smoke"), 0));
-	Smoke::ModuleIndex mi(smokeList[smokeidx], ix);
+	Smoke::ModuleIndex mi = rubyValueToSmokeModuleIndex(mi_value);
 	return rb_str_new2(IdToClassNameMap[mi].constData());
 }
 
@@ -2684,35 +2686,34 @@ dumpCandidates(VALUE /*self*/, VALUE rmeths)
 		int count = RARRAY_LEN(rmeths);
 		for(int i = 0; i < count; i++) {
 			qt_rb_str_catf(errmsg, "\t");
-			int id = NUM2INT(rb_funcall(rb_ary_entry(rmeths, i), rb_intern("index"), 0));
-			Smoke* smoke = smokeList[NUM2INT(rb_funcall(rb_ary_entry(rmeths, i), rb_intern("smoke"), 0))];
-			const Smoke::Method &meth = smoke->methods[id];
-			const char *tname = smoke->types[meth.ret].name;
+			Smoke::ModuleIndex mi = rubyValueToSmokeModuleIndex(rb_ary_entry(rmeths, i));
+			const Smoke::Method &meth = mi.smoke->methods[mi.index];
+			const char *tname = mi.smoke->types[meth.ret].name;
 			if(meth.flags & Smoke::mf_enum) {
 				qt_rb_str_catf(errmsg, "enum ");
-				qt_rb_str_catf(errmsg, "%s::%s", smoke->classes[meth.classId].className, smoke->methodNames[meth.name]);
+				qt_rb_str_catf(errmsg, "%s::%s", mi.smoke->classes[meth.classId].className, mi.smoke->methodNames[meth.name]);
 			} else {
 				if(meth.flags & Smoke::mf_static) qt_rb_str_catf(errmsg, "static ");
 				qt_rb_str_catf(errmsg, "%s ", (tname ? tname:"void"));
-				qt_rb_str_catf(errmsg, "%s::%s(", smoke->classes[meth.classId].className, smoke->methodNames[meth.name]);
+				qt_rb_str_catf(errmsg, "%s::%s(", mi.smoke->classes[meth.classId].className, mi.smoke->methodNames[meth.name]);
 				for(int i = 0; i < meth.numArgs; i++) {
 					if(i) qt_rb_str_catf(errmsg, ", ");
-					tname = smoke->types[smoke->argumentList[meth.args+i]].name;
+					tname = mi.smoke->types[mi.smoke->argumentList[meth.args+i]].name;
 					qt_rb_str_catf(errmsg, "%s", (tname ? tname:"void"));
 				}
 				qt_rb_str_catf(errmsg, ")");
 				if(meth.flags & Smoke::mf_const) qt_rb_str_catf(errmsg, " const");
 			}
-			for(int j = 0; j < smoke->numMethodMaps; j++) {
-				if (smoke->methodMaps[j].method < 0) {
-					for(int k = -smoke->methodMaps[j].method; smoke->ambiguousMethodList[k] != 0; k++) {
-						if (smoke->ambiguousMethodList[k] == id) {
-							qt_rb_str_catf(errmsg, " %s", smoke->methodNames[smoke->methodMaps[j].name]);
+			for(int j = 0; j < mi.smoke->numMethodMaps; j++) {
+				if (mi.smoke->methodMaps[j].method < 0) {
+					for(int k = -mi.smoke->methodMaps[j].method; mi.smoke->ambiguousMethodList[k] != 0; k++) {
+						if (mi.smoke->ambiguousMethodList[k] == mi.index) {
+							qt_rb_str_catf(errmsg, " %s", mi.smoke->methodNames[mi.smoke->methodMaps[j].name]);
 						}
 					}
 				} else {
-					if (smoke->methodMaps[j].method == id) {
-						qt_rb_str_catf(errmsg, " %s", smoke->methodNames[smoke->methodMaps[j].name]);
+					if (mi.smoke->methodMaps[j].method == mi.index) {
+						qt_rb_str_catf(errmsg, " %s", mi.smoke->methodNames[mi.smoke->methodMaps[j].name]);
 					}
 				}
 			}
@@ -2725,18 +2726,16 @@ dumpCandidates(VALUE /*self*/, VALUE rmeths)
 static VALUE
 isConstMethod(VALUE /*self*/, VALUE idx)
 {
-	int id = NUM2INT(rb_funcall(idx, rb_intern("index"), 0));
-	Smoke* smoke = smokeList[NUM2INT(rb_funcall(idx, rb_intern("smoke"), 0))];
-	const Smoke::Method &meth = smoke->methods[id];
+	Smoke::ModuleIndex mi = rubyValueToSmokeModuleIndex(idx);
+	const Smoke::Method &meth = mi.smoke->methods[mi.index];
 	return (meth.flags & Smoke::mf_const) ? Qtrue : Qfalse;
 }
 
 static VALUE
 isExplicitMethod(VALUE /*self*/, VALUE idx)
 {
-	int id = NUM2INT(rb_funcall(idx, rb_intern("index"), 0));
-	Smoke* smoke = smokeList[NUM2INT(rb_funcall(idx, rb_intern("smoke"), 0))];
-	const Smoke::Method &meth = smoke->methods[id];
+	Smoke::ModuleIndex mi = rubyValueToSmokeModuleIndex(idx);
+	const Smoke::Method &meth = mi.smoke->methods[mi.index];
 	return (meth.flags & Smoke::mf_explicit) ? Qtrue : Qfalse;
 }
 
@@ -2751,23 +2750,17 @@ isObject(VALUE /*self*/, VALUE obj)
 static VALUE
 setCurrentMethod(VALUE self, VALUE meth_value)
 {
-	int smokeidx = NUM2INT(rb_funcall(meth_value, rb_intern("smoke"), 0));
-	int meth = NUM2INT(rb_funcall(meth_value, rb_intern("index"), 0));
 	// FIXME: damn, this is lame, and it doesn't handle ambiguous methods
-	_current_method.smoke = smokeList[smokeidx];  //qtcore_Smoke->methodMaps[meth].method;
-	_current_method.index = meth;
+	_current_method = rubyValueToSmokeModuleIndex(meth_value);
 	return self;
 }
 
 static VALUE
 setCurrentMethodConversion(VALUE self, VALUE arg_num_value, VALUE meth_value)
 {
-	int smokeidx = NUM2INT(rb_funcall(meth_value, rb_intern("smoke"), 0));
-	int meth = NUM2INT(rb_funcall(meth_value, rb_intern("index"), 0));
 	int arg_num = NUM2INT(arg_num_value);
 
-	    _current_method_conversion_constructors[arg_num].smoke = smokeList[smokeidx];
-	    _current_method_conversion_constructors[arg_num].index = meth;
+	_current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
 	return self;
 }
 
