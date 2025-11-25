@@ -1461,7 +1461,8 @@ initialize_qt(int argc, VALUE * argv, VALUE self)
 	}
 
 	{
-		QByteArray mcid = find_cached_selector(argc+4, temp_stack, klass, rb_class2name(klass));
+		QByteArray mcid = find_cached_selector(argc+4, temp_stack, klass, rb_class2name(klass),
+				_current_method, _current_method_conversion_constructors);
 
 		if (_current_method.index == -1) {
 			VALUE result = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+4, temp_stack);

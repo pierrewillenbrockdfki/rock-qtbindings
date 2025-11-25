@@ -832,7 +832,9 @@ findAllMethodNames(VALUE /*self*/, VALUE result, VALUE classid, VALUE flags_valu
 }
 
 QByteArray
-find_cached_selector(int argc, VALUE * argv, VALUE klass, const char * methodName)
+find_cached_selector(int argc, VALUE * argv, VALUE klass, const char * methodName,
+                     Smoke::ModuleIndex &method,
+                     QHash< unsigned int, Smoke::ModuleIndex > &conversionConstructors)
 {
     // Look in the cache
     QByteArray mcid;
@@ -855,12 +857,12 @@ find_cached_selector(int argc, VALUE * argv, VALUE klass, const char * methodNam
 #ifdef DEBUG
 		if (do_debug & qtdb_calls) qWarning("method_missing cache hit, mcid: %s", (const char *) *mcid);
 #endif
-		_current_method = rcid.method;
-        _current_method_conversion_constructors = rcid.conversionConstructors;
+		method = rcid.method;
+		conversionConstructors = rcid.conversionConstructors;
 	} else {
-		_current_method.smoke = 0;
-		_current_method.index = -1;
-        _current_method_conversion_constructors.clear();
+		method.smoke = 0;
+		method.index = -1;
+		conversionConstructors.clear();
 	}
 
 	return mcid;
@@ -907,7 +909,9 @@ void find_object_method(int argc, VALUE * argv, VALUE self) {
             temp_stack[count + 3] = argv[count];
         }
 
-        QByteArray mcid = find_cached_selector(argc + 3, temp_stack, klass, methodName);
+        QByteArray mcid = find_cached_selector(argc + 3, temp_stack, klass, methodName,
+                                               _current_method,
+                                               _current_method_conversion_constructors);
 
         if (_current_method.index == -1) {
             // Find the C++ method to call. Do that from Ruby for now
@@ -1093,7 +1097,9 @@ void find_class_method(int argc, VALUE * argv, VALUE klass) {
     }
 
     {
-        QByteArray mcid = find_cached_selector(argc + 3, temp_stack, klass, methodName);
+        QByteArray mcid = find_cached_selector(argc + 3, temp_stack, klass, methodName,
+                                               _current_method,
+                                               _current_method_conversion_constructors);
 
         if (_current_method.index == -1) {
             VALUE result = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc + 3, temp_stack);
