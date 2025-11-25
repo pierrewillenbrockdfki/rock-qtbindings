@@ -3305,8 +3305,10 @@ module Qt5
       if chosen
         setCurrentMethod(chosen)
         conversionConstructors.each { |arg_num, method| setCurrentMethodConversion(arg_num, method) }
+        return chosen, conversionConstructors
       end
-      return chosen, conversionConstructors
+
+      return nil
     end
 
     def Internal.init_all_classes()
