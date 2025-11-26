@@ -419,17 +419,9 @@ VirtualMethodReturnValue::VirtualMethodReturnValue(Smoke::ModuleIndex mi, Smoke:
             {
                 VALUE method_index = rb_funcall2(qt_internal_module, rb_intern("find_implicit_constructor_method"), 4, temp_stack);
                 if(method_index != Qnil) {
-                    int index = NUM2INT(rb_funcall(method_index, rb_intern("index"), 0));
-                    int smokeidx = NUM2INT(rb_funcall(method_index, rb_intern("smoke"), 0));
-                    if (index == 0) {
-                        qWarning("Cannot find conversion from %s to %s", actual_type_flag, qPrintable(target_type));
-                    } else {
-                        Smoke *smoke = smokeList[smokeidx];
-                        mi.smoke = smoke;
-                        mi.index = index;
-                    }
+                    mi = rubyValueToSmokeModuleIndex(method_index);
                 } else {
-                    qWarning("Cannot find conversion from %s to %s", actual_type_flag, qPrintable(target_type));
+                    //qWarning("Cannot find conversion from %s to %s", actual_type_flag, qPrintable(target_type));
                     mi.index = 0;
                 }
             }
