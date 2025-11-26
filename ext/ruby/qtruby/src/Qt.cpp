@@ -312,35 +312,6 @@ Binding::callMethod(Smoke::Index method, void *ptr, Smoke::Stack args, bool isAb
 	if (rb_during_gc()) {
 		return false;
 	}
-	// If not in a ruby thread, complain and throw and exception.
-	// It it is abstract, raise an error.
-#ifdef HAVE_RUBY_RUBY_H
-	int ruby_thread = ruby_native_thread_p();
-	if (ruby_thread == 0 && false) //ruby since v2 may be threadsafe enough already.
-#else
-	if (ruby_stack_check() && false) //ruby since v2 may be threadsafe enough already.
-#endif
-	{
-		//throw std::runtime_error("Qt tries to call object while not running on a ruby thread");
-		// Make sure things run on the main thread. this is slow and prone to deadlock.
-		// Better idea would be to be able to tell us which functions definitely have been overriden,
-		// which would avoid calling rb_respond_to and, for functions not overriden, the call into ruby.
-		bool result = false;
-		QMetaObject::invokeMethod(static_cast<QObject*>(ptr), [&result, obj, methodName, isAbstract, args, method, this](){
-			if (rb_respond_to(obj, rb_intern(methodName)) == 0) {
-				if (isAbstract)
-					rb_raise(rb_eFatal, "Trying to call pure virtual c++ method");
-				result = false;
-				return;
-			}
-
-			QtRuby::VirtualMethodCall c(Smoke::ModuleIndex(smoke, method), QHash<unsigned int, Smoke::ModuleIndex>(), args, obj, ALLOCA_N(VALUE, smoke->methods[method].numArgs));
-			c.next();
-			result = true;
-			return;
-		}, Qt::BlockingQueuedConnection);
-		return result;
-	}
 	// If the virtual method hasn't been overriden, just call the C++ one.
 	if (rb_respond_to(obj, rb_intern(methodName)) == 0) {
 		if (isAbstract)
@@ -969,15 +940,6 @@ method_missing(int argc, VALUE * argv, VALUE self)
     const char *methodName = rb_id2name(SYM2ID(argv[0]));
 
     // Look for 'thing?' methods, and try to match isThing() or hasThing() in the Smoke runtime
-    static VALUE mainThread = Qnil;
-    if (mainThread == Qnil) {
-        mainThread = rb_thread_main();
-    }
-
-    if (rb_thread_current() != mainThread) {
-        rb_raise(rb_eRuntimeError, "Qt methods cannot be called from outside of the main thread");
-    }
-
     QByteArray pred;
 
 	pred = methodName;
@@ -1100,17 +1062,10 @@ class_method_missing(int argc, VALUE * argv, VALUE klass)
 {
 	VALUE result = Qnil;
 	const char * methodName = rb_id2name(SYM2ID(argv[0]));
-	static VALUE mainThread = Qnil;
-	if (mainThread == Qnil) {
-		mainThread = rb_thread_main();
-	}
 	static QRegExp * rx = 0;
 	if (rx == 0) {
 		rx = new QRegExp("[a-zA-Z]+");
 	}
-    if (rb_thread_current() != mainThread) {
-        rb_raise(rb_eRuntimeError, "Qt methods cannot be called from outside of the main thread");
-    }
 
 	if(klass == qt_module && rx->indexIn(methodName) == -1) {
 		// operator under the module(i think this happens for all operators)
