@@ -1145,20 +1145,7 @@ class_method_missing(int argc, VALUE * argv, VALUE klass)
     find_class_method(argc, argv, klass, current_method, current_method_conversion_constructors);
 
     if (current_method.index == -1) {
-        if (rx->indexIn(methodName) == -1) {
-            // operator has not been found in class/module, try on first argument object
-
-            // create a new argument array
-            VALUE *method_stack = ALLOCA_N(VALUE, argc - 1);
-            method_stack[0] = argv[0];
-            for (int count = 1; count < argc - 1; count++) {
-                method_stack[count] = argv[count + 1];
-            }
-            result = method_missing(argc - 1, method_stack, argv[1]);
-            return result;
-        } else {
-            return rb_call_super(argc, argv);
-        }
+        return rb_call_super(argc, argv);
     }
 
     QtRuby::MethodCall c(current_method, current_method_conversion_constructors, Qnil, argv + 1, argc - 1);
