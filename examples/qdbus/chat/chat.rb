@@ -61,7 +61,7 @@ class Ui_ChatMainWindow < Qt5::MainWindow
         Qt5::DBusConnection.sessionBus.connect(nil, nil, "com.trolltech.chat", "message", self, SLOT('messageSlot(QString,QString)'))
         connect(iface, SIGNAL('action(QString,QString)'), self, SLOT('actionSlot(QString,QString)'))
     
-        require 'ui_chatsetnickname.rb'
+        require './ui_chatsetnickname.rb'
         dialog = Ui_NicknameDialog.new
         dialog.cancelButton.visible = false
         dialog.exec

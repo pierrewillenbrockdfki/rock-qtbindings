@@ -158,7 +158,7 @@ class Window < Qt5::Widget
 	    @rotationAngleSpinBox = Qt5::SpinBox.new do |r|
 			r.range = 0..359
 			r.wrapping = true
-			r.suffix = "\xB0"
+			r.suffix = "°"
 		end
 	
 	    @rotationAngleLabel = Qt5::Label.new(tr("&Rotation Angle:"))
