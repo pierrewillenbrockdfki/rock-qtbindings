@@ -799,7 +799,7 @@ findAllMethodNames(VALUE /*self*/, VALUE result, VALUE classid, VALUE flags_valu
     return result;
 }
 
-QByteArray
+static QByteArray
 find_cached_selector(int argc, VALUE * argv, VALUE klass, const char * methodName,
                      Smoke::ModuleIndex &method,
                      QHash< unsigned int, Smoke::ModuleIndex > &conversionConstructors)

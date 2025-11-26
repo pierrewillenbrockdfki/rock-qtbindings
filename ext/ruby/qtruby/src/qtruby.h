@@ -187,9 +187,6 @@ extern Q_DECL_EXPORT VALUE findMethod(VALUE self, VALUE c_value, VALUE name_valu
 extern Q_DECL_EXPORT VALUE findAllMethods(int argc, VALUE * argv, VALUE self);
 extern Q_DECL_EXPORT VALUE findAllMethodNames(VALUE self, VALUE result, VALUE classid, VALUE flags_value);
 
-extern Q_DECL_EXPORT QByteArray find_cached_selector(int argc, VALUE * argv, VALUE klass, const char * methodName,
-                                                     Smoke::ModuleIndex &method,
-                                                     QHash< unsigned int, Smoke::ModuleIndex > &conversionConstructors);
 extern Q_DECL_EXPORT void run_do_method_missing(int argc, VALUE * argv, VALUE klass, const char * methodName,
                                                 Smoke::ModuleIndex &current_method,
                                                 QHash< unsigned int, Smoke::ModuleIndex > &current_method_conversion_constructors);
