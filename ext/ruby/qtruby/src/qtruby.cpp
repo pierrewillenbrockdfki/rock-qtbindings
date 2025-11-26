@@ -1463,32 +1463,7 @@ initialize_qt(int argc, VALUE * argv, VALUE self)
 	Smoke::ModuleIndex current_method;
 	QHash<unsigned int, Smoke::ModuleIndex> current_method_conversion_constructors;
 
-	{
-		QByteArray mcid = find_cached_selector(argc+4, temp_stack, klass, rb_class2name(klass),
-				current_method, current_method_conversion_constructors);
-
-		if (current_method.index == -1) {
-			VALUE result = rb_funcall2(qt_internal_module, rb_intern("do_method_missing"), argc+4, temp_stack);
-			if(result != Qnil) {
-				VALUE method = rb_ary_entry(result, 0);
-				VALUE conversions = rb_ary_entry(result, 1);
-				// FIXME: damn, this is lame, and it doesn't handle ambiguous methods
-				current_method = rubyValueToSmokeModuleIndex(method);
-				VALUE keys = rb_funcall(conversions, rb_intern("keys"), 0);
-				for(long i = 0; i < RARRAY_LEN(keys); i++) {
-					VALUE key = rb_ary_entry(keys, i);
-					VALUE meth_value = rb_hash_aref(conversions, key);
-					int arg_num = NUM2INT(key);
-					current_method_conversion_constructors[arg_num] = rubyValueToSmokeModuleIndex(meth_value);
-				}
-
-				if (current_method.index != -1) {
-					// Success. Cache result.
-					methcache.insert(mcid, QtRuby::MethodCacheElement(current_method, current_method_conversion_constructors));
-				}
-			}
-		}
-	}
+	run_do_method_missing(argc+4, temp_stack, klass, rb_class2name(klass), current_method, current_method_conversion_constructors);
 
 	if (current_method.index == -1) {
 		// Another longjmp here..
