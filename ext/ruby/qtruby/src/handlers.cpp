@@ -453,6 +453,8 @@ smokeruby_free(void * p)
 	unmapPointer(o, o->classId, 0);
 	object_count --;
 
+	//where we know how to check if the object has an owning parent, check for the parent and only free the smokeruby_object.
+	//if the object is not owned by another object, it can be deleted.
 	if (o->smoke->isDerivedFrom(className, "QGraphicsLayoutItem")) {
 		QGraphicsLayoutItem * item = (QGraphicsLayoutItem *) o->smoke->cast(o->ptr, o->classId, o->smoke->idClass("QGraphicsLayoutItem", true).index);
 		if (item->graphicsItem() != 0 || item->parentLayoutItem() != 0) {
@@ -505,19 +507,20 @@ smokeruby_free(void * p)
 
 	if(do_debug & qtdb_gc) qWarning("Deleting (%s*)%p", className, o->ptr);
 
-	//~ char *methodName = new char[strlen(className) + 2];
-	//~ methodName[0] = '~';
-	//~ strcpy(methodName + 1, className);
-	//~ Smoke::ModuleIndex nameId = o->smoke->findMethodName(className, methodName);
-	//~ Smoke::ModuleIndex classIdx(o->smoke, o->classId);
-	//~ Smoke::ModuleIndex meth = o->smoke->findMethod(classIdx, nameId);
-	//~ if(meth.index > 0) {
-		//~ Smoke::Method &m = meth.smoke->methods[meth.smoke->methodMaps[meth.index].method];
-		//~ Smoke::ClassFn fn = meth.smoke->classes[m.classId].classFn;
-		//~ Smoke::StackItem i[1];
-		//~ (*fn)(m.method, o->ptr, i);
-	//~ }
-	//~ delete[] methodName;
+	//do not delete the object itself for now.
+	char *methodName = new char[strlen(className) + 2];
+	methodName[0] = '~';
+	strcpy(methodName + 1, className);
+	Smoke::ModuleIndex nameId = o->smoke->findMethodName(className, methodName);
+	Smoke::ModuleIndex classIdx(o->smoke, o->classId);
+	Smoke::ModuleIndex meth = o->smoke->findMethod(classIdx, nameId);
+	if(meth.index > 0) {
+		Smoke::Method &m = meth.smoke->methods[meth.smoke->methodMaps[meth.index].method];
+		Smoke::ClassFn fn = meth.smoke->classes[m.classId].classFn;
+		Smoke::StackItem i[1];
+		(*fn)(m.method, o->ptr, i);
+	}
+	delete[] methodName;
 	free_smokeruby_object(o);
 
     return;
