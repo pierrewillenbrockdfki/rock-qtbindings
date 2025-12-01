@@ -66,11 +66,20 @@ ClangGeneratorVisitor::~ClangGeneratorVisitor()
 static QString getNestedNameSpecifier(clang::NamedDecl const *nd) {
     std::string nspace;
     llvm::raw_string_ostream nspaceStream(nspace);
+#if LLVM_VERSION_MAJOR < 10
+    nd->printQualifiedName(nspaceStream);
+    QString result = QString::fromStdString(nspaceStream.str());
+    int idx = result.lastIndexOf("::");
+    if (idx >= 0) {
+        result.remove(idx, -1);
+    }
+#else
     nd->printNestedNameSpecifier(nspaceStream);
     QString result = QString::fromStdString(nspaceStream.str());
     if(result.endsWith("::")) {
         result.resize(result.size()-2);
     }
+#endif
     return result;
 }
 
