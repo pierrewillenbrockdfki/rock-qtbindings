@@ -734,7 +734,7 @@ void ClangGeneratorVisitor::setupCXXCtor(Class *c, clang::CXXConstructorDecl con
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
     // we don't care about methods with ellipsis paramaters (i.e. 'foo(const char*, ...)') for now..
-    if (Declaration->getEllipsisLoc().isValid())
+    if (Declaration->isVariadic())
         return;
 
     //qDebug() << "Constructor" << declName << Qt::endl;
@@ -922,7 +922,7 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
     // we don't care about methods with ellipsis paramaters (i.e. 'foo(const char*, ...)') for now..
-    if (Declaration->getEllipsisLoc().isValid())
+    if (Declaration->isVariadic())
         return;
     if (Declaration->getRefQualifier() != clang::RQ_None)
         return;
@@ -1126,7 +1126,7 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl const *
     QList<ClangQProperty> properties;
     auto range = decl->getSourceRange();
     for(auto &prop : *m_PropertyAnnotations) {
-        if(range.fullyContains(prop.Range)) {
+        if(fullyContains(range, prop.Range)) {
             //its one of our properties.
             // this monster only matches "type name READ getMethod WRITE setMethod"
             static QRegExp regexp("^([\\w:<>\\*]+)\\s+(\\w+)\\s+READ\\s+(\\w+)(\\s+WRITE\\s+\\w+)?");
@@ -1329,7 +1329,7 @@ bool ClangGeneratorVisitor::VisitCXXConstructorDecl(clang::CXXConstructorDecl *D
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
     // we don't care about methods with ellipsis paramaters (i.e. 'foo(const char*, ...)') for now..
-    if (Declaration->getEllipsisLoc().isValid())
+    if (Declaration->isVariadic())
         return true;
     if(inTemplate)
         return true;
@@ -1435,7 +1435,7 @@ bool ClangGeneratorVisitor::VisitCXXDestructorDecl(clang::CXXDestructorDecl *Dec
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
     // we don't care about methods with ellipsis paramaters (i.e. 'foo(const char*, ...)') for now..
-    if (Declaration->getEllipsisLoc().isValid())
+    if (Declaration->isVariadic())
         return true;
     if(inTemplate)
         return true;
@@ -1538,7 +1538,7 @@ bool ClangGeneratorVisitor::VisitCXXConversionDecl(clang::CXXConversionDecl *Dec
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
     // we don't care about methods with ellipsis paramaters (i.e. 'foo(const char*, ...)') for now..
-    if (Declaration->getEllipsisLoc().isValid())
+    if (Declaration->isVariadic())
         return true;
     if (Declaration->getRefQualifier() != clang::RQ_None)
         return true;
@@ -1672,7 +1672,7 @@ bool ClangGeneratorVisitor::VisitCXXMethodDecl(clang::CXXMethodDecl *Declaration
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
     // we don't care about methods with ellipsis paramaters (i.e. 'foo(const char*, ...)') for now..
-    if (Declaration->getEllipsisLoc().isValid())
+    if (Declaration->isVariadic())
         return true;
     if (Declaration->getRefQualifier() != clang::RQ_None)
         return true;
@@ -1812,7 +1812,7 @@ bool ClangGeneratorVisitor::VisitFunctionDecl(clang::FunctionDecl *Declaration) 
 
     const QString declName = QString::fromStdString(Declaration->getQualifiedNameAsString());
 
-    if (Declaration->getEllipsisLoc().isValid())
+    if (Declaration->isVariadic())
         return true;
     if(Declaration->isInvalidDecl())
         return true;
