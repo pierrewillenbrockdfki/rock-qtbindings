@@ -609,7 +609,7 @@ void ClangGeneratorVisitor::setupCXXMethod(Class *c, clang::CXXMethodDecl const 
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
     // we don't care about methods with ellipsis paramaters (i.e. 'foo(const char*, ...)') for now..
-    if (Declaration->getEllipsisLoc().isValid())
+    if (Declaration->isVariadic())
         return;
     if (Declaration->getRefQualifier() != clang::RQ_None)
         return;
