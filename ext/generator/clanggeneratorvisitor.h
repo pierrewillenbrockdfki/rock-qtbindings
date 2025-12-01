@@ -65,7 +65,7 @@ public:
     QString getFullyQualifiedName(clang::NamedDecl const *nd) const;
     QString getClassName(clang::NamedDecl const *nd) const;
 
-    void setupCXXClass(Class *c, clang::CXXRecordDecl const *decl) const;
+    void setupCXXClass(Class *c, clang::CXXRecordDecl *decl) const;
     void setupCXXMethod(Class *c, clang::CXXMethodDecl const *decl,
                                            QList<ClangQProperty> const &properties) const;
     void setupCXXCtor(Class *c, clang::CXXConstructorDecl const *decl) const;

@@ -1022,7 +1022,7 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
     c->appendMethod(currentMethod);
 }
 
-void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl const *decl) const {
+void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl *decl) const {
     if(!decl->isCompleteDefinition()) {
         return;
     }
