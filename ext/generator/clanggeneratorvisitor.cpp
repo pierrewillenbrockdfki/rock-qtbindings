@@ -2145,7 +2145,7 @@ void ClangDefaultExpressionVisitor::VisitCallExpr(clang::CallExpr *Call) {
 void ClangDefaultExpressionVisitor::VisitFloatingLiteral(clang::FloatingLiteral *Node) {
   clang::SmallString<16> Str;
   Node->getValue().toString(Str);
-  result += QString::fromStdString(std::string(Str));
+  result += QString::fromStdString(std::string(Str.str()));
   if (Str.find_first_not_of("-0123456789") == clang::StringRef::npos)
     result += "."; // Trailing dot in order to separate from ints.
 

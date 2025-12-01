@@ -184,23 +184,23 @@ class DiagConsumer : public clang::DiagnosticConsumer
         Info.FormatDiagnostic(str);
         switch (DiagLevel) {
         case clang::DiagnosticsEngine::Level::Fatal:
-            qCritical().noquote() << loc << " Fatal: " << QString::fromStdString(std::string(str));
+            qCritical().noquote() << loc << " Fatal: " << QString::fromStdString(std::string(str.str()));
             qFatal("Aborting due to Fatal error");
             break;
         case clang::DiagnosticsEngine::Level::Error:
-            qCritical().noquote() << loc << " Error: " << QString::fromStdString(std::string(str));
+            qCritical().noquote() << loc << " Error: " << QString::fromStdString(std::string(str.str()));
             break;
         case clang::DiagnosticsEngine::Level::Warning:
-            qWarning().noquote() << loc << " Warning: " << QString::fromStdString(std::string(str));
+            qWarning().noquote() << loc << " Warning: " << QString::fromStdString(std::string(str.str()));
             break;
         case clang::DiagnosticsEngine::Level::Remark:
-            qInfo().noquote() << loc << " Remark: " << QString::fromStdString(std::string(str));
+            qInfo().noquote() << loc << " Remark: " << QString::fromStdString(std::string(str.str()));
             break;
         case clang::DiagnosticsEngine::Level::Note:
-            qInfo().noquote() << loc << " Note: " << QString::fromStdString(std::string(str));
+            qInfo().noquote() << loc << " Note: " << QString::fromStdString(std::string(str.str()));
             break;
         case clang::DiagnosticsEngine::Level::Ignored:
-            qDebug().noquote() << loc << " Ignored: " << QString::fromStdString(std::string(str));
+            qDebug().noquote() << loc << " Ignored: " << QString::fromStdString(std::string(str.str()));
             break;
         }
     }
