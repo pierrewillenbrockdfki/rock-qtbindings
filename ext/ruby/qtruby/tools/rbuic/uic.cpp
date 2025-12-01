@@ -76,6 +76,13 @@
   QT_BEGIN_NAMESPACE
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+namespace Qt
+{
+    using ::endl;
+}
+#endif
+
 Uic::Uic(Driver *d)
      : drv(d),
        out(d->output()),

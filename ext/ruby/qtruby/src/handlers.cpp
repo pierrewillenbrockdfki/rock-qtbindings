@@ -81,6 +81,13 @@
 #define HINT_BYTES HINT_BYTE
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+namespace Qt
+{
+    using ::endl;
+}
+#endif
+
 extern "C" {
 extern VALUE set_obj_info(const char * className, smokeruby_object * o);
 extern VALUE qt_internal_module;

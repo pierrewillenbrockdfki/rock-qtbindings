@@ -28,6 +28,13 @@
 #include "globals.h"
 #include "../../options.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+namespace Qt
+{
+    using ::endl;
+}
+#endif
+
 uint qHash(const QVector<int> intList)
 {
     const char *byteArray = (const char*) intList.constData();

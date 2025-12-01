@@ -26,6 +26,13 @@
 #include "globals.h"
 #include "../../options.h"
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+namespace Qt
+{
+    using ::endl;
+}
+#endif
+
 QHash<QString, QString> Util::typeMap;
 QHash<const Method*, const Function*> Util::globalFunctionMap;
 QHash<const Method*, const Field*> Util::fieldAccessors;

@@ -28,6 +28,13 @@
 #include <QtDBus>
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+namespace Qt
+{
+    using ::endl;
+}
+#endif
+
 static bool qtruby_embedded = false;
 
 extern "C" {

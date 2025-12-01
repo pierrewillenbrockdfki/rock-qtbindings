@@ -23,6 +23,13 @@
 
 #include <QtDebug>
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+namespace Qt
+{
+    using ::endl;
+}
+#endif
+
 ClangGeneratorVisitor::ClangGeneratorVisitor(
     clang::ASTContext *context,
     std::shared_ptr< std::vector< QTRangedAnnotation > > AccessSpecAnnotations,
