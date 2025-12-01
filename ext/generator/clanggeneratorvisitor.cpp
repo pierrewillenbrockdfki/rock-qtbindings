@@ -233,9 +233,9 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
     clang::Type const *t = q.getTypePtr();
 
     {
-        std::string dumped;
-        llvm::raw_string_ostream dumpStream(dumped);
-        t->dump(dumpStream, *context);
+        //std::string dumped;
+        //llvm::raw_string_ostream dumpStream(dumped);
+        //t->dump(dumpStream, *context);
         //qDebug().noquote() << "Converting type" << (isVolatile ? "volatile" : "") << (isConst ? "const" : "") <<  "" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
     }
 
@@ -476,9 +476,9 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
     //Type result(tdef, isConst, isVolatile, pointerDepth, isRef);
     //Type result(klass, isConst, isVolatile, pointerDepth, isRef);
 
-    std::string dumped;
-    llvm::raw_string_ostream dumpStream(dumped);
-    t->dump(dumpStream, *context);
+    //std::string dumped;
+    //llvm::raw_string_ostream dumpStream(dumped);
+    //t->dump(dumpStream, *context);
     //qDebug().noquote() << "Converted type" << (isVolatile?"volatile":"") << (isConst?"const":"") <<  "" << Qt::endl << QString::fromStdString(dumpStream.str())
     //<< "to" << Qt::endl << result.toString() << Qt::endl;
 
@@ -552,9 +552,9 @@ bool ClangGeneratorVisitor::VisitAccessSpecDecl(clang::AccessSpecDecl *Declarati
 bool ClangGeneratorVisitor::VisitEnumDecl(clang::EnumDecl *Declaration)
 {
     {
-        std::string dumped;
-        llvm::raw_string_ostream dumpStream(dumped);
-        Declaration->dump(dumpStream);
+        //std::string dumped;
+        //llvm::raw_string_ostream dumpStream(dumped);
+        //Declaration->dump(dumpStream);
         //qDebug().noquote() << "enum:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
     }
     Enum *e;
@@ -632,9 +632,9 @@ void ClangGeneratorVisitor::setupCXXMethod(Class *c, clang::CXXMethodDecl const 
     }
 
     //qDebug() << "method " << declName << returnType->toString() << Qt::endl;
-    std::string dumped;
-    llvm::raw_string_ostream dumpStream(dumped);
-    Declaration->dump(dumpStream);
+    //std::string dumped;
+    //llvm::raw_string_ostream dumpStream(dumped);
+    //Declaration->dump(dumpStream);
     //qDebug().noquote() << QString::fromStdString(dumpStream.str());
 
     //we cannot get back to the AccessSpecDecl from the CXXMethodDecl alone to check if the specifier is a qt signal or slot.
@@ -665,9 +665,9 @@ void ClangGeneratorVisitor::setupCXXMethod(Class *c, clang::CXXMethodDecl const 
             // this parameter has a default value
 
             {
-                std::string dumped;
-                llvm::raw_string_ostream dumpStream(dumped);
-                defaultarg->dump(dumpStream, *context);
+                //std::string dumped;
+                //llvm::raw_string_ostream dumpStream(dumped);
+                //defaultarg->dump(dumpStream, *context);
                 //qDebug().noquote() << "default:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
             }
 
@@ -782,9 +782,9 @@ void ClangGeneratorVisitor::setupCXXCtor(Class *c, clang::CXXConstructorDecl con
             // this parameter has a default value
 
             {
-                std::string dumped;
-                llvm::raw_string_ostream dumpStream(dumped);
-                defaultarg->dump(dumpStream, *context);
+                //std::string dumped;
+                //llvm::raw_string_ostream dumpStream(dumped);
+                //defaultarg->dump(dumpStream, *context);
                 //qDebug().noquote() << "default:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
             }
 
@@ -868,9 +868,9 @@ void ClangGeneratorVisitor::setupCXXDtor(Class *c, clang::CXXDestructorDecl cons
             // this parameter has a default value
 
             {
-                std::string dumped;
-                llvm::raw_string_ostream dumpStream(dumped);
-                defaultarg->dump(dumpStream, *context);
+                //std::string dumped;
+                //llvm::raw_string_ostream dumpStream(dumped);
+                //defaultarg->dump(dumpStream, *context);
                 //qDebug().noquote() << "default:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
             }
 
@@ -944,9 +944,9 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
     }
 
     //qDebug() << "method " << declName << returnType->toString() << Qt::endl;
-    std::string dumped;
-    llvm::raw_string_ostream dumpStream(dumped);
-    Declaration->dump(dumpStream);
+    //std::string dumped;
+    //llvm::raw_string_ostream dumpStream(dumped);
+    //Declaration->dump(dumpStream);
     //qDebug().noquote() << QString::fromStdString(dumpStream.str());
 
     Access clangaccess = Access_public;
@@ -973,9 +973,9 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
             // this parameter has a default value
 
             {
-                std::string dumped;
-                llvm::raw_string_ostream dumpStream(dumped);
-                defaultarg->dump(dumpStream, *context);
+                //std::string dumped;
+                //llvm::raw_string_ostream dumpStream(dumped);
+                //defaultarg->dump(dumpStream, *context);
                 //qDebug().noquote() << "default:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
             }
 
@@ -1156,9 +1156,9 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl const *
         } else if (clang::isa<clang::UsingShadowDecl>(m)) {
             //UsingShadowDecl 0x55e0a0641a40 </usr/include/c++/11/atomic:835:26> col:26 implicit CXXConversion 0x55e0a063af40 'operator int' 'std::__atomic_base<int>::__int_type () const noexcept'
         } else {
-            std::string dumped;
-            llvm::raw_string_ostream dumpStream(dumped);
-            m->dump(dumpStream);
+            //std::string dumped;
+            //llvm::raw_string_ostream dumpStream(dumped);
+            //m->dump(dumpStream);
             //qDebug().noquote() << QString::fromStdString(dumpStream.str()) << Qt::endl;
             qFatal("Conversion func is not a CXXConversionDecl");
         }
@@ -1218,9 +1218,9 @@ bool ClangGeneratorVisitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *Declarat
 
     if(!Declaration->isCompleteDefinition()) {
         //qDebug() << "Skipping class without definition" << QString::fromStdString(Declaration->getName().str()) << Qt::endl;
-        std::string dumped;
-        llvm::raw_string_ostream dumpStream(dumped);
-        Declaration->dump(dumpStream);
+        //std::string dumped;
+        //llvm::raw_string_ostream dumpStream(dumped);
+        //Declaration->dump(dumpStream);
         //qDebug().noquote() << QString::fromStdString(dumpStream.str()) << Qt::endl;
         return true;
     }
@@ -1382,9 +1382,9 @@ bool ClangGeneratorVisitor::VisitCXXConstructorDecl(clang::CXXConstructorDecl *D
                 // this parameter has a default value
 
                 {
-                    std::string dumped;
-                    llvm::raw_string_ostream dumpStream(dumped);
-                    defaultarg->dump(dumpStream, *context);
+                    //std::string dumped;
+                    //llvm::raw_string_ostream dumpStream(dumped);
+                    //defaultarg->dump(dumpStream, *context);
                     //qDebug().noquote() << "default:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
                 }
 
@@ -1476,9 +1476,9 @@ bool ClangGeneratorVisitor::VisitCXXDestructorDecl(clang::CXXDestructorDecl *Dec
                 // this parameter has a default value
 
                 {
-                    std::string dumped;
-                    llvm::raw_string_ostream dumpStream(dumped);
-                    defaultarg->dump(dumpStream, *context);
+                    //std::string dumped;
+                    //llvm::raw_string_ostream dumpStream(dumped);
+                    //defaultarg->dump(dumpStream, *context);
                     //qDebug().noquote() << "default:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
                 }
 
@@ -1563,9 +1563,9 @@ bool ClangGeneratorVisitor::VisitCXXConversionDecl(clang::CXXConversionDecl *Dec
         }
 
         //qDebug() << "method " << declName << returnType->toString() << Qt::endl;
-        std::string dumped;
-        llvm::raw_string_ostream dumpStream(dumped);
-        Declaration->dump(dumpStream);
+        //std::string dumped;
+        //llvm::raw_string_ostream dumpStream(dumped);
+        //Declaration->dump(dumpStream);
         //qDebug().noquote() << QString::fromStdString(dumpStream.str());
 
         Access clangaccess = Access_public;
@@ -1595,9 +1595,9 @@ bool ClangGeneratorVisitor::VisitCXXConversionDecl(clang::CXXConversionDecl *Dec
                 // this parameter has a default value
 
                 {
-                    std::string dumped;
-                    llvm::raw_string_ostream dumpStream(dumped);
-                    defaultarg->dump(dumpStream, *context);
+                    //std::string dumped;
+                    //llvm::raw_string_ostream dumpStream(dumped);
+                    //defaultarg->dump(dumpStream, *context);
                     //qDebug().noquote() << "default:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
                 }
 
@@ -1697,9 +1697,9 @@ bool ClangGeneratorVisitor::VisitCXXMethodDecl(clang::CXXMethodDecl *Declaration
         }
 
         //qDebug() << "method " << declName << returnType->toString() << Qt::endl;
-        std::string dumped;
-        llvm::raw_string_ostream dumpStream(dumped);
-        Declaration->dump(dumpStream);
+        //std::string dumped;
+        //llvm::raw_string_ostream dumpStream(dumped);
+        //Declaration->dump(dumpStream);
         //qDebug().noquote() << QString::fromStdString(dumpStream.str());
 
         //we cannot get back to the AccessSpecDecl from the CXXMethodDecl alone to check if the specifier is a qt signal or slot.
@@ -1733,9 +1733,9 @@ bool ClangGeneratorVisitor::VisitCXXMethodDecl(clang::CXXMethodDecl *Declaration
                 // this parameter has a default value
 
                 {
-                    std::string dumped;
-                    llvm::raw_string_ostream dumpStream(dumped);
-                    defaultarg->dump(dumpStream, *context);
+                    //std::string dumped;
+                    //llvm::raw_string_ostream dumpStream(dumped);
+                    //defaultarg->dump(dumpStream, *context);
                     //qDebug().noquote() << "default:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
                 }
 
@@ -1823,9 +1823,9 @@ bool ClangGeneratorVisitor::VisitFunctionDecl(clang::FunctionDecl *Declaration) 
         return true;
 
     //qDebug() << "Function" << declName << Qt::endl;
-    std::string dumped;
-    llvm::raw_string_ostream dumpStream(dumped);
-    Declaration->dump(dumpStream);
+    //std::string dumped;
+    //llvm::raw_string_ostream dumpStream(dumped);
+    //Declaration->dump(dumpStream);
     //qDebug().noquote() << QString::fromStdString(dumpStream.str()) << Qt::endl;
 
     //qDebug() << "inMethod:" << inMethod << "inClass:" << inClass << Qt::endl;
@@ -1857,9 +1857,9 @@ bool ClangGeneratorVisitor::VisitFunctionDecl(clang::FunctionDecl *Declaration) 
                     // this parameter has a default value
 
                     {
-                        std::string dumped;
-                        llvm::raw_string_ostream dumpStream(dumped);
-                        defaultarg->dump(dumpStream, *context);
+                        //std::string dumped;
+                        //llvm::raw_string_ostream dumpStream(dumped);
+                        //defaultarg->dump(dumpStream, *context);
                         //qDebug().noquote() << "default:" << Qt::endl << QString::fromStdString(dumpStream.str()) << Qt::endl;
                     }
 
