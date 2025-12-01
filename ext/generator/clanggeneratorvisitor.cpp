@@ -2061,7 +2061,11 @@ void ClangDefaultExpressionVisitor::VisitCXXOperatorCallExpr(clang::CXXOperatorC
 }
 
 void ClangDefaultExpressionVisitor::VisitMaterializeTemporaryExpr(clang::MaterializeTemporaryExpr *Node) {
+#if LLVM_VERSION_MAJOR < 10
+    Visit(Node->GetTemporaryExpr());
+#else
     Visit(Node->getSubExpr());
+#endif
 }
 
 void ClangDefaultExpressionVisitor::VisitCXXBindTemporaryExpr(clang::CXXBindTemporaryExpr *Node) {
