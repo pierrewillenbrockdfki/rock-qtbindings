@@ -30,6 +30,25 @@ namespace Qt
 }
 #endif
 
+#if LLVM_VERSION_MAJOR < 10
+static inline bool operator<(const clang::SourceLocation &LHS, const clang::SourceLocation &RHS) {
+	return LHS.getRawEncoding() < RHS.getRawEncoding();
+}
+static inline bool operator>(const clang::SourceLocation &LHS, const clang::SourceLocation &RHS) {
+	return LHS.getRawEncoding() > RHS.getRawEncoding();
+}
+static inline bool operator<=(const clang::SourceLocation &LHS, const clang::SourceLocation &RHS) {
+	return LHS.getRawEncoding() <= RHS.getRawEncoding();
+}
+static inline bool operator>=(const clang::SourceLocation &LHS, const clang::SourceLocation &RHS) {
+	return LHS.getRawEncoding() >= RHS.getRawEncoding();
+}
+
+static bool fullyContains(const clang::SourceRange &outer, const clang::SourceRange &inner) {
+	return outer.getBegin() <= inner.getBegin() && outer.getEnd() >= inner.getEnd();
+}
+#endif
+
 ClangGeneratorVisitor::ClangGeneratorVisitor(
     clang::ASTContext *context,
     std::shared_ptr< std::vector< QTRangedAnnotation > > AccessSpecAnnotations,
@@ -534,7 +553,13 @@ bool ClangGeneratorVisitor::VisitAccessSpecDecl(clang::AccessSpecDecl *Declarati
     //we check if any of our annotations are between here.
     auto range = Declaration->getSourceRange();//this is from getAccessSpecifierLoc to getColonLoc
     for(auto &anno : *m_AccessSpecAnnotations) {
-        if(range.fullyContains(anno.Range)) {
+        if(
+#if LLVM_VERSION_MAJOR < 10
+          fullyContains(range, anno.Range)
+#else
+          range.fullyContains(anno.Range)
+#endif
+        ) {
             if(anno.Type == "qt_signal") {
                 scopes.top().inSignals = true;
                 ParserOptions::resolveTypedefs = false;
@@ -1126,7 +1151,13 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl *decl) 
     QList<ClangQProperty> properties;
     auto range = decl->getSourceRange();
     for(auto &prop : *m_PropertyAnnotations) {
-        if(fullyContains(range, prop.Range)) {
+        if(
+#if LLVM_VERSION_MAJOR < 10
+          fullyContains(range, prop.Range)
+#else
+          range.fullyContains(prop.Range)
+#endif
+	) {
             //its one of our properties.
             // this monster only matches "type name READ getMethod WRITE setMethod"
             static QRegExp regexp("^([\\w:<>\\*]+)\\s+(\\w+)\\s+READ\\s+(\\w+)(\\s+WRITE\\s+\\w+)?");
@@ -1261,7 +1292,13 @@ bool ClangGeneratorVisitor::TraverseCXXRecordDecl(clang::CXXRecordDecl *Declarat
 
     auto range = Declaration->getSourceRange();
     for(auto &prop : *m_PropertyAnnotations) {
-        if(range.fullyContains(prop.Range)) {
+        if(
+#if LLVM_VERSION_MAJOR < 10
+          fullyContains(range, prop.Range)
+#else
+          range.fullyContains(prop.Range)
+#endif
+	) {
             //its one of our properties.
             // this monster only matches "type name READ getMethod WRITE setMethod"
             static QRegExp regexp("^([\\w:<>\\*]+)\\s+(\\w+)\\s+READ\\s+(\\w+)(\\s+WRITE\\s+\\w+)?");
