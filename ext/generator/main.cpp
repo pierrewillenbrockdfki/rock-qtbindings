@@ -448,8 +448,6 @@ int main(int argc, char **argv)
             QByteArray absfile_path = file.absoluteFilePath().toLocal8Bit();
             ClangArgs->push_back(absfile_path.data());
 
-            clang::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = llvm::vfs::createPhysicalFileSystem();
-
             clang::SmallVector<clang::StoredDiagnostic, 4> StoredDiagnostics;
 
             std::shared_ptr<clang::CompilerInvocation> CI;
@@ -526,6 +524,7 @@ int main(int argc, char **argv)
             }
             CI->getFrontendOpts().SkipFunctionBodies = false;
 
+            clang::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = llvm::vfs::getRealFileSystem();
             auto FileMgr = new clang::FileManager(CI->getFileSystemOpts(), VFS);
 
             auto Clang = std::make_unique<clang::CompilerInstance>();
