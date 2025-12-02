@@ -45,6 +45,8 @@
 #include "options.h"
 #include "config.h"
 
+#include "compiletime_settings.inc"
+
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 namespace Qt
 {
@@ -227,27 +229,6 @@ static void showUsage()
     "    -h shows this message" << std::endl;
 }
 
-static std::string getClangResourcesPath()
-{
-    static std::string foundPath;
-    if(foundPath.empty()) {
-        FILE *f = popen("clang -print-resource-dir", "r");
-        char buffer[256];
-        int res = fread(buffer, 1, 255, f);
-        pclose(f);
-        if (res <= 0) {
-            return std::string();
-        }
-        buffer[res] = 0;
-        if (buffer[res - 1] == '\n') {
-            buffer[res - 1] = 0;
-            res--;
-        }
-        foundPath = buffer;
-    }
-    return foundPath;
-}
-
 int main(int argc, char **argv)
 {
     if (argc == 1) {
@@ -414,7 +395,7 @@ int main(int argc, char **argv)
         clangIncludeOpts.emplace_back(std::string("-I")+id.absolutePath().toStdString());
         clangIncludeDirs.emplace_back(id.absolutePath().toStdString());
     }
-    std::string clangResourceDirInclude = getClangResourcesPath() + "/include";
+    std::string clangResourceDirInclude = std::string(COMPILETIME_CLANG_RESOURCEPATH) + "/include";
 
     Q_FOREACH (QFileInfo file, ParserOptions::headerList) {
         qDebug() << "parsing" << file.absoluteFilePath();
@@ -459,7 +440,9 @@ int main(int argc, char **argv)
 
             ClangArgs->push_back("-fno-spell-checking");
             ClangArgs->push_back("-fparse-all-comments");
-            ClangArgs->push_back("-std=c++17");
+            for(char const **elem = COMPILETIME_CLANG_ARGS; *elem; elem++) {
+                ClangArgs->push_back(*elem);
+            }
             ClangArgs->push_back("-x");
             ClangArgs->push_back("c++");
             QByteArray absfile_path = file.absoluteFilePath().toLocal8Bit();
@@ -523,19 +506,15 @@ int main(int argc, char **argv)
 
             auto &hsi = CI->getHeaderSearchOpts();
             // Override the resources path.
-            hsi.ResourceDir = getClangResourcesPath();
+            hsi.ResourceDir = COMPILETIME_CLANG_RESOURCEPATH;
 
             for (auto &id : clangIncludeDirs) {
                 hsi.AddPath(id, clang::frontend::IncludeDirGroup::After, false, false);
             }
-            //TODO this is awfully hardcoded, should be coming from clang itself...
-            hsi.AddPath("/usr/include/c++/11", clang::frontend::IncludeDirGroup::System, false, true);
-            hsi.AddPath("/usr/include/x86_64-linux-gnu/c++/11", clang::frontend::IncludeDirGroup::System, false, true);
-            hsi.AddPath("/usr/include/c++/11/backward", clang::frontend::IncludeDirGroup::System, false, true);
-            hsi.AddPath(clangResourceDirInclude, clang::frontend::IncludeDirGroup::System, false, true);
-            hsi.AddPath("/usr/include/x86_64-linux-gnu", clang::frontend::IncludeDirGroup::System, false, true);
-            hsi.AddPath("/usr/include", clang::frontend::IncludeDirGroup::System, false, true);
 
+            for(char const **elem = COMPILETIME_CLANG_INCLUDES; *elem; elem++) {
+                hsi.AddPath(*elem, clang::frontend::IncludeDirGroup::System, false, true);
+            }
             CI->getFrontendOpts().SkipFunctionBodies = false;
 
             auto FileMgr = new clang::FileManager(CI->getFileSystemOpts(), VFS);
