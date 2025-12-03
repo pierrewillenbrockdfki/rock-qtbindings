@@ -551,11 +551,11 @@ int main(int argc, char **argv)
             }
 #endif
 
-            auto SourceMgr = llvm::makeIntrusiveRefCnt<clang::SourceManager>(
+            auto SourceMgr = new clang::SourceManager(
                                  *Diags, *FileMgr, true);
 
             // Create the source manager.
-            Clang->setSourceManager(SourceMgr.get());
+            Clang->setSourceManager(SourceMgr);
 
             std::unique_ptr<TopLevelDeclTrackerAction> Act(
                 new TopLevelDeclTrackerAction());
