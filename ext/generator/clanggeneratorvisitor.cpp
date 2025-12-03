@@ -2290,8 +2290,12 @@ void ClangDefaultExpressionVisitor::VisitFloatingLiteral(clang::FloatingLiteral 
   // Emit suffixes.  Float literals are always a builtin float type.
   switch (Node->getType()->castAs<clang::BuiltinType>()->getKind()) {
   default: llvm_unreachable("Unexpected type for float literal!");
-  case clang::BuiltinType::Half:       break; // FIXME: suffix?
-  case clang::BuiltinType::Ibm128:     break; // FIXME: No suffix for ibm128 literal
+  case clang::BuiltinType::Half:       break;
+#if LLVM_VERSION_MAJOR < 14
+#else
+  // not available before llvm-14
+  case clang::BuiltinType::Ibm128:     break;
+#endif
   case clang::BuiltinType::Double:     break; // no suffix.
   case clang::BuiltinType::Float16:    result += "F16"; break;
   case clang::BuiltinType::Float:      result += "F"; break;
