@@ -2192,10 +2192,77 @@ void ClangDefaultExpressionVisitor::VisitCXXBoolLiteralExpr(clang::CXXBoolLitera
 }
 
 void ClangDefaultExpressionVisitor::VisitCharacterLiteral(clang::CharacterLiteral *Node) {
+#if LLVM_VERSION_MAJOR < 13
+	unsigned value = Node->getValue();
+
+	switch (Node->getKind()) {
+		case clang::CharacterLiteral::Ascii:
+			break; // no prefix.
+		case clang::CharacterLiteral::Wide:
+			result += 'L';
+			break;
+		case clang::CharacterLiteral::UTF8:
+			result += "u8";
+			break;
+		case clang::CharacterLiteral::UTF16:
+			result += 'u';
+			break;
+		case clang::CharacterLiteral::UTF32:
+			result += 'U';
+			break;
+	}
+
+  switch (value) {
+  case '\\':
+    result += "'\\\\'";
+    break;
+  case '\'':
+    result += "'\\''";
+    break;
+  case '\a':
+    result += "'\\a'";
+    break;
+  case '\b':
+    result += "'\\b'";
+    break;
+  // Nonstandard escape sequence.
+  /*case '\e':
+    result += "'\\e'";
+    break;*/
+  case '\f':
+    result += "'\\f'";
+    break;
+  case '\n':
+    result += "'\\n'";
+    break;
+  case '\r':
+    result += "'\\r'";
+    break;
+  case '\t':
+    result += "'\\t'";
+    break;
+  case '\v':
+    result += "'\\v'";
+    break;
+  default:
+    if ((value & ~0xFFu) == ~0xFFu && Node->getKind() == clang::CharacterLiteral::Ascii)
+      value &= 0xFFu;
+    if (value < 256 && clang::isPrintable((unsigned char)value))
+      result += QString("'") + (char)value + QString("'");
+    else if (value < 256)
+      result += QString("'\\x%1'").arg(value, 2, QChar('0'));
+    else if (value <= 0xFFFF)
+      result += QString("'\\u%1'").arg(value, 4, QChar('0'));
+    else
+      result += QString("'\\U%1'").arg(value, 8, QChar('0'));;
+  }
+#else
+    //not available up to llvm-12
     std::string dumped;
     llvm::raw_string_ostream dumpStream(dumped);
     clang::CharacterLiteral::print(Node->getValue(), Node->getKind(), dumpStream);
     result += QString::fromStdString(dumpStream.str());
+#endif
 }
 
 void ClangDefaultExpressionVisitor::VisitCallExpr(clang::CallExpr *Call) {
