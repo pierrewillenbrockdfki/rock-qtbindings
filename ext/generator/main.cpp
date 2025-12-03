@@ -607,20 +607,10 @@ int main(int argc, char **argv)
             Act->EndSourceFile();
         }
 
-
-
         // TODO: improve 'header => class' association
-        //GeneratorVisitor visitor(&session, file.fileName());
-        //visitor.visit(ast);
         
         if (!logErrors)
             continue;
-        /*
-        Q_FOREACH (const Problem* p, c.problems()) {
-            logOut << file.fileName() << ": " << p->file << "(" << p->position.line << ", " << p->position.column << "): "
-                   << p->description << "\n";
-        }
-        */
     }
     
     log.close();
