@@ -455,8 +455,14 @@ int main(int argc, char **argv)
             std::shared_ptr<clang::CompilerInvocation> CI;
 
             CI = std::make_shared<clang::CompilerInvocation>();
+#if LLVM_VERSION_MAJOR < 10
+            clang::CompilerInvocation::CreateFromArgs(*CI,
+                    &*ClangArgs->begin(), &*ClangArgs->end(),
+                    *Diags);
+#else
             clang::CompilerInvocation::CreateFromArgs(*CI, *ClangArgs,
                     *Diags);
+#endif
 
             clang::PreprocessorOptions &PPOpts = CI->getPreprocessorOpts();
             PPOpts.RemappedFilesKeepOriginalName = true;
