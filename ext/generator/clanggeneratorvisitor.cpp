@@ -93,7 +93,12 @@ QString ClangGeneratorVisitor::getFullyQualifiedName(clang::NamedDecl const *nd)
         for (auto &ta : tal.asArray()) {
             std::string dumped;
             llvm::raw_string_ostream dumpStream(dumped);
+#if LLVM_VERSION_MAJOR < 13
+            ta.print(context->getPrintingPolicy(), dumpStream);
+#else
+            //third parameter does not exist before llvm-13
             ta.print(context->getPrintingPolicy(), dumpStream, false);
+#endif
             if (!first) {
                 fqn += ",";
             }
@@ -117,7 +122,12 @@ QString ClangGeneratorVisitor::getClassName(clang::NamedDecl const *nd) const {
         for (auto &ta : tal.asArray()) {
             std::string dumped;
             llvm::raw_string_ostream dumpStream(dumped);
+#if LLVM_VERSION_MAJOR < 13
+            ta.print(context->getPrintingPolicy(), dumpStream);
+#else
+            //third parameter does not exist before llvm-13
             ta.print(context->getPrintingPolicy(), dumpStream, false);
+#endif
             if (!first) {
                 name += ",";
             }
