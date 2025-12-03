@@ -555,6 +555,8 @@ int main(int argc, char **argv)
             std::unique_ptr<TopLevelDeclTrackerAction> Act(
                 new TopLevelDeclTrackerAction());
 
+            Act->PrepareToExecute(*Clang);
+
             if (!Act->BeginSourceFile(*Clang, Clang->getFrontendOpts().Inputs[0])) {
                 qDebug() << "Act->BeginSourceFile" << Qt::endl;
                 return 1;
