@@ -540,10 +540,16 @@ int main(int argc, char **argv)
             Clang->setDiagnostics(Diags.get());
 
             // Create the target instance.
+#if LLVM_VERSION_MAJOR < 13
+            Clang->setTarget(clang::TargetInfo::CreateTargetInfo(*Diags,
+                                         CI->TargetOpts));
+#else
+            //createTarget does not exist for llvm-9, llvm-10
             if (!Clang->createTarget()) {
                 qDebug() << "Could not create Clang target" << Qt::endl;
                 return 1;
             }
+#endif
 
             auto SourceMgr = llvm::makeIntrusiveRefCnt<clang::SourceManager>(
                                  *Diags, *FileMgr, true);
