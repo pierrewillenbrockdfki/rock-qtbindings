@@ -462,7 +462,10 @@ int main(int argc, char **argv)
             PPOpts.RemappedFilesKeepOriginalName = true;
             PPOpts.AllowPCHWithCompilerErrors = true;
             PPOpts.SingleFileParseMode = false;
+#if LLVM_VERSION_MAJOR < 10
+#else
             PPOpts.RetainExcludedConditionalBlocks = false;
+#endif
             for(auto &d : clangMacroDef) {
                 PPOpts.addMacroDef(d);
             }
