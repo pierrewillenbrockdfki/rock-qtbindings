@@ -444,6 +444,9 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
                 qFatal("Type retrieved from registry show incorrect toString");
             }
         }
+#if LLVM_VERSION_MAJOR < 14
+#else
+        //clang::UsingType does not exist before llvm-14
     } else if(clang::isa<clang::UsingType>(t)) {
         auto decl = t->getAs<clang::UsingType>()->getFoundDecl();
         QString name = QString::fromStdString(decl->getQualifiedNameAsString());
@@ -462,6 +465,7 @@ Type ClangGeneratorVisitor::makeTypeFromQualType(clang::QualType const &q) const
         if (types.contains(result.toString())) {
             //qDebug() << "Type" << result.toString() << "maps to" << types[result.toString()] << types[result.toString()]->toString() << Qt::endl;
         }
+#endif
     } else if(clang::isa<clang::ElaboratedType>(t)) {
         result = makeTypeFromQualType(t->getAs<clang::ElaboratedType>()->getNamedType());
         result.setIsConst(isConst);
