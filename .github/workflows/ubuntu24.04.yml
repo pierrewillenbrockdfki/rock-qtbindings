@@ -1,4 +1,4 @@
-name: Ruby
+name: Ubuntu-24.04, Ruby-3.2
 
 on: [push]
 
