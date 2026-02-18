@@ -231,7 +231,7 @@ module Qt5
       classid = nil
       loop do
         classid = Qt5::Internal::find_pclassid(klass.name)
-        break if classid.index
+        break if classid.index != 0
 
         klass = klass.superclass
         if klass.nil?
@@ -3881,7 +3881,7 @@ class Module
     classid = Qt5::Internal::ModuleIndex.new(0, 0)
     loop do
       classid = Qt5::Internal::find_pclassid(klass.name)
-      break if classid.index
+      break if classid.index != 0
 
       klass = klass.superclass
       if klass.nil?
