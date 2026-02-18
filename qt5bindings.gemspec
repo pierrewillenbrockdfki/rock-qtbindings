@@ -12,7 +12,7 @@ spec = Gem::Specification.new do |s|
   s.require_path = 'lib'
   s.files = Dir['lib/**/*', 'bin/**/*', 'examples/**/*', 'ext/**/*', '*.txt', 'extconf.rb', '*.gemspec', 'Rakefile'].to_a
   s.extensions = ['extconf.rb']
-  s.executables = ['smokeapi', 'smokedeptool', 'rbrcc5', 'rbuic5', 'rbqtapi']
+  s.executables = ['smoke5api', 'smoke5deptool', 'rbrcc5', 'rbuic5', 'rbqt5api']
   s.description = 'qt5bindings provides ruby bindings to QT5.x. It is derived from the kdebindings project.'
   s.licenses = ['LGPL-2.1']
 end
