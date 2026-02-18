@@ -2717,7 +2717,9 @@ module Qt5
             (?:const\ )?
             (?:
                 QStringList[\*&]?|
-                QValueList<int>[\*&]?|
+                QValueList<.*>[\*&]?|
+                QList<.*>[\*&]?|
+                QVector<.*>[\*&]?|
                 QRgb\*|
                 char\*\*
             )
@@ -2830,7 +2832,9 @@ module Qt5
             (?:const\ )?
             (?:
                 QStringList[\*&]?|
-                QValueList<int>[\*&]?|
+                QValueList<.*>[\*&]?|
+                QList<.*>[\*&]?|
+                QVector<.*>[\*&]?|
                 QRgb\*|
                 char\*\*
             )

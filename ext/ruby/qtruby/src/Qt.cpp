@@ -1356,6 +1356,8 @@ value_to_type_flag(VALUE ruby_value)
 		r = "s";
 	else if(ruby_value == Qtrue || ruby_value == Qfalse || qstrcmp(classname, "Qt5::Boolean") == 0)
 		r = "B";
+	else if(TYPE(ruby_value) == T_ARRAY)
+		r = "a";
 	else if (qstrcmp(classname, "Qt5::Enum") == 0) {
 		VALUE temp = rb_funcall(qt_internal_module, rb_intern("get_qenum_type"), 1, ruby_value);
 		r = StringValuePtr(temp);

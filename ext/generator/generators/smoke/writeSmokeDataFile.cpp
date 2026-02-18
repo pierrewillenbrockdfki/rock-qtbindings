@@ -151,7 +151,7 @@ QString SmokeDataFile::getTypeFlags(const Type *t, int *classIdx)
 
     QString flags = "0";
     if (Options::voidpTypes.contains(t->name())) {
-        // support some of the weird quirks the kalyptus code has
+        // Mostly used for marking types using special marshallers
         flags += "|Smoke::t_voidp";
     } else if (t->getClass()) {
         if (t->getClass()->isTemplate()) {
