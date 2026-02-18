@@ -2624,7 +2624,7 @@ module Qt5
       ruby_classname2.sub!(/</,"Of")
       ruby_classname2.sub!(/>/,"")
       ruby_classname2.sub!(/,/,"And")
-      ruby_classname2.sub!(/ \*/,"Ptr")
+      ruby_classname2.sub!(/ ?\*/,"Ptr")
       puts "Normalized #{classname} to #{ruby_classname} then #{ruby_classname2}" if debug_level >= DebugLevel::High
       ruby_classname2
     end
