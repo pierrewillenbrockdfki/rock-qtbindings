@@ -1248,7 +1248,7 @@ qobject_metaobject(VALUE self)
 													o->smoke->idClass("QMetaObject").index,
 													meta );
 
-	obj = set_obj_info("Qt::MetaObject", m);
+	obj = set_obj_info("Qt5::MetaObject", m);
 	return obj;
 }
 
