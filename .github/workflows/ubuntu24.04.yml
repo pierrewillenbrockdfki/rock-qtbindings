@@ -12,8 +12,8 @@ jobs:
       with:
         ruby-version: 3.2
     - name: Install Package Dependencies
-      uses: mstksg/get-package@v1
-      with:
-        apt-get: ruby-dev qtbase5-dev libqt5opengl5-dev qttools5-dev qtscript5-dev libqt5svg5-dev libqt5webkit5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtmultimedia5-dev qtdeclarative5-dev libclang-dev clang
+      run: |
+        sudo apt-get update
+        sudo apt-get install ruby-dev qtbase5-dev libqt5opengl5-dev qttools5-dev qtscript5-dev libqt5svg5-dev libqt5webkit5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtmultimedia5-dev qtdeclarative5-dev libclang-dev clang
     - name: Build and test with Rake
       run: rake
