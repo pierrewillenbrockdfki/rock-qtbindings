@@ -315,6 +315,7 @@
         <class>QFlags&lt;QUrl::ComponentFormattingOption&gt;</class>
         <class>QFlags&lt;QUrl::UserInputResolutionOption&gt;</class>
 
+        <class>QStringList</class>
         <class>QList&lt;QObject*&gt;</class>
         <class>QList&lt;QModelIndex&gt;</class>
         <class>QList&lt;QFileInfo&gt;</class>
