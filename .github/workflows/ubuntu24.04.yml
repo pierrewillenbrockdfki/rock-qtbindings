@@ -14,6 +14,6 @@ jobs:
     - name: Install Package Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install ruby-dev qtbase5-dev libqt5opengl5-dev qttools5-dev qtscript5-dev libqt5svg5-dev libqt5webkit5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtmultimedia5-dev qtdeclarative5-dev libclang-dev clang
+        sudo apt-get install ruby-dev qtbase5-dev libqt5opengl5-dev qttools5-dev qtscript5-dev libqt5svg5-dev libqt5webkit5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev qtmultimedia5-dev qtdeclarative5-dev libclang-18-dev clang-18
     - name: Build and test with Rake
       run: rake
