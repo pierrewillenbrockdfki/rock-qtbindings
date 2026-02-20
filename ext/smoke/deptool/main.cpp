@@ -78,7 +78,7 @@ int main(int argc, char** argv)
         for (short i = 1; i <= iter.key()->numClasses; i++) {
             Smoke::Class *klass = iter.key()->classes + i;
 
-            for (short* idx = iter.key()->inheritanceList + klass->parents; *idx; idx++) {
+            for (Smoke::Index* idx = iter.key()->inheritanceList + klass->parents; *idx; idx++) {
                 Smoke::Class *parentClass = iter.key()->classes + *idx;
                 if (!parentClass->external)
                     continue;
