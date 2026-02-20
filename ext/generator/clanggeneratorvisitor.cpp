@@ -1070,6 +1070,87 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
     c->appendMethod(currentMethod);
 }
 
+void ClangGeneratorVisitor::collectCXXMethods(Class *c, clang::CXXRecordDecl *decl,
+                        QList<ClangQProperty> const &properties, bool is_base) const {
+    QList<Method> initial_methods;
+    if(is_base) {
+        initial_methods = c->methods();
+    }
+
+    for(auto m : decl->methods()) {
+
+        if(is_base) {
+            // check if the method is already contained by name
+            // if so, it is shadowed by that already existing name
+            QString methodname = QString::fromStdString(m->getNameAsString());
+            if(methodname == "operator=") {
+                //there is always an implicit operator= shadowing any from the base class
+                continue;
+            }
+            bool found = false;
+            for(auto &m2 : initial_methods) {
+                if(m2.name() == methodname) {
+                    found = true;
+                    break;
+                }
+            }
+            if(found) {
+                continue;
+            }
+        }
+
+        setupCXXMethod(c, m, properties);
+    }
+    for(auto b : decl->bases()) {
+        if(b.getAccessSpecifier() == clang::AS_private) {
+            continue;
+        }
+        auto t = b.getType().getTypePtr();
+        if(!t) {
+            continue;
+        }
+        auto rt = t->getAs<clang::RecordType>();
+        if(!rt) {
+            continue;
+        }
+        auto bdecl = rt->getDecl();
+        if(!bdecl) {
+            continue;
+        }
+        if (!clang::isa<clang::CXXRecordDecl>(bdecl)) {
+            continue;
+        }
+        if (!clang::cast<clang::CXXRecordDecl>(bdecl)->getDefinition()) {
+            continue;
+        }
+        collectCXXMethods(c, clang::cast<clang::CXXRecordDecl>(bdecl)->getDefinition(), properties, true);
+    }
+    for(auto b : decl->vbases()) {
+        if(b.getAccessSpecifier() == clang::AS_private) {
+            continue;
+        }
+        auto t = b.getType().getTypePtr();
+        if(!t) {
+            continue;
+        }
+        auto rt = t->getAs<clang::RecordType>();
+        if(!rt) {
+            continue;
+        }
+        auto bdecl = rt->getDecl();
+        if(!bdecl) {
+            continue;
+        }
+        if (!clang::isa<clang::CXXRecordDecl>(bdecl)) {
+            continue;
+        }
+        if (!clang::cast<clang::CXXRecordDecl>(bdecl)->getDefinition()) {
+            continue;
+        }
+        collectCXXMethods(c, clang::cast<clang::CXXRecordDecl>(bdecl)->getDefinition(), properties, true);
+    }
+}
+
 void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl *decl) const {
     if(!decl->isCompleteDefinition()) {
         return;
@@ -1193,9 +1274,8 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl *decl) 
         }
     }
 
-    for(auto m : decl->methods()) {
-        setupCXXMethod(c, m, properties);
-    }
+    collectCXXMethods(c, decl, properties, false);
+
     for(auto m : decl->ctors()) {
         setupCXXCtor(c, m);
     }

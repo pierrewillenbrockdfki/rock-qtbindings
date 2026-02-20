@@ -66,6 +66,8 @@ public:
     QString getClassName(clang::NamedDecl const *nd) const;
 
     void setupCXXClass(Class *c, clang::CXXRecordDecl *decl) const;
+    void collectCXXMethods(Class *c, clang::CXXRecordDecl *decl,
+                           QList<ClangQProperty> const &properties, bool is_base) const;
     void setupCXXMethod(Class *c, clang::CXXMethodDecl const *decl,
                                            QList<ClangQProperty> const &properties) const;
     void setupCXXCtor(Class *c, clang::CXXConstructorDecl const *decl) const;
