@@ -44,6 +44,7 @@
         <signature>E2 operator int\(\)</signature>
         <signature>E2 operator QFlags&lt;E2&gt;\(\)</signature>
         <signature>E2 operator QFlags&lt;E1&gt;\(\)</signature>
+        <signature>QSet&lt;QList&lt;QVariant&gt; &gt; QSignalSpy::toSet\(\) const</signature>
     </exclude>
     <functions>
         <name>^QTest::.*</name>
