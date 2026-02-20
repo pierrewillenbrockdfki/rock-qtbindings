@@ -6,17 +6,27 @@ find_package(Clang REQUIRED)
 find_package(LLVM REQUIRED)
 
 execute_process(COMMAND clang -print-resource-dir
-    OUTPUT_VARIABLE CLANG_RESOURCDIR
+    OUTPUT_VARIABLE CLANG_RESOURCEDIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE CLANG_RESOURCEDIR_RESULT
     )
+
+if(NOT "${CLANG_RESOURCEDIR_RESULT}" EQUAL 0)
+    message(FATAL_ERROR "clang -print-resource-dir returned with an error code.")
+endif()
 
 execute_process(COMMAND clang++ -E -v -x c++ -
     OUTPUT_VARIABLE CLANG_VERBOSE_OUTPUT
     ERROR_VARIABLE CLANG_VERBOSE_ERROR
     INPUT_FILE /dev/null
+    RESULT_VARIABLE CLANG_VERBOSE_RESULT
     )
 
-string(REGEX MATCHALL "[^\n\r]+" CLANG_VERBOSE_ERROR_LINES ${CLANG_VERBOSE_ERROR})
+if(NOT "${CLANG_VERBOSE_RESULT}" EQUAL 0)
+    message(FATAL_ERROR "clang++ -E -v -x c++ returned with an error code.")
+endif()
+
+string(REGEX MATCHALL "[^\n\r]+" CLANG_VERBOSE_ERROR_LINES "${CLANG_VERBOSE_ERROR}")
 set(PARSE_STATE 0)
 set(CLANG_BUILTIN_INCLUDE_DIRS)
 foreach(LINE ${CLANG_VERBOSE_ERROR_LINES})
@@ -42,7 +52,7 @@ set(COMPILETIME_CLANG_INCLUDES, )
 foreach(INCLUDE ${CLANG_BUILTIN_INCLUDE_DIRS})
     set(COMPILETIME_CLANG_INCLUDES "${COMPILETIME_CLANG_INCLUDES}  \"${INCLUDE}\",\n")
 endforeach()
-set(COMPILETIME_CLANG_RESOURCEPATH "\"${CLANG_RESOURCDIR}\"")
+set(COMPILETIME_CLANG_RESOURCEPATH "\"${CLANG_RESOURCEDIR}\"")
 
 configure_file(compiletime_settings.inc.in
     compiletime_settings.inc
