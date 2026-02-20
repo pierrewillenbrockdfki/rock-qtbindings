@@ -5,6 +5,7 @@
 #include <cstring>
 #include <string>
 #include <map>
+#include <stdexcept>
 
 /*
    Copyright (C) 2002, Ashley Winters <qaqortog@nwlink.com>
@@ -83,7 +84,7 @@ public:
 	EnumToLong
     };
 
-    typedef short Index;
+    typedef int Index;
     typedef void (*ClassFn)(Index method, void* obj, Stack args);
     typedef void* (*CastFn)(void* obj, Index from, Index to);
     typedef void (*EnumFn)(EnumOperation, Index, void*&, long&);
@@ -96,11 +97,11 @@ public:
         Index index;
         ModuleIndex() : smoke(0), index(0) {}
         ModuleIndex(Smoke * s, Index i) : smoke(s), index(i) {}
-        
+
         inline bool operator==(const Smoke::ModuleIndex& other) const {
             return index == other.index && smoke == other.smoke;
         }
-        
+
         inline bool operator!=(const Smoke::ModuleIndex& other) const {
             return index != other.index || smoke != other.smoke;
         }
@@ -108,8 +109,8 @@ public:
     /**
      * A ModuleIndex with both fields set to 0.
      */
-    static ModuleIndex NullModuleIndex; 
-    
+    static ModuleIndex NullModuleIndex;
+
     typedef std::map<std::string, ModuleIndex> ClassMap;
     static ClassMap classMap;
 
@@ -181,16 +182,16 @@ public:
     };
 
     enum TypeFlags {
-        // The first 4 bits indicate the TypeId value, i.e. which field
+        // The first 5 bits indicate the TypeId value, i.e. which field
         // of the StackItem union is used.
-        tf_elem = 0x0F,
+        tf_elem = 0x1F,
 
 	// Always only one of the next three flags should be set
-	tf_stack = 0x10, 	// Stored on the stack, 'type'
-	tf_ptr = 0x20,   	// Pointer, 'type*'
-	tf_ref = 0x30,   	// Reference, 'type&'
+	tf_stack = 0x20, 	// Stored on the stack, 'type'
+	tf_ptr = 0x40,   	// Pointer, 'type*'
+	tf_ref = 0x60,   	// Reference, 'type&'
 	// Can | whatever ones of these apply
-	tf_const = 0x40		// const argument
+	tf_const = 0x80		// const argument
     };
     /**
      * One Type entry is one argument type needed by a method.
@@ -204,6 +205,7 @@ public:
 
     // We could just pass everything around using void* (pass-by-reference)
     // I don't want to, though. -aw
+    // TODO This should at some point learn to carry member field/function pointers
     union StackItem {
 	void* s_voidp;
 	bool s_bool;
@@ -217,8 +219,11 @@ public:
 	unsigned long s_ulong;
 	float s_float;
 	double s_double;
-        long s_enum;
-        void* s_class;
+	long s_enum;
+	void* s_class;
+	size_t s_size_t;
+	char16_t s_char16_t;
+	char32_t s_char32_t;
     };
     enum TypeId {
 	t_voidp,
@@ -233,8 +238,11 @@ public:
 	t_ulong,
 	t_float,
 	t_double,
-        t_enum,
-        t_class,
+	t_enum,
+	t_class,
+	t_size_t,
+	t_char16_t,
+	t_char32_t,
 	t_last		// number of pre-defined types
     };
 
@@ -332,15 +340,15 @@ public:
         if (castFn == 0) {
             return ptr;
         }
-        
+
         if (from.smoke == to.smoke) {
             return (*castFn)(ptr, from.index, to.index);
         }
-        
+
         const Smoke::Class &klass = to.smoke->classes[to.index];
         return (*castFn)(ptr, from.index, idClass(klass.className, true).index);
     }
-    
+
     inline void *cast(void *ptr, Index from, Index to) {
     if(!castFn) return ptr;
     return (*castFn)(ptr, from, to);
@@ -516,13 +524,13 @@ public:
     static inline bool isDerivedFrom(const ModuleIndex& classId, const ModuleIndex& baseClassId) {
         return isDerivedFrom(classId.smoke, classId.index, baseClassId.smoke, baseClassId.index);
     }
-    
+
     static inline bool isDerivedFrom(Smoke *smoke, Index classId, Smoke *baseSmoke, Index baseId) {
 	if (!classId || !baseId || !smoke || !baseSmoke)
 	    return false;
 	if (smoke == baseSmoke && classId == baseId)
 	    return true;
-	
+
 	for(Index p = smoke->classes[classId].parents; smoke->inheritanceList[p]; p++) {
 	    Class& cur = smoke->classes[smoke->inheritanceList[p]];
 	    if (cur.external) {
@@ -537,9 +545,9 @@ public:
     }
 
     static inline bool isDerivedFrom(const char *className, const char *baseClassName) {
-    ModuleIndex classId = findClass(className);
-    ModuleIndex baseId = findClass(baseClassName);
-    return isDerivedFrom(classId.smoke, classId.index, baseId.smoke, baseId.index);
+        ModuleIndex classId = findClass(className);
+        ModuleIndex baseId = findClass(baseClassName);
+        return isDerivedFrom(classId.smoke, classId.index, baseId.smoke, baseId.index);
     }
 };
 
@@ -550,8 +558,15 @@ public:
     SmokeBinding(Smoke *s) : smoke(s) {}
     virtual void deleted(Smoke::Index classId, void *obj) = 0;
     virtual bool callMethod(Smoke::Index method, void *obj, Smoke::Stack args, bool isAbstract = false) = 0;
-    virtual char* className(Smoke::Index classId) = 0;
+    virtual const char* className(Smoke::Index classId) = 0;
     virtual ~SmokeBinding() {}
+};
+
+class SmokeAbstractMethodException : public std::runtime_error {
+public:
+SmokeAbstractMethodException( const std::string& what_arg ) : runtime_error(what_arg) {}
+SmokeAbstractMethodException( const char* what_arg ) : runtime_error(what_arg) {}
+SmokeAbstractMethodException( const runtime_error& other ) noexcept  : runtime_error(other) {}
 };
 
 #endif
