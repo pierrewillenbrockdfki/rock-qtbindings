@@ -235,14 +235,14 @@ void SmokeClassFiles::generateMethod(QTextStream& out, const QString& className,
 
 bool SmokeClassFiles::methodUsesMemberPointers(const Method& meth) {
     Type const *rettype = meth.type()->resolveTypedefs();
-    for(unsigned int i = 0; i < rettype->pointerDepth(); i++) {
+    for(int i = 0; i < rettype->pointerDepth(); i++) {
         if (rettype->memberPointerOf(i)) {
             return true;
         }
     }
     for (auto const &param : meth.parameters()) {
         Type const *parmtype = param.type()->resolveTypedefs();
-        for (unsigned int i = 0; i < parmtype->pointerDepth(); i++) {
+        for (int i = 0; i < parmtype->pointerDepth(); i++) {
             if (parmtype->memberPointerOf(i)) {
                 return true;
             }
@@ -252,13 +252,13 @@ bool SmokeClassFiles::methodUsesMemberPointers(const Method& meth) {
 }
 
 bool SmokeClassFiles::methodTypeAccessPossible(const Method &meth) {
-    for(unsigned int i = 0; i < meth.type()->pointerDepth(); i++) {
+    for(int i = 0; i < meth.type()->pointerDepth(); i++) {
         if (Util::typeAccess(meth.type()) == Access_private) {
             return false;
         }
     }
     for (auto const &param : meth.parameters()) {
-        for (unsigned int i = 0; i < param.type()->pointerDepth(); i++) {
+        for (int i = 0; i < param.type()->pointerDepth(); i++) {
             if (Util::typeAccess(param.type()) == Access_private) {
                 return false;
             }
