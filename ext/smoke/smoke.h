@@ -84,7 +84,7 @@ public:
 	EnumToLong
     };
 
-    typedef short Index;
+    typedef int Index;
     typedef void (*ClassFn)(Index method, void* obj, Stack args);
     typedef void* (*CastFn)(void* obj, Index from, Index to);
     typedef void (*EnumFn)(EnumOperation, Index, void*&, long&);
