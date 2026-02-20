@@ -5,6 +5,9 @@ find_package(Qt5 REQUIRED COMPONENTS Core Xml)
 find_package(Clang REQUIRED)
 find_package(LLVM REQUIRED)
 
+message(STATUS "Found Clang ${Clang_DIR}")
+message(STATUS "Found LLVM ${LLVM_VERSION}")
+
 execute_process(COMMAND clang -print-resource-dir
     OUTPUT_VARIABLE CLANG_RESOURCEDIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
