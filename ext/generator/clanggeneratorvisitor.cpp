@@ -652,7 +652,11 @@ void ClangGeneratorVisitor::setupCXXMethod(Class *c, clang::CXXMethodDecl const 
     //methods cannot be explicit. constructors and conversion operators can.
     bool isExplicit = false;
     bool isStatic = Declaration->isStatic();
+#if LLVM_VERSION_MAJOR < 18
     bool isPure = Declaration->isPure();
+#else
+    bool isPure = Declaration->isPureVirtual();
+#endif
 
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
@@ -878,7 +882,11 @@ void ClangGeneratorVisitor::setupCXXCtor(Class *c, clang::CXXConstructorDecl con
 
 void ClangGeneratorVisitor::setupCXXDtor(Class *c, clang::CXXDestructorDecl const *Declaration) const {
     bool isVirtual = Declaration->isVirtual();
+#if LLVM_VERSION_MAJOR < 18
     bool isPure = Declaration->isPure();
+#else
+    bool isPure = Declaration->isPureVirtual();
+#endif
 
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
@@ -965,7 +973,11 @@ void ClangGeneratorVisitor::setupCXXConvFunc(Class *c, clang::CXXConversionDecl 
     bool isVirtual = Declaration->isVirtual();
     bool isExplicit = Declaration->isExplicit();
     bool isStatic = Declaration->isStatic();
+#if LLVM_VERSION_MAJOR < 18
     bool isPure = Declaration->isPure();
+#else
+    bool isPure = Declaration->isPureVirtual();
+#endif
 
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
@@ -1158,6 +1170,7 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl *decl) 
 
     clang::TagDecl::TagKind _kind = decl->getTagKind();
     Class::Kind kind = Class::Kind_Struct;
+#if LLVM_VERSION_MAJOR < 18
     if (_kind == clang::TTK_Class) {
         kind = Class::Kind_Class;
     } else if (_kind == clang::TTK_Struct) {
@@ -1165,6 +1178,15 @@ void ClangGeneratorVisitor::setupCXXClass(Class *c, clang::CXXRecordDecl *decl) 
     } else if (_kind == clang::TTK_Union) {
         kind = Class::Kind_Union;
     }
+#else
+    if (_kind == clang::TagTypeKind::Class) {
+        kind = Class::Kind_Class;
+    } else if (_kind == clang::TagTypeKind::Struct) {
+        kind = Class::Kind_Struct;
+    } else if (_kind == clang::TagTypeKind::Union) {
+        kind = Class::Kind_Union;
+    }
+#endif
 
     //Declaration->getNameAsString(): just the name. std::thread::_State results in _State
     //Declaration->getQualifiedNameAsString(): the qualified name. std::thread::_State results in std::thread::_State
@@ -1570,7 +1592,11 @@ bool ClangGeneratorVisitor::VisitCXXDestructorDecl(clang::CXXDestructorDecl *Dec
     bool isVirtual = Declaration->isVirtual();
     bool isExplicit = false;
     bool isStatic = false;
+#if LLVM_VERSION_MAJOR < 18
     bool isPure = Declaration->isPure();
+#else
+    bool isPure = Declaration->isPureVirtual();
+#endif
 
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
@@ -1673,7 +1699,11 @@ bool ClangGeneratorVisitor::VisitCXXConversionDecl(clang::CXXConversionDecl *Dec
     bool isVirtual = Declaration->isVirtual();
     bool isExplicit = Declaration->isExplicit();
     bool isStatic = Declaration->isStatic();
+#if LLVM_VERSION_MAJOR < 18
     bool isPure = Declaration->isPure();
+#else
+    bool isPure = Declaration->isPureVirtual();
+#endif
 
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
@@ -1807,7 +1837,11 @@ bool ClangGeneratorVisitor::VisitCXXMethodDecl(clang::CXXMethodDecl *Declaration
     //methods cannot be explicit. constructors and conversion operators can.
     bool isExplicit = false;
     bool isStatic = Declaration->isStatic();
+#if LLVM_VERSION_MAJOR < 18
     bool isPure = Declaration->isPure();
+#else
+    bool isPure = Declaration->isPureVirtual();
+#endif
 
     const QString declName = QString::fromStdString(Declaration->getNameAsString());
 
